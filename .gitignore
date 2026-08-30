@@ -1,0 +1,18 @@
+/.quarto/
+/_site
+.DS_Store
+/.luarc.json
+
+**/*.quarto_ipynb
+
+# Build intermediates from the figure pipeline (see AGENTS.md)
+figures/*.aux
+figures/*.log
+figures/*.pdf
+figures/*.xdv
+
+# Working notes kept on the maintainer's machine, never committed
+AGENTS.md
+CLAUDE.md
+STATUS.md
+TASKS.md

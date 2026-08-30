@@ -1,0 +1,14 @@
+---
+title: "Agentic AI Tool Chain"
+---
+
+An opinionated map of the tools that compose an agentic-AI working surface, organized by function.
+
+What role each category of tool plays, and which specific tool to reach for first. Written for data scientists. A snapshot in time, biased toward what the author actually runs; every section makes a pick, names alternatives, and explains why.
+
+::: {.callout-note}
+## This site is being built
+
+The chapters are generated from the guide's markdown source, and the conversion is not finished yet.
+Until it is, the current PDF is the complete document.
+:::

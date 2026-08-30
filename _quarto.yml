@@ -1,0 +1,22 @@
+# Agentic AI Tool Chain as a Quarto website on the dss-theme extension (quarto add IQSS/dss-theme).
+# Chapters are generated from the upstream markdown; see AGENTS.md for the pipeline and the no-drift contract.
+# Nothing executes: the source is prose and pre-built SVG figures.
+project:
+  type: dss-theme
+  output-dir: _site
+  render:
+    - index.qmd
+    - "chapters/*.qmd"
+
+website:
+  title: "Agentic AI Tool Chain"
+  site-url: https://iqss.github.io/dss-agentic-toolchain/
+  repo-url: https://github.com/IQSS/dss-agentic-toolchain
+  page-navigation: true
+  sidebar:
+    style: floating
+    search: true
+    collapse-level: 1
+    contents:
+      - index.qmd
+      # chapters are added here when the content pipeline runs (AGENTS.md)
