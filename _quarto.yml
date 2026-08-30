@@ -10,8 +10,8 @@ project:
 
 website:
   title: "Agentic AI Tool Chain"
-  site-url: https://iqss.github.io/dss-agentic-toolchain/
-  repo-url: https://github.com/IQSS/dss-agentic-toolchain
+  # site-url: set when a public URL exists (Cloudflare Pages, then IQSS)
+  repo-url: https://github.com/stevenworthington/dss-agentic-toolchain
   page-navigation: true
   sidebar:
     style: floating

@@ -1,0 +1,22 @@
+# Build check: render on every push, so a broken source is caught here rather than at publish time.
+# Nothing is published from CI. The repository is a private sandbox; publishing will come from Cloudflare
+# Pages, which builds from the repository itself. If the site later moves to IQSS and GitHub Pages, restore
+# a publish step (quarto-dev/quarto-actions/publish@v2 with target: gh-pages).
+name: Render
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: "1.9.38"
+      - name: Render
+        run: quarto render
