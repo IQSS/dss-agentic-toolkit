@@ -1,0 +1,69 @@
+---
+title: "9. IDE and IDE-Side Agent"
+---
+
+One of the four entry points for driving an agent (per the introduction): you open a project in your editor, and the agent runs inside it with full access to your open files, cursor position, and diagnostics. Two adjacent decisions: the editor itself, and the AI integration that runs inside it. They get separate subsections because the picks are genuinely independent. For `Positron`, `VSCodium`, or `VS Code` users, the agent comes as an extension you choose. For `Cursor` or `Zed` users, the agent is baked into the editor itself, and the IDE-side-agent subsection collapses into the IDE one.
+
+For agentic work specifically, I personally live almost entirely in the terminal: the §10 CLI agents and a multiplexer are where my work happens, and even the occasional file inspection usually stays in the terminal rather than opening the IDE for a glance — `nano` for a config tweak, `micro` for a quick edit or sanity-check of agent output, `bat` for a syntax-highlighted read (all covered in §5). The IDE is worth opening for genuine reading-and-writing sessions, not glances. The pick below reflects what I'd choose if I were running an IDE-first workflow rather than what I open daily today: the doc isn't here to pigeon-hole readers into my current preferences, and the IDE-first entry point is one of the legitimate ways to drive agentic work (per the four-entry-points framing in the introduction).
+
+## IDE
+
+### Role
+
+The IDE is where work becomes readable and editable across many files at once: project search, an integrated terminal, diagnostics, debuggers, the extension ecosystem. What that's *for* splits by the kind of work — which is why this subsection names two picks. For data science it's where `R` sessions attach interactively, `Jupyter` notebooks render, `Quarto` documents preview, and data inspection happens visually (`View()`, the variables pane, plot history); for general and web development it's language servers, refactoring tools, and debuggers across a codebase.
+
+### macOS: Positron or VSCodium
+
+Two picks, split by the kind of work — the same split the two intro workflow diagrams already make. For **R / Python / Quarto data-science work**, `Positron` (from Posit) is the forward-looking choice: built on `Code OSS` (the open-source base of `VS Code`) with `R` and `Python` as primary languages, an integrated Data Explorer that filters and facets more cleanly than `RStudio`'s `View()`, and native `Jupyter` and `Quarto` support. It's multilingual where `RStudio` is R-primary, and Posit positions it as the successor to `RStudio` for new work.
+
+For **general / cross-stack development** (web, TypeScript, plain coding, anything that isn't R or `Python` data analysis), `VSCodium` is the pick. It's the community build of `VS Code` compiled from the same source tree, minus Microsoft's branding and telemetry. It behaves identically to `VS Code` for editing, with one structural difference: its extension view points at `Open VSX` rather than Microsoft's Marketplace. Most of what a data scientist needs is on `Open VSX`: the `Claude Code` and `Codex` agent extensions (§9b), Microsoft's open-licensed `ms-python` Python extension, the `ms-azuretools` Docker tooling, Ruff. The carve-outs are Microsoft's *proprietary* pieces, which are licensed not to run on non-Microsoft builds — chiefly `Pylance` (swap in `basedpyright` + Ruff, both on `Open VSX`) and the Remote-Development extensions (Remote-SSH and Dev Containers on macOS; Remote-WSL on Windows). On macOS none of those costs me anything, so dropping the telemetry is pure upside. On Windows the Remote-WSL gap is exactly why the comparator differs (below).
+
+`Positron` ships its own built-in AI assistant; `VSCodium`, unlike `VS Code`, does *not* bundle `GitHub Copilot` (another Microsoft-proprietary piece). That doesn't matter for this stack, because the part that counts is that both editors host the `Claude Code` and `Codex` extensions (§9b), installed through `Open VSX` or the `Code OSS` extension APIs. So the editor choice doesn't constrain the agent: pick the one that fits the project and run the same agents inside either.
+
+### Ubuntu / Windows (WSL2): Positron or VS Code
+
+The IDE is the GUI host layer (per the second-column note): the editor window runs on the host OS, but the project, extensions, language servers, and integrated terminal all live in Ubuntu. **On Windows**, that means native `VS Code` or `Positron` reaching into the WSL2 Ubuntu through the **Remote - WSL** extension — which is Microsoft-proprietary and won't run on `VSCodium`, so the general-purpose pick flips from `VSCodium` (macOS) back to the official `VS Code` build here. `Positron` is the data-science pick on both platforms, with the same remote story into WSL2. **On bare-metal Linux** there's no WSL2 layer to reach across: run the Linux build of `Positron`, `VSCodium`, or `VS Code` directly, exactly as on macOS, so `VSCodium` is fine again. Either way the editor is a window onto the same Ubuntu environment.
+
+### Alternatives and why not
+
+`VS Code`, Microsoft's official build, is the editor I reach for on macOS only when I need something `VSCodium` can't do: the macOS-relevant Remote-Development extensions (Remote-SSH, Dev Containers) or a Marketplace-only extension such as `Pylance`. It's also the Windows pick, for the Remote-WSL reason (above), since that extension is Windows-only. The trade is Microsoft's telemetry and branding, which is why on macOS it's the fallback rather than the default. Everything else — the extension model, settings, keybindings, the `Claude Code` / `Codex` extensions — is identical, so moving a project between the two is friction-free.
+
+`RStudio` (also from Posit) is what most existing R users live in. It still has a more refined workflow specifically for R package development (Build pane, devtools integration, document/check/install/test as one-click actions), Shiny app development (Run App workflow, integrated viewer, hot reload), and a small set of legacy formats (Sweave, classic R Notebooks). For a project that's primarily R analysis without those concerns, `Positron` is the better forward-looking pick; for active R package development, `RStudio` is still less friction. Where `RStudio` falls short for *this* stack specifically is agents: it has no built-in AI assistant by default and can't host the `Claude Code` or `Codex` extensions, so agentic work runs in a terminal beside it rather than inside the editor — exactly the gap `Positron` and the `VS Code` family (`VSCodium` included) close.
+
+`Cursor` is a `VS Code` fork with the agent baked in. The case for `Cursor` is convenience: there's no extension to manage separately and the agent UI is more tightly integrated. The case against is that `Cursor` is a paid product with a different data model than open-source `VS Code` / `Positron`, and `Cursor`-specific workflows don't translate back cleanly if you decide to leave.
+
+`Zed` is a Rust-written editor by ex-`Atom` team members. Faster than `VS Code` in benchmarks, with collaborative editing built in and native agent integration via ACP (the Agent Client Protocol, the editor↔agent layer covered in §12). `Zed` lists `Claude Code`, `Codex CLI`, `Gemini CLI`, `Goose`, and `opencode` as ACP integrations.
+
+`PyCharm` (from `JetBrains`) is the structured `Python` IDE with deep refactoring, integrated debuggers, and `JetBrains`' own AI Assistant. The Assistant is functional but currently behind `Claude Code` and `Codex` on the agentic side. Smaller extension ecosystem than `VS Code` / `Positron`.
+
+`JupyterLab` + `Jupyter AI` is the notebook-first alternative for `Python` data scientists who live in notebooks rather than scripts. `Jupyter AI` uses ACP and connects mainstream coding agents to the notebook environment. 
+
+### When I'd reconsider
+
+If `Zed`'s ACP integration plus its language-server and `Jupyter` coverage become competitive with `Positron` for data-science work, I'd evaluate it on those grounds. And the day I need Dev Containers or Remote-SSH on macOS (or Remote-WSL on the Windows side), I'd move that project to `VS Code` proper — the one workflow where `VSCodium`'s `Open VSX` boundary is a real wall rather than a cosmetic one. For now, `Positron` is the right IDE-first pick for the data-science niche; `VSCodium` covers the cross-stack cases where `Positron` doesn't fit.
+
+## IDE-side agent
+
+### Role
+
+The IDE-side agent is the AI integration that runs locally inside your editor. It has the editor's full context (open files, cursor position, diagnostics, project structure) at no extra cost, which makes it the right surface for "I'm reading this code and want a quick edit" or "explain this function." "IDE-side" specifically means the agent runs locally inside the editor. Cloud-spawned agents (`Codex` invoked from a GitHub PR comment, `Copilot`'s autonomous-coding-via-GitHub workflows) are a different surface, deferred to §10 and §16. The IDE-side agent is complementary to a CLI agent rather than a replacement: the CLI agent owns multi-file refactors and long-running tasks; the IDE-side agent owns small in-the-moment edits.
+
+One distinction worth drawing sharply: running a CLI agent in the editor's *integrated terminal* is not the same thing as an IDE-side agent. A CLI in the terminal panel shares window pixels with the editor but inherits none of the editor-integrated affordances: inline edit-this-selection, a chat anchored to the active file, diagnostic-aware suggestions, edits applied across multiple cursors. It is also a degraded terminal: tied to the editor's lifecycle, with none of the session persistence or pane layouts a real terminal emulator plus a multiplexer gives you (§4, §6). The integrated terminal panel is fine for a one-off command, but it is neither a true IDE-side agent nor a substitute for the terminal stack — treating "open the terminal panel" as the IDE-side option quietly files a CLI-shaped agent under an IDE-shaped label.
+
+### macOS / Ubuntu: Claude Code or Codex
+
+Both `Claude Code` and `Codex` ship official extensions. They install in `VS Code` directly via the official marketplace, and on the `Code OSS`-derived editors (`Positron`, `VSCodium`) via `Open VSX` or a direct `Code OSS` extension-API install — the same Extensions-view flow, just pointed at a different registry. The `Claude Code` extension installs cleanly on `VSCodium` from `Open VSX`. Both vendors document support for `Code OSS`-derived editors generally, but verify the `Codex` install on your current `Positron` / `VSCodium` version before adopting it for daily use. They're effectively the same agents you'd run as CLIs (§10a), with an editor surface added. Which one you reach for depends on the task; they're complementary not redundant. On Windows, the same extensions run with the editor on Windows and the agent inside the WSL2 Ubuntu via Remote - WSL (per §9a).
+
+### Alternatives and why not
+
+`GitHub Copilot` is no longer just inline completion. Its agent mode does autonomous code editing with terminal-command suggestions and iteration. Plan mode lays out multi-step changes before applying them. It supports MCP, custom instructions, and multi-file edits. The case against `Copilot` for this workflow isn't "it's just autocomplete" anymore: it's model quality (the user's call), workflow fit (the official `Claude Code` and `Codex` extensions integrate more tightly with their respective agent CLIs), and subscription/account constraints.
+
+`Cody` (from Sourcegraph) is more codebase-aware than `GitHub Copilot` and is multi-model. It sits in a niche between `GitHub Copilot` and `Claude Code` / `Codex`: more capable than `GitHub Copilot`, less integrated than the official extensions from Anthropic and OpenAI.
+
+`Continue` is open source and BYO-model. Useful if you want to route the IDE agent through your own LLM provider via `LiteLLM` or `OpenRouter`, accepting more configuration work to get there.
+
+Important caveat: if you picked `Cursor` or `Zed` on §9a, this entire section is moot. Both ship their own agents and you don't layer an extension on top.
+
+### When I'd reconsider
+
+If ACP (per §12) becomes the lingua franca for editor↔agent integration, the calculus shifts: I'd evaluate IDE-side agent extensions on protocol fit rather than vendor. For now, the official `Claude Code` and `Codex` extensions are the right defaults.

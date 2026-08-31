@@ -1,0 +1,109 @@
+---
+title: "5. Shell, Framework, and Prompt"
+---
+
+Three adjacent decisions on the same surface: the shell (the language), the shell framework (the plugin and load-order manager), and the prompt theme (the visual presentation). All three configure in the same dotfile (`.zshrc`), so they're treated together here even though some prompt tools (like `Oh My Posh`) work across shells. The shell is foundational; the framework and prompt are layers on top of it.
+
+## Shell
+
+### Role
+
+The shell is where every command you type runs and where most of your dotfiles live. It's the layer underneath the agent CLIs in §10, the environment-variable injection in §2c, the multiplexer in §6, and most other parts of the stack. Picking the wrong shell makes everything above it worse; picking a sensible default keeps the rest of the stack consistent.
+
+### macOS / Ubuntu: zsh
+
+`zsh` has been the macOS default since Catalina and has the largest plugin ecosystem of any current shell: `zsh-syntax-highlighting` (highlights commands as you type), `zsh-autosuggestions` (greys-out command suggestions based on history), `fzf-tab` (fuzzy-finder tab completion), and others. Most agentic-tool examples and dotfiles assume a POSIX-style shell (one that follows the Unix command-language conventions, of which `zsh` and `bash` are the standard examples). `zsh` covers that without fighting the macOS default. Sticking with it avoids the friction of swapping the shell out from under the rest of the stack.
+
+On Ubuntu, `zsh` is one `apt install zsh` (or `brew install zsh`) away and identical to the macOS setup. The Windows path is the *same* `zsh`, reached by first installing `WSL2` (Windows Subsystem for Linux 2, Microsoft's official Linux-on-Windows runtime) and running `zsh` inside its Ubuntu — which is far less work than bending `PowerShell` into the POSIX shape the agent CLIs and dotfiles assume.
+
+### Alternatives and why not
+
+`PowerShell 7` is the Windows-native answer and works differently from `zsh`. Where `zsh` and `bash` pass plain text between commands, `PowerShell` passes structured objects, with direct access to the .NET libraries and Windows APIs. If you primarily script Windows itself (managing Active Directory, Exchange, system administration), it's the right pick. For agent CLIs and POSIX-style dotfiles, it will fight you.
+
+`fish` ships with usable defaults and doesn't require a `Powerlevel10k`-style configuration assembly. The "I want it to just work" niche. The downside is that `fish` doesn't follow POSIX conventions, so scripts that assume them (many `bash` snippets you'll find online) won't run unmodified.
+
+`nushell` is the structured-data shell, with typed pipelines and a query-language flavor. The reason to watch it specifically for statistical work isn't shell novelty: it's that structured tables map naturally to CSV, JSON, and tabular inspection, which could matter once the ecosystem matures. 
+
+`bash` is the default shell on most remote servers (university clusters, cloud VMs, HPC nodes) and the language most portable shell scripts assume. Reach for it when SSHing into a machine you don't control or when you want a script to run anywhere. For interactive daily work on your own laptop, `zsh` is the modern default.
+
+### When I'd reconsider
+
+If `nushell`'s plugin and tooling ecosystem matures enough that the agentic stack starts shipping nu-aware extensions, I'd seriously try it. Today, the cost of being a `nushell`-only user is too high.
+
+## Shell framework
+
+### Role
+
+A shell framework manages your plugins, your theme, and the load order between them. Without one, you write your own `source` lines in `.zshrc` and manage plugin clones by hand. With one (`Oh My Zsh`, `antidote`, etc.), you declare what you want and the framework handles loading. Whether you need one depends on how many plugins you run and how much you care about shell startup time.
+
+### macOS / Ubuntu: Oh My Zsh
+
+`Oh My Zsh` is what I run. It has the largest community and the most-documented setup path of any `zsh` framework. Most blog posts, dotfile repositories, and tutorials that mention a shell framework assume `Oh My Zsh`, so searching for a fix usually returns relevant answers. The plugin set is broad, themes are abundant, and updates are automated. The known downside is performance: `Oh My Zsh` earned plugin managers their poor performance reputation, and shell startup can feel heavier than alternatives if your plugin set grows.
+
+### Alternatives and why not
+
+`antidote` is the lighter-weight alternative: the actively-released successor to `antibody`, written in `zsh`. You list plugins in a plain-text `.zsh_plugins.txt` manifest and `antidote bundle` static-compiles them into one file the shell sources at startup, so startup stays fast without any turbo or async machinery to reason about. It can pull individual `Oh My Zsh` or `prezto` plugins as snippets without installing the whole framework. The trade-off against `Oh My Zsh` is the familiar one — most snippet-style help online is still `Oh My Zsh`-flavored. I name it over the more powerful `zinit` for a maintenance reason: `zinit` hasn't cut a release since April 2025 (occasional branch commits notwithstanding), while `antidote` ships regular tagged releases. I still run `Oh My Zsh`; the conditions that would move me to `antidote` are in *When I'd reconsider* below.
+
+*None (direct source)* is the minimalist alternative: write your own `source` lines in `.zshrc`, manage plugin clones via `chezmoi`, no framework dependency. Fits advanced `zsh` users with a small plugin footprint who want zero abstraction. Not a sensible default for newcomers: going framework-less assumes you already understand `zsh`'s sourcing model, plugin file structure, clone management, and update flow.
+
+### When I'd reconsider
+
+`Oh My Zsh`'s performance gets noticeable when the plugin set grows. If that ever became a real annoyance, the lighter-weight `antidote` (above) is where I'd look — but my plugin set is small enough that it hasn't, and I'm not planning a migration. Beyond that, I'd only revisit if a fundamentally different shell framework emerges; switching between current options is mostly lateral.
+
+## Prompt theme
+
+### Role
+
+A good prompt surfaces the state your shell already knows (`git` branch, exit code, virtualenv, time-of-last-command) so you don't have to ask. In an agentic stack that matters more than usual: parallel agents land on different branches per §16, worktrees mean the same project lives at multiple paths, and which language runtime is active changes what an agent will run. A bad prompt either tells you nothing, or it tells you so much it slows down every command.
+
+Prompt themes are mostly shell-coupled (`Powerlevel10k` is zsh-specific), but the cross-shell tools (`Oh My Posh`, `Starship`) work alongside whatever shell you picked in §5a, so this subsection applies even if you went with `fish` or another shell.
+
+### macOS / Ubuntu: Powerlevel10k
+
+`Powerlevel10k` is what I run, and the pick. It's the most performant `zsh` prompt available (`zsh-bench`, from the same author, is the relevant benchmark: <https://github.com/romkatv/zsh-bench>), information density is high, and its *instant prompt* feature renders the prompt before the rest of `.zshrc` finishes loading, so the shell feels ready immediately. It surfaces everything I want from a prompt — `git` state, exit status, runtime versions, virtualenv, command duration, transient prompt, right prompt — and on a stack where parallel agents land on different branches (§16) and worktrees put the same project at several paths, I rely on that prompt to tell me which branch and path I'm on. Install via `brew install powerlevel10k` and configure with `p10k configure`. Its powerline glyphs need a Nerd Font selected in the terminal emulator (§4), the one host-side setting the prompt depends on, on macOS or Windows alike.
+
+The honest caveat is maintenance: `Powerlevel10k`'s README now states that support is very limited, no new features are planned, and most bugs will go unfixed. I keep it anyway because it's mature and feature-complete: there's nothing I'm waiting on it to add, and the limited-maintenance status hasn't cost me anything in practice. If it ever does, the migration path is `Oh My Posh` (below) and it's straightforward — but "the maintainer stopped adding features to a prompt that already does everything I need" is a weak reason to walk away from a fast, stable setup.
+
+### Alternatives and why not
+
+`Oh My Posh` is what I'd switch to if `Powerlevel10k`'s limited maintenance ever became a real problem, or if I needed a prompt outside `zsh`. It's cross-shell and actively maintained: the same `*.omp.json` theme works in `zsh`, `PowerShell`, `fish`, and `nushell`, and it's visually comparable to `Powerlevel10k`. Theming is well-covered: scores of official themes ship with it, and a community-built visual configurator (James Montemagno's, at <https://jamesmontemagno.github.io/ohmyposh-configurator>) lets you assemble one by eye instead of hand-editing the JSON. It's a standalone binary rather than an `Oh My Zsh` plugin, activated with a single `oh-my-posh init` line in `.zshrc`, and on the Ubuntu side it installs from the same Homebrew tap as on macOS. Being cross-shell, it's also what you'd reach for in the rare case you needed a prompt outside `zsh`. The only reason I don't run it is that `Powerlevel10k` is faster and already does everything I need.
+
+`Starship` is the simpler cross-shell alternative: a single Rust binary, TOML config, fast enough that the gap from `Powerlevel10k`'s instant-prompt mode isn't perceptible in normal use. Less visual depth than `Oh My Posh`. Pick `Starship` if you want a low-maintenance default and `Oh My Posh` if you want more expressiveness.
+
+`Pure` is the minimalist `zsh` prompt: almost no config, shows the essentials only. For users who find `Powerlevel10k`'s or `Oh My Posh`'s configuration overwhelming, or who don't want a feature-rich prompt.
+
+### When I'd reconsider
+
+I'd move off `Powerlevel10k` if its unmaintained status actually bit me — a real bug left unfixed, or a `zsh` change it failed to keep up with — or if I needed a prompt outside `zsh`. `Oh My Posh` is the migration target in either case. Short of that, the prompt-theme category is stable enough that I wouldn't expect to revisit for years unless a fundamentally different shape emerges.
+
+## Reading and editing files in the shell
+
+A handful of lightweight tools cover reading and editing files without leaving the terminal: the terminal-side counterpart to the IDE in §9, and what a terminal-first workflow actually reaches for. `nano` is for a quick config-file edit. `micro` handles a slightly longer edit or a fast sanity-check of something an agent just wrote (mouse support and syntax highlighting, with `nano`-level approachability). `bat` is for *viewing* a file with syntax highlighting, line numbers, and `git` change markers (a `cat` upgrade, not an editor). One small convenience worth setting up: bind the editors and pager to a common exit — I use `Ctrl+X`, mirroring `nano` — so the muscle memory carries across them (in `bat`'s case via its `less` pager). Anything longer than a quick look belongs in the IDE (§9).
+
+| Tool | Kind | Reach for it when |
+|:--------|:------------------|:----------------------------------------------------------------|
+| `cat` | viewer (built in) | Dumping a short file straight to the terminal, no frills |
+| `bat` | viewer | Reading a file with syntax highlighting, line numbers, and `git` change markers |
+| `nano` | editor | A quick config-file edit |
+| `micro` | editor | A slightly longer edit, or sanity-checking something an agent just wrote |
+
+## CLI tools the agents reach for
+
+A handful of modern CLI tools sit underneath the agents' day-to-day work, even though I rarely type them myself. An agent doing a refactor runs `rg` dozens of times to find call sites, reaches for `fd` to locate files, reads files through `bat`, and parses command output with `jq`. They're in the Brewfile (§1a) because the agentic workflow leans on them, not because they're part of my own routine. The classic `grep` / `find` / `cat` still work; the agents just default to the faster, more structured versions when they're installed.
+
+| Tool | Role | The agent uses it to |
+|:-----------------|:---------------------------------------|:--------------------------------------------------|
+| `ripgrep` (`rg`) | recursive search (a faster `grep`) | find where a name or pattern lives before editing |
+| `fd` | file finder (a friendlier `find`) | locate files by name or extension |
+| `bat` | file viewer (`cat` with highlighting) | read a file with syntax and line numbers |
+| `jq` | JSON processor | parse JSON from APIs, configs, and tool output |
+| `yq` | YAML/TOML processor (`jq` for YAML) | read `.yml` / `.toml` config |
+
+## Getting around the shell
+
+Two interactive helpers for moving around faster — both things I type, not things the agents reach for. `zoxide` replaces `cd` with jumps ranked by how often and how recently I have visited a directory: `z proj` lands in the one I use most that matches "proj", no full path required. `fzf` is a general fuzzy finder wired into the shell — `Ctrl+R` fuzzy-searches history, `Ctrl+T` drops a file path onto the command line, `Alt+C` fuzzy-`cd`s into a subdirectory — and it also backs `zoxide`'s interactive `zi` picker.
+
+| Tool | Kind | Reach for it when |
+|:----------------|:-------------------|:-------------------------------------------------------------------------------|
+| `zoxide` (`z`) | smarter `cd` | Jumping to a directory by partial name instead of typing out the path |
+| `fzf` | fuzzy finder | Searching history (`Ctrl+R`), picking a file or directory, or filtering any list |

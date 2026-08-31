@@ -1,0 +1,130 @@
+---
+title: "Introduction"
+---
+
+This is a map of the tools that compose an agentic-AI working surface for data scientists, organized by *function* rather than by brand. The aim is to give my future self (or a colleague) a fast answer to two questions: *what role does this category of tool play?*, and *which specific tool would I reach for first?*.
+
+It's a snapshot in time, biased toward what I actually run for my own projects. Not a tutorial, not a neutral survey, not exhaustive. Every section makes a pick, names notable alternatives, and explains why. The macOS picks are tools I run. The second column is Ubuntu: what each tool advertises for Linux, reached via WSL2 on Windows or on a Linux box, and untested by me (the note after the matrix explains how to read it). Desktop-app surfaces (`Claude Desktop`, `ChatGPT` desktop client, etc.) are out of scope, as is the data-science middle layer (data versioning, experiment tracking, deep model-development tooling), except where it becomes part of agent control, reproducibility, or verification (the topics in §12 context, §13 permissions and sandboxing, §14 telemetry, and §15 pipelines and QA). The picks lean toward Anthropic in places, reflecting my current setup: OpenAI and other vendors offer equivalents. The audience is data scientists, not developers, which shaped terminology in places (§14 is "Agent Telemetry," not "Observability") and which alternatives earned a mention.
+
+Different categories age at different rates. The *stable layers* (foundation §1, configuration & environment §2, doc production §3, prompt themes §5c, long-running jobs §7, context and memory §12, permissions and sandboxing §13, reproducible pipelines §15) rest on slow-moving infrastructure — LaTeX distributions, OS sandbox primitives, file-based conventions — and warrant an annual look. The *unstable layers* (CLI agents §10, IDE-side agents §9b, browser and computer-use §11, multi-agent orchestration §16, personal AI assistant §18) can shift within a quarter, so they warrant a check every six months. The framing of each section is more durable than the specific pick inside it. I'd revisit the whole map if a major shift in how agents are deployed reset the assumptions, or if one of the unstable categories settled enough to consolidate.
+
+There are four entry points to controlling agents: terminal (covered at §10), IDE (§9), chat-based for personal AI assistant (§18), and desktop apps (out of scope). The doc's section ordering follows the terminal-first stack I actually use, but readers driving an IDE-first or chat-first workflow can use the corresponding sections as the primary entry point.
+
+![](figures/entry-points.svg){#fig-entry-points fig-alt="Four entry points to controlling agents — terminal, IDE and chat around a central Agents box, with desktop apps marked out of scope." above="22pt" below="6pt"}
+
+::: {.pagebreak}
+:::
+
+Of the two code-driving entry points — terminal and IDE — the choice between them shapes what the working relationship with the agent feels like. Three axes capture this contrast.
+
+- *Working relationship:* In an IDE the agent is a co-pilot bound to an editor window: we write code together, with me reading along, accepting or rejecting changes chunk by chunk, and the language server feeding back as the agent types. In the terminal the agent is a process I delegate to. I describe the goal — what I want done, and the constraints around it — and the agent decides how to implement it inside the guardrails set by the plan we develop together (per §10), the project's context files (per §12), and sandbox policy (per §13). I review the outcome, not each step. Because the agent is a process rather than a window-bound conversation, I can keep several whole projects live at once, one per multiplexer pane (§6), and move between them issuing commands and steering a different agent in each. Less often, I run several sessions on a single project across branches and worktrees (§16). An IDE window is essentially one project at a time, so this multi-project parallelism is the clearest terminal-side advantage in my own use. In short, the difference between them is the working relationship itself: co-pilot versus delegate, not just how the review works.
+
+- *What the agent sees:* Inside an IDE the agent inherits ambient context — open files, current selection, cursor position, language-server symbols — without asking. From the terminal the agent sees nothing until it reads a file via an explicit tool call. The IDE flavor is faster on small in-flow edits; the terminal flavor leaves an auditable read trail and won't pull in an irrelevant scratch file I happened to leave open.
+
+- *What the agent can do:* The IDE flavor treats file edits as the native verb; shell commands and build-and-test loops are bolted on. The terminal flavor treats the shell as the native verb: `git`, `gh`, the test runner, the package manager, and deployment commands sit on the same surface as file edits. This is why the terminal is the natural home for long-horizon work: refactors across dozens of files, test-and-fix loops, scripted pipeline runs.
+
+Where I use each: the IDE-side flavor for tight in-flow edits to code I'm actively reading and writing; the terminal flavor for everything that crosses the file boundary or runs unattended. In my own setup the bulk of daily activity is on the terminal side.
+
+The unifying theme for everything that follows: agents are allowed to help because project files (§12), version control (§1b), permissions and sandboxing (§13), and deterministic pipelines (§15) keep the work inspectable, reversible, and bounded. The picks below follow from that operating model. The *bounded* half of that has a shape worth seeing up front: the permission and sandboxing layers nest as concentric containment around the agent, with secrets kept out of scope and version control underneath as the recovery path. §13 fills in each ring.
+
+![](figures/security-layers-intro.svg){#fig-security-layers-intro fig-alt="The permission and sandboxing layers as nested containment around an agent action. Captioned: secrets out of scope, and a mistake stays reversible and inspectable." above="10pt" below="14pt"}
+
+::: {.pagebreak}
+:::
+
+## The Operating Model
+
+Whichever entry point you choose, the model underneath is the same: four pillars, and every section that follows serves one of them.
+
+![](figures/four-pillars.svg){#fig-four-pillars fig-alt="The four pillars of the operating model: be a supervisor; teach the agent your way; verify and reproduce; keep it bounded." above="26pt"}
+
+::: {.subsection-rule state="off"}
+:::
+
+::: {.pagebreak newpage="true"}
+:::
+
+## Tools by Function
+
+Skim the table below to find the functional row you care about. Then jump to the section for that row to read the *why*. Rows with a green highlight contain tools I use daily.
+
+::: {.vspace height="20pt"}
+:::
+
+| # | Function | macOS | Ubuntu / Windows (WSL2) |
+|:-----|:------------------------------------|:----------------------------|----------------------------:|
+| 1a | [Package manager](#package-manager) | [Homebrew]{.tool} | [Homebrew]{.tool} |
+| 1b | [Version control & remote host](#version-control-and-remote-host) | [git]{.tool} + [GitHub]{.tool} + [gh]{.tool} (HTTPS) | [git]{.tool} + [GitHub]{.tool} + [gh]{.tool} (HTTPS) |
+| 2a | [Dotfile manager](#dotfile-manager) | [chezmoi]{.tool} | [chezmoi]{.tool} |
+| 2b | [Secrets & credentials](#secrets-and-credentials) | [op]{.tool} or [gopass]{.tool} | [op]{.tool} or [gopass]{.tool} |
+| 2c | [Environment manager](#environment-manager) | [direnv]{.tool} | [direnv]{.tool} |
+| 2d | [Runtime manager](#runtime-manager) | [mise]{.tool} | [mise]{.tool} |
+| 3a | [Computational documents](#computational-documents) | [Quarto]{.tool} + [pandoc]{.tool} + [MacTeX]{.tool} / [TeX Live]{.tool} | [Quarto]{.tool} + [pandoc]{.tool} + [MacTeX]{.tool} / [TeX Live]{.tool} |
+| 3b | [Non-computational publishing](#non-computational-publishing) | [pandoc]{.tool} + [XeTeX]{.tool} + [MacTeX]{.tool} / [TeX Live]{.tool} | [pandoc]{.tool} + [XeTeX]{.tool} + [MacTeX]{.tool} / [TeX Live]{.tool} |
+| 4 | [Terminal emulator](#terminal-emulator) | [iTerm2]{.tool} | [Windows Terminal]{.tool} |
+| 5a | [Shell](#shell) | [zsh]{.tool} | [zsh]{.tool} |
+| 5b | [Shell framework](#shell-framework) | [Oh My Zsh]{.tool} | [Oh My Zsh]{.tool} |
+| 5c | [Prompt theme](#prompt-theme) | [Powerlevel10k]{.tool} | [Powerlevel10k]{.tool} |
+| 6 | [Multiplexer & session persistence](#session-persistence-and-pane-management) | [Zellij]{.tool} | [Zellij]{.tool} |
+| 7 | [Long-running jobs](#long-running-jobs) | [Pueue]{.tool} | [Pueue]{.tool} |
+| 8a | [General-purpose language](#general-purpose-language-python) | [Python]{.tool} ([uv]{.tool} or [pixi]{.tool}) | [Python]{.tool} ([uv]{.tool} or [pixi]{.tool}) |
+| 8b | [Data-science language](#data-science-language-r) | [R]{.tool} ([rig]{.tool} + [renv]{.tool}) | [R]{.tool} ([rig]{.tool} + [renv]{.tool}) |
+| 9a | [IDE](#ide) | [Positron]{.tool} or [VSCodium]{.tool} / [VS Code]{.tool} | [Positron]{.tool} or [VSCodium]{.tool} / [VS Code]{.tool} |
+| 9b | [IDE-side agent](#ide-side-agent) | [Claude Code]{.tool} or [Codex]{.tool} | [Claude Code]{.tool} or [Codex]{.tool} |
+| 10a | [CLI agent (single-vendor)](#cli-agent-single-vendor) | [Claude Code]{.tool} or [Codex]{.tool} | [Claude Code]{.tool} or [Codex]{.tool} |
+| 10b | [CLI agent (multi-vendor)](#cli-agent-multi-vendor) | [opencode]{.tool} | [opencode]{.tool} |
+| 11a | [Browser surface](#browser-surface) | [Claude in Chrome]{.tool} | [Claude in Chrome]{.tool} |
+| 11b | [Browser automation (MCP)](#browser-automation-mcp) | [Playwright MCP]{.tool} | [Playwright MCP]{.tool} |
+| 11c | [Computer-use API](#computer-use-api) | [Anthropic Computer Use]{.tool} | [Anthropic Computer Use]{.tool} |
+| 12 | [Context & memory](#context-and-memory) | [AGENTS.md]{.tool} hierarchy + MCP + memory | [AGENTS.md]{.tool} hierarchy + MCP + memory |
+| 13a | [Agent permission settings](#agent-permission-settings) | [Claude]{.tool} [settings.json]{.tool} + [Codex]{.tool} config + rules | [Claude]{.tool} [settings.json]{.tool} + [Codex]{.tool} config + rules |
+| 13b | [Sandboxing (lightweight)](#sandboxing-lightweight-os-native-process-sandbox) | [Seatbelt]{.tool} ([sandbox-exec]{.tool}) | [WSL2]{.tool} isolation |
+| 13c | [Sandboxing (heavyweight)](#sandboxing-heavyweight-container-runtime) | [Colima]{.tool} | [Docker Engine]{.tool} |
+| 14a | [Agent telemetry (Claude)](#telemetry-for-claude) | [ccusage]{.tool} + [claude-trace]{.tool} | [ccusage]{.tool} + [claude-trace]{.tool} |
+| 14b | [Agent telemetry (Codex)](#telemetry-for-codex) | [ccusage]{.tool} + [OpenAI Platform]{.tool} | [ccusage]{.tool} + [OpenAI Platform]{.tool} |
+| 15a | [General pipeline runner](#general-pipeline-runner-just) | [just]{.tool} | [just]{.tool} |
+| 15b | [Data-pipeline runner (R)](#data-pipeline-runner-r-targets) | [targets]{.tool} | [targets]{.tool} |
+| 15c | [Data-pipeline runner (Python)](#data-pipeline-runner-python-snakemake) | [Snakemake]{.tool} | [Snakemake]{.tool} |
+| 15d | [Project isolation](#project-isolation) | [Dockerfile]{.tool} | [Dockerfile]{.tool} |
+| 16 | [Multi-agent orchestration](#multi-agent-orchestration) | Manual (worktrees + [Zellij]{.tool}) | Manual (worktrees + [Zellij]{.tool}) |
+| 17a | [Task manager (human-native)](#task-manager-human-native) | [dstask]{.tool} | [dstask]{.tool} |
+| 17b | [Task planner (agent-native)](#task-planner-agent-native) | [AGENTS.md]{.tool} + [TASKS.md]{.tool} | [AGENTS.md]{.tool} + [TASKS.md]{.tool} |
+| 18 | [Personal AI assistant](#personal-ai-assistant) | [Hermes]{.tool} | [Hermes]{.tool} |
+
+::: {.subsection-rule state="on"}
+:::
+
+::: {.pagebreak}
+:::
+
+## Starting from zero
+
+Two small starting sets, both assuming §1a (package manager) and `.git/` cloud-sync-excluded per §1's cloud-sync subsection:
+
+- *Terminal track:* `git` + GitHub (§1b) → terminal emulator (§4) → shell (§5a) → CLI agent (§10) → `AGENTS.md` + `TASKS.md` (§12) → one permission posture (§13) → one build/check command (§15a).
+- *IDE track:* `git` + GitHub (§1b) → Positron or your existing IDE (§9a) → IDE-side agent (§9b) → `AGENTS.md` + `TASKS.md` (§12) → one permission posture (§13) → one build/check command (§15a).
+
+## The second column is Ubuntu
+
+I run macOS. The second column is **Ubuntu**, and it's untested by me — it reflects what each tool advertises for Linux, not anything I've benchmarked. There are two ways to be in that column: inside **WSL2** on Windows (what my two Windows teammates run) or on **bare-metal Linux**. Both are the same Ubuntu underneath, so the column reads the same either way.
+
+This works because the stack is Unix-native: macOS and Ubuntu share the same POSIX foundations, so most of the matrix is a single entry, identical on both — which is why those rows collapse to one centered cell. The job of the WSL2 layer is just to *get* a Windows machine into that Ubuntu world; once you're in the Ubuntu shell, the recipes are the macOS recipes.
+
+What's genuinely native Windows is a thin GUI *host* layer, not part of the Unix stack: the terminal-emulator window (`Windows Terminal`, which renders the WSL2 shell, §4), the IDE window (`VS Code` or `Positron` reaching into Ubuntu via Remote-WSL, §9a), the `1Password` desktop app that `op` unlocks against (§2b), and a browser when you drive one (§11). Everything else — shell, framework, prompt, multiplexer, languages, agents, pipelines, the secrets backend — lives in Ubuntu.
+
+Where the repository lives: pick one owner per project. WSL2 ownership (`~/projects/...` on the WSL2 side) is the default the rest of the stack assumes. *What you should not do* is edit the same working copy from both the Windows and WSL2 sides — that way lies line-ending corruption, credential confusion (Windows Credential Manager vs `gh auth` in WSL2), file-permission churn, and Windows Defender scanning a WSL2 `.git/` through the `\\wsl$\` mount. The dual-write pattern is solvable once you've made deliberate decisions about `core.autocrlf`, credential storage, and filesystem-performance trade-offs; until then, single ownership is the safe default.
+
+You can run pieces of this natively on Windows instead — `PowerShell`, native installers, a native-Windows package manager — but the doc doesn't cover that route, and I wouldn't take it: you give up the single Unix stack and end up maintaining two of everything, for a POSIX-shaped workflow that fits WSL2 far better. The GUI host layer above is the one place native Windows is unavoidable, and it's there by necessity, not preference.
+
+::: {.pagebreak}
+:::
+
+## Workflows: how the pieces fit together
+
+The matrix lists every tool by function. The two diagrams below show how those tools chain together for typical workflow shapes, one for data-science work and one for general development. Use them as a self-routing aid: the diagram tells you which sections of this doc matter for the kind of work you do, and which you can skip. Boxes are colored by stage — foundation (periwinkle), language / runtime (sage), authoring (dusty red), pipeline (gold), output (gray). Where the macOS and Ubuntu / Windows columns differ, the second variant appears in italics under the macOS picks. Boxes without a second annotation are identical on both: the same tool, reached via `WSL2` on Windows or natively on Linux.
+
+![](figures/workflow-data-science.svg){#fig-workflow-data-science fig-alt="The data-science workflow as a flowchart, from foundation and environment through language and authoring to pipeline and output." above="26pt"}
+
+![](figures/workflow-development.svg){#fig-workflow-development fig-alt="The general development workflow as a flowchart, the non-data-science counterpart to the previous figure." below="26pt"}
+
+Two things to notice across the diagrams. First, the *Setup* stage is nearly identical between them. The foundation layer (§1, §2a, §2b, §2c) pays off in every workflow. Second, the *language / runtime* stage is where the workflows diverge: data science uses language-specific stacks (§8), general development uses `mise` (§2d) for one-off tool-version pinning. The *Pipeline runner* / *Build runner* stage at the bottom tells you which §15 subsection matters for your workflow — `targets` / `Snakemake` carry the analysis pipeline in data-science projects, with `just` typically wrapping them as the project-level entry point (`just build` = run the pipeline plus render the paper); for general development, `just` alone covers task running.

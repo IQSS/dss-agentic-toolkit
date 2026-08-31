@@ -1,0 +1,59 @@
+---
+title: "16. Multi-Agent Orchestration"
+---
+
+Running more than one agent at a time without them stepping on each other. The moment you have two agents trying to edit the same file or push to the same branch, you have a coordination problem. The trick is to give each agent its own bounded space (its own working tree, its own pane, ideally its own branch) so they can work in parallel without conflicts.
+
+## Role
+
+Multi-agent orchestration becomes useful once you find yourself starting an agent task and waiting on it before doing anything else. Two agents in parallel double your throughput on independent work; four parallel agents change the project shape (parallel feature development, simultaneous test runs, exploration plus build). The constraint is coordination (they need to not conflict), and the practical solution is `git` worktrees plus a multiplexer.
+
+The scale to optimize for is *a handful of agents, not a hundred*. The entry-level pattern is one agent plus a review or check loop: you focus on the work, the agent drafts changes, and before merging you rerun the pipeline (§15) and read the diff on the parts that matter. That's the place to start, and it pays off well before any orchestration layer enters the picture. The advanced plateau, after you've internalized the review loop and have stable per-project guardrails (per §12 and §13), is four to six parallel agents on different parts of the pipeline: one main session driving the work, another reviewing or drafting tests, two or three subagents handling scoped pieces. That plateau is real but it is not where to begin. Running hundreds of agents is the production-data-engineering / agent-platform shape, and that's a different problem with different tools (the third-party orchestrators in this section gesture at it). The right size is "small enough that a `Zellij` layout still works, large enough that hand-rolled coordination starts to creak" — once you've grown into it.
+
+Three layers, escalating in heaviness:
+
+- *In-session subagents* (per §10's `Claude Code` extension points): one CLI agent session spawning subagents for scoped work. Handles a layer of orchestration before you reach for any external tooling.
+- *Manual worktrees + `Zellij` panes* (this section's pick): cross-session parallelism, one agent per worktree per pane.
+- *Purpose-built orchestrators* (`Container Use`): managed orchestration for when the manual approach starts to feel like more pane-juggling than the throughput justifies.
+
+## Manual approach: git worktrees + Zellij panes
+
+The manual approach is what I primarily use because it has the most mileage, depends on the fewest extra tools, and works alongside the rest of the stack rather than replacing parts of it. The pattern: each agent gets its own `git` worktree (created with `git worktree add`), each worktree runs in its own `Zellij` pane, and the agents coordinate through `git` rather than directly. When one finishes, you review its branch, merge it, and reuse the worktree for the next task.
+
+This is "manual" only in the sense that you're operating the moving parts yourself. With `Zellij` layouts (per §6), you can declare a standard "three-agent worktree layout" that scaffolds the panes and worktrees with one command. The result is a workspace where switching between parallel agents is just switching panes, and shipping their work is normal git.
+
+## Purpose-built orchestrators
+
+The orchestrator landscape is still maturing. One contender worth naming as an alternative:
+
+`Container Use` is the agent-per-container orchestration approach: each agent runs in its own container, with its own bounded view of the filesystem and its own resource limits. It's an MCP server / CLI underneath (an extension of the §12 protocol pattern rather than a standalone app), which makes it cross-platform tooling. It overlaps with §13c heavyweight sandboxing in spirit, but differs in giving each agent its own container. Right pick when you want each agent isolated from the host by default, accepting the overhead of containerization.
+
+## macOS vs Ubuntu / Windows
+
+On Ubuntu — including inside `WSL2` on Windows — the manual approach runs identically: `Zellij`, worktrees, and the agent CLIs behave exactly as on macOS. `Container Use` is cross-platform via MCP. The coordination problem is the same everywhere; nothing essential is lost on the second column.
+
+## Coordination and conflict avoidance
+
+How prescriptive the coordination pattern needs to be depends on how many agents you're running in parallel, how heavily they overlap on the same files, and how much review friction you want. The patterns below are recommendations, not strict requirements. I've worked productively for weeks with multiple agents on a single branch when their tasks didn't overlap and I was reviewing inline; I've also used the full one-branch-per-agent + review-before-merge pattern when several agents were touching shared modules at the same time. Scale the structure to the actual conflict surface, not to a hypothetical worst case.
+
+Recommended patterns when running multiple parallel agents on overlapping work:
+
+- *One agent owns one branch.* If two agents are committing to the same branch concurrently, they will conflict and the resolution is painful. Per-branch isolation also makes review-by-diff straightforward.
+- *One agent owns one file set when possible.* Even within a branch, if two agents are writing to overlapping files, you'll hit conflicts in review. Scope the task brief to a directory or a file group.
+- *Every agent gets a short task brief that states the goal, not just the code change.* "Refactor the data-loading function in `02-clean.R` to handle multi-file inputs, preserving the existing column types" is a brief; "edit `02-clean.R`" is a request. The brief is what keeps the agent from drifting onto adjacent code that shouldn't change.
+- *No agent merges its own work.* A different session — or you — does the merge. Low cost, meaningful safety floor when several branches are landing in close succession.
+- *Model-output changes require human inspection.* Anything that touches model fits, diagnostics, or rendered output needs human review before it's accepted, not just a passing test suite.
+- *Read-only access to shared resources.* Multiple agents can read the same database, the same config, the same docs. Only one should write at a time, and writes should land via deliberate review rather than directly.
+- *Cleanup between sessions.* Worktrees and branches pile up. A weekly `git worktree list` review and cleanup keeps the orchestration model sustainable.
+
+Lighter workflows that work when there are fewer agents, less overlap, or tighter review:
+
+- A single working branch with sequential agent sessions, each one reviewed inline before the next starts.
+- One agent per branch but no formal merge gate — review the work yourself, merge directly when satisfied.
+- Direct commits to `master` for a solo project where you're reviewing changes as they land anyway.
+
+Pick the structure your conflict surface actually warrants. The list above isn't a checklist that must be followed; it's the kit you reach into when you start hitting the problems each item is designed to prevent.
+
+## When I'd reconsider
+
+When I'm regularly running enough parallel agents that the manual coordination overhead starts to dominate, I'd revisit the purpose-built orchestrator landscape. The field is moving fast — if a tool starts solving the coordination problem more cleanly than worktrees + panes, I'd switch. Re-evaluate every six months until the category settles.

@@ -1,0 +1,78 @@
+---
+title: "1. Foundation"
+---
+
+Two foundational picks sit beneath everything else in this doc: the package manager that installs the rest of the stack, and the version-control system that makes agent work reversible. Both are set up first on a new machine; both are assumed in every section that follows.
+
+## Package manager
+
+The package manager is the front door to your machine. Almost every other tool in this doc gets installed through it, so this is the first thing to set up on a new machine.
+
+### Role
+
+The choice of package manager matters more than it looks because it defines an implicit contract for *where things live* and *how they get updated*. That contract then leaks into your dotfiles, your automated build scripts, and the install-from-zero story you give a teammate.
+
+### macOS / Ubuntu: Homebrew
+
+`Homebrew` is the practical default — on macOS for years, and on Linux (so WSL2) just as well. Most CLI tools, language runtimes, fonts, and libraries install with `brew install`, and the same commands and dotfiles carry from macOS into a WSL2 or Linux Ubuntu shell unchanged. On macOS, casks cover the GUI-app side through the same mechanism, so an application install list is scriptable. `Homebrew` on Linux handles only a limited cask set (fonts, AppImages, standalone binaries), but on Windows the GUI apps (the §9a IDE, a browser, the `1Password` app) are native anyway, so the command-line set is all WSL2's `Homebrew` needs to cover.
+
+The installed set is itself reproducible through a committed `Brewfile`, the package-manager analogue of a `requirements.txt`. `brew bundle dump` records the install-on-request formulae, casks, and taps; `brew bundle install` recreates that set on a new machine in one command. It pins the *set* of packages, not exact versions (Homebrew is rolling-release), and it lives under version control with the dotfiles (§2a), so the machine's tool inventory is rebuildable rather than remembered. The `Brewfile` is itself a `chezmoi`-tracked dotfile (§2a), so a fresh-machine rebuild is two commands: `chezmoi init --apply` lays down the configs — including the `Brewfile` — and `brew bundle install` then installs the package set it lists.
+
+### Alternatives and why not
+
+`Nix` is more complicated but affords full reproducibility and declarative system config. The complexity might be worth it if you want a setup you can recreate on any machine from a single config file or you're scaffolding a shared development environment across a team that needs exact reproducibility. For most workflows, `Homebrew` is faster to set up and easier to use, and for per-project reproducibility, a project container (§15d) is the lighter-weight answer than going to `Nix`.
+
+`Scoop` is the native-Windows package manager, the closest in spirit to `Homebrew` there. It's only relevant if you run the stack natively on Windows instead of in WSL2.
+
+### When I'd reconsider
+
+For project-level "works on my machine" problems, a per-project container (§15d) is the lower-cost answer — pin the environment per project rather than switching the system-wide package manager. The trigger for `Nix` is system-level reproducibility: recreating an entire machine from a single config file, or archival-grade pinning.
+
+### Other installers you'll meet
+
+`Homebrew` is the package manager you *choose*. But a working agent stack also brushes against the installers of other ecosystems, because much of the agent-adjacent tooling ships through them. You never adopt those ecosystems. The useful skill is recognizing which installer a copy-paste command belongs to, and whether its runtime is already on the machine.
+
+| Installer | Ecosystem | Where it shows up in this stack |
+|:------------------------|:---------------------------|:--------------------------------------------------------------|
+| `Homebrew` | OS-level (the pick above) | Everything you install deliberately |
+| `apt` | Ubuntu (WSL2 or Linux) | Distro/system packages outside Homebrew: §13c's Docker Engine, §3's TeX Live |
+| `uv` / `uvx` | Python (§8a) | Project dependencies; `uvx` runs a Python tool without installing it (some MCP servers, per §12) |
+| `renv` | R (§8b) | Per-project R packages |
+| `npm` / `npx` | JavaScript / Node.js | Agent-adjacent tools (§14's `ccusage` and `claude-trace`, many MCP servers); `npx` runs a package without installing it. Needs `Node` (`brew install node`) |
+| `yarn` / `pnpm` / `cargo` | JavaScript siblings; Rust | Only inside web-product projects (§2d's example) or other tools' build instructions; nothing in this stack asks you to run them |
+
+`npm` deserves the one-sentence introduction since it recurs the most: it is the package manager of the JavaScript/Node.js world — what `install.packages()` is to `R`, or `pip` to `Python` — and a surprising amount of agent tooling is distributed through it even though none of this stack's own work is written in JavaScript.
+
+## Version control and remote host
+
+### Role
+
+Version control is the substrate that makes agent work tolerable. Every change an agent makes is a `git` change. Multi-agent layouts in §16 run against `git` worktrees. A rollback when an agent goes wrong is `git reset` or `git revert`, and every PR a reviewer reads is a `git diff`. The doc leans on this throughout — `chezmoi` for dotfiles (§2a) is a `git` repository underneath, the agent-detachment pattern (§15) hinges on `git status` being clean before a long-running job starts, the safety preflight at the top of §10 lists a clean working copy as a precondition. Because version control makes every change inspectable and every mistake reversible, the rest of the stack can safely let agents do far more than they otherwise could.
+
+### macOS / Ubuntu: `git` + GitHub + `gh`, with HTTPS auth
+
+`git` is the version-control system and GitHub is the remote host; `gh` is the CLI that wraps GitHub's API for issue, PR, release, and Actions operations. The three compose: `git` handles local history, GitHub holds the canonical remote, and `gh` lets the rest of this stack (agents included) drive PR workflow from the terminal.
+
+The authentication pick is HTTPS, with credentials managed by `gh auth login`. That one command handles credentials for both `git push` and `gh` API calls, which means token rotation is one `gh auth refresh` rather than the more involved SSH-key rotation dance (regenerate, add to GitHub, remove the old one, re-authorize anywhere it was trusted).
+
+On WSL2, keep the repository on the WSL2 side (`~/projects/...`) and run `git`, `gh`, and the agent CLIs from there — the repo-ownership and dual-write hazards (line endings, credential confusion, Defender scanning a WSL2 `.git/`) are covered in the second-column note above. GitHub Desktop is an option if you'd rather pick branches and inspect diffs in a UI than in `git log`; it operates on the same repositories without interference. I don't use it.
+
+### Alternatives and why not
+
+GitLab and Bitbucket are the obvious hosting alternatives to GitHub. Both work fine with `git` itself; the case for GitHub here isn't that the underlying VCS is different, it's that the surrounding ecosystem (GitHub Actions in §15 for remote checks, `gh` as the CLI, Anthropic/OpenAI agent surfaces that integrate with GitHub PRs and issues by default, the largest population of templates and Actions workflows to copy from) is the best for this stack. But if you want to use GitLab or Bitbucket the rest of this doc still applies, with `glab` substituting for `gh` and GitLab CI substituting for GitHub Actions.
+
+SSH is the alternative authentication pick. SSH wins for automated pushes from infrastructure where agent forwarding is cleaner than HTTPS credential helpers, for environments where browser-based credential flows can't run, and for users who already have a deeply-configured `~/.ssh/config`. None of those apply to this stack as it currently runs: there are no automated pushes from infrastructure, every machine can run a browser, and `gh auth login` covers the credential setup for both `git` and `gh` in one flow. SSH is the pick if any of those constraints change.
+
+`Jujutsu` (`jj`) is the newer entrant — a git-compatible VCS with a repository-level operations log (undo for the entire repo state, including botched rebases) and no staging area, so every commit is directly editable without `git add` and `--amend` steps. It sits on top of an existing `.git/` directory, so the GitHub side of the equation is unchanged. The reason it doesn't displace `git` here is the agent stack: every CLI agent in §10 and every IDE-side agent in §9b reaches for `git status`, `git diff`, `git log`, and `git commit` by default. Running `jj` on top while sub-agents drive the git layer means translating between two mental models on every operation, which costs more than the cleaner CLI saves.
+
+### When I'd reconsider
+
+If my work moves toward automated agent pushes from cloud infrastructure (cloud-spawned agents per §10's out-of-scope subsection), SSH-via-agent-forwarding becomes the cleaner credential path and HTTPS-via-`gh-auth-login` stops being the right default for those workflows. If GitHub itself develops policies incompatible with the data-handling rules in §13 (training-data use, AI-feature defaults that can't be opted out of), the hosting pick would move to GitLab self-hosted or similar.
+
+## Cloud sync and project infrastructure
+
+Many data scientists keep their projects in a cloud-synced directory (`Dropbox`, `Google Drive`, `OneDrive`, `iCloud Drive`) for backup and cross-machine availability. That works fine for most files but interacts badly with two specific kinds of project infrastructure: the `git` repository's `.git/` directory and language virtual environments (`.venv/`, `node_modules/`, and similar).
+
+The issue: cloud sync services try to sync every file in the directory, and these infrastructure folders contain thousands of small files that change rapidly during normal use. The result is sync storms (every `git commit` triggers thousands of upload events), severe performance hits, and occasional state corruption when the sync engine catches a `git` pack file or venv binary mid-write.
+
+The fix is general: configure your cloud sync to ignore these directories per-project. Each service has its own mechanism (`Dropbox` uses an extended attribute, `Google Drive` has selective-sync rules, `OneDrive` has equivalents). I deal with this by putting a reminder in my global `AGENTS.md` (per §13) that agents should configure cloud-sync ignores when scaffolding new projects, particularly when creating venvs or initializing `git` repositories. The interference is hard to diagnose after the fact, so catching it at setup is cheaper than debugging it later. This is foundational infrastructure: it applies to every project from setup, before any pipeline (§15) or environment isolation (§15d) decisions matter.

@@ -1,0 +1,281 @@
+---
+title: "13. Permissions and Sandboxing"
+---
+
+Limiting what an agent can do. The framing is "what can this agent touch if it goes wrong" rather than "is this agent malicious": agents make mistakes, and this section is what keeps a mistake from being unrecoverable. Three subsections: the agent's own permission settings (§13a), the lightweight OS sandbox its commands can run inside (§13b), and the heavyweight container for the cases that warrant it (§13c).
+
+Across those three mechanisms sit four distinct layers of control, and the clearest way to keep them apart is by the guarantee each one adds. Deny rules (layer 1, *guardrails*) stop routine mistakes and drift at the rule. Approval prompts (layer 2, *attended review*) put a human in front of plausible-but-wrong changes before they land. The kernel sandbox (layer 3, *hard isolation*) bounds what a command can touch and where its network traffic can go. The container (layer 4, *containment*) is the floor for the cases the other layers don't reach. The first two layers both live in the agent's permission system, so §13a carries layers 1 and 2, §13b is layer 3, and §13c is layer 4.
+
+![](figures/security-layers-guarantee.svg){#fig-security-layers-guarantee fig-alt="The four security layers and the guarantee each adds: deny rules and approval prompts bind a cooperating agent; the kernel sandbox and the container hold regardless. Captioned: each layer covers a failure mode the others don't, and none substitutes for another." above="18pt" below="16pt"}
+
+The split that matters most is between the first two layers and the last two. Rules and review bind a *cooperating* agent: a deny rule matches the command as the agent wrote it, and a prompt depends on a human reading it. Both are excellent against accidents, but neither is a wall. Two facts make the distinction live. First, an approval prompt gates an action before the content arrives: approving "run the scraper" happens before the page exists, so whatever protection holds afterward cannot depend on asking again. Second, once a session has read content you wouldn't fully trust (a scraped page, a third-party README, an issue thread), interactive approval becomes the least dependable control, because every subsequent request looks plausible; the failure mode is the click-fest described in §13a. What stays dependable at that point are the content-independent bounds: what the session can read at all, where its traffic can go, which writes fail outright. Those are the lower two layers, enforced by the kernel or the container boundary rather than by rule-matching or attention. The corollary I keep coming back to: anything that must never happen should not be promptable.
+
+Seen by reach instead of by guarantee, the same mechanisms nest as concentric containment around the agent: the permission layer gates individual commands, the OS sandbox restricts the running process's view of the filesystem and network, and the container isolates the whole environment. "When to use which" at the end of the section says which combination to run. Two cross-cutting supports sit alongside: secrets kept out of scope so a mistake can't leak them (§2b/c), and version control plus deterministic pipelines so a mistake stays reversible and inspectable (§1b, §14, §15).
+
+![](figures/security-layers-reach.svg){#fig-security-layers-reach fig-alt="The same layers seen by reach: permission settings, OS sandbox and container as concentric containment around an agent action. Captioned: cross-cutting, secrets are kept out of scope and a mistake stays reversible and inspectable." above="18pt" below="16pt"}
+
+## Agent permission settings
+
+### Role
+
+In the intro's layer terms, this subsection carries layers 1 and 2: the deny rules that stop known-bad actions at the rule, and the approval prompts that put the remaining judgment calls in front of a human. The OS sandbox (per §13b) and the container (per §13c) are walls around whatever these two layers let through; neither replaces them. The tension this layer manages: an agent that asks before every action turns approval prompts into a click-fest, and you stop reading. An agent with no restrictions can do real damage. The permission system is how you keep routine work flowing without friction, while dangerous actions still demand explicit confirmation and the worst actions are forbidden outright. This subsection is a record of the choices I made and why, so future-me (or someone starting fresh) doesn't have to re-derive them — and because the settings files themselves are a poor place to keep that reasoning, I also keep it in a companion `SANDBOX.md` (described below).
+
+### Different defaults across vendors
+
+The starting defaults differ between the two agents, and have shifted across versions of each — check current docs if a specific default matters to your setup. The current state:
+
+`Claude Code`: the sandbox is currently *off by default*. Opt in by setting `sandbox.enabled` to `true` in `~/.claude/settings.json`. Without that, the agent has full filesystem and network access (limited only by per-tool approval prompts).
+
+`Codex`: the sandbox is currently *on by default* in its `workspace-write` mode — the project directory is writable, nothing else is, and there's no network. You loosen those restrictions via named profiles.
+
+Practical consequence: as installed, `Codex` starts locked down; `Claude Code` starts open. After configuration, both can land in similar postures, but the starting point differs and the configuration files are different shapes.
+
+### Configuration surfaces
+
+`Claude Code`: one file at `~/.claude/settings.json`. It covers the permission rules (`allow` / `ask` / `deny`, reaching both shell commands and the file-editing tools) and the `sandbox` block: filesystem write bounds, the `allowedDomains` network allowlist, and the short `excludedCommands` exemption list.
+
+`Codex`: two files. `~/.codex/config.toml` covers sandbox modes, filesystem permissions per profile, network domains, environment-variable exclusions. `~/.codex/rules/default.rules` covers command-level `forbidden` / `allow` policies with justifications attached to each rule.
+
+### Three tiers of command policy
+
+The useful distinction isn't binary "allow / deny." It's three tiers:
+
+- *Routine pass-through* — daily-use tools that run without prompts. With the sandbox on, this tier mostly needs no list: anything that stays inside the kernel bounds runs promptless, so the tools I use constantly (`Rscript`, `R`, `python`, `pip`, `pandoc`, `xelatex`, `make`, `bash *.sh`, local `git`) pass through *because they are sandboxed*, not because they are exempt. What remains on Claude's `excludedCommands` list is the short set that cannot run inside the sandbox at all: `git push*` / `git pull*` / `git fetch*` and `gh *` (GitHub authentication reads the macOS keychain, which the sandbox blocks), `op *` (talks to the 1Password app), and `pueue *` / `pueued *` (talk to the §7 daemon). The forbidden list (last tier) still carves out destructive subcommands like `git push --force`. `Codex` reaches the same posture by *not* listing routine tools in any rule and letting its sandbox bound them. Each exemption runs outside the kernel bounds entirely, so entries have to earn their place; how the list got this short is taken up in §13b.
+- *Prompt before running.* The middle tier, and where the two agents' shapes converge. `Codex` supports standing `decision = "prompt"` rules for commands you want to consciously approve (deploys, DB-state changes); I don't keep standing prompt-rules on either agent. The middle tier I actually use is *escalation*: a sandboxed command that needs more than the bounds allow fails, the agent asks, and I approve that one invocation. Package managers I touch a few times a month (`npm`, `yarn`, `brew`) live there deliberately — at that frequency, reading one prompt beats holding a standing exemption open. `Codex`'s `on-request` approval policy is the same mechanism, so the postures stay aligned without standing prompt-rules on either side.
+- *Forbidden* — commands too destructive to delegate. Both agents agree on the set, grouped by category. Git: `git push --force`, `git reset --hard`, `git clean -fd`, `git branch -D`, `git rm -rf`, `git checkout --`. Filesystem: `rm -rf`, `sudo`. Tooling: `gh repo delete`, `gh release delete`, `pip uninstall`, `npm uninstall`, `brew uninstall`, `npm publish`.
+
+A representative `Codex` `prefix_rule` entry from `default.rules`:
+
+```
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Never destructively reset a worktree from an agent
+session. Use patch review, commits, or manual reset instead.",
+    match = ["git reset --hard", "git reset --hard HEAD~1"],
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "allow",
+    justification = "Routine remote push. Destructive variants
+(--force, etc.) are covered by separate forbidden rules.",
+    match = ["git push", "git push origin main"],
+)
+```
+
+The `justification` field is what matters for future-me: the rule and the reason for it travel together, so when I come back to a rule six months later I don't have to rediscover why it's there.
+
+The Claude side of the same posture lives in `~/.claude/settings.json`. The `permissions` rules cover the destructive blocks and the file-editing channel (deny and ask). The `sandbox` block carries the kernel-enforced bounds (filesystem writes, outbound network) plus the short exemption list. And `failIfUnavailable` makes a missing sandbox a hard failure rather than a silent unsandboxed fallback:
+
+```
+{
+  "permissions": {
+    "deny": [
+      "Read(~/private/**)",
+      "Edit(~/.local/share/chezmoi/dot_config/agents/codex-rules/**)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)"
+    ],
+    "ask": [
+      "Edit(~/.config/agents/claude-settings.json)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "network": {
+      "allowedDomains": [
+        "github.com", "api.github.com", "pypi.org",
+        "files.pythonhosted.org", "cran.r-project.org"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/.cache/uv", "~/.local/share/uv",
+        "~/.local/share/chezmoi",
+        "~/Library/Application Support/pueue"
+      ],
+      "denyWrite": [
+        "~/.config/agents/claude-settings.json",
+        "~/.config/agents/codex-rules"
+      ]
+    },
+    "excludedCommands": [
+      "git push*", "git pull*", "git fetch*",
+      "gh *", "op *", "pueue *", "pueued *"
+    ]
+  }
+}
+```
+
+### Filesystem boundaries
+
+A `Read` deny keeps a chosen directory off-limits — point it at whatever should never be pulled into context, such as a private-files tree or confidential client data, so the agent can't read it even by accident. `Codex` adds wildcard denies for secret-shaped filenames: `**/.env*`, `**/*secret*`, `**/*Secret*`, `**/*credential*`, `**/*.pem`, `**/*.key`, `**/*.p12`, `**/*.pfx`. Write access is scoped to `<workspace-root>/` and project-specific directories; everything else is read-only or denied.
+
+### Two write channels, two gatekeepers
+
+A subtlety that is easy to miss: `Claude Code` sends its two ways of writing files through different layers. Shell commands pass through the kernel sandbox (layer 3, per §13b): a write outside the allowed directories fails at the kernel, with no prompt and no way for the agent to talk its way past. The built-in file-editing tools never touch the shell, so the kernel never sees them; their gate is layers 1 and 2 — the deny rules you've written for the editing tools, plus a per-edit approval prompt showing the diff.
+
+This is not a loophole; it is a deliberate split between an unattended control and an attended one. Shell commands run without prompts precisely *because* the kernel bounds what they can touch. File edits can reach further, but each one outside the standing allow rules is reviewed by a human before it lands. Each channel covers the other's weakness: the sandbox keeps promptless work contained (layer 3), the edit prompt keeps wider-reaching writes visible (layer 2).
+
+Two practical consequences follow:
+
+- *A hard "never touch this file" must cover both channels.* A filesystem deny in the sandbox configuration stops shell writes; only a deny rule on the file-editing tools (`Edit(path)` / `Write(path)` in `permissions.deny`) stops the other channel. A path covered on one channel but not the other degrades from "blocked" to "blocked unless I approve a prompt" — fine for some files, not for credentials or the agent's own policy files. Whenever I protect a file, I now check both lists.
+- *Keep the sandbox write-allowlist narrow, and let occasional edits flow through the prompted channel.* Widening the allowlist to spare yourself an approval prompt trades a reviewed write for an unreviewed one. My dotfiles illustrate the division of labor: the `chezmoi` source tree (per §2a) is on the sandbox allowlist, so the capture-commit-push cycle runs without prompts, while the applied files under `~/.config/` are not — edits there arrive through the file-editing tools, where the rules grade by sensitivity: a standing allow for the ordinary metadata files, a per-edit `ask` (prompt with diff) for the agent policy files, and a hard deny on those files' `chezmoi` sources, covering both channels.
+
+`Codex` does not have this split: its filesystem permission profile applies to every write the same way, whichever internal tool performs it. One `Codex` value covers what `Claude Code` needs two settings for — worth remembering when mirroring a policy across both agents (per the cross-agent alignment below).
+
+### Network allowlist
+
+Package registries (PyPI, CRAN). GitHub (`github.com`, `api.github.com`, `codeload.github.com`, and the `raw`/`objects` `githubusercontent.com` hosts). Model API endpoints that project code calls. Project databases when a project needs them (`api.supabase.com`, `*.supabase.co` for Supabase-backed projects). The two agents' lists are maintained separately and need not match; after the §13b narrowing, Claude's is the leaner one — a registry I rarely install from (npm) now takes a per-session approval instead of a standing entry. Anything else needs explicit approval per session.
+
+### Environment-variable exclusions (Codex)
+
+Even if a secret is set in your login shell, you can prevent the agent's child processes from seeing it. The `shell_environment_policy.exclude` list strips named variables from the environment `Codex` hands to commands it runs: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GITHUB_TOKEN`, `SUPABASE_*`, `AWS_*`, `AZURE_*`, `GOOGLE_APPLICATION_CREDENTIALS`, `DATABASE_URL`. A second line of defense against accidental leaks.
+
+### Codex profiles (per-task posture)
+
+`Codex` lets you define multiple named profiles and pick one when you start a session:
+
+- `auto` — no approval prompts, project directory writable, no network. For unattended local work where I trust the task scope.
+- `guarded` — project directory writable, but untrusted commands prompt. For local automation that should ask before running unfamiliar commands.
+- `networked` — adds allowlisted network access. For dependency installs, web scraping, or GitHub work.
+- `readonly` — read-only filesystem, no writes. For audits and codebase questions.
+
+The pattern is to pick the most-restricted profile that still lets the task complete, rather than running one permissive profile for everything. A read-only audit shouldn't have write permissions; an unattended overnight run shouldn't have network access unless it needs it.
+
+### Cross-agent alignment
+
+The destructive-command policy is intentionally mirrored between `claude-settings.json` and `codex-rules/default.rules`. The top comment in `default.rules` makes this explicit:
+
+> These rules intentionally mirror the destructive-command denials in `claude-settings.json` where `Codex` has an equivalent command-policy surface.
+
+When you run multiple CLI agents (per §10's recommendation to run both), aligning the worst-case policy across them keeps the security posture coherent. Without alignment, a less-trusted agent could end up with permissions a more-trusted agent doesn't have.
+
+### Keeping the rationale in one place
+
+The settings files hold the *values*; they're a poor place for the *reasoning*. `settings.json` on the Claude side is strict JSON, which has no comment syntax at all, so there's nowhere to write a *why* beside a deny rule. `Codex`'s TOML does take comments, and I use them for local notes, but the reasoning that matters most is cross-cutting: it is about the *relationship* between the two agents' policies — the mirrored destructive-command set, the shared filesystem denies, the threat model they jointly defend against — and that doesn't live naturally inside either single file.
+
+So I keep a `SANDBOX.md` next to the settings that records the *why*, not the values: the design priorities, the principles behind the rules, the layered model that opens §13, a `Claude Code` ↔ `Codex` equivalence table that maps one agent's knobs onto the other's, and the operational gotchas (which changes need a restart, which config values are deprecated aliases for which). Keeping it there means the reasoning travels with the configuration instead of living only in my head.
+
+The test of whether such a file is worth keeping: when I change a permission a year from now, does it tell me why the setting was the way it was? It is the same split as the per-rule `justification` field above, lifted from the single rule to the whole policy — settings answer *what*, `SANDBOX.md` answers *why*.
+
+### The blind-click-fest failure mode
+
+The tuning matters as much as the rules themselves. When you find yourself approving the same prompt repeatedly without reading it, that's a signal: move that command to routine pass-through (if it's safe in general) or to a project-scoped blanket allow (if it's safe just in that project). When you discover an action you'd never have approved if you'd actually read the prompt, tighten the rule: move that command to `prompt` (with a justification line) or to `forbidden`. The whole system only works if the prompt rate stays low enough that you actually read the prompts that remain.
+
+### Conservative starting posture for new agent users
+
+The posture above is what I currently run after several years of tuning, and it leans toward broad pass-through with destructive carve-outs. That's reasonable for me; it is not the posture I'd recommend on day one. If you are new to agent permissions, the shape of a conservative starting posture looks roughly like this — *shape* rather than copyable config, since the exact values are specific to your own setup:
+
+- *Prompt* on destructive or externally-visible operations — `git push`, `gh`, deploys, DB-state changes, package install/uninstall/publish, system-package changes (`brew`, `apt`, `winget`).
+- *Allow* read-only inspection and local test/build commands — language interpreters, `git status`, `git diff`, `git log`, `just check`, `just build`, anything that reads but doesn't push or publish.
+- *Deny* destructive filesystem and `git` operations outright — `rm -rf`, `sudo`, `git push --force`, `git reset --hard` on branches with a remote, history-rewriting operations on shared branches.
+
+The relaxation path is to move items from the prompt-list to the allow-list one at a time as you trust the boundaries — same as the tuning loop in the previous subsection, just started from a tighter point. Items rarely flow the other way (allow → prompt) unless you discover a tool doing something you didn't expect. The `auto`/`guarded`/`networked`/`readonly` `Codex` profiles described earlier in this section let you carry this posture into specific task shapes without re-tuning each time.
+
+### Data permissions
+
+A different angle on the same permission layer: not what *commands* the agent can run, but what *data* the agent is allowed to read even when it has the credentials to do so. For statistical consulting and research work, the bigger risk is often an agent sending client material, unpublished results, or human-subject data to a cloud model or MCP server that the project's data-handling rules don't allow.
+
+Two questions to answer for each project explicitly:
+
+- *What can the agent read?* Some projects allow agents to operate on de-identified data; others can't allow agents to touch raw data at all. The default for sensitive material is *no agent access* unless the project's data-handling rules explicitly approve it.
+- *Can project data be sent to external model providers?* Cloud models receive whatever context the agent passes them. For client material, IRB-sensitive data, or unpublished results, the answer is often "no": meaning either the agent runs on a local model only, or the agent works on de-identified extracts, or the agent doesn't touch the data at all.
+
+The rule belongs in the project `AGENTS.md` (per §12), where the agent reads it on entry. A concrete example to adapt:
+
+> Agents may edit code and documentation, but may not open raw human-subject data unless the session explicitly says the data are de-identified and approved for cloud-model use.
+
+The mechanism for enforcement lives in the permission layer this subsection has been describing: filesystem denies on data directories, network denies on cloud model APIs when the project's data shouldn't leave the machine. The rule states the policy; the permission file encodes it.
+
+*Auth, privacy, and billing path.* A separate concern from "can the agent see this data" is "can the *vendor* see and train on it" — and the answer depends on which auth surface the agent is using. The four practical entry points and their default posture as of this writing:
+
+| Auth path | Training default | Cost visibility | Secret location | Recommended for sensitive work |
+|:---------------------------------------|:-------------------------------|:--------------------------|:-----------------------|:-------------------------------|
+| `Claude Code` via `Claude Pro/Max` | Opt-out toggle in `claude.ai` Settings → Privacy & data → *Help improve Anthropic*; verify CLI inherits | Flat monthly subscription | Login session | No — consumer terms apply unless you've verified the opt-out covers the CLI |
+| `Claude Code` via Anthropic Console / Commercial API | Excluded from training by default (commercial API terms) | Metered per-token, visible in Console dashboard | API key in `op`/`gopass` per §2b | Yes — cleaner default posture, document key + opt-out state in project `AGENTS.md` |
+| `Codex` via `ChatGPT Plus/Pro` | Opt-out toggle in `chatgpt.com` Settings → Data controls → *Improve the model for everyone*; verify CLI inherits | Flat monthly subscription | Login session | No — consumer terms apply unless you've verified the opt-out covers the CLI |
+| `Codex` via OpenAI Platform / Business / Enterprise / Edu | Excluded from training by default (Platform / Business / Enterprise / Edu terms) | Metered per-token (Platform) or workspace-billed (Business / Enterprise) | API key in `op` / `gopass` per §2b | Yes — workspace-tier accounts add audit logging and data-residency controls |
+
+Where to verify: each vendor's privacy or data-controls page is the source of truth; vendor terms have shifted multiple times (Anthropic notably tightened consumer data-use defaults in a recent policy change) so don't assume yesterday's setting is still in effect. For consulting engagements or any project covered by NDA, IRB review, or client confidentiality, *verify the opt-out state at the start of the project* and document it in the project `AGENTS.md`.
+
+### Cross-references
+
+- §2b secrets and credentials: the credential half of the picture this subsection covers the data-permission half of.
+- §12 MCP security: MCP servers fall under the same scrutiny: installing one is a permission grant, and credentials should flow through the §2b + §2c pipeline.
+
+## Sandboxing (lightweight): OS-native process sandbox
+
+### Role
+
+Lightweight sandboxing is an OS-level safety net that the agent CLI can wrap around its own execution. When active, the agent runs with a restricted view of the filesystem (typically only its working directory, not your `~/.ssh/` or other sensitive folders) and the network (typically only the model API, not your local services). Two important caveats: (a) what's actually restricted varies by product, platform, and the agent's approval-mode setting: `Claude Code`, `Codex`, and `Gemini CLI` don't all enforce the same boundaries, and an agent's "auto" mode allows more than its "ask first" mode; (b) even with the sandbox active, the agent can still touch any sensitive data that's *inside* the allowed area, so the project data boundary in `AGENTS.md` (per §13a's data-permissions framing) matters as much as the OS sandbox itself. Check each agent's actual permission model rather than assuming the restrictions are the same.
+
+In the intro's layer terms this is layer 3, and what it adds over §13a is the kind of guarantee. A deny rule binds the command as the agent wrote it. A prompt binds whatever a human catches. The kernel binds what the process can actually do. This is the one layer whose protection doesn't depend on the session behaving as expected: the bounds hold no matter what the agent has read, which is why the layer matters most for work that ingests content you don't control (scraping, third-party repositories and their issue threads, documents from outside your team). One residual stays open even here. A domain the session may read from can also receive data inside the requests sent to it, so the network allowlist cannot stop information flowing out to the same place it flows in from. For ingestion-heavy work the load-bearing control is read scope: run the work in a project that can read nothing else, so the worst case is bounded by that project's own contents.
+
+### What the pass-through list costs
+
+The guarantee above has a scope question attached: which commands actually run inside the sandbox? For `Claude Code` the answer is everything *not* on the `excludedCommands` list. An excluded command runs outside the kernel sandbox entirely: no filesystem bounds, no network allowlist. The deny rules still apply, but they match the command text as written and nothing more. Every exemption therefore trades the bound for convenience, and a list that grows casually hollows the layer out: exclude the general-purpose interpreters (`python`, `Rscript`, `bash *.sh`) and most of what an agent runs in a working session never meets the kernel bound at all — layers 1 and 2 carry the whole load. My own configuration started exactly there, with broad `tool *` wildcards for every daily tool; I have since reversed it.
+
+Exemptions are convenient, not required. A sandboxed command that needs more than the sandbox allows fails loudly with an "operation not permitted" error, and the agent can then request a one-off attended run — a prompt per invocation rather than a standing hole. So the question for each tool is whether it actually fails in-sandbox, and testing my daily workloads showed that most don't: `R` and `Rscript` (script writes, CRAN installs, `Stan` model compiles), `python` and `pip` (environment setup, package installs), the full `pandoc` → `xelatex` document build, `make`, `bash` scripts, and local `git` all run clean inside the bounds, and all came off the exemption list. Two narrow write grants made the frequent cases frictionless: `uv`'s interpreter store, and `chezmoi`'s state file so the §2a capture loop runs fully sandboxed. The rarely-used package managers (`npm`, `yarn`, `brew`) came off as well; per-invocation approval is the right channel at their frequency. What remains exempt is §13a's short list, the tools that genuinely cannot run sandboxed: the authenticated GitHub commands (`git push` / `git pull` / `git fetch`, `gh`) whose credential helper reads the macOS keychain the sandbox blocks, `op` (talks to the 1Password app), and `pueue` (talks to its daemon). That closes the asymmetry with `Codex`, whose sandbox has always bound every command: layer 3 now covers the bulk of both agents' command traffic.
+
+### macOS: Seatbelt (sandbox-exec)
+
+`Seatbelt` is Apple's built-in sandbox (the underlying command is `sandbox-exec`). `Claude Code` and `Codex` invoke it internally on macOS when you've enabled sandboxing in the agent's config (per §13a). You're not configuring `sandbox-exec` directly (the agent is), but knowing the layer is there helps when something the agent tried to do gets blocked unexpectedly.
+
+### Ubuntu / Windows (WSL2): the agent's Linux sandbox
+
+There's no single OS-native sandbox every agent CLI uses the way `Seatbelt` does on macOS. Instead each agent applies its own Linux sandbox when you enable sandboxing in its config (§13a), the same way it invokes `Seatbelt` on macOS. On bare-metal Linux that's the whole story. On Windows, running the agent inside `WSL2` adds an outer wall — a Linux subsystem isolated from your main Windows environment — and the agent's own restrictions apply inside it. As on macOS you don't drive this layer directly: the agent picks it. How much it restricts varies by product, so treat `WSL2` isolation as a practical containment pattern and verify the agent's actual behavior if a project's data-handling rules require a hard guarantee.
+
+### Alternatives and why not
+
+There aren't realistic alternatives at this layer for agentic CLI use today: this section is essentially "whatever sandbox the agent has chosen to use internally." A handful of OS-level tools exist (`AppContainer` on Windows, `firejail` and `bubblewrap` on Linux, low-level kernel mechanisms like `seccomp`), but none of the major agent CLIs use them. You don't pick the lightweight sandbox; the agent picks it for you. Your §10 agent choice and your §13a permission settings determine what's actually running here.
+
+### When I'd reconsider
+
+If the agent vendors stopped offering sandboxing, I'd start scripting `sandbox-exec` invocations by hand. That hasn't happened and probably won't, so this section is more about knowing the layer exists than actively configuring it. The configuration that you actually drive happens at §13a.
+
+## Sandboxing (heavyweight): container runtime
+
+### Role
+
+For most consulting analyses, you don't need a container runtime in the loop. You need reproducible R/Python environments (per §8) and a renderable report (per §3a). Heavyweight sandboxing applies in narrower cases: running untrusted code (building from a fresh dependency tree, executing third-party code, running a destructive migration) or §11c computer-use (the agent should drive a desktop in a container, not your actual desktop). Containers are a real tool, just not a daily one for most analyses.
+
+What you pick at this layer is the *runtime*: the engine that builds and runs containers. The containers themselves serve two functions in this stack — walled-off execution when blast radius warrants it (this subsection), and frozen project environments for reproducibility (§15d's project containers, defined by a `Dockerfile` and brought up on the same engine). One runtime, installed once, reached two ways: a throwaway `docker run` when the job is containment, the project's `Dockerfile` built and entered when the job is reproducibility.
+
+### macOS: Colima
+
+`Colima` is an open-source (MIT) command-line container runtime for the macOS. One Homebrew install (`colima`, plus the separate `docker` command-line client), one `colima start`, and the standard Docker socket is available to everything that expects one: `docker run`, `docker compose`, and §15d's project containers. There is no GUI, which suits this stack: setup and debugging are shell commands, so agents can do both (per §10), and after `colima start` the layer is invisible — you interact with `docker`, not with `Colima`. It manages a lightweight Linux virtual machine through `Lima`, an open-source virtual-machine manager, and runs the real Docker engine inside it, so compatibility is the engine's own rather than an emulation. It is free for any use, professional included: no paid seats, no license terms to clear with an employer.
+
+### Ubuntu / Windows (WSL2): Docker Engine
+
+On Linux the open-source Docker Engine runs *natively*, with no VM layer at all: you install it with `apt` and run it as a normal `systemd` service. On Windows the managed Linux VM already exists in the form of `WSL2`, which removes the need for a `Colima`-style VM manager: install the same Docker Engine inside the `WSL2` distribution and the Docker socket lives in the same shell where the terminal stack (§5) and the agents (§10) already operate. Either way the licensing distinction is the point: Docker *Engine* is Apache-2.0 and free at any organization size: it is Docker *Desktop*, the GUI wrapper, that requires a paid subscription beyond 250 employees or \$10M in revenue. The engine-only path gives up the GUI and its managed updates: no loss in a terminal-first, agent-managed setup. (macOS needs a VM manager of its own, which is why `Colima` is its pick.)
+
+### Alternatives and why not
+
+`OrbStack` is the commercial macOS option: a closed-source GUI product with a bundled Docker-compatible engine, marketed on speed (fast file sharing into containers, low battery drain). I haven't used it, and two facts keep it out of the pick: the GUI and desktop integration it charges for buy nothing in a workflow where agents handle setup and debugging from a shell, and its license requires a paid seat for professional use, including at non-profit and government employers.
+
+`Docker Desktop` is the incumbent GUI on both platforms and the lowest-friction path if you want a managed installer and automatic updates. The same license caveat applies in stronger form: free only below 250 employees and \$10M in revenue, government entities pay regardless, and the education exemption targets instructional use — verify before assuming it covers research or administrative work. On Windows it wraps the same `WSL2`-hosted engine you can install directly.
+
+`Rancher Desktop` is the free, open-source GUI alternative (Apache 2.0, from SUSE), with built-in `Kubernetes`. On the macOS it manages a `Lima` virtual machine — the same substrate `Colima` uses — so the choice between them is mostly a GUI versus the command line. Right pick if you want a graphical container view without license terms.
+
+`Podman` (the `podman machine` command-line tool, with `Podman Desktop` as an optional GUI) is the security-differentiated alternative: no root-level engine process, containers run under your own user account. The trade is Docker-API compatibility through a shim socket, which is where the edge cases live for `docker compose` and §15d workflows. Right pick if that security model matters more than drop-in compatibility.
+
+`Apple container` is Apple's first-party entry: open-source, Apple-silicon-only, one lightweight virtual machine per container. As of v0.11 it is not a Docker replacement — Docker-socket compatibility needs an experimental shim, and §15d-style workflows hit gaps — but a first-party tool is the likeliest future default on the platform. One to watch rather than adopt.
+
+### When I'd reconsider
+
+If `Apple container` reaches Docker-socket and §15d-class compatibility, the first-party tool probably becomes the macOS pick, and I'd re-evaluate then. If container work shifted from occasional (this section's framing) to daily — heavy §15d use, where file-sharing speed into the container starts to be felt — the performance-oriented commercial options would earn a benchmark and possibly a paid seat. On Windows, a teammate who wants a managed installer and clears the license terms can run `Docker Desktop` over the same `WSL2` engine; nothing else in the stack changes.
+
+## When to use which
+
+Three mechanisms, four layers, used together:
+
+- *Agent permission settings* (§13a; layers 1 and 2) — configured once per machine, tuned over time. This is the daily-use surface that determines what each agent can do.
+- *Lightweight OS sandbox* (§13b; layer 3) — runs around the agent automatically when configured. You check that it's enabled, and check what's excluded from it, rather than drive it day-to-day.
+- *Heavyweight container* (§13c; layer 4) — reach for it when blast radius warrants: untrusted code from the internet, destructive operations, fresh dependency trees from sources you don't know. Edge-case for routine analysis, first-line for §11c computer-use.
+
+You can also run all three at once. They serve different purposes and each one closes a different failure mode. For *project isolation* (the project `Dockerfile` — the reproducibility side of the container story), see §15d.

@@ -1,0 +1,53 @@
+---
+title: "17. Task Management"
+---
+
+Two adjacent niches that are easy to confuse. The *human-native* task manager is a personal productivity tool you drive day to day, that an agent can also read and append to. The *agent-native* task planner is the inverse: a structured task surface designed for an agent to consume, with you reading and editing it. The human-native manager carries your *operational* layer — the non-code, often deadline-driven obligations (correspondence, memos, follow-ups, errands) that span your ongoing concerns — while `TASKS.md` (§17b) carries one project's build tasks. They track different objects, which is why both earn a subsection: `TASKS.md` is per-project and lives in the repo; the human-native manager is cross-concern and lives in its own store.
+
+The distinction matters because the right tool for "what's on my plate this week" isn't the right tool for "decompose this PRD (Product Requirements Document, a written project spec) into a task tree the agent can work through." Both are tracked work; the workflows around them are different.
+
+## Task manager (human-native)
+
+### Role
+
+A human-native task manager is a personal productivity tool: you create tasks, organize them by project and tag, work through them, mark them complete. The agentic angle is that the task DB should be readable and writable by an agent too, so the agent can read what's on your list this week, append new tasks discovered during a session, or mark items complete as it finishes them.
+
+### macOS / Ubuntu: dstask
+
+`dstask` is my pick for the operational layer: each task is a markdown file with YAML frontmatter, stored in a `git` repository. The practical consequences of that design: each task is plain text and agent-readable without invoking the CLI, the `git` repository holds the task history, sync between machines is `git push` and `git pull`, and backup is whatever you do for git. The CLI follows a `dstask add` / `dstask edit` / `dstask done` shape.
+
+What makes it carry the operational layer cleanly is that a `dstask` store *is* a git repository, selected by the `DSTASK_GIT_REPO` environment variable (default `~/.dstask`). That turns separation between concerns into git access control: a separate store per ongoing concern, each its own repository with its own access (store = repository = access unit). I wire the switch through `direnv` (§2c): `cd` into a concern's project and its `.envrc` exports `DSTASK_GIT_REPO`, so `dstask` transparently operates on that concern's store; step out and it reverts to the personal default. That matters when concerns differ in confidentiality or in who else needs access: a confidential program's store lives in its own repository (kept off shared sync, pushed to a restricted remote), structurally separate from the personal one — a separation that tags inside a single shared store can't give you.
+
+Two knobs, two jobs. Separate *stores* (`DSTASK_GIT_REPO`) give hard separation across confidentiality or access boundaries. *Contexts* and tags (`dstask context +x`, also `direnv`-settable via `DSTASK_CONTEXT`) give soft focus *within* a store. Reach for stores when the question is who may see what; tags when it's only filtering your own view. And mind the boundary with code: this operational layer is for non-code obligations. Code work items and cross-repo tracking belong in GitHub issues, not here. (Cross-project *content* search — "which projects touched X" — is a third thing again, and it's just `rg` across the workspace.)
+
+### Alternatives and why not
+
+`TaskWarrior` is the obvious alternative. It's more featureful (recurrences, urgency calculations, complex dependencies, deep tagging) and has a longer history than `dstask`. It can export machine-readable JSON via `task export`, and extensions use that surface routinely, so agents can read `TaskWarrior`. The honest case for `dstask` over `TaskWarrior` is the file-native shape: a markdown task file is something an agent can read directly without invoking the CLI, which is one less indirection. Right pick for `TaskWarrior` if you need its depth and don't mind invoking `task export` from the agent path.
+
+`Linear` and `GitHub Issues` aren't a direct replacement for personal task tracking: they're issue trackers and project-management tools, in a different category. But they become relevant in an agentic context when agents are picking up work from issue or PR comments (cross-references §10 and §16). Worth knowing where the boundary is rather than skipping them entirely.
+
+### When I'd reconsider
+
+If the operational layer started to want recurrences, urgency calculations, or complex dependencies that `dstask` doesn't have, I'd switch to `TaskWarrior` — accepting the `task export` indirection on the agent path in exchange for the depth. For now `dstask`'s file-native simplicity, and the git-repo-per-concern story above, win.
+
+## Task planner (agent-native)
+
+### Role
+
+An agent-native task planner is a structured task surface designed primarily for the agent to consume, while a human reviews and edits. The shape: you (or the agent) write down what needs to happen at varying levels of detail. The agent reads the structure to plan its work and updates state as it makes progress. You check in periodically to redirect or clean up.
+
+### macOS / Ubuntu: AGENTS.md + TASKS.md
+
+`TASKS.md` is the persistent task-tracking file at the project root, alongside `AGENTS.md` (per §12). The two compose naturally: one convention, two uses. `AGENTS.md` briefs the agent on the project, `TASKS.md` tracks the work. No extra tool to learn or maintain. Plain markdown, human and agent-readable, version-controlled with the rest of the project.
+
+The structure is deliberately simple: *To Do*, *In Progress*, *Done*, with completion dates on done items. The agent reads it at the start of a session, after `STATUS.md`, to see what's open, and updates it as work happens. You read it at session start to remember context. For most iterative workflows (academic publishing, research projects, the kind of work this doc itself was produced under), `TASKS.md` is sufficient.
+
+Four files, four roles. `STATUS.md` (per §12) carries the current state: where the project stands right now, in one screen, rewritten as it changes. `TASKS.md` carries operational state: what's open, what's mid-flight, what's done and when. `PLAN.md` (per §12) carries the analysis sequence: what's planned, in what order, what the milestones are. `METHODOLOGY.md` (per §12) carries the methodological reasoning: why this model, why this prior, what alternatives were rejected. Don't mix them: `TASKS.md` shouldn't carry model rationale, `METHODOLOGY.md` shouldn't carry routine to-dos, `PLAN.md` shouldn't track in-progress task state, and `STATUS.md` shouldn't accumulate a history. Four files keeps each one readable and keeps the agent reading the right file for the right question.
+
+### Alternatives and why not
+
+`Task Master AI` is the structured, PRD-driven (Product Requirements Document) alternative. You point it at a written specification document, it generates a decomposed task tree, and it exposes a `tasks.json` that agents can consume programmatically. The tasks have explicit dependencies, statuses, and structured metadata. It fits PRD-shaped software projects, where a multi-page specification gets decomposed into a deep dependency tree the agent works through. Most statistical consulting projects aren't PRD-shaped: they're question-shaped, data-shaped, model-shaped, and the structure that matters lives in `PLAN.md` and `METHODOLOGY.md`, not in a `tasks.json` schema. For statistical work, `AGENTS.md` + `TASKS.md` + `PLAN.md` + `METHODOLOGY.md` covers the ground; reach for `Task Master AI` only on PRD-driven projects.
+
+### When I'd reconsider
+
+If I started a project from a real PRD-style spec and the manual `TASKS.md` scaffold started to feel like it was hiding the structure, I'd try `Task Master AI` for that project. At the moment, `AGENTS.md` + `TASKS.md` continues to be sufficient.

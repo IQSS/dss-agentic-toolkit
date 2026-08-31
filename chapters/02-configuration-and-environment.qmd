@@ -1,0 +1,219 @@
+---
+title: "2. Configuration and Environment"
+---
+
+Four tools that together define your working environment. Each owns a different orthogonal axis (config *files*, secret *values*, environment *variables*, runtime *versions*), and they compose into a coherent stack rather than overlapping. The subsections below are in install order — set them up in the order a fresh machine would need them. Secrets storage (§2b) and environment injection (§2c) are adjacent because they form the two halves of the per-project secrets pipeline; runtime version pinning (§2d) is an independent concern and comes last.
+
+§2b covers two co-equal paths because the choice is driven by whether you're willing to pay for `1Password`: the primary path uses `op` (the `1Password` CLI) and is what I run; the open-source path uses `gopass` with `age` encryption. The rest of §2 is identical regardless of which storage tool you pick.
+
+| Tool | Job | What it owns |
+|:-------------------|:------------------------------------|:-------------------------------------------|
+| `chezmoi` (§2a) | Where do your *config files* live? | `.zshrc`, `.gitconfig`, `~/.config/foo/config.toml` |
+| `op` or `gopass` (§2b) | Where do your secret *values* live? | API keys, tokens, passwords in an encrypted vault |
+| `direnv` (§2c) | Which *environment variables* are active in this shell? | `PATH`, `DATABASE_URL`, `GITHUB_PAT` — set/unset on `cd`, including secrets pulled from §2b |
+| `mise` (§2d) | Which *runtime versions* are active? | Python 3.12, ripgrep 14 — installed per project |
+
+They compose: `chezmoi` puts your `.zshrc` in place, and the `.zshrc` activates `direnv` and `mise`. When you `cd` into a project, `direnv` reads the project's `.envrc` and exports its environment variables (including secrets pulled from the §2b store via `op read` or `gopass show`), while `mise` switches to the project's pinned runtimes. Each tool does one job and the integration points are stable.
+
+## Dotfile manager
+
+### Role
+
+Your dotfiles are the configuration that distinguishes your machine from a stock install. A dotfile manager carries them across machines, keeps them in version control, and reduces the "set up a new laptop" task to one command. It's also where per-machine differences (user names, work vs. personal API keys, OS-specific paths) get resolved without forking config files.
+
+The reason this needs a dedicated tool rather than plain `git`: dotfiles aren't a folder you can version. They're scattered across `\$HOME` at paths each tool dictates (`~/.zshrc`, `~/.gitconfig`, `~/.config/`, `~/.claude/`), and you can't `git init` in `\$HOME` without tracking the entire home directory (every cache, key, and download). Plain `git` gives you the repository. It does nothing about placement. A dotfile manager is the repository *plus* the engine that puts each file where its tool reads it. Hand-symlinking each file from a central directory gets you part of the way, but some tools won't follow a symlinked config, and the symlink count climbs fast once the shell, prompt, and multiplexer are all in play. Keeping the files in a repository also buys history: trying a setting and cleanly reverting it becomes a `git` operation rather than a guess.
+
+### macOS / Ubuntu: chezmoi
+
+`chezmoi` is what I use, and it's fully cross-platform — one dotfile repository carries macOS and an Ubuntu (WSL2 or Linux) shell without forking, with templates resolving per-machine. It manages a `git` repository of your dotfiles and applies them to your home directory on demand. Three features that matter:
+
+- *Templates.* A single source file can produce different output on different machines. One `.gitconfig` template can resolve to your work email on the work laptop and your personal email on the personal laptop, for example.
+- *Encrypted secrets.* When a secret has to be physically present in a config file, `chezmoi` can either store it encrypted in the repository (via `age`, a modern encryption tool, or `gpg`, the older standard) and decrypt it on apply, or pull it from your `op` / `gopass` store at apply time so nothing — not even ciphertext — reaches the repository. For most users this feature is rarely used (see "Division of labor with §2b" below).
+- *Preview before apply.* `chezmoi diff` shows what would change in your home directory before `chezmoi apply` makes the change. Useful for not accidentally overwriting a config file you'd hand-edited.
+
+![](figures/chezmoi-source-and-applied.svg){#fig-chezmoi-source-and-applied fig-alt="How chezmoi relates its source tree to the applied dotfiles and the per-agent symlinks." above="16pt" below="14pt"}
+
+The figure shows how this works, with my agent-config setup as the example. The source files live in a `chezmoi`-tracked directory — a private `git` repository, not your live home directory. `chezmoi apply` materializes each one as an ordinary file at the path its tool expects. Edit one of those applied files in place, and `chezmoi re-add` captures the change back into the source repository as an ordinary `git` commit. The agent files are the interesting case. Rather than leaving each at the scattered path its tool dictates, they are collected into a single directory, `~/.config/agents/`, called the hub, and each tool's expected path (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and the rest) becomes a symlink pointing into it.
+
+Why gather them like this, when `chezmoi` already puts each file where its tool reads it? Because the hub answers a different question than `chezmoi` does. `chezmoi` handles reproducibility and placement across machines. The hub is a layout choice on top, and the payoff shows up when you edit: with every rule and config file in one folder, the whole set opens in a single editor. `Typora` lists every file in the folder in its side nav, so reading or editing the entire rule set is one task instead of a hunt across `~/.claude/`, `~/.codex/`, and the rest. And because the hub is one `chezmoi` repository underneath, that whole rule set is backed up and rebuildable from a single `chezmoi init --apply` if the machine is ever wiped or replaced. The symlinks the figure shows are what reconcile this with each tool's fixed read path, and `chezmoi` makes and tracks them as part of the same apply.
+
+What I actually keep in mine: standard dotfiles (`.zshrc`, `.gitconfig`, `.p10k.zsh`, shell aliases, the Zellij layouts from §6), the entire `~/.config/agents/` tree from §12 (so the global agent rules apply identically on every machine), the per-agent symlinks `Claude Code` and `Codex` read, and a few small productivity scripts — for instance a `typora` shim at `~/.local/bin/typora` so I can `typora <file>` from the terminal, and shell functions like `agents CONVENTIONS.md` (opens that metadata file in Typora) and `cda` (`cd` into the global metadata folder). A single `chezmoi init --apply <repo>` on a fresh macOS machine rebuilds every dotfile.
+
+### Division of labor with §2b
+
+Most of what you'll need to keep secret (API keys, tokens, deploy keys, database credentials) belongs in your §2b secrets store (`op` or `gopass`), not in `chezmoi`'s encrypted-secrets feature. The §2b store keeps secrets encrypted at rest; `direnv` (per §2c) pulls them into the process environment of each project on `cd`-in, so they never sit unencrypted in a file on disk. `chezmoi`'s encryption is for the narrow case where a secret has to live inside a config file rather than in the project environment. Most users never touch the encryption feature, because the configs they manage reference §2b (via `direnv`) for any credentials they need.
+
+### Alternatives and why not
+
+`stow` is the simpler alternative. It places symlinks from your home directory back to files in a central directory: no templates, no encryption, no per-machine logic. That symlink fan-out is exactly what the agent hub relies on, but `chezmoi` already makes and tracks those symlinks on apply, so pairing it with `stow` would be redundant. `stow` on its own is fine for a small set of dotfiles on one machine, and adding a second machine or an encrypted credential is where it starts to fall short.
+
+### When I'd reconsider
+
+If I were going to use `Nix` on §1, I'd switch to `Home Manager` (the dotfile-manager built into `Nix`) instead of `chezmoi`, to keep the foundation layer on one tool. Otherwise I won't leave `chezmoi`.
+
+## Secrets and credentials
+
+### Role
+
+How API keys, tokens, and other credentials get *stored* in a canonical encrypted place so that the injection layer (§2c) can pull them into the process environment without leaking into shell history, dotfiles, or commit logs. The surface area is small but the consequences of getting it wrong are large: a leaked credential in a public repository or pasted into a chat. This is foundational because credentials are needed before any tool that reads them from an environment variable can work: agent CLIs that call commercial APIs, database clients, deployment commands, and scripts that hit web services. (`git push` over HTTPS and `gh` sit outside this path — they authenticate through the OS credential manager / `gh`'s own keyring, not an environment variable, so they don't depend on §2b/§2c at all.) This section covers *storage*. §2c covers the *injection* half: how stored secrets land in the environment of the process that needs them.
+
+### Two co-equal paths
+
+The doc treats two paths as co-equal because the choice between them is genuinely down to taste and budget, not capability:
+
+- *Primary path: `op` + `1Password`.* What I run. Touch ID unlock, vendor-managed cloud sync, ~\$3/mo `1Password Personal` subscription. The GUI is nice if you also use it for human-facing logins (banks, web accounts, 2FA backup codes). Easiest on macOS specifically because biometric unlock is a single tap.
+- *Open-source path: `gopass` + `age`.* Free, no vendor, secrets are encrypted at rest with `age` and synced across machines via a private `git` repository you control. (`age` is a modern file-encryption tool.) Worth the slightly rougher UX if you don't want to pay a subscription for credential storage or you object to vendor lock-in for any reason.
+
+Everything *outside* §2b is identical regardless of which path you pick: `direnv` (§2c) reads a per-project `.envrc`, the `.envrc` calls either `op read` or `gopass show`, and the project gets the secrets it needs. The per-shape `.envrc` templates in `TEMPLATES.md` come in both flavors. Switching from one to the other later is a sed-and-migrate job, not an architectural change.
+
+### Primary path: op (macOS and Ubuntu)
+
+`op` is the `1Password` command-line interface, distinct from the `1Password` GUI app. (Install via `brew install --cask 1password-cli` on macOS; on Ubuntu it installs the same way through `Homebrew`, and inside WSL2 it unlocks against the `1Password` desktop app on the Windows side.) After enabling "Integrate with `1Password` CLI" in the desktop app's developer settings, `op` authenticates via the same biometric unlock you use for the GUI — no separate `op signin` session token to manage. If you don't run the desktop app at all, the `gopass` path below needs no GUI.
+
+Two CLI patterns matter:
+
+- `op read op://Vault/Item/field` — pulls a single value to stdout. Used inside an `.envrc` to populate one environment variable.
+- `op run --env-file=.env.template -- <command>` — wraps a command, reads `op://...` references from `.env.template`, exports them to the wrapped process's environment, and discards them when it exits. Used when you want secrets to live only for one command's lifetime rather than the whole shell session.
+
+The pattern, with §2c as the consumer:
+
+```
+# stored in 1Password as item "github-pat-personal" with a credential field, in the Credentials vault.
+# Pulled into the project env via direnv (.envrc — see §2c for the full per-project template):
+export GITHUB_PAT="\$(op read op://Credentials/github-pat-personal/credential)"
+```
+
+One syntactic constraint worth knowing in advance: `op://` references can't contain parentheses, slashes, colons, or other punctuation that `1Password` permits inside *item titles*. This bites first on keychain-imported logins, which arrive with shapes like `apple.com (user@example.com)`. When an item's title has any of those characters, reference the item by its UUID instead — `op item list --vault <name> --format=json` prints the IDs, and a reference of the form `op://<vault>/<id>/credential` resolves the same way as the title form.
+
+### Open-source path: gopass + age (macOS and Ubuntu)
+
+`gopass` is an `age`-encrypted secret store on disk, synced across machines via a private `git` repository. Each secret lives as a small encrypted file under a tree like `personal/github/pat`, and `gopass show personal/github/pat` decrypts the file and prints the value to your terminal. Install via `brew install gopass age` on macOS (same install inside `WSL2` on Windows). On first machine, `gopass setup --create --crypto age --storage gitfs` generates an `age` keypair and initializes the local store; on subsequent machines you import the same `age` private key and `gopass clone <git-remote>`.
+
+The unlock story is the only material difference vs. `op`: the `age` identity is passphrase-encrypted, so the first `gopass show` after a fresh login prompts (in your terminal, via `pinentry`) for the passphrase. After that, `gopass`'s built-in age agent caches the unlocked identity in memory for the lifetime of the agent process — every subsequent `gopass show` is silent, across shells and subprocesses. So the practical UX is "type a passphrase once per login session, then silent" rather than `op`'s "Touch ID tap once per session, then silent."
+
+The pattern, with §2c as the consumer:
+
+```
+# stored in gopass under personal/github/pat
+gopass insert personal/github/pat
+
+# pulled into the project env via direnv (.envrc — see §2c for the full per-project template):
+export GITHUB_PAT="\$(gopass show -o personal/github/pat)"
+```
+
+The `-o` flag prints only the first line (the secret value) and suppresses the metadata line `gopass` prepends to multi-line entries.
+
+The `git` remote for the encrypted store should be private (`gh repo create gopass-store --private` is enough). The repository only ever contains ciphertext, so a private repository on any host you already use is fine; the threat model the encryption defeats is loss of the cloud host's storage, not loss of access control over it.
+
+### Disaster recovery (open-source path only)
+
+`gopass`'s entire security model rests on the `age` private key at `~/.config/gopass/age/identities`. If you lose that key, the encrypted store on every machine becomes unrecoverable. Back the key up somewhere durable that isn't the same git host the store syncs through: a hard copy filed with your passport, or a digital copy in a password manager like `1Password` if you use one. Treat it like any other one-time-write credential you can't afford to lose. The `op` path doesn't have an equivalent step — `1Password` handles your master credential's recovery via the recovery code they generate at signup.
+
+### Division of labor with §2a chezmoi
+
+The two tools cover different secret-shapes:
+
+- §2b handles *runtime secrets*: anything an agent or script reads from an environment variable. API keys, tokens, deploy keys, database credentials. The secret is decrypted on demand and exported into a project's environment by `direnv` (per §2c) for the duration of the shell session, never sitting unencrypted in a file on disk.
+- `chezmoi`'s encrypted-secrets feature (per §2a) handles *config-file secrets*: the narrow case where a secret must live inside a config file rather than in the project environment.
+
+For most users, §2b covers ~90% of what they need and `chezmoi` just manages config files without using its encryption feature, because the configs reference §2b (via `direnv`) for any credentials they touch.
+
+### Other alternatives
+
+`Bitwarden` is the third name worth knowing: a free tier for personal use, `Vaultwarden` for self-hosting if you'd rather not put secrets in a vendor cloud. The non-interactive story is rougher than either `op`'s Touch ID or `gopass`'s agent-cached unlock — you capture a session token (`BW_SESSION=\$(bw unlock --raw)`) and persist it somewhere for scheduled scripts to find. Reasonable pick if `1Password`'s subscription is the blocker but you want a GUI experience that `gopass` doesn't provide.
+
+`sops` is the option for teams that need to encrypt whole files (`YAML`, `JSON`) and share them in a `git` repository. The natural pick if your team already runs `Kubernetes` / `Terraform` infrastructure where shared encrypted config files are a normal pattern. Overkill for solo CLI work.
+
+Plaintext `.env` files (the simpler-but-risky pattern people often land on first) sit on disk unencrypted, any process can read them once exported, and they're easy to accidentally commit. They are *not* a secrets-storage option. `direnv`'s `.envrc` (per §2c) is for *injection*, not storage — the values it injects come from §2b, not from a committed plaintext file.
+
+### When I'd reconsider
+
+If I joined a team that genuinely shared a vault — multiple humans needing read access to the same credentials — `op` (paired with `1Password Teams`) becomes the right answer for the shared subset; `gopass` works too via repository collaborator access. If I started managing `Kubernetes` / `Terraform` infrastructure, I'd evaluate `sops` for the structured-file half of the storage problem. If `1Password` ever stopped working for me (price hike, policy change, mobile experience regression), `gopass` is the path I'd switch to without changing anything else in §2c onward.
+
+## Environment manager
+
+### Role
+
+An environment manager auto-loads project-specific environment variables when you `cd` into a project directory, and unloads them when you leave. Under §2b's storage choice (either `op` or `gopass`), the environment manager is also the *injection* half of the secrets pipeline: a project's `.envrc` (present only when that project's own code or tooling consumes a credential at runtime) calls `op read` (or `gopass show`) to pull the credentials it needs and exports them into the shell. So this section covers two related jobs in one tool: (a) per-project secrets *injection* (the primary job), and (b) per-project non-secret env scoping — `PATH` tweaks, project flags, virtualenv markers — the secondary job.
+
+### macOS / Ubuntu: direnv
+
+`direnv` reads a `.envrc` file at the project root when you `cd` in, exports whatever environment variables it declares, and unloads them when you leave the directory. It's small, fast, and unobtrusive once configured. You approve each project's `.envrc` once with `direnv allow` so a malicious `.envrc` from a cloned repository can't auto-execute.
+
+The canonical pattern: a project gets an `.envrc` only when its own code or tooling consumes a credential at runtime, and that `.envrc` exports just those secrets from §2b plus any non-secret env the project needs. Paper-shaped projects typically need only `GITHUB_PAT`, consumed by `renv` to authenticate GitHub package installs (it avoids API rate limits and is needed for private-repo packages), *not* by `git` or `gh`, which authenticate through the credential manager. A paper project that doesn't use `renv` needs no `.envrc` at all, and push-only, minimal, and publishing projects generally don't get one either. Data projects layer data-source API keys on top of `GITHUB_PAT`, and SaaS-shaped projects pull a fuller stack. Per-project-shape templates for the `.envrc` live in `TEMPLATES.md` so an agent scaffolding a new project can write the right one from the shape definition. The templates come in two flavors — `op read` for the primary path, `gopass show` for the open-source path — and which one applies is determined by which §2b path the user picked.
+
+A typical data-shaped project `.envrc`, primary (`op`) path — `GITHUB_PAT` for `renv` plus one data-source key:
+
+```
+# in .envrc — per-project secrets from 1Password + non-secret env
+export GITHUB_PAT="\$(op read op://Credentials/github-pat-personal/credential)"
+export CENSUS_API_KEY="\$(op read op://Credentials/us-census-api/credential)"
+
+# non-secret project env
+export PATH="\$PWD/scripts:\$PATH"
+export PROJECT_FLAG=foo
+```
+
+The same project's `.envrc` on the open-source (`gopass`) path:
+
+```
+# in .envrc — per-project secrets from gopass + non-secret env
+export GITHUB_PAT="\$(gopass show -o personal/github/pat)"
+export CENSUS_API_KEY="\$(gopass show -o personal/census/api-key)"
+
+# non-secret project env
+export PATH="\$PWD/scripts:\$PATH"
+export PROJECT_FLAG=foo
+```
+
+AI-provider keys belong in an `.envrc` only when the project's *own code* calls the API at runtime — and then they route through the Bedrock item, since there is no standalone Anthropic key and no OpenAI key at all (Codex runs on a Pro account):
+
+```
+export ANTHROPIC_API_KEY="$(op read op://Credentials/aws-bedrock-claude/credential)"
+```
+
+Don't add an AI-provider key to an `.envrc` just to point an agent at a backend: `direnv` would export it for *every* shell started in that directory, so a subscription-mode launch would silently pick it up and route onto billed API usage. Agent-backend selection happens at launch, not in the `.envrc`.
+
+`direnv` captures these exports into the shell on `cd`-in and unsets them on `cd`-out, so secrets exist in environment only while you are working in that project directory. The `.envrc` itself is safe to commit in *private* project repositories — it holds vault *paths*, not values, so the repository only reveals which named credentials the project consumes. For *public* repositories, the vault path itself can leak more than you mean to: service names, client names, internal item labels, the shape of your secrets layout. The conservative pattern for public repositories is to commit a `.envrc.example` with generic item names (`op://Vault/PROJECT_TOKEN/credential` rather than `op://Acme/AcmeProductionAPI/credential`) and keep the real `.envrc` gitignored, expecting each contributor to derive their own from the example.
+
+The first time you `cd` into a project after cloning it, `direnv` prints a warning and refuses to load until you run `direnv allow`. This is the safety mechanism that prevents arbitrary shell code from executing just because you opened a directory.
+
+### Alternatives and why not
+
+*Loading every secret in `~/.zshrc`* is the simpler "just put them all in the shell" pattern. Works fine if your secrets are stable across projects and you want zero per-project setup. The reason `direnv` wins for me: my project mix varies enough — paper-shaped projects (R, only `GITHUB_PAT` for `renv`), data projects (data-source API keys layered on top), the React/TypeScript SaaS project (a whole stack of project-specific tokens) — that loading everything in every shell either over-exposes secrets to projects that don't use them or under-fills the environment for the project that does. The per-project `.envrc` also doubles as the manifest of which credentials each project depends on.
+
+*Per-command secret-injection wrappers* (`op run --env-file=...` is the canonical example; gopass has no equivalent built-in) inject secrets only into the wrapped process's environment and discard them when the command exits. The right pick when you need strict isolation between processes — multi-user machines, regulated environments, or scheduled jobs where you want secrets to vanish the moment the job completes. Overkill for solo CLI work where the threat model is "don't leave plaintext on disk," not "isolate one process from another." The extra wrapper around every command is friction without benefit at this scale.
+
+`mise` (per §2d) has its own `[env]` block in `mise.toml` that can set environment variables per project. For static, low-sensitivity variables (`RUST_LOG=debug`, project tool versions), `mise`'s `[env]` does the same job. Reach for `direnv` instead when you need to run shell commands at directory entry — `op read` or `gopass show` calls for secrets, dynamic `PATH` extension — which `mise`'s declarative TOML can't do. For workflows where projects need *neither* secrets injection *nor* dynamic environment variables, `mise` alone covers the static environment-variable case.
+
+### When I'd reconsider
+
+If `mise` adds support for executing shell commands in its env section (similar to `direnv`'s `.envrc`), the two tools collapse and one of them — probably `direnv` — becomes redundant. If my project mix narrowed to one shape with stable secrets, the zshrc-loaded pattern would compete more seriously. If I started running unattended cron jobs that should not leave secrets sitting in shell env after they complete, I'd add a per-command wrapper for those specific jobs while keeping `direnv` for interactive use.
+
+Putting §2b and §2c together, the whole secrets path is one short flow:
+
+![](figures/secrets-flow.svg){#fig-secrets-flow fig-alt="Secrets from storage to injection to use: the 1Password and gopass paths converging on per-project environment variables. Captioned: injection is needs-based, so a project gets an .envrc only when its own code or tooling consumes a credential." above="18pt" below="16pt"}
+
+## Runtime manager
+
+### Role
+
+This subsection covers a single tool that pins multiple runtime versions per project and activates them on `cd`. It's most valuable for real product-development work where a single project mixes several runtimes. A concrete example from my own stack: a React.js / TypeScript SaaS on a `Supabase` backend that pins a specific `Node` major and a specific `pnpm` version at the project root, so every shell — interactive, agent-spawned, or a continuous-integration runner — picks up the same versions automatically.
+
+Single-language projects don't need a runtime manager: §8a's `uv` covers `Python` interpreter pinning alongside its dependencies, and §8b's `renv` covers R packages on top of a system R install. The runtime manager pays off once the language count crosses two and you'd rather have one config format pinning all of them than a separate single-language manager per tool.
+
+The boundary with §8: this section handles runtime/CLI version pinning; §8 handles full transitive dependency closures (`pixi.toml` + `pixi.lock` for Python, `renv.lock` for R) where version *and* environment management are managed together by language-specific tooling.
+
+### macOS / Ubuntu: mise
+
+`mise` (formerly `rtx`) is a multi-language runtime manager: one Rust binary that replaces `pyenv` and similar single-language version managers. It reads a `.tool-versions` file at the project root and switches to the right versions when you `cd` in. The plugin ecosystem covers `Python`, `Node`, `Pandoc`, `TeX Live`, and the long tail of CLI tools — the runtime versions a project actually needs to pin. The `.tool-versions` file is portable, so a project pins the same versions on macOS and Ubuntu alike.
+
+### Alternatives and why not
+
+`asdf` is the original polyglot runtime manager — same shape as `mise`, same `.tool-versions` file format, same plugin model. `mise` is essentially a from-scratch Rust rewrite (`asdf` is implemented in Bash with shim files), so the performance difference shows up on every `cd` and every command invocation in a deep project tree. Anyone with an existing `.tool-versions` setup can adopt `mise` as a transparent upgrade.
+
+`devbox` (from Jetify) and `devenv` (from the Cachix team) take a more ambitious approach: both wrap `Nix` (covered as the heavier-weight reproducibility option in §15d) to declare a project's full toolchain — runtimes, system libraries, services like databases — in a single config file. The reproducibility ceiling is higher than `mise`'s because you're pinning the entire dependency graph rather than just runtime versions, but the adoption tax is also higher (`Nix` has a real learning curve and its own conceptual model). Worth a look for projects that need bit-exact reproducibility or that span runtimes `Nix` covers well but `mise` plugins don't.
+
+### When I'd reconsider
+
+If a future runtime manager solves `R`-version management properly, I'd revisit. `mise`'s `R` plugin is functional but thin, which is why §8b adds `rig` as a companion tool. That gap is the weakest part of `mise`'s coverage today.

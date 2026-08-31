@@ -1,0 +1,29 @@
+---
+title: "6. Session Persistence and Pane Management"
+---
+
+Two problems show up routinely in data-science work: keeping an interactive *shell* alive across closing and reopening the terminal (so an `R` REPL or a multi-step build doesn't lose state when you quit `iTerm2` at the end of the day), and the need to watch several things at once (the model run, the log, the agent, `git` status). Once you're running multiple agents in parallel (per §10), the second problem becomes constant. A *terminal multiplexer* solves both: it splits one window into multiple side-by-side panes, and it keeps the shells inside those panes running after the terminal window closes. The related but separate problem — keeping a long-running *job* alive across reboot or agent-session reset (`brm()` fits, overnight scrapes) — is §7's job; a multiplexer alone isn't enough for that.
+
+## Role
+
+A terminal multiplexer does two jobs that look related but aren't: it lets a session survive disconnect (so closing the terminal window or quitting the terminal app doesn't kill the shells inside, and you reopen the terminal, `zellij attach`, and pick up exactly where you left off), and it splits one terminal window into many panes with named layouts (so several parallel agents are a single keystroke away from each other). What it does *not* cover is a job dying when *its* shell dies, even if the surrounding pane stayed alive — most commonly when an agent session ends and the shells it spawned go with it. §7 is where that broader job-persistence problem lives. Session persistence is the baseline; declarative layouts are what make two parallel patterns cheap to set up.
+
+The one I lean on most is keeping several whole projects live at once, one per pane, so I can move between them issuing commands and steering a different agent in each; within any one of those panes the agent may be editing dozens of files, so the aggregate is scores of files across a handful of projects, all attended in parallel. The second, which I reach for less often, is the worktree-per-agent pattern in §16: several agents working a *single* project, each in its own worktree. Both are still *project-shaped* work, one pane bounded by one project root. Genuinely *cross-project* work is a different shape and not an agent-in-a-pane job: cross-project task tracking lives in `dstask` (§17), code work items in GitHub issues, and cross-project content search — "which projects touched X" — is just `rg` across the workspace.
+
+On screen, the first pattern looks like this:
+
+![](figures/zellij-panes.svg){#fig-zellij-panes fig-alt="The working model of one Zellij pane per project, with several projects live at once. Captioned: move between panes to steer a different agent in each; each pane is one project root, so parallel projects rather than many agents on one project." above="18pt" below="16pt"}
+
+## macOS / Ubuntu: Zellij
+
+`Zellij` is a Rust multiplexer with usable keybindings by default, a status bar that shows the current mode and the available keys, layouts in KDL so a project can declare its standard layout once and reload it on demand, and adequate plugin support. For agentic work specifically, layouts let you scaffold a standard arrangement with a single command. It runs identically in an Ubuntu shell (so inside WSL2), once your shell is there per §5a.
+
+## Alternatives and why not
+
+`tmux` is the long-standing default. Large ecosystem, configurable, plugins for most things. The downside: the config language and prefix-based keybindings are archaic and difficult to learn. `tmux` can be useful on a remote machine where it's preinstalled and `Zellij` isn't.
+
+`WezTerm`'s built-in multiplexer handles persistence and panes itself.
+
+## When I'd reconsider
+
+I'd reconsider only if the §16 orchestrators matured enough to retire hand-laying-out parallel agents — and even then `Zellij`'s one-pane-per-project job would remain, which `WezTerm`'s built-in multiplexer could absorb if you'd already chosen it at §4.
