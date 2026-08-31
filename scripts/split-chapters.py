@@ -53,6 +53,16 @@ PLACEHOLDER = re.compile(r"^\s*# chapters are added here when the content pipeli
 # and a naive ^# scan would cut the document at every one of them.
 FENCE = re.compile(r"^ {0,3}(?P<char>`{3,}|~{3,})(?P<info>.*)$")
 
+# What the sync copies out of this directory into a site, as (source name, destination path). These
+# have to live in the site because CI clones it alone. check-upstream.py reads this list, so that a
+# file added here is a file the next check knows a site should have.
+COPIED_TOOLING = (
+    ("site-filter.lua", "filters/site-filter.lua"),
+    ("site.css", "site.css"),
+    ("split-chapters.py", "scripts/split-chapters.py"),
+    ("check-site.py", "scripts/check-site.py"),
+)
+
 H1 = re.compile(r"^# (?P<text>.+?)\s*$")
 NUMBERED = re.compile(r"^(?P<num>\d+)\.\s+(?P<rest>.+)$")
 APPENDIX = re.compile(r"^Appendix\s+(?P<letter>[A-Z])\.\s+(?P<rest>.+)$")
@@ -362,14 +372,12 @@ def main() -> None:
     # renders it, exactly as a deployment would. They are copies, so an edit made to one of them here
     # is lost at the next sync -- the originals are in dss-training-ops/scripts/.
     here = Path(__file__).parent
-    (site / "filters").mkdir(exist_ok=True)
-    shutil.copyfile(here / "site-filter.lua", site / "filters" / "site-filter.lua")
-    shutil.copyfile(here / "site.css", site / "site.css")
-    (site / "scripts").mkdir(exist_ok=True)
-    for tool in ("split-chapters.py", "check-site.py"):
-        dest = site / "scripts" / tool
-        shutil.copyfile(here / tool, dest)
-        dest.chmod(0o755)
+    for name, rel_dest in COPIED_TOOLING:
+        dest = site / rel_dest
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(here / name, dest)
+        if dest.suffix == ".py":
+            dest.chmod(0o755)
 
     # 4. the chapters, replacing whatever was there so a rename cannot leave the old file behind
     out_dir = site / "chapters"
