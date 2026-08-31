@@ -9,7 +9,9 @@ filters:
 # The filter's styling counterpart, generated alongside it by `just sync`.
 format:
   dss-theme-html:
-    css: site.css
+    css:
+      - site.css
+      - figures-dark.css
 
 project:
   type: dss-theme
