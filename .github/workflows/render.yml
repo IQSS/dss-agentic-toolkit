@@ -1,4 +1,6 @@
-# Build check: render on every push, so a broken source is caught here rather than at publish time.
+# Build and content checks on every push. The render catches a broken source; the two checks catch the
+# failures a render cannot see -- a chapter edited here instead of upstream, an authoring comment in the
+# page source, a figure or cross-reference that no longer resolves.
 # Nothing is published from CI. The repository is a private sandbox; publishing will come from Cloudflare
 # Pages, which builds from the repository itself. If the site later moves to IQSS and GitHub Pages, restore
 # a publish step (quarto-dev/quarto-actions/publish@v2 with target: gh-pages).
@@ -18,5 +20,11 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: "1.9.38"
+      - name: Chapters match the committed source
+        run: scripts/split-chapters.py --check --site .
+
       - name: Render
         run: quarto render
+
+      - name: Rendered site is clean
+        run: scripts/check-site.py
