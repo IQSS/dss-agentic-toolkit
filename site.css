@@ -1,0 +1,45 @@
+/* site.css — the styling counterpart of scripts/site-filter.lua, shared by both agentic-AI sites and
+   copied into each by `just sync`. Rules that apply to only one of the two documents are inert on the
+   other, which is why they live together rather than in two nearly identical files. */
+
+/* Neither document captions a figure: each carries its own title inside the image, and the PDF sets
+   them as plain centred images with no number. Quarto reads the `#fig-` identifier out of the
+   markdown before any filter runs and makes each one a numbered float, so the empty "Figure 3" it
+   prints underneath has to be turned off here rather than in the filter. */
+figure.quarto-float-fig > figcaption {
+  display: none;
+}
+
+/* The empty anchor the filter puts before each subsection, so a §13c from another page lands on the
+   heading rather than at the top of a long chapter. */
+.subsection-anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: 4rem;
+}
+
+/* The tool-chain's function matrix. filters/site-filter.lua marks each row's first cell: an
+   alternating band so a numbered group (1a/1b, 15a-15d) reads as one block, and a green pill on the
+   rows the author uses every day -- the prose promises a green highlight, and the print build draws
+   one. The daily-use list is the author's, kept upstream beside the document and carried here by the
+   sync, so the two builds cannot disagree about which rows are marked.
+
+   The mark sits on the cell rather than the row because pandoc's HTML writer gives every row its own
+   odd/even class and discards row attributes. :has() reaches the row from the cell; where it is not
+   supported the banding is simply absent and the pills still show. */
+table tr:has(.matrix-band-1) > td {
+  background-color: rgba(0, 0, 0, 0.035);
+}
+
+.matrix-daily {
+  font-weight: 600;
+  padding: 0.1em 0.45em;
+  border-radius: 0.8em;
+  background-color: #d8ebdf;
+  color: #1f4632;
+}
+
+@media (prefers-color-scheme: dark) {
+  table tr:has(.matrix-band-1) > td { background-color: rgba(255, 255, 255, 0.045); }
+  .matrix-daily { background-color: #2f5f47; color: #dff0e6; }
+}
