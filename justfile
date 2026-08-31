@@ -31,3 +31,13 @@ check: render
 # Serve locally, rebuilding on save
 preview:
     quarto preview
+
+# Publish to Cloudflare Pages -- project `dss-agentic-toolchain`, https://dss-agentic-toolchain.pages.dev
+# Direct upload, deliberately not a git integration: CI renders and checks but never publishes, so no
+# Cloudflare credential lives in the workflow. It depends on `verify`, so a site that is stale against
+# its upstream document, or that fails either check, cannot be published by accident.
+# Run it from an interactive terminal: wrangler's stored OAuth login only works there. Non-interactively
+# (an agent, a cron) hand it a token instead --
+#     CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... just deploy
+deploy: verify
+    wrangler pages deploy _site --project-name dss-agentic-toolchain --branch main

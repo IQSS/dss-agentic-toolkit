@@ -22,7 +22,9 @@ project:
 
 website:
   title: "Agentic AI Tool Chain"
-  # site-url: set when a public URL exists (Cloudflare Pages, then IQSS)
+  # Cloudflare Pages, direct upload from `just deploy`. Behind Cloudflare Access while the
+  # content is polished; it changes if the site ever moves to IQSS.
+  site-url: https://dss-agentic-toolchain.pages.dev
   repo-url: https://github.com/stevenworthington/dss-agentic-toolchain
   page-navigation: true
   sidebar:
