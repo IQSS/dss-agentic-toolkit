@@ -78,7 +78,7 @@ The full inventory, marked canonical (necessary for the setup to work) vs. recom
 *Per-project files* (in the project root):
 
 - `AGENTS.md` *(canonical)* — project-specific brief: what this project is, project conventions, build/run commands, project-specific guardrails. Symlink `CLAUDE.md` to it.
-- `STATUS.md` *(canonical)* — the current-state snapshot. It answers one question, where does this project stand right now, in one screen (40–50 lines): the stage and a last-updated date, the headline result so far, what's in motion, what's blocked and on whom, the standing facts an agent would otherwise hunt for (current N, the spec in force, the version number, the production branch), and the watch items. Rewritten in place as the state changes, never appended: it describes where the project is, not how it got here. The agent reads it first in any session, before `TASKS.md`.
+- `STATUS.md` *(canonical)* — the current-state snapshot. It answers one question, where does this project stand right now, in one screen (40–50 lines): the stage and a last-updated date, the main result so far, what's in motion, what's blocked and on whom, the standing facts an agent would otherwise hunt for (current N, the spec in force, the version number, the production branch), and the watch items. Rewritten in place as the state changes, never appended: it describes where the project is, not how it got here. The agent reads it first in any session, before `TASKS.md`.
 - `TASKS.md` *(canonical)* — operational task state. Plain markdown with *To Do*, *In Progress*, *Done* sections; completion dates on done items as a built-in changelog. The agent reads it after `STATUS.md` to see what's open and mid-flight, updates it as work happens, and you read it on Monday to remember where you left off Friday. Deliberately low-tech for that reason.
 - `README.md` *(canonical)* — human-facing project description (the file a collaborator opens first).
 - `.claude/settings.json` *(optional, but commit if present)* — project-versioned Claude Code config that overrides or extends the global settings. Commit to `git` so collaborators inherit it.
@@ -112,7 +112,7 @@ The agent now knows where to look. When the task is "rewrite this section of the
 
 Two things make this work in practice:
 
-- *Self-explanatory filenames.* `CONVENTIONS.md` for project conventions, `TEMPLATES.md` for project-shape templates, `WRITING.md` for prose, `CODING.md` for code. An agent can figure out which file to load from the name alone; the index is reinforcement, not the only signal.
+- *Self-explanatory filenames.* `CONVENTIONS.md` for project conventions, `TEMPLATES.md` for project-shape templates, `WRITING.md` for prose, `CODING.md` for code. An agent can figure out which file to load from the name alone, and the index only confirms it.
 - *The ancillary files are themselves self-contained.* `WRITING.md` doesn't assume the agent has read `AGENTS.md` first; it stands on its own with its own context (what the file covers, who the audience is, what to avoid). This means the agent can load just that file without missing setup.
 
 The cost is splitting one big file into several. The benefit is each agent session loads only the slice it needs, which leaves more context budget for the actual work.

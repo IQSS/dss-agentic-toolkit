@@ -250,7 +250,7 @@ What counts as agreement depends on the computation:
 - *Deterministic results* — descriptive statistics, an OLS fit, a fixed transformation — should match to numerical precision. A difference past rounding is a real discrepancy to chase down, not noise.
 - *Sampling-based results* will not match bit-for-bit. Two MCMC fits with different seeds, a bootstrap, or any step with a random draw produce different samples, so the comparison is against *Monte Carlo error* rather than exact equality. Posterior means, credible intervals, and test statistics should agree within the sampling noise the chain lengths imply. State that tolerance before comparing, so a near-miss isn't quietly rationalized into a pass after the fact.
 
-Two caveats keep this honest. Agreement rules out *implementation* error, not *specification* error: if the design in `METHODOLOGY.md` is itself wrong, both implementations start from it and faithfully agree on the wrong answer. And because a second implementation roughly doubles the cost of the analysis, I save it for the results that carry a claim — the headline estimate in a paper, the model behind a decision — not every intermediate.
+Two caveats keep this honest. Agreement rules out *implementation* error, not *specification* error: if the design in `METHODOLOGY.md` is itself wrong, both implementations start from it and faithfully agree on the wrong answer. And because a second implementation roughly doubles the cost of the analysis, I save it for the results that carry a claim — the primary estimate in a paper, the model behind a decision — not every intermediate.
 
 ## Reviewing what the agent changed
 

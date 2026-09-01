@@ -103,7 +103,7 @@ Two further values, `bypassPermissions` and `dontAsk`, drop prompting entirely. 
 
 The asymmetry is worth noting: `Claude Code` hides its blanket-bypass modes behind a launch flag, while `Codex` exposes the equivalent as the selectable "Full Access" preset (with an even blunter `--dangerously-bypass-``\allowbreak`{=latex}`approvals-and-sandbox` flag that drops the sandbox along with the prompts).
 
-Day to day I run mostly in accept-edits, and reach for auto only when I'm implementing a detailed plan that came out of plan mode — the plan is what earns the looser mode, not the other way around.
+Day to day I run mostly in accept-edits, and reach for auto only when I'm implementing a detailed plan that came out of plan mode. I don't switch to auto first and write the plan inside it.
 
 ### Plan mode
 
