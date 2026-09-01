@@ -61,7 +61,7 @@ When an agent needs to do browser work that's repeatable, scriptable, or runs in
 
 ### macOS / Ubuntu: Playwright MCP
 
-Microsoft's official `Playwright MCP` server (`microsoft/playwright-mcp`) is the implementation. Install it, register it with your agent, and the agent gains browser-automation capabilities. Cross-platform.
+Microsoft's official `Playwright MCP` server (`microsoft/playwright-mcp`) is what provides this. Install it, register it with your agent, and the agent gains browser-automation capabilities. Cross-platform.
 
 ### Alternatives and why not
 

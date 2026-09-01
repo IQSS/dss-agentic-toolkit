@@ -19,7 +19,7 @@ Before running an agent against real project work, six conditions are worth havi
 
 ### Role
 
-A single-vendor agent is tightly coupled to one model provider: `Claude Code` talks to Anthropic, `Codex` talks to OpenAI. The trade is depth for breadth. Committing to one vendor lets the agent integrate with that vendor's specifics (caching, tool use, thinking modes, prompt-caching idioms) and use features that generic multi-vendor agents can't match. This is where most of my daily work happens.
+A single-vendor agent is tightly coupled to one model provider: `Claude Code` talks to Anthropic, `Codex` talks to OpenAI. You get a deeper fit with that one vendor, and give up the ability to switch. Committing to one vendor lets the agent integrate with that vendor's specifics (caching, tool use, thinking modes, prompt-caching idioms) and use features that generic multi-vendor agents can't match. This is where most of my daily work happens.
 
 ### macOS / Ubuntu: Claude Code or Codex
 

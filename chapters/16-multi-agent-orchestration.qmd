@@ -18,7 +18,7 @@ Three layers, escalating in heaviness:
 
 ## Manual approach: git worktrees + Zellij panes
 
-The manual approach is what I primarily use because it has the most mileage, depends on the fewest extra tools, and works alongside the rest of the stack rather than replacing parts of it. The pattern: each agent gets its own `git` worktree (created with `git worktree add`), each worktree runs in its own `Zellij` pane, and the agents coordinate through `git` rather than directly. When one finishes, you review its branch, merge it, and reuse the worktree for the next task.
+The manual approach is what I primarily use: I have run it the longest, it depends on the fewest extra tools, and it works alongside the rest of the stack rather than replacing parts of it. The pattern: each agent gets its own `git` worktree (created with `git worktree add`), each worktree runs in its own `Zellij` pane, and the agents coordinate through `git` rather than directly. When one finishes, you review its branch, merge it, and reuse the worktree for the next task.
 
 This is "manual" only in the sense that you're operating the moving parts yourself. With `Zellij` layouts (per §6), you can declare a standard "three-agent worktree layout" that scaffolds the panes and worktrees with one command. The result is a workspace where switching between parallel agents is just switching panes, and shipping their work is normal git.
 
