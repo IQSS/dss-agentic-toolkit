@@ -38,7 +38,7 @@ Practical consequence: as installed, `Codex` starts locked down; `Claude Code` s
 
 ### Three tiers of command policy
 
-The useful distinction isn't binary "allow / deny." It's three tiers:
+The useful distinction isn't binary "allow / deny." It's three tiers — recorded below as the posture I run after several years of tuning; a newcomer starts tighter, prompt-heavy, and relaxes one rule at a time as trust in the boundaries grows:
 
 - *Routine pass-through* — daily-use tools that run without prompts. With the sandbox on, this tier mostly needs no list: anything that stays inside the kernel bounds runs promptless, so the tools I use constantly (`Rscript`, `R`, `python`, `pip`, `pandoc`, `xelatex`, `make`, `bash *.sh`, local `git`) pass through *because they are sandboxed*, not because they are exempt. What remains on Claude's `excludedCommands` list is the short set that cannot run inside the sandbox at all: `git push*` / `git pull*` / `git fetch*` and `gh *` (GitHub authentication reads the macOS keychain, which the sandbox blocks), `op *` (talks to the 1Password app), and `pueue *` / `pueued *` (talk to the §7 daemon). The forbidden list (last tier) still carves out destructive subcommands like `git push --force`. `Codex` reaches the same posture by *not* listing routine tools in any rule and letting its sandbox bound them. Each exemption runs outside the kernel bounds entirely, so entries have to earn their place; how the list got this short is taken up in §13b.
 - *Prompt before running.* The middle tier, and where the two agents' shapes converge. `Codex` supports standing `decision = "prompt"` rules for commands you want to consciously approve (deploys, DB-state changes); I don't keep standing prompt-rules on either agent. The middle tier I actually use is *escalation*: a sandboxed command that needs more than the bounds allow fails, the agent asks, and I approve that one invocation. Package managers I touch a few times a month (`npm`, `yarn`, `brew`) live there deliberately — at that frequency, reading one prompt beats holding a standing exemption open. `Codex`'s `on-request` approval policy is the same mechanism, so the postures stay aligned without standing prompt-rules on either side.
@@ -163,20 +163,6 @@ So I keep a `SANDBOX.md` next to the settings that records the *why*, not the va
 
 The test of whether such a file is worth keeping: when I change a permission a year from now, does it tell me why the setting was the way it was? It is the same split as the per-rule `justification` field above, lifted from the single rule to the whole policy — settings answer *what*, `SANDBOX.md` answers *why*.
 
-### The blind-click-fest failure mode
-
-The tuning matters as much as the rules themselves. When you find yourself approving the same prompt repeatedly without reading it, that's a signal: move that command to routine pass-through (if it's safe in general) or to a project-scoped blanket allow (if it's safe just in that project). When you discover an action you'd never have approved if you'd actually read the prompt, tighten the rule: move that command to `prompt` (with a justification line) or to `forbidden`. The whole system only works if the prompt rate stays low enough that you actually read the prompts that remain.
-
-### Conservative starting posture for new agent users
-
-The posture above is what I currently run after several years of tuning, and it leans toward broad pass-through with destructive carve-outs. That's reasonable for me; it is not the posture I'd recommend on day one. If you are new to agent permissions, the shape of a conservative starting posture looks roughly like this — *shape* rather than copyable config, since the exact values are specific to your own setup:
-
-- *Prompt* on destructive or externally-visible operations — `git push`, `gh`, deploys, DB-state changes, package install/uninstall/publish, system-package changes (`brew`, `apt`, `winget`).
-- *Allow* read-only inspection and local test/build commands — language interpreters, `git status`, `git diff`, `git log`, `just check`, `just build`, anything that reads but doesn't push or publish.
-- *Deny* destructive filesystem and `git` operations outright — `rm -rf`, `sudo`, `git push --force`, `git reset --hard` on branches with a remote, history-rewriting operations on shared branches.
-
-The relaxation path is to move items from the prompt-list to the allow-list one at a time as you trust the boundaries — same as the tuning loop in the previous subsection, just started from a tighter point. Items rarely flow the other way (allow → prompt) unless you discover a tool doing something you didn't expect. The `auto`/`guarded`/`networked`/`readonly` `Codex` profiles described earlier in this section let you carry this posture into specific task shapes without re-tuning each time.
-
 ### Data permissions
 
 A different angle on the same permission layer: not what *commands* the agent can run, but what *data* the agent is allowed to read even when it has the credentials to do so. For statistical consulting and research work, the bigger risk is often an agent sending client material, unpublished results, or human-subject data to a cloud model or MCP server that the project's data-handling rules don't allow.
@@ -186,22 +172,13 @@ Two questions to answer for each project explicitly:
 - *What can the agent read?* Some projects allow agents to operate on de-identified data; others can't allow agents to touch raw data at all. The default for sensitive material is *no agent access* unless the project's data-handling rules explicitly approve it.
 - *Can project data be sent to external model providers?* Cloud models receive whatever context the agent passes them. For client material, IRB-sensitive data, or unpublished results, the answer is often "no": meaning either the agent runs on a local model only, or the agent works on de-identified extracts, or the agent doesn't touch the data at all.
 
-The rule belongs in the project `AGENTS.md` (per §12), where the agent reads it on entry. A concrete example to adapt:
+The rule belongs in the project `AGENTS.md` (per §17b), where the agent reads it on entry. A concrete example to adapt:
 
 > Agents may edit code and documentation, but may not open raw human-subject data unless the session explicitly says the data are de-identified and approved for cloud-model use.
 
 The mechanism for enforcement lives in the permission layer this subsection has been describing: filesystem denies on data directories, network denies on cloud model APIs when the project's data shouldn't leave the machine. The rule states the policy; the permission file encodes it.
 
-*Auth, privacy, and billing path.* A separate concern from "can the agent see this data" is "can the *vendor* see and train on it" — and the answer depends on which auth surface the agent is using. The four practical entry points and their default posture as of this writing:
-
-| Auth path | Training default | Cost visibility | Secret location | Recommended for sensitive work |
-|:---------------------------------------|:-------------------------------|:--------------------------|:-----------------------|:-------------------------------|
-| `Claude Code` via `Claude Pro/Max` | Opt-out toggle in `claude.ai` Settings → Privacy & data → *Help improve Anthropic*; verify CLI inherits | Flat monthly subscription | Login session | No — consumer terms apply unless you've verified the opt-out covers the CLI |
-| `Claude Code` via Anthropic Console / Commercial API | Excluded from training by default (commercial API terms) | Metered per-token, visible in Console dashboard | API key in `op`/`gopass` per §2b | Yes — cleaner default posture, document key + opt-out state in project `AGENTS.md` |
-| `Codex` via `ChatGPT Plus/Pro` | Opt-out toggle in `chatgpt.com` Settings → Data controls → *Improve the model for everyone*; verify CLI inherits | Flat monthly subscription | Login session | No — consumer terms apply unless you've verified the opt-out covers the CLI |
-| `Codex` via OpenAI Platform / Business / Enterprise / Edu | Excluded from training by default (Platform / Business / Enterprise / Edu terms) | Metered per-token (Platform) or workspace-billed (Business / Enterprise) | API key in `op` / `gopass` per §2b | Yes — workspace-tier accounts add audit logging and data-residency controls |
-
-Where to verify: each vendor's privacy or data-controls page is the source of truth; vendor terms have shifted multiple times (Anthropic notably tightened consumer data-use defaults in a recent policy change) so don't assume yesterday's setting is still in effect. For consulting engagements or any project covered by NDA, IRB review, or client confidentiality, *verify the opt-out state at the start of the project* and document it in the project `AGENTS.md`.
+*Auth, privacy, and billing path.* A separate concern from "can the agent see this data" is whether the *vendor* may see and train on it — and that depends on which auth surface the agent is using. The pattern is stable even as the terms shift: consumer-plan sign-ins train by default unless an opt-out is set, while API, gateway, and workspace-tier paths exclude training by their terms and add audit and residency controls, so API or enterprise auth is the clean posture for sensitive work. Vendor terms have shifted multiple times; for consulting engagements or any project covered by NDA, IRB review, or client confidentiality, *verify the opt-out state at the start of the project* and document it, along with which auth path is in use, in the project `AGENTS.md`.
 
 ### Cross-references
 

@@ -46,7 +46,7 @@ website:
       - chapters/09-ide-and-ide-side-agent.qmd
       - chapters/10-cli-agentic-coding-tools.qmd
       - chapters/11-browser-and-computer-use.qmd
-      - chapters/12-context-and-memory.qmd
+      - chapters/12-integration-and-memory.qmd
       - chapters/13-permissions-and-sandboxing.qmd
       - chapters/14-agent-telemetry.qmd
       - chapters/15-reproducible-pipelines-and-human-qa.qmd
@@ -68,7 +68,7 @@ chapter-map:
   "9": /chapters/09-ide-and-ide-side-agent.qmd
   "10": /chapters/10-cli-agentic-coding-tools.qmd
   "11": /chapters/11-browser-and-computer-use.qmd
-  "12": /chapters/12-context-and-memory.qmd
+  "12": /chapters/12-integration-and-memory.qmd
   "13": /chapters/13-permissions-and-sandboxing.qmd
   "14": /chapters/14-agent-telemetry.qmd
   "15": /chapters/15-reproducible-pipelines-and-human-qa.qmd
@@ -84,7 +84,6 @@ anchor-map:
   "cli-agent-single-vendor": /chapters/10-cli-agentic-coding-tools.qmd#cli-agent-single-vendor
   "computational-documents": /chapters/03-documentation-production.qmd#computational-documents
   "computer-use-api": /chapters/11-browser-and-computer-use.qmd#computer-use-api
-  "context-and-memory": /chapters/12-context-and-memory.qmd
   "data-pipeline-runner-python-snakemake": /chapters/15-reproducible-pipelines-and-human-qa.qmd#data-pipeline-runner-python-snakemake
   "data-pipeline-runner-r-targets": /chapters/15-reproducible-pipelines-and-human-qa.qmd#data-pipeline-runner-r-targets
   "data-science-language-r": /chapters/08-programming-languages.qmd#data-science-language-r
@@ -94,6 +93,7 @@ anchor-map:
   "general-purpose-language-python": /chapters/08-programming-languages.qmd#general-purpose-language-python
   "ide": /chapters/09-ide-and-ide-side-agent.qmd#ide
   "ide-side-agent": /chapters/09-ide-and-ide-side-agent.qmd#ide-side-agent
+  "integration-and-memory": /chapters/12-integration-and-memory.qmd
   "long-running-jobs": /chapters/07-long-running-jobs.qmd
   "multi-agent-orchestration": /chapters/16-multi-agent-orchestration.qmd
   "non-computational-publishing": /chapters/03-documentation-production.qmd#non-computational-publishing

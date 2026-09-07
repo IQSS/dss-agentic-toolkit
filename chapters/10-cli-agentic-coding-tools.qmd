@@ -2,13 +2,13 @@
 title: "10. CLI Agentic Coding Tools"
 ---
 
-The core of this stack. A coding agent that lives in a terminal, reads and writes files, runs commands, and is driven by your project's context files (per §12). Two flavors worth distinguishing: agents tightly coupled to a single model vendor, and agents that route across vendors.
+The core of this stack. A coding agent that lives in a terminal, reads and writes files, runs commands, and is driven by your project's context files (per §17b). Two flavors worth distinguishing: agents tightly coupled to a single model vendor, and agents that route across vendors.
 
 The IDE-side surface for the same agents is at §9 (and the contrast between the two surfaces is laid out in the introduction). Orchestrating multiple parallel agent sessions is at §16.
 
 Before running an agent against real project work, six conditions are worth having in place. The picks in this section assume them; agent work without them is harder to roll back when it goes wrong, and the conditions are individually cheap to set up.
 
-- The project has an `AGENTS.md`, a `STATUS.md`, and a `TASKS.md`, so the agent inherits your conventions, the current state, and the open tasks (§12).
+- The project has an `AGENTS.md`, a `STATUS.md`, and a `TASKS.md`, so the agent inherits your conventions, the current state, and the open tasks (§17b).
 - You've decided which paths the agent may touch and which are off limits (§13a's data-permissions subsection).
 - Secrets are injected per project via `op` or `gopass`, not committed in plaintext `.env` files (§2b and §2c).
 - You've set a permission posture (§13) — default to more prompts when you're new to agents and relax items as you trust the boundaries.
@@ -35,27 +35,6 @@ Worth a brief mention: `Cline` and `Amp` (from Sourcegraph) are both Anthropic-f
 
 The single-vendor agent landscape changes faster than any other category in this doc. I'd re-evaluate the picks every six months. The framing (run multiple single-vendor agents because their strengths differ) is more durable than which specific two are recommended at any given moment.
 
-### Model and effort
-
-Two settings change how an agent approaches a task, and both track how deterministic the work is. The first is which *model* runs the job: both `Claude Code` and `Codex` let you pick the tier in-session, from a frontier model down to a smaller, faster one. The second is *effort* — how much the model reasons before it acts.
-
-Effort has its own controls: on the Claude side the `/effort` command and `effortLevel` in `settings.json`, on the Codex side the `/model` picker (which bundles the model and its reasoning effort) and `model_reasoning_effort` in `config.toml`, which the §13a profiles can pin per task shape. The two scales almost line up:
-
-| Effort | `Claude Code` | `Codex` |
-|:----------|:--------------------------------------------|:--------------------------------------------|
-| `minimal` | — | The floor: fastest, for trivial mechanical tasks |
-| `low` | High-volume or latency-sensitive work | Quick tasks where speed beats thoroughness |
-| `medium` | Balanced speed, cost, and quality | The default: everyday interactive coding |
-| `high` | The default: complex reasoning, quality over speed | Thorough reasoning on hard problems |
-| `xhigh` | Deepest level that persists in settings | The ceiling: longest thinking, where latency doesn't matter |
-| `max` | Session-only ceiling: unconstrained thinking, resets when the session ends | — |
-
-Think of them as two gears that turn together with how scripted the task is. A deterministic recipe — scaffolding a project whose shape is already stored in `TEMPLATES.md`, or applying a known pattern across files — runs well on a lower tier at lower effort: `Sonnet` at `medium` thinks less and does more, and is faster for it. A job where the agent has to work out its own approach and pivot as evidence arrives wants the frontier and the depth instead, `Opus` at `xhigh`. What links the two gears is a single dimension: how much of the approach is given versus how much the agent has to invent.
-
-![](figures/two-gears.svg){#fig-two-gears fig-alt="Two coupled bars, model and effort, each ramping from left to right beneath a scale from scripted to open-ended work." above="18pt" below="16pt"}
-
-My own default sits at the deep end: I pin both agents high and drop a session down when a task is clearly mechanical, rather than the reverse. Statistical work is rarely latency-bound, and the real budget is §14's usage windows, which higher effort spends faster per task. Two product nuances: `Claude Code` refuses `max` in `settings.json` (it is deliberately session-scoped), and some smaller `Codex` models cap at `high`.
-
 ### Patterns and extension points worth knowing inside Claude Code
 
 A few capabilities worth knowing once you're using `Claude Code` daily: both day-to-day patterns and longer-term extension surfaces. All listed in the docs, but easy to miss at first.
@@ -64,13 +43,11 @@ Daily patterns:
 
 - *`git` worktrees* for parallel work. Each agent gets its own worktree (and its own branch) so concurrent agents don't fight over the working tree. This is the foundation of §16's manual multi-agent orchestration.
 - *Background agents* for tasks that are *parallel* and *bounded*, not for tasks that are *long*. Each background-agent invocation is a tool-call-shaped child process with the same ~10-minute timeout cap as any other tool call, and the child is reaped when the parent agent session ends. Useful for "run these tests while I work on something else" or "do a quick parallel search" — not for `brm()` fits, overnight scrapes, or anything that needs to outlive the current session. For genuinely long-running work, reach for `pueue` (§7) instead; the daemon-backed pattern is what survives session boundaries cleanly. Pairs well with §14 (telemetry) for "what did the background agent do while I was working."
-- *Context hygiene* with `/context` and `/compact`. Long sessions accumulate context — every file read, diff, and tool result rides along on each subsequent turn — and past a point the per-message token cost dwarfs anything the effort level controls. `/context` shows what is filling the window, and `/compact` rewrites the conversation into a summary that keeps the working state and releases the bulk. My habit is to glance at `/context` once a session has been running long and compact when usage passes roughly 300k tokens, rather than waiting for the automatic compaction near the window's edge. This matters most on capped API access: in my case an institutional `Bedrock` gateway (the §2c credential), where every turn's input tokens count against the cap, so a bloated context taxes every remaining message. On subscription auth the same waste burns §14's usage windows instead.
-- *File references with `@`, not pasted file contents.* Typing `@` in the prompt opens a fuzzy file picker and drops a reference into the message. The reference wins three ways. The agent sees the current on-disk version rather than a possibly stale copy. The path survives a `/compact`, so the agent can re-read the file afterward instead of you re-pasting it. And the conversation carries a short reference where a paste plants the whole blob as prompt text — paid for again on every subsequent turn.
-- *Plan mode* for any task whose shape isn't obvious before you start — covered as its own subsection below.
+- *Plan mode* for any task whose shape isn't obvious before you start: the agent reads what it needs, drafts a step-by-step plan with the files it intends to touch, and waits for approval — catching a wrong-shaped solution at the plan stage instead of twenty file edits later.
 
 Extension surfaces (documented prominently in `Claude Code`'s docs):
 
-- *`CLAUDE.md` / `AGENTS.md`*: the project brief the agent reads on entry (per §12).
+- *`CLAUDE.md` / `AGENTS.md`*: the project brief the agent reads on entry (per §17b).
 - *Hooks*: pre- and post-tool-call shell hooks for guardrails. Lets you enforce conventions ("don't push to main", "always run tests before committing") at the agent layer rather than relying on the agent to remember.
 - *Slash commands and skills*: packaged reusable workflows the agent can invoke by name. Your accumulated `/` commands become a shared vocabulary (`/review`, `/deploy`, `/security-review`) that anyone on a project can invoke without re-explaining context. The three I use most: `/scaffold` (set up a new project from the project-shape templates in `TEMPLATES.md`), `/pueue` (submit and wait on long-running jobs per §7), and `/targets` (the `targets` + `crew` + `pueue` pattern from §15b).
 - *MCP servers*: extend the agent's tool inventory at runtime (per §12's integration-layer subsection).
@@ -79,41 +56,6 @@ Extension surfaces (documented prominently in `Claude Code`'s docs):
 - *Plugins and marketplaces*: distribution surface for skills and MCP integrations from the broader community.
 
 Most extension surfaces become useful once you've moved past basic single-session use. Subagents in particular handle a layer of orchestration that sits below §16's worktree-and-pane pattern: useful before you reach for external orchestrators.
-
-### Permission modes
-
-Orthogonal to effort is the session's *permission mode*: how much the agent may do before it stops to ask. The two agents shape this differently. In `Claude Code` you cycle through four modes with `Shift+Tab` (or pin one via `defaultMode` in `settings.json`):
-
-| Mode (`defaultMode`) | `Shift+Tab` label | What it permits |
-|:----------------------|:------------------|:------------------------------------------------|
-| `default` | *(unlabeled)* | Prompts on first use of each tool; the §13a standing rules decide the rest. |
-| `acceptEdits` | accept edits | File edits inside the project apply without prompting; shell commands still go through the rules. |
-| `plan` | plan mode | Read and plan only — no edits or commands until you approve the plan (its own subsection below). |
-| `auto` | auto mode | A classifier auto-approves the operations it judges safe and still prompts on risky ones — looser than `default`, short of a blanket bypass. |
-
-Two further values, `bypassPermissions` and `dontAsk`, drop prompting entirely. Both are deliberately kept *out* of the `Shift+Tab` cycle and unlock only when you launch with `--allow-dangerously-``\allowbreak`{=latex}`skip-permissions`; I leave that posture to the container case (§13c).
-
-`Codex` has no `Shift+Tab` cycle. The in-session equivalent is the `/approvals` picker, which offers three presets — each a bundle of a sandbox mode and an approval policy — and the per-task profiles in `config.toml` (per §13a) pin the same two dials ahead of time:
-
-| `/approvals` preset | Sandbox + approval | What it permits |
-|:---------------------|:--------------------------------|:--------------------------------------------|
-| Read Only | `read-only` · asks beyond reading | Reads and plans; every edit or command needs approval. |
-| Auto | `workspace-write` · `on-request` | Edits files and runs commands inside the project without asking; prompts before escaping the workspace (network, or paths outside it). |
-| Full Access | `danger-full-access` · `never` | No sandbox and no prompts — full read, write, and network. |
-
-The asymmetry is worth noting: `Claude Code` hides its blanket-bypass modes behind a launch flag, while `Codex` exposes the equivalent as the selectable "Full Access" preset (with an even blunter `--dangerously-bypass-``\allowbreak`{=latex}`approvals-and-sandbox` flag that drops the sandbox along with the prompts).
-
-Day to day I run mostly in accept-edits, and reach for auto only when I'm implementing a detailed plan that came out of plan mode. I don't switch to auto first and write the plan inside it.
-
-### Plan mode
-
-For any task whose shape isn't obvious to both you and the agent before work starts, ask the agent for a plan before any edits. Both `Claude Code` and `Codex` ship a built-in plan mode that does this explicitly: the agent reads what it needs to, drafts a step-by-step plan with the files it intends to touch and the changes it intends to make, and waits for approval before executing. In `Claude Code` you toggle into it via `Shift+Tab` cycling between input modes; in `Codex` it's exposed through the equivalent planning slash command. Either way the round-trip is conversational and cheap.
-
-The payoff is catching the wrong-shaped solution at the plan stage instead of twenty file edits later. Even on tasks where you think the implementation is obvious, the plan tends to surface assumptions the agent is making that you hadn't noticed — which files it considers in scope, which tests it expects to gate the change, what edge cases it's planning to handle, which conventions it's inferring from `AGENTS.md` versus from the surrounding code. If a step is wrong, you edit the plan in place before approving. If the scope drifted, you redirect. If something is unsafe, you push back. None of that requires unwinding edits the agent has already committed.
-
-When *not* to use plan mode: small surgical edits where the right move is genuinely obvious to both sides — rename this symbol, fix this typo, add this missing import, copy this pattern from the file above to the file below. The overhead of a plan exceeds the value when the work is five-minutes-and-clear. The rule of thumb: if the task is small and the shape is obvious to both you and the agent, skip plan mode. Otherwise, ask for the plan. The cost of asking when you didn't need to is one extra round-trip; the cost of *not* asking when you did need to is rework on a wrong-shaped solution.
-
-Plan mode composes with the safety preflight at the top of this section: the conditions there (clean `git status`, `AGENTS.md`, `STATUS.md`, and `TASKS.md` in place, permission posture set) are what make the plan-and-execute loop reviewable in the first place. A plan you can't subsequently inspect via `git diff`, or that runs against a permission posture you haven't decided on, doesn't buy you the safety it appears to.
 
 ### Long-running and scheduled tasks
 

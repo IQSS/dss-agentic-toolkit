@@ -37,7 +37,42 @@ The figure shows how this works, with my agent-config setup as the example. The 
 
 Why gather them like this, when `chezmoi` already puts each file where its tool reads it? Because the hub answers a different question than `chezmoi` does. `chezmoi` handles reproducibility and placement across machines. The hub is a layout choice on top, and the payoff shows up when you edit: with every rule and config file in one folder, the whole set opens in a single editor. `Typora` lists every file in the folder in its side nav, so reading or editing the entire rule set is one task instead of a hunt across `~/.claude/`, `~/.codex/`, and the rest. And because the hub is one `chezmoi` repository underneath, that whole rule set is backed up and rebuildable from a single `chezmoi init --apply` if the machine is ever wiped or replaced. The symlinks the figure shows are what reconcile this with each tool's fixed read path, and `chezmoi` makes and tracks them as part of the same apply.
 
-What I actually keep in mine: standard dotfiles (`.zshrc`, `.gitconfig`, `.p10k.zsh`, shell aliases, the Zellij layouts from §6), the entire `~/.config/agents/` tree from §12 (so the global agent rules apply identically on every machine), the per-agent symlinks `Claude Code` and `Codex` read, and a few small productivity scripts — for instance a `typora` shim at `~/.local/bin/typora` so I can `typora <file>` from the terminal, and shell functions like `agents CONVENTIONS.md` (opens that metadata file in Typora) and `cda` (`cd` into the global metadata folder). A single `chezmoi init --apply <repo>` on a fresh macOS machine rebuilds every dotfile.
+On disk, the arrangement the figure summarizes:
+
+```
+~/.local/share/chezmoi/dot_config/agents/  # chezmoi source (private git repo)
+|-- AGENTS.md                       # source of truth; CLAUDE.md symlinks to it
+|-- CONVENTIONS.md                  # general conventions, naming, paths
+|-- TEMPLATES.md                    # per-shape templates + scaffolding
+|-- WRITING.md                      # prose voice and style
+|-- CODING.md                       # code style conventions
+|-- MODELING.md                     # statistical modeling rules
+|-- DESIGN.md                       # product design principles
+|-- TOOLCHAIN.md                    # CLI tool inventory
+|-- WORKSPACE.md                    # index of projects on this machine
+|-- ALIASES.md                      # shared shell aliases
+|-- SANDBOX.md                      # sandbox/permission rationale (per §13a)
+|-- claude-settings.json            # Claude Code permissions/sandbox (per §13a)
+|-- codex-config.toml               # Codex sandbox/profiles (per §13a)
+`-- codex-rules/                    # Codex command-policy rules
+    `-- default.rules
+
+~/                                  # home directory (chezmoi-applied)
+|-- .config/agents/                 # real directory, populated by chezmoi
+|       (every file from the source tree above, materialized here)
+|
+|-- .claude/CLAUDE.md       -> ~/.config/agents/AGENTS.md
+|-- .claude/settings.json   -> ~/.config/agents/claude-settings.json
+|-- .codex/AGENTS.md        -> ~/.config/agents/AGENTS.md
+|-- .codex/config.toml      -> ~/.config/agents/codex-config.toml
+|-- .codex/rules            -> ~/.config/agents/codex-rules
+`-- ...                # one symlink per agent tool you use
+                       # (the symlinks are chezmoi-tracked too)
+```
+
+Two details the figure can't show. Every vendor-specific name (`CLAUDE.md`, `.codex/AGENTS.md`, and the rest) is a symlink pointing back at the one source of truth, so switching agents or adding one never forks your conventions across files — and the symlinks are tracked as `chezmoi` template-symlinks, so they resolve against the right home directory on each machine. And a new ancillary file dropped next to `AGENTS.md` is picked up by the same apply: no per-tool reconfiguration when the rule set grows.
+
+What I actually keep in mine: standard dotfiles (`.zshrc`, `.gitconfig`, `.p10k.zsh`, shell aliases, the Zellij layouts from §6), the entire `~/.config/agents/` tree shown above (so the global agent rules apply identically on every machine), the per-agent symlinks `Claude Code` and `Codex` read, and a few small productivity scripts — for instance a `typora` shim at `~/.local/bin/typora` so I can `typora <file>` from the terminal, and shell functions like `agents CONVENTIONS.md` (opens that metadata file in Typora) and `cda` (`cd` into the global metadata folder). A single `chezmoi init --apply <repo>` on a fresh macOS machine rebuilds every dotfile.
 
 ### Division of labor with §2b
 
