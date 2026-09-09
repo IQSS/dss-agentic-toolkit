@@ -27,6 +27,6 @@ A private working repository, not yet published anywhere. Publishing will come f
 building from this repository; a move to IQSS and the DSS training index waits on iteration over the
 materials themselves.
 
-## Licence
+## License
 
 CC BY 4.0.
