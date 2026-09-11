@@ -84,6 +84,21 @@ def title_case_part(text: str) -> str:
     return " ".join(w if ROMAN.match(w) else w.capitalize() for w in text.split())
 
 
+def frontmatter_end(lines: list[str]) -> int:
+    """Index of the first line after a leading YAML frontmatter block, or 0 when there is none.
+
+    Frontmatter can carry YAML comments, and a comment starts with `# `, which is exactly an H1 to
+    this splitter: on 2026-09-11 a comment in the guide's frontmatter became a chapter page. Nothing
+    above this index is searched for headings or part markers.
+    """
+    if not lines or lines[0].rstrip() != "---":
+        return 0
+    for i in range(1, len(lines)):
+        if lines[i].rstrip() in ("---", "..."):
+            return i + 1
+    sys.exit("error: unterminated YAML frontmatter -- the split would be wrong, refusing")
+
+
 def find_chapters(lines: list[str]) -> tuple[list[dict], list[dict]]:
     """Return (chapters, parts). Each chapter is {num, key, title, slug, start, end}.
 
@@ -93,8 +108,11 @@ def find_chapters(lines: list[str]) -> tuple[list[dict], list[dict]]:
     chapters: list[dict] = []
     parts: list[dict] = []
     fence: str | None = None
+    skip = frontmatter_end(lines)
 
     for i, line in enumerate(lines):
+        if i < skip:
+            continue
         m = FENCE.match(line)
         if m:
             char = m.group("char")
