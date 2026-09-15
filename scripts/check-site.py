@@ -63,7 +63,10 @@ def check(site: Path, source_dir: Path) -> list[str]:
         for src in re.findall(r'<img[^>]+src="([^"]+)"', text):
             if src.startswith(("http://", "https://", "data:")):
                 continue
-            if not (page.parent / src).exists():
+            # Root-absolute, like the links in check 4: resolved against the site root, since a
+            # page can sit at any depth and 404.html is served from all of them.
+            base = site if src.startswith("/") else page.parent
+            if not (base / src.lstrip("/")).exists():
                 problems.append(f"{page.relative_to(site)}: image does not resolve — {src}")
 
     # 4. Every link resolves: a fragment to an id on this page, a path to a file that exists, and a
@@ -79,12 +82,31 @@ def check(site: Path, source_dir: Path) -> list[str]:
                 if fragment not in ids[page]:
                     problems.append(f"{page.relative_to(site)}: link to #{fragment}, which is not on the page")
                 continue
-            target = (page.parent / path).resolve()
+            # A root-absolute href resolves against the site root, not the page's own folder.
+            # Quarto emits these on 404.html deliberately -- see check 6 -- and joining them to
+            # the page's folder would resolve them against the filesystem root instead.
+            base = site if path.startswith("/") else page.parent
+            target = (base / path.lstrip("/")).resolve()
             if not target.exists():
                 problems.append(f"{page.relative_to(site)}: link to {path}, which does not exist")
             elif fragment and target.suffix == ".html" and fragment not in ids.get(target, set()):
                 problems.append(f"{page.relative_to(site)}: link to {path}#{fragment}, "
                                 "which is not in that page")
+
+    # 6. The not-found page links by absolute path. Cloudflare Pages answers a request for any
+    # unmatched address with this page's body, and the browser keeps the address it asked for, so a
+    # relative link would resolve against whatever wrong path the reader typed: from
+    # /chpaters/12-analysis.html, "index.html" points at /chpaters/index.html. Only a root-absolute
+    # link is right at every depth. Quarto emits them correctly today; this asserts it, because the
+    # failure is silent -- every check still passes and the page breaks only for real 404s, which
+    # are exactly the visits nobody is watching.
+    notfound = site / "404.html"
+    if notfound.is_file():
+        for href in re.findall(r'href="([^"]+)"', html.get(notfound, notfound.read_text())):
+            if href.startswith(("http://", "https://", "mailto:", "#", "data:", "/")) or href == "":
+                continue
+            problems.append(f"404.html: link to {href} is relative; the page is served at whatever "
+                            "address the reader mistyped, so its links must start with /")
 
     # 5. Every section reference in prose is a link. An unlinked one means the filter did not
     # recognise the chapter, which is exactly how a renumbered document goes quietly wrong.

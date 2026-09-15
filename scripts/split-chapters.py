@@ -36,6 +36,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
+import math
 import re
 import shutil
 import subprocess
@@ -170,10 +172,205 @@ def body_of(lines: list[str], chapter: dict) -> str:
     return "\n".join(body)
 
 
-def chapter_text(lines: list[str], chapter: dict) -> str:
-    """The whole .qmd for one chapter: a title, and the body byte for byte."""
+# ---- the chapter agent -------------------------------------------------------------------------
+# The landing page draws one robot per chapter from a parts kit (the SVG groups in index.qmd) and a
+# recipe (console.js `CH`). The same recipe dresses a static copy at the head of the chapter's own
+# page, so the figure a reader hovered on the console is the one that greets them inside. Both inputs
+# live in the site repository and are hand-maintained, which is what keeps this site-internal: a
+# document with no console.js (the tool-chain) gets no agents and none of this runs.
+
+AGENT_VIEWBOX = "451 -16 346 410"  # measured across every pose, widest held objects included,
+                                   # and deep enough for the glassbox caption on y=382
+
+# Scene props that wrap around the figure rather than standing beside it, so they belong in the
+# chapter's crop. Boundaries' glassbox is the case this exists for: the whole point of the drawing
+# is the container, and a robot shipped without it is the figure with its subject removed.
+ENCLOSING_SCENES = frozenset({"glassbox"})
+
+CH_ENTRY = re.compile(r'\{\s*n:\s*"(?P<n>[^"]+)".*?slug:\s*"[^"]+".*?r:\s*\{(?P<r>[^}]*)\}', re.S)
+
+
+def _js_literal(js: str, name: str) -> str:
+    """The text of `const NAME = <literal>;`, matched on its own brackets rather than a line."""
+    m = re.search(rf"const\s+{name}\s*=\s*", js)
+    if not m:
+        sys.exit(f"error: console.js has no `const {name}` -- the chapter agents cannot be built")
+    i = m.end()
+    opener = js[i]
+    closer = {"{": "}", "[": "]"}[opener]
+    depth, j, quote = 0, i, None
+    while j < len(js):
+        c = js[j]
+        if quote:
+            if c == "\\":
+                j += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "\"'":
+            quote = c
+        elif c == opener:
+            depth += 1
+        elif c == closer:
+            depth -= 1
+            if depth == 0:
+                return js[i:j + 1]
+        j += 1
+    sys.exit(f"error: console.js `const {name}` is unterminated")
+
+
+def _js_obj(text: str):
+    """A JS literal of plain scalars -> Python. Quotes bare keys, drops trailing commas, then JSON."""
+    t = re.sub(r"([{,\[]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:", r'\1"\2":', text)
+    t = re.sub(r",(\s*[}\]])", r"\1", t)
+    return json.loads(t)
+
+
+def _recipe(text: str) -> dict:
+    return {k: (None if v == "null" else v.strip('"'))
+            for k, v in re.findall(r'(\w+):\s*(null|"[^"]*")', text)}
+
+
+def _group(markup: str, opening: re.Match) -> int:
+    """Index one past the `</g>` that closes the group `opening` starts."""
+    depth, k = 1, opening.end()
+    while depth:
+        nxt = re.search(r"<g\b|</g>", markup[k:])
+        if not nxt:
+            sys.exit("error: unbalanced <g> in the parts kit -- refusing to build the agents")
+        k += nxt.end()
+        depth += 1 if nxt.group() == "<g" else -1
+    return k
+
+
+def _svg_group(qmd: str, gid: str) -> str:
+    m = re.search(rf'<g id="{gid}"[^>]*>', qmd)
+    if not m:
+        sys.exit(f'error: index.qmd has no <g id="{gid}"> -- the chapter agents cannot be built')
+    return qmd[m.start():_group(qmd, m)]
+
+
+def _keep_parts(markup: str, keep: set[str]) -> str:
+    """Drop every `.part` the recipe does not name, and unclass the ones it does.
+
+    The console shows a part by adding a class; a static copy has no script, so the parts that are
+    not worn are removed outright rather than left hidden in the markup of all 22 pages.
+    """
+    found = []
+    for m in re.finditer(r'<g class="part" data-part="([^"]+)"', markup):
+        opening = re.compile(r"<g\b[^>]*>").match(markup, m.start())
+        found.append((m.group(1), m.start(), _group(markup, opening)))
+    for name, start, end in reversed(found):
+        inner = (re.sub(r'^<g class="part" data-part="[^"]+"', "<g", markup[start:end], count=1)
+                 if name in keep else "")
+        markup = markup[:start] + inner + markup[end:]
+    return markup
+
+
+def _arm(side: str, a1: float, a2: float, shoulder: dict, seg: dict) -> str:
+    sx, sy = shoulder[side]
+    sleeve, fore, hand = seg["sleeve"], seg["forearm"], seg["hand"]
+    fingers = "".join(f'<rect x="{x}" y="{fore + hand - 4}" width="6" height="12" rx="2" '
+                      f'fill="var(--gloves-dk)"/>' for x in (-9, -2, 5))
+    return (f'<g transform="translate({sx},{sy}) rotate({a1})">'
+            f'<rect x="-13" y="-4" width="26" height="{sleeve + 4}" rx="6" class="coat"/>'
+            f'<rect x="-13" y="{sleeve - 8}" width="26" height="9" class="coat-dk"/>'
+            f'<circle cx="0" cy="0" r="9" class="coat-dk"/>'
+            f'<g transform="translate(0,{sleeve}) rotate({a2})">'
+            f'<circle cx="0" cy="0" r="8" fill="var(--c-metal-3)"/>'
+            f'<rect x="-10" y="0" width="20" height="{fore}" rx="4" fill="var(--c-metal)"/>'
+            f'<rect x="-10" y="{fore - 6}" width="20" height="6" fill="var(--c-metal-3)"/>'
+            f'<rect x="-12" y="{fore}" width="24" height="{hand}" rx="4" fill="var(--gloves)"/>'
+            f'{fingers}'
+            f'<rect x="-12" y="{fore}" width="24" height="4" fill="var(--gloves-dk)"/>'
+            f"</g></g>")
+
+
+def _hand(side: str, a1: float, a2: float, shoulder: dict, seg: dict) -> tuple[float, float]:
+    sx, sy = shoulder[side]
+    d1, d2 = math.radians(a1), math.radians(a1 + a2)
+    ex = sx - math.sin(d1) * seg["sleeve"]
+    ey = sy + math.cos(d1) * seg["sleeve"]
+    reach = seg["forearm"] + seg["hand"] + 10
+    return ex - math.sin(d2) * reach, ey + math.cos(d2) * reach
+
+
+def agent_svg(kit: dict, r: dict) -> str:
+    eyes, coat, glove = kit["EYES"][r["eyes"]], kit["COATS"][r["coat"]], kit["GLOVES"][r["gloves"]]
+    arms = kit["ARMS"][r["arms"]]
+    shoulder, seg = kit["SHOULDER"], kit["SEG"]
+
+    keep = {"antenna" if r["hat"] == "none" else r["hat"]}
+    if eyes["brows"]:
+        keep.add("brows")
+    fig = _keep_parts(kit["figure"], keep)
+    fig = re.sub(r'(<circle class="iris"[^>]*?)r="[\d.]+"([^>]*?)fill="[^"]*"',
+                 lambda m: f'{m.group(1)}r="{eyes["r"]}"{m.group(2)}fill="{eyes["color"]}"', fig)
+    built = _arm("L", *arms["L"], shoulder, seg) + _arm("R", *arms["R"], shoulder, seg)
+    fig = fig.replace('<g id="arms"></g>', f'<g id="arms">{built}</g>', 1)
+    # The coat and glove colours are set on #figure itself, not a wrapper: console.css declares
+    # defaults on #figure, and a variable set on an ancestor would lose to them.
+    style = (f'--coat:{coat["c"]};--coat-dk:{coat["dk"]};--coat-lt:{coat["lt"]};'
+             f'--gloves:{glove["c"]};--gloves-dk:{glove["dk"]}')
+    fig = fig.replace('<g id="figure">', f'<g id="figure" style="{style}">', 1)
+
+    held = ""
+    if r["holds"]:
+        hx, hy = _hand("R", *arms["R"], shoulder, seg)
+        held = _keep_parts(kit["held"], {r["holds"]})
+        held = re.sub(r'<g id="held" transform="[^"]*"',
+                      f'<g id="held" transform="translate({hx:.1f},{hy:.1f})"', held, count=1)
+
+    # The scene goes first so it sits behind the figure, as it does on the console. Only the props
+    # that enclose the robot survive the chapter crop: the tree, database and screens are drawn to
+    # the right of the figure to clear the speech bubble and fall outside it entirely, and widening
+    # the box to reach them would shrink the robot on all 22 pages to serve three.
+    scene = ""
+    if r["scene"] in ENCLOSING_SCENES:
+        scene = _keep_parts(kit["surround"], {r["scene"]})
+    svg = (f'<div class="chapter-agent" aria-hidden="true">'
+           f'<svg viewBox="{AGENT_VIEWBOX}" xmlns="http://www.w3.org/2000/svg">'
+           f"{scene}{fig}{held}</svg></div>")
+    svg = re.sub(r"\s*\n\s*", "", svg)
+    if "\n" in svg:
+        sys.exit("error: the agent markup contains a newline; a blank line would end the raw HTML "
+                 "block and spill markup into the page")
+    return svg
+
+
+def build_agents(site: Path, chapters: list[dict]) -> dict[str, str]:
+    """One dressed figure per chapter key, or {} for a site with no console to take them from."""
+    js_path, qmd_path = site / "console.js", site / "index.qmd"
+    if not (js_path.is_file() and qmd_path.is_file()):
+        return {}
+    js, qmd = js_path.read_text(), qmd_path.read_text()
+    kit = {name: _js_obj(_js_literal(js, name))
+           for name in ("COATS", "GLOVES", "EYES", "ARMS", "SHOULDER", "SEG")}
+    kit["figure"] = _svg_group(qmd, "figure")
+    kit["held"] = _svg_group(qmd, "held")
+    kit["surround"] = _svg_group(qmd, "surround")
+    agents = {m.group("n"): agent_svg(kit, _recipe(m.group("r")))
+              for m in CH_ENTRY.finditer(_js_literal(js, "CH"))}
+    absent = [c["key"] for c in chapters if c["key"] and c["key"] not in agents]
+    if absent:
+        sys.exit("error: console.js has no recipe for chapter(s) " + ", ".join(absent)
+                 + " -- add one, or the page would open with no figure")
+    return agents
+
+
+def chapter_text(lines: list[str], chapter: dict, agent: str = "") -> str:
+    """The whole .qmd for one chapter: a title, and the body byte for byte.
+
+    With an agent, the figure comes first and the chapter's own H1 is written back in after it. A
+    float only wraps the line boxes that follow it, so a title rendered above the body could never
+    sit beside the figure; site.css hides Quarto's own title block on the pages that carry one.
+    """
     title = chapter["title"].replace('"', '\\"')
-    return f'---\ntitle: "{title}"\n---\n\n{body_of(lines, chapter)}\n'
+    head = f'---\ntitle: "{title}"\n---\n\n'
+    body = body_of(lines, chapter)
+    if agent:
+        return f'{head}{agent}\n\n# {chapter["title"]}\n\n{body}\n'
+    return f"{head}{body}\n"
 
 
 def content_commit(upstream: Path, rel: Path) -> str:
@@ -349,7 +546,9 @@ def check(site: Path) -> int:
     chapters, _ = find_chapters(lines)
     problems: list[str] = []
 
-    expected = {f"{c['slug']}.qmd": chapter_text(lines, c) for c in chapters}
+    agents = build_agents(site, chapters)
+    expected = {f"{c['slug']}.qmd": chapter_text(lines, c, agents.get(c["key"], ""))
+                for c in chapters}
     actual = {f.name: f.read_text() for f in sorted((site / "chapters").glob("*.qmd"))}
     for name in sorted(set(expected) | set(actual)):
         if name not in actual:
@@ -464,8 +663,9 @@ def main() -> None:
     out_dir.mkdir(exist_ok=True)
     for old in out_dir.glob("*.qmd"):
         old.unlink()
+    agents = build_agents(site, chapters)
     for c in chapters:
-        (out_dir / f"{c['slug']}.qmd").write_text(chapter_text(lines, c))
+        (out_dir / f"{c['slug']}.qmd").write_text(chapter_text(lines, c, agents.get(c["key"], "")))
 
     # 5. provenance
     (site / "SOURCE.lock").write_text(

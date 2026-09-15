@@ -10,6 +10,14 @@ figure.quarto-float-fig > figcaption {
   display: none;
 }
 
+/* The same identifier makes Quarto mark the float `anchored`, and the theme's AnchorJS then hangs a
+   link icon off it on hover, as it does on headings. A figure nobody cross-references has no use for
+   a permalink, so the icon is hidden on figures alone; heading anchors are left as they are. AnchorJS
+   appends the link as the wrapper's last child, which is what the selector reaches. */
+.quarto-figure > .anchorjs-link {
+  display: none;
+}
+
 /* The empty anchor the filter puts before each subsection, so a §13c from another page lands on the
    heading rather than at the top of a long chapter. */
 .subsection-anchor {
@@ -42,4 +50,34 @@ table tr:has(.matrix-band-1) > td {
 @media (prefers-color-scheme: dark) {
   table tr:has(.matrix-band-1) > td { background-color: rgba(255, 255, 255, 0.045); }
   .matrix-daily { background-color: #2f5f47; color: #dff0e6; }
+}
+
+/* ---- the chapter agent ----
+   The landing page's robot, dressed by that chapter's own recipe and floated at the head of the
+   page, so the figure a reader hovered on the console is the one that greets them inside. The
+   markup is generated into each chapter by split-chapters.py, from console.js and index.qmd. A
+   document with no console.js gets no agents, so on the tool-chain site these rules match nothing
+   -- the same "inert on the other" arrangement as the matrix rules above.
+
+   Quarto renders the frontmatter title into a header that precedes all body content, and a float
+   only wraps the line boxes that come after it: a title rendered above the body could never sit
+   beside the figure. So the generator writes the chapter's H1 back into the body after the figure
+   and the theme's own title is hidden here. The breadcrumb nav lives in that same header and is
+   deliberately left alone. */
+main:has(.chapter-agent) #title-block-header .quarto-title { display: none; }
+
+.chapter-agent { float: right; width: 40%; margin: 0 0 14px -30px; }
+.chapter-agent svg { display: block; width: 100%; height: auto; }
+.chapter-agent + h1 { margin-top: 0; }
+
+/* The gap is negative on purpose. The figure's box is its viewBox, not the robot: every agent carries
+   transparent space on its left (about 60px as rendered on most chapters, less on Boundaries, where the
+   glass box reaches further out), so a zero margin still leaves the text stranded well clear of the ink.
+   -30px pulls it into that dead space. Checked across all four arm poses and the glass box: at -60px the
+   text ran under Boundaries' dashed border, at -30px every chapter clears.
+
+   Narrow: the measure beside a 40% figure is already tight at full width, and below this it stops
+   being a column at all, so the figure gives up the float and sits above the text. */
+@media (max-width: 700px) {
+  .chapter-agent { float: none; width: min(60%, 250px); margin: 0 auto 16px; }
 }
