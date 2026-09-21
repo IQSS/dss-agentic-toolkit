@@ -35,7 +35,7 @@ Part I is the ground and is worth reading once. After that, go by need. Most rea
 
 **Part IV. Reaching further.** None of what follows is needed to start. These four sections are for when the core set is in place and the work asks for more: data that is not in files, a website with no API, two tasks that could run side by side, settings you want to be able to undo. Each one widens what the agent can touch, so read §4 before adding any of them.
 
-**Part V. Working in the terminal yourself.** Nothing in Parts I to IV needs a terminal. The agent installs and runs every tool there, and the app is enough to ask for them and to check them. This Part is for readers who want to work in a terminal themselves. §20 gives the reasons someone might. §21 to §25 describe the stack from the agent outward: the terminal, the shell, the multiplexer, and an editor beside them.
+**Part V. Working in the terminal yourself.** Nothing in Parts I to IV asks you to work in a terminal. The agent installs and runs every tool there, and the app is enough to ask for them and to check them. The exceptions are a few steps that need your password or your answer, where you paste a line the agent gives you (§2). This Part is for readers who want to work in a terminal themselves. §20 gives the reasons someone might. §21 to §25 describe the stack from the agent outward: the terminal, the shell, the multiplexer, and an editor beside them.
 
 ## The tools, by what they let the agent do
 
@@ -159,12 +159,20 @@ Homebrew, on a Mac and inside Ubuntu alike. The commands are identical on both, 
 
 Both routes need administrator rights on the computer. Most Harvard researchers have them on a university laptop. If you do not, ask your local IT support to carry out these steps.
 
-This is the one place in the guide where you type commands yourself. Paste each line exactly, press Return, and wait for it to finish before the next.
+**On a Mac.** Two installers, both with ordinary Mac dialogs, and no terminal.
 
-**On a Mac.**
+1. Apple's Command Line Tools, which Homebrew needs. If git already works on this Mac, you have them. If not, ask the agent to run `xcode-select --install`. A dialog opens. Click *Install*, accept the license, and wait for it to finish. It can take several minutes.
+2. Download [Homebrew.pkg](https://github.com/Homebrew/brew/releases/latest/download/Homebrew.pkg), Homebrew's own installer package, and double-click it. It asks for your Mac password in a standard dialog. By the package's own files (read 2026-09-21), it runs on a Mac with Apple silicon and macOS 15 or later, refuses to start until step 1 is done, and adds Homebrew to the path that new sessions search.
+3. Start a new session and ask:
+
+   > Run `brew doctor` and tell me what it says. If `brew` is not found, it is at `/opt/homebrew/bin/brew`: add it to my shell's startup file.
+
+   It should report `Your system is ready to brew.`
+
+**On an older Mac** (an Intel processor, or macOS 14 or earlier), the package does not run, and you type the commands yourself. Paste each line exactly, press Return, and wait for it to finish before the next.
 
 1. Open Terminal: press Command-Space, type `Terminal`, press Return.
-2. Install Apple's Command Line Tools, which Homebrew needs:
+2. Install Apple's Command Line Tools:
 
    ```
    xcode-select --install
@@ -207,11 +215,11 @@ This is the one place in the guide where you type commands yourself. Paste each 
 
 DSS will ship one install list with this guide. It is a `Brewfile`: a plain text file with one line for each tool in Parts II and III. You do not work through it. You point the agent at it:
 
-> Homebrew is installed. Here is the DSS install list. Tell me what it would install, then install it with `brew bundle`. Report anything that failed, and stop and tell me if a step needs my password.
+> Homebrew is installed. Here is the DSS install list. Tell me what it would install, then install it with `brew bundle`. Set `HOMEBREW_NO_ASK=1` so that Homebrew does not stop to ask for confirmation. Report anything that failed, and stop and tell me if a step needs my password.
 
 <!-- TODO at release: the install list's public address -->
 
-When a step needs your password, run that one command yourself. The vendor's documentation (read 2026-09-21) says the app's local sessions have a terminal pane (*Views* menu) that opens in the project folder. WSL sessions have none, so on Windows use the Ubuntu window from step 3.
+When a step needs your password, run that one command yourself. The agent gives you the line. On a Mac, open Terminal (press Command-Space, type `Terminal`, press Return), paste the line, and press Return. On Windows, use the Ubuntu window from step 3.
 
 Three things to know about the list:
 
@@ -245,7 +253,7 @@ Three decisions, made once.
 
 **In the app, choose the WSL session.** Only a session running inside Ubuntu sees the tools installed there. Anthropic's documentation (read 2026-09-20) says the desktop app's Code tab can run a session inside a WSL2 distribution, with the agent, its tools, and `git` all running in it. It needs Windows 10 or 11, WSL2, and `git` inside the distribution, which step 4 installed. When you start a session, open the environment picker and choose Ubuntu under *WSL*. The folder picker then browses Ubuntu's own paths, such as `/home/<you>/project`.
 
-The same documentation lists what a WSL session lacks: connectors and plugins (so the connectors in §16 are not available there), the integrated terminal, the file browser, and `@` file suggestions. It also says WSL sessions may be unavailable on a computer your organization manages. If a session refuses to start for that reason, ask your local IT support.
+The same documentation lists what a WSL session lacks: connectors and plugins (so the connectors in §16 are not available there), the file browser, and `@` file suggestions. It also says WSL sessions may be unavailable on a computer your organization manages. If a session refuses to start for that reason, ask your local IT support.
 
 # 3. Telling the agent what it has: instruction files and skills
 
@@ -1471,7 +1479,7 @@ Such runs are often paid for by a project, not a person. The vendor's documentat
 
 This reason does not apply on a Mac.
 
-On Windows the tools in this guide live in WSL2, and only a WSL session in the app sees them. The vendor's documentation (read 2026-09-20) says WSL sessions lack the integrated terminal, connectors and plugins, session forking, the file-browser pane, and `@` file suggestions, and that they may be unavailable on a device an organization manages. On Linux the app is a beta for Ubuntu 22.04 and Debian 12 or later, with no support for Fedora or RHEL, and without computer use or dictation.
+On Windows the tools in this guide live in WSL2, and only a WSL session in the app sees them. The vendor's documentation (read 2026-09-20) says WSL sessions lack connectors and plugins, session forking, the file-browser pane, and `@` file suggestions, and that they may be unavailable on a device an organization manages. On Linux the app is a beta for Ubuntu 22.04 and Debian 12 or later, with no support for Fedora or RHEL, and without computer use or dictation.
 
 Those gaps belong to the app's WSL sessions and its Linux beta. The command-line agent, inside WSL2 or on Linux, is an ordinary Linux program installed beside the tools it drives.
 

@@ -36,7 +36,7 @@ Such runs are often paid for by a project, not a person. The vendor's documentat
 
 This reason does not apply on a Mac.
 
-On Windows the tools in this guide live in WSL2, and only a WSL session in the app sees them. The vendor's documentation (read 2026-09-20) says WSL sessions lack the integrated terminal, connectors and plugins, session forking, the file-browser pane, and `@` file suggestions, and that they may be unavailable on a device an organization manages. On Linux the app is a beta for Ubuntu 22.04 and Debian 12 or later, with no support for Fedora or RHEL, and without computer use or dictation.
+On Windows the tools in this guide live in WSL2, and only a WSL session in the app sees them. The vendor's documentation (read 2026-09-20) says WSL sessions lack connectors and plugins, session forking, the file-browser pane, and `@` file suggestions, and that they may be unavailable on a device an organization manages. On Linux the app is a beta for Ubuntu 22.04 and Debian 12 or later, with no support for Fedora or RHEL, and without computer use or dictation.
 
 Those gaps belong to the app's WSL sessions and its Linux beta. The command-line agent, inside WSL2 or on Linux, is an ordinary Linux program installed beside the tools it drives.
 

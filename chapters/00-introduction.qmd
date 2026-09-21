@@ -30,7 +30,7 @@ Part I is the ground and is worth reading once. After that, go by need. Most rea
 
 **Part IV. Reaching further.** None of what follows is needed to start. These four sections are for when the core set is in place and the work asks for more: data that is not in files, a website with no API, two tasks that could run side by side, settings you want to be able to undo. Each one widens what the agent can touch, so read §4 before adding any of them.
 
-**Part V. Working in the terminal yourself.** Nothing in Parts I to IV needs a terminal. The agent installs and runs every tool there, and the app is enough to ask for them and to check them. This Part is for readers who want to work in a terminal themselves. §20 gives the reasons someone might. §21 to §25 describe the stack from the agent outward: the terminal, the shell, the multiplexer, and an editor beside them.
+**Part V. Working in the terminal yourself.** Nothing in Parts I to IV asks you to work in a terminal. The agent installs and runs every tool there, and the app is enough to ask for them and to check them. The exceptions are a few steps that need your password or your answer, where you paste a line the agent gives you (§2). This Part is for readers who want to work in a terminal themselves. §20 gives the reasons someone might. §21 to §25 describe the stack from the agent outward: the terminal, the shell, the multiplexer, and an editor beside them.
 
 ## The tools, by what they let the agent do
 
