@@ -1,7 +1,7 @@
 ---
 title: Agentic AI Tool Chain
 subtitle: An Opinionated Ecosystem Map
-version: "1.8"
+version: "1.8.1"
 ---
 
 # Introduction
@@ -748,11 +748,15 @@ The pattern, once the daemon is up, is two shell calls:
 # Submit and capture the task ID
 ID=$(pueue add --print-task-id -- Rscript code/fit-model.R)
 
-# Wait for completion (in a separate backgrounded shell call)
-pueue wait $ID && echo "DONE" || { echo "FAILED"; pueue log $ID; }
+# Wait (in a separate backgrounded shell call), then read the outcome.
+# `pueue wait` exits 0 whether the task succeeded or failed.
+pueue wait $ID
+OK='.tasks[$id].status.Done.result == "Success"'
+if pueue status --json | jq -e --arg id "$ID" "$OK" >/dev/null
+then echo "DONE"; else echo "FAILED"; pueue log $ID; fi
 ```
 
-`pueue add` queues the command on the daemon and returns immediately with the task ID. `pueue wait $ID` blocks inside the daemon until the task finishes and exits with the task's own exit code, giving clean success-or-failure classification without a polling loop to maintain. On failure, `pueue log $ID` prints the task's stdout and stderr so the agent can see how the job died. The full queue is inspectable any time with `pueue status` and `pueue log`. Short jobs (under about five minutes) that you're certain will complete inside the immediate session don't need this — use the agent's plain background-task tracking and rely on the harness's own completion notification.
+`pueue add` queues the command on the daemon and returns immediately with the task ID. `pueue wait $ID` blocks inside the daemon until the task finishes, so there is no polling loop to maintain. It exits 0 whether the task succeeded or failed, so its exit code says nothing about the outcome; the outcome is read from `pueue status --json`, where a finished task carries its result. On failure, `pueue log $ID` prints the task's stdout and stderr so the agent can see how the job died. The full queue is inspectable any time with `pueue status` and `pueue log`. Short jobs (under about five minutes) that you're certain will complete inside the immediate session don't need this — use the agent's plain background-task tracking and rely on the harness's own completion notification.
 
 The `pueue add` + `pueue wait` pair belongs in your global `AGENTS.md` so any agent reading those rules submits long-running work through the daemon by default. A one-paragraph instruction plus the canonical form is enough — the agent doesn't need the full reasoning every time, just the form and the rule to use it.
 
@@ -784,7 +788,7 @@ The scheduled-task pattern crosses into §15: see the agent-detachment-pattern s
 
 Two things pull me back to the terminal when my attention is elsewhere: an agent that needs input, and a long job that finishes. For the first, `Claude Code`'s `Notification` hook fires a desktop popup the moment the agent is waiting on me — a permission prompt, or an idle turn. Mine runs `terminal-notifier` (a small macOS notifier) from a one-line hook in `settings.json`, so I can work in another window and get pulled back exactly when the agent is blocked.
 
-For the second, the `pueue wait $ID` I already use to classify success also carries the ping: `pueue wait $ID && terminal-notifier -message done` fires when that one job finishes. `pueue`'s global `callback` config runs after every task instead, for when I'd rather hear about all of them.
+For the second, the `pueue wait $ID` I already use to block until a job finishes also carries the ping: `pueue wait $ID; terminal-notifier -message done` fires when that one job finishes, whatever its outcome. `pueue`'s global `callback` config runs after every task instead, for when I'd rather hear about all of them.
 
 ## When I'd reconsider
 
