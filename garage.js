@@ -31,7 +31,7 @@
       body: "More tools means more reach, for mistakes too. Deny rules, approval prompts, and the sandbox, set before the tools arrive." },
     { n: "5", group: "II", slug: "05-find-and-read-things-fast-rg-fd-jq-yq-bat", title: "Find and read things fast", tool: "the hammer",
       body: "The small tools the agent uses hundreds of times a session to find and read things: faster searches, fewer tokens, fewer mistakes." },
-    { n: "6", group: "II", slug: "06-undo-anything-and-work-with-github-git-and-gh", title: "Undo anything, and work with GitHub", tool: "a box on the floor",
+    { n: "6", group: "II", slug: "06-undo-anything-and-work-with-github-git-and-gh", title: "Undo anything, and work with GitHub", tool: "the tape measure",
       body: "Every change reviewable and reversible, and GitHub without improvised API calls." },
     { n: "7", group: "II", slug: "07-run-long-jobs-in-your-own-queue-pueue", title: "Run long jobs in your own queue", tool: "the clock",
       body: "A queue on your own machine. Long fits outlive the session, and a simulation study keeps every core busy until the list is empty." },
@@ -41,7 +41,7 @@
       body: "A pinned language and pinned packages, so the project rebuilds on another machine, or next year." },
     { n: "10", group: "II", slug: "10-turn-the-analysis-into-a-paper-or-a-deck-quarto-and-pandoc", title: "Turn the analysis into a paper or a deck", tool: "the pencil cup",
       body: "From analysis to a paper or a deck: Quarto for documents that run code, pandoc for those that do not." },
-    { n: "11", group: "III", slug: "11-re-run-only-what-changed-targets-and-snakemake", title: "Re-run only what changed", tool: "a box on the floor",
+    { n: "11", group: "III", slug: "11-re-run-only-what-changed-targets-and-snakemake", title: "Re-run only what changed", tool: "the gears",
       body: "A pipeline that knows what is out of date and re-runs only that, for when steps take hours." },
     { n: "12", group: "III", slug: "12-keep-keys-and-tokens-out-of-your-files-1password-and-direnv", title: "Keep keys and tokens out of your files", tool: "the drawers and keys",
       body: "The agent uses a key without ever seeing it written down. 1Password holds the values; direnv hands each project only what it needs." },
@@ -57,19 +57,19 @@
       body: "A browser, and the screen itself, for work that crosses from your machine to the outside." },
     { n: "18", group: "IV", slug: "18-run-several-agents-at-once-git-worktrees", title: "Run several agents at once", tool: "the charging dock",
       body: "Several agents at once, each in its own working tree and branch, so parallel work cannot collide." },
-    { n: "19", group: "IV", slug: "19-version-control-for-your-tools-settings-chezmoi", title: "Version control for your tools' settings", tool: "a box on the floor",
+    { n: "19", group: "IV", slug: "19-version-control-for-your-tools-settings-chezmoi", title: "Version control for your tools' settings", tool: "the parts organizer",
       body: "Version control for the settings files your tools scatter across the home directory." },
-    { n: "20", group: "V", slug: "20-why-use-the-terminal-instead-of-the-app", title: "Why use the terminal instead of the app?", tool: "a box on the floor",
+    { n: "20", group: "V", slug: "20-why-use-the-terminal-instead-of-the-app", title: "Why use the terminal instead of the app?", tool: "the light switch",
       body: "What a terminal gives that the app does not, and why most readers can stop before this Part." },
     { n: "21", group: "V", slug: "21-the-agent-in-a-terminal-claude-code", title: "The agent in a terminal", tool: "the radio",
       body: "The same agent, started as a command in a terminal." },
     { n: "22", group: "V", slug: "22-a-terminal-worth-working-in-iterm2-windows-terminal", title: "A terminal worth working in", tool: "the strip light",
       body: "The window everything in a terminal appears through." },
-    { n: "23", group: "V", slug: "23-the-shell-its-framework-and-the-prompt-zsh-oh-my-zsh-oh-my-posh", title: "The shell, its framework, and the prompt", tool: "a box on the floor",
+    { n: "23", group: "V", slug: "23-the-shell-its-framework-and-the-prompt-zsh-oh-my-zsh-oh-my-posh", title: "The shell, its framework, and the prompt", tool: "the screwdrivers",
       body: "The shell, the framework that loads its plugins, and a prompt that shows the state you would otherwise ask for." },
     { n: "24", group: "V", slug: "24-keep-sessions-alive-and-watch-several-things-at-once-zellij", title: "Keep sessions alive and watch several things", tool: "the vise",
       body: "Sessions that survive closing the window, and panes to watch several things at once." },
-    { n: "25", group: "V", slug: "25-an-editor-beside-the-terminal-positron", title: "An editor beside the terminal", tool: "a box on the floor",
+    { n: "25", group: "V", slug: "25-an-editor-beside-the-terminal-positron", title: "An editor beside the terminal", tool: "the drafting lamp",
       body: "An editor beside the terminal, for reading and writing at length." },
   ];
   const byN = n => CH.find(c => c.n === n);
@@ -362,13 +362,61 @@
       E(t, 0, -30, 17, 3.4, v("metal"));
       E(t, 0, 0, 13, 2.4, v("metal-2"), { opacity: 0.5 });
     },
-    crate(x, y) {
-      return g => {
-        R(g, x, y, 48, 36, v("wood-lt"), { rx: 2 });
-        R(g, x, y, 48, 7, v("wood"), { rx: 2 });
-        R(g, x + 20, y, 8, 36, v("cream"), { opacity: 0.7 });
-        R(g, x, y + 33, 48, 3, v("wood-dk"), { opacity: 0.6 });
+    tape(g) {                                   // §6: every change can be reeled back in
+      const t = G(g, 322, 446);
+      R(t, 16, -10, 66, 6, v("mustard-2"));
+      for (let i = 0; i < 9; i++) R(t, 24 + i * 6.5, -10, 1, i % 2 ? 2.5 : 4, v("dark"), D);
+      R(t, 81, -13, 3, 11, v("metal-3"));
+      R(t, -20, -38, 42, 38, v("mustard"), { rx: 8 });
+      R(t, -20, -38, 42, 8, v("mustard-2"), { rx: 5, opacity: 0.75 });
+      C(t, 1, -18, 12, v("dark"), D); C(t, 1, -18, 4.5, v("metal"), D);
+      R(t, -24, -30, 5, 16, v("metal-3"), { rx: 2 });
+    },
+    screwdrivers(g) {                           // §23: the shell, the everyday hand tools of Part V
+      R(g, 336, 290, 108, 6, v("wood-dk"), { rx: 2 });
+      [["red", 24], ["blue", 19], ["mustard", 27], ["teal", 17]].forEach(([c, len], i) => {
+        const x = 351 + i * 26;
+        R(g, x - 6, 296, 12, 23, v(c), { rx: 4 });
+        R(g, x - 6, 303, 12, 2, v("dark"), Object.assign({ opacity: 0.35 }, D)); R(g, x - 6, 309, 12, 2, v("dark"), Object.assign({ opacity: 0.35 }, D));
+        R(g, x - 3, 319, 6, 4, v("metal-3"));
+        R(g, x - 1.6, 323, 3.2, len, v("steel"));
+        P(g, "M" + (x - 2.4) + " " + (323 + len) + " h4.8 l-1.2 4 h-2.4z", v("metal-2"));
+      });
+    },
+    gears(g) {                                  // §11: only the wheels that need to turn, turn
+      R(g, 360, 502, 110, 66, v("metal-3"), { rx: 5, opacity: 0.55 });
+      const gear = (cx, cy, r, n, fill, rot) => {
+        const t = el("g", { transform: "translate(" + cx + "," + cy + ") rotate(" + rot + ")" }, g);
+        for (let i = 0; i < n; i++) R(t, -2.6, -r - 5, 5.2, 7, fill, { transform: "rotate(" + (i * 360 / n) + ")" });
+        C(t, 0, 0, r, fill); C(t, 0, 0, r * 0.62, v("metal-3"), D); C(t, 0, 0, r * 0.24, v("steel"), D);
+        for (let i = 0; i < 3; i++) R(t, -1.4, -r * 0.62, 2.8, r * 0.62, fill, Object.assign({ transform: "rotate(" + (i * 120) + ")" }, D));
       };
+      gear(392, 536, 20, 12, v("mustard"), 0);
+      gear(427, 521, 13, 8, v("metal"), 11);
+      gear(449, 545, 10, 7, v("red"), 4);
+    },
+    organizer(g) {                              // §19: many small drawers, each a setting that lives somewhere else
+      const x = 352, y = 592, w = 112, h = 50;
+      box(g, x, y, w, h, 0.06, v("metal-2"), v("metal-3"), v("metal"));
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
+        const dx = x + 4 + c * 26.5, dy = y + 4 + r * 15;
+        R(g, dx, dy, 24, 12.5, v("blue-lt"), { rx: 1.5 });
+        R(g, dx + 7, dy + 3, 10, 4, v("cream"), { rx: 1 });
+      }
+    },
+    lamp(g) {                                   // §25: for close reading
+      R(g, 740, 439, 34, 8, v("dark"), { rx: 3 });
+      S(g, "M757 439 L746 394 L783 366", v("metal-2"), 5);
+      C(g, 746, 394, 4.5, v("metal-3")); C(g, 757, 439, 4, v("metal-3"));
+      C(g, 790, 362, 16, v("sky"), { opacity: 0.55 });
+      C(g, 790, 362, 16, "none", { stroke: v("metal-3"), "stroke-width": 5 });
+      S(g, "M781 356 q5 -7 13 -6", "#fff", 2, Object.assign({ opacity: 0.7 }, D));
+    },
+    lightswitch(g) {                            // §20: a way in, not a tool
+      R(g, 244, 104, 24, 38, v("cream"), { rx: 3, stroke: v("metal"), "stroke-width": 1.5 });
+      R(g, 252, 114, 8, 18, v("metal-2"), { rx: 2 });
+      R(g, 252, 114, 8, 9, v("steel"), { rx: 2 });
+      C(g, 256, 109, 1.3, v("metal-3")); C(g, 256, 137, 1.3, v("metal-3"));
     },
     toolbox(g) {
       const x = 800, y = 396, w = 104, h = 54, t = 0.07, lid = 19;
@@ -426,6 +474,7 @@
 
   const wall = document.getElementById("wall"), benchL = document.getElementById("bench");
   tool(wall, "17", DRAW.window, { heavy: true, tag: [222, 170] });
+  tool(wall, "20", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
   shelf(wall, 46, 250, 214);
   tool(wall, "16", DRAW.jars, { tag: [226, 222] });
   shelf(wall, 46, 350, 214);
@@ -433,7 +482,8 @@
   tool(wall, "18", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
   tool(wall, "22", DRAW.striplight, { heavy: true, tag: [704, 56] });
-  tool(wall, "9", DRAW.wrenches, { ghost: true, tag: [366, 284] });
+  tool(wall, "9", DRAW.wrenches, { ghost: true, tag: [440, 252] });
+  tool(wall, "23", DRAW.screwdrivers, { ghost: true, tag: [312, 318] });
   tool(wall, "5", DRAW.hammer, { ghost: true, tag: [512, 262] });
   tool(wall, "8", DRAW.drill, { ghost: true, tag: [652, 232] });
   tool(wall, "14", DRAW.meter, { ghost: true, tag: [722, 112] });
@@ -451,9 +501,8 @@
     tool(benchL, "2", DRAW.bench, { heavy: true, tag: [515, 480] });
     tool(benchL, "12", DRAW.drawers, { heavy: true, tag: [145, 493] });
     tool(benchL, "4", DRAW.cabinet, { heavy: true, tag: [825, 493] });
-    // Six sections have no object of their own yet. Each is a box on the floor, in reading order.
-    [["6", 330, 600], ["11", 384, 600], ["19", 438, 600], ["20", 357, 562], ["23", 411, 562], ["25", 384, 524]]
-      .forEach(([n, x, y]) => tool(benchL, n, DRAW.crate(x, y), { tag: [x + 24, y + 20] }));
+    tool(benchL, "11", DRAW.gears, { tag: [492, 536] });
+    tool(benchL, "19", DRAW.organizer, { heavy: true, tag: [408, 654] });
     // the stool is furniture
     const st = G(benchL, 560, 650, 1.1);
     S(st, "M-20 -62 L-30 0 M20 -62 L30 0 M-25 -24 H25", v("wood-dk"), 5);
@@ -461,6 +510,8 @@
     R(st, -32, -70, 64, 11, v("red-dk"), { rx: 4 }); E(st, 0, -70, 32, 6, v("red"));
     for (const x of [xfl + 8, xfr - 28]) box(benchL, x, yf + apron, 20, front - yf - apron, 0.035, v("wood"), v("wood-dk"), v("wood"), false);
     tool(benchL, "24", DRAW.vise, { tag: [222, 442] });
+    tool(benchL, "6", DRAW.tape, { tag: [322, 396] });
+    tool(benchL, "25", DRAW.lamp, { tag: [722, 430] });
     tool(benchL, "10", DRAW.pencils, { tag: [510, 442] });
     tool(benchL, "15", DRAW.toolbox, { tag: [938, 442] });
   })();
