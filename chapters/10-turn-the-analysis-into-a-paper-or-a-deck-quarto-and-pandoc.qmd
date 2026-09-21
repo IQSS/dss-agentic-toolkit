@@ -1,0 +1,74 @@
+---
+title: "10. Turn the analysis into a paper or a deck: Quarto and pandoc"
+---
+
+**We recommend** Quarto for documents that run code, and `pandoc` with a LaTeX template for those that do not. **Alternatives:** R Markdown, Jupyter notebooks, Typst, Quarto for everything.
+
+## Without it
+
+The agent fits the model, reads the output, and types the estimates into the manuscript. Then a coding error in the data is fixed and the model is refit. Some of the forty numbers in the text are now stale, and nothing says which.
+
+## What it gives the agent
+
+**Quarto** is for documents that run code. One `.qmd` file holds the prose, the R or Python code, the citations, and the cross-references. Rendering runs the code and places its output, tables, and figures in the text, so no number in the paper is older than the analysis. The same source renders to HTML, PDF, slides, or a manuscript.
+
+**`pandoc`** with a LaTeX template is for documents with no code to run: a grant report, a CV, a slide deck. `pandoc` converts markdown to PDF, and the template fixes the fonts, headings, and layout, so documents of a kind look alike.
+
+Both sources are plain text: the agent edits them like code, `git` shows each revision as a diff (§6), and `just build` rebuilds the document (§8). Both rest on `pandoc` for conversion and a TeX distribution for PDF.
+
+## Do you need it yet?
+
+Yes, if numbers in a document come from code that will run again: a paper in review, a report rerun on each year's data. Yes to `pandoc`, if you produce designed PDFs regularly and want them to match.
+
+No, if your co-authors and journal work in Word and the analysis is finished, or for a document you will write once by hand.
+
+## What we recommend
+
+Quarto for computational documents. For the rest, markdown through `pandoc` to XeLaTeX, with your own template. XeLaTeX uses the fonts installed on the machine directly.
+
+For TeX, start with TinyTeX, a small distribution in your home folder. Its documentation says it needs no administrator rights, and Quarto installs it (`quarto install tinytex`) and fetches missing packages as needed. Quarto's documentation says that copy is kept off the system path unless installed with `--update-path`, which `pandoc` run outside Quarto needs. A full TeX Live (MacTeX on a Mac) carries every package from the start, the safer base for a document that must rebuild identically in five years.
+
+## Ask for it, and tell the agent
+
+> Install Quarto and pandoc, and a TeX distribution that needs no administrator password. Render a one-page test document to PDF with XeLaTeX and show me the file. Then add a `build` recipe to this project's `justfile` that renders the paper.
+
+**What only you can do.** Nothing, with a user-level TeX. A full TeX distribution is a system package, and its installer asks for your administrator password.
+
+The standing lines for the instruction file:
+
+- Every number, table, and figure in a document comes from code in the document or from a file the pipeline wrote. Never type a result into the text.
+- Build documents with `just build`. The `pandoc` options live in the `justfile`.
+- A render is finished only when the output file exists and is newer than its source.
+
+## Check that it's working
+
+Ask: *can this machine build a PDF?* A good answer gives the versions of `pandoc` (3 or later) and `xelatex`, shows `quarto check` printing "[OK]" lines, then builds a PDF and names the file and its time.
+
+What goes wrong when an agent operates it:
+
+- **A render hangs at full CPU.** A Quarto document that runs R is subject to the same spin as §8 when an agent renders it directly: the R process Quarto starts has no terminal either. The `justfile` recipe runs the whole render inside a pseudo-terminal, outside the sandbox (§4). A render that refits models goes to the queue (§7), where R does not spin. This is what the recipe should run:
+
+```
+script -q /dev/null quarto render paper.qmd < /dev/null
+```
+
+- **"No counter 'none' defined."** On TeX Live 2026 and later, `pandoc` wraps a table that has no caption in a way the template must allow for. The agent adds this to the template's preamble:
+
+```
+\makeatletter
+\@ifundefined{c@none}{\newcounter{none}}{}
+\makeatother
+```
+
+- **A missing package or font.** A small TeX lacks less common packages; `tlmgr install` adds one. A font the template names must be installed, or the build stops with "Font not found"; `fc-list` shows what is there. Newly installed TeX programs are found only from a new shell.
+
+## Alternatives, and when to choose them
+
+- **R Markdown**, only for an existing project that uses it.
+- **Jupyter notebooks**, for Python work where the notebook is the document.
+- **Quarto for everything**, when you do not need control of the design: its default themes give a working PDF with no template. Customizing beyond what they expose leads back to a LaTeX template.
+- **Typst**, for simple standalone documents: one program, no TeX, fast. It is short of LaTeX on mathematics and citations and has no counterpart to `pandoc`'s filters.
+
+## On Windows (WSL2) and Linux
+
+In Ubuntu, TeX comes from the system's package manager (`texlive`, `texlive-xetex`, and `texlive-fonts-recommended`, through `sudo apt install`), which asks for your Linux password. It is the same TeX Live that MacTeX bundles, so one template builds identically on both. Quarto's download page gives a `.deb` installer for Ubuntu, not an `apt` repository: the agent downloads and installs it.

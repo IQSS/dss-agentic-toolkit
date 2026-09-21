@@ -1,0 +1,62 @@
+---
+title: "13. Check what the agent changed: tests and diff review"
+---
+
+**We recommend** `testthat` for R, or `pytest` with `pandera` for Python, run from one `just check` command, and `difftastic` for showing what changed. **Alternatives:** the app's diff view alone, Great Expectations, another host's check runner.
+
+## Without it
+
+You ask the agent to speed up the data-cleaning step. It does, and the script still runs. It has also dropped a factor level in a merge, and every estimate downstream moved a little. Nothing failed, so nothing told you.
+
+Without checks, the agent's only evidence that a change is safe is that the code ran. Your only view of the change is a line diff in which it has also re-indented half the file.
+
+## What it gives the agent
+
+Checks it can run by itself after every change, with one command, that fail loudly. Unit tests call one function with known inputs and compare the output. Assertions guard what would silently change a result: the rows after a merge, the factor levels, the missing values.
+
+And a way to show you what changed in meaning, not in layout. `difftastic` parses the code and compares its structure, so re-indentation and moved blocks drop out. It covers R and Python.
+
+On GitHub, the same command can run on every push and pull request, so nobody has to remember it.
+
+## Do you need it yet?
+
+Yes, as soon as the agent edits code whose results you will report.
+
+No, for exploration you will read once and throw away.
+
+## What we recommend
+
+- **R:** `testthat` for unit tests, and plain assertions (`stopifnot()`) in the scripts.
+- **Python:** `pytest` for unit tests, and `pandera` to state what a data frame must look like (column types, ranges, missing values) before the analysis runs.
+- **Both:** a linter and a formatter (`lintr` and `styler` for R, `ruff` for Python), run at every commit by `pre-commit`. They catch typos and layout noise, not statistical errors.
+
+All of it runs from `just check` (§8), the same command for you, the agent, and a collaborator.
+
+For reading changes, the agent uses `difftastic` and you use the app's own diff view. Read closely where a passing build would miss a problem: model code, data handling, contrast coding, the `justfile` and pipeline files.
+
+## Ask for it, and tell the agent
+
+> Install the test tools for this project's language, and difftastic. Add a `just check` recipe that runs the tests, the data assertions, and the linter. Write a first set of tests and assertions, and tell me what each one checks.
+
+The standing lines for the instruction file:
+
+- Run `just check` after every code change, and report the result before calling the work done.
+- Never edit, skip, or delete a failing check to make it pass. Show me the failure.
+- When I ask what changed, use `difftastic`.
+
+## Check that it's working
+
+Ask: *run the checks, and tell me what each one covers and what none of them covers.* A good answer gives the number passed and failed, what each check asserts, and which steps have no check. Then ask: *what changed in behavior since the last commit?*
+
+What goes wrong when an agent operates it:
+
+- **The agent makes a failing check pass by changing the check.** Look at the diff of the test files.
+- **`just check` hangs at full CPU.** R run directly by an agent spins (§11), so this recipe goes through the pseudo-terminal wrapper too.
+- **"Only formatting changed" is wrong.** On very large files, or files it cannot parse, `difftastic` falls back to a line diff.
+- **The checks pass and the analysis is wrong.** Tests show that the code does what the tests say, not that the model is right. Which checks an analysis needs is research practice: see "Verification" in *Doing Research with AI Agents*.
+
+## Alternatives, and when to choose them
+
+- **The app's diff view alone**, when changes are small and you read all of them.
+- **Great Expectations**, when data quality is itself the product: many sources with conflicting schemas.
+- **GitLab CI or another host's runner**, when the repository is not on GitHub.

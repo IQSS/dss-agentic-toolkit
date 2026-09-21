@@ -1,0 +1,68 @@
+---
+title: "7. Run long jobs in your own queue: pueue"
+---
+
+**We recommend** `pueue`. **Alternatives:** `targets` with `crew`, GNU `parallel`, `nohup`, a cluster scheduler.
+
+## Without it
+
+Ask an agent to fit a `brms` model that takes six hours and it starts the fit inside its own session. Sessions end: the context fills and compacts, you clear the conversation, the app reclaims an idle shell. When the session goes, the operating system tells every process it started to stop, and the fit stops with them, mid-chain, with nothing logged. You find out the next morning.
+
+The second failure is slower. A calibration study is 400 runs and the laptop has twelve cores. Left to itself, the agent runs them one after another, which takes a week, or starts all 400 at once, which takes the machine down.
+
+## What it gives the agent
+
+A queue that belongs to the machine, not to the session. `pueue` runs a small background service that starts at login. A job the agent hands to it becomes the service's job, so nothing that happens to the agent's session can reach it. The queue holds as many jobs as you like, runs a set number at a time, and starts the next the moment one finishes, so every core stays busy until the list is empty. It keeps each job's output and its result, and reports both in a form the agent can read, so the agent can tell you what is running, what finished, and what failed.
+
+## Do you need it yet?
+
+Yes, if anything you run outlasts a sitting, or if you have more runs than cores. That covers Bayesian fits, simulation and calibration studies, scrapes, and long builds.
+
+No, if your jobs finish in a few minutes. The agent's ordinary background tasks are enough for those.
+
+You do not need a cluster for this. A queue on your own machine keeps your existing workflow: the same project folder, the same packages, no second environment to maintain.
+
+## What we recommend
+
+`pueue`, with the number of parallel jobs set a little below your core count. It is free, it behaves the same on macOS and Ubuntu, and it keeps its state in plain files.
+
+One thing to know: a queued job runs as you, outside whatever limits you have set on the agent (§4). The agent's permission rules see the command that submits the job, not what the script does once it runs. Have the agent show you a script before it queues one you have not read.
+
+## Ask for it, and tell the agent
+
+> Install pueue and set its service to start when I log in. Set it to run ten jobs at a time. Then add to my global instruction file the rules for long jobs below.
+
+The standing lines for the instruction file:
+
+- Any job that might run longer than five minutes goes to `pueue`, never into your own session.
+- For many similar runs, queue them all as one group and let the queue pace them.
+- Never tell me a job is running, or finished, without checking its status first.
+
+## Check that it's working
+
+Ask: *what is in the queue?* A good answer lists each job with its state (queued, running, done, failed) and, for a failed job, the last lines of its output.
+
+What goes wrong when an agent operates it:
+
+- **It reports success for a job that crashed.** `pueue wait` returns the same exit code whether the job succeeded or failed, so an agent that checks only that will say "done" either way. The result has to be read from the queue's status. This is what the agent should run:
+
+```
+pueue wait $ID
+OK='.tasks[$id].status.Done.result == "Success"'
+pueue status --json | jq -e --arg id "$ID" "$OK" >/dev/null \
+  && echo DONE || { echo FAILED; pueue log $ID; }
+```
+
+- **The agent's sandbox blocks the queue.** `pueue` talks to its service through a socket the command sandbox (§4) does not allow by default. The symptom is an agent that says the service is not running when it is. §4's settings include the exemption.
+- **A `targets` pipeline sits at full CPU and writes nothing.** That is a separate problem with one fix, in §11.
+
+## Alternatives, and when to choose them
+
+- **`targets` with `crew`** (§11), when the parallel work is steps inside one R pipeline. The two combine: `targets` runs the steps in parallel, and `pueue` holds the pipeline so it outlives the session.
+- **GNU `parallel`**, for a one-off batch you will watch finish. It paces the runs but keeps no record, and it dies with the session.
+- **`nohup`**, for a single job on a machine where you cannot install anything. It survives the session, but there is no queue and no status, so the agent has to watch a log file.
+- **A cluster scheduler**, if you already have a cluster workflow you are happy with, or the job does not fit on your machine. We do not assume one.
+
+## On Windows (WSL2) and Linux
+
+Homebrew runs the service through `systemd` instead of macOS's `launchd`. You ask for it in the same words. Microsoft's documentation says the current Ubuntu from `wsl --install` has `systemd` on by default, and that a `systemd` service does not keep WSL2 alive: ask the agent to confirm that a queued job outlives the session.

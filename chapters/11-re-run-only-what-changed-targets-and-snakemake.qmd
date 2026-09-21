@@ -1,0 +1,72 @@
+---
+title: "11. Re-run only what changed: targets and Snakemake"
+---
+
+**We recommend** `targets` for R, and `Snakemake` for Python or a pipeline that mixes languages. **Alternatives:** `just` alone, Make, Nextflow, Dagster.
+
+## Without it
+
+A project has six steps: load, clean, fit model A, fit model B, draw the figures, render the paper. You ask the agent to change a prior in model B. With only a build command (§8), it can re-run everything, so one changed fit costs two, at hours each. Or it can guess which steps are affected and run those by hand. If it misses one, the paper mixes new results with old, and nothing records which is which.
+
+## What it gives the agent
+
+A pipeline runner holds the project's steps as a graph: each step, what it needs, and what it produces. Asked to build, it re-runs the steps whose inputs changed and everything downstream of them, skips the rest, and runs independent steps in parallel. A run that crashed picks up where it stopped.
+
+The two tools below differ in what counts as a change. The easy answer is to watch files: has any source file been touched since the last run? That works in any language, but it over-rebuilds. Tweak a prior inside a model script and the runner refits: fair enough. Change only a comment in that file and the runner still refits, because the file is different. When each fit is a multi-hour Stan run, that is real waste. The R-native answer is to track the content of the R objects and functions a step uses, so a comment change does nothing and a prior change refits exactly the affected branch. `targets` does that. `Snakemake` watches files, which works across languages and is coarser.
+
+## Do you need it yet?
+
+Yes, if your steps are expensive. A single Stan fit takes hours, and a sweep over priors takes days. Skipping what is current saves real compute, and the agent can load two saved fits and compare them without re-running either. Yes, too, when the pipeline is a real graph: past about ten stages, with branches, a merge step, and costly intermediate files.
+
+No, if every stage finishes in seconds: load some CSVs, run a few regressions, draw plots. Re-running end to end is cheap, and `just` with plain scripts (§8) does the same work. No, too, if the steps are strictly sequential and already save checkpoints.
+
+## What we recommend
+
+**For R, `targets`.** The steps are declared in one file, `_targets.R`, each as a function call. `targets` builds the graph, hashes the content of each object so a step re-runs only if its inputs really changed, and runs independent steps in parallel through `crew`.
+
+`targets` wants the analysis written as functions, not as scripts that run top to bottom. An existing project does not have to be rewritten first: the agent can wrap each script as a single step, then turn scripts into functions one at a time, and each one gains finer tracking.
+
+**For Python, or for mixed languages, `Snakemake`.** The steps are rules in a `Snakefile`. Each rule names its input files, its output files, and the command that turns one into the other. `Snakemake` builds the graph from those and runs the rules in parallel where it can, within the limits it is given.
+
+Both can declare a step once and run it across a grid of priors or specifications. Both sit behind `just build` (§8), which stays the project's one command. Both are free, behave the same on macOS and Ubuntu, and keep their state in plain files in the project.
+
+## Ask for it, and tell the agent
+
+> The fits in this project take hours. Set it up as a `targets` pipeline: wrap each existing script as one step first, keep `just build` as the command that runs it, and show me the graph of steps before you run anything.
+
+For a Python project, name `Snakemake` instead.
+
+The standing lines for the instruction file:
+
+- Build only through `just build`. Never run pipeline steps by hand or out of order.
+- Before a rebuild, tell me which steps are out of date and why.
+- A rebuild that might run longer than five minutes goes to `pueue` (§7).
+
+## Check that it's working
+
+Ask: *what is out of date, and what would a rebuild run?* A good answer lists the stale steps and the change that made each one stale, and runs nothing. The agent gets it from `tar_outdated()`, or from a `snakemake -n` dry run. Then have the agent edit only a comment in an R model script, and ask again. With `targets` the answer should be that nothing is out of date.
+
+What goes wrong when an agent operates it:
+
+- **An R pipeline sits at full CPU and writes nothing.** There are two cases.
+    - *The agent runs R directly.* R's output goes to `/dev/null` or a pipe, and R on macOS spins one core at 100% forever: no output, no error. The fix is a pseudo-terminal wrapper in the project's command surface (`bin/rscript-pty`, called from every `just` recipe), so that no call can forget it. The wrapper needs the sandbox off for that call, and §4's settings include the exemption. `crew` workers spin too, so in this case the pipeline runs without `crew`.
+    - *The agent hands the pipeline to `pueue`.* Output goes to a log file and nothing spins. `targets` needs only `tar_make(callr_function = NULL)`, because by default it runs the pipeline in a subprocess whose output is a pipe. `crew` can stay.
+- **A spun process never exits.** It outlives the session, and every later fit runs several times slower. If that happens, ask the agent to list R processes that have run longer than their job should take.
+- **`Snakemake` rebuilds too much, or too little.** Its documentation says a rule reruns when an input is newer than its output (inputs under 1 MB are compared by content), or when the rule's code, parameters, set of inputs, or software environment changed. A script on a rule's `script:` line is checked too. One run from a `shell:` line should be listed as an input.
+- **The cache is committed or synced.** `_targets/` is a rebuildable cache. It stays out of git and, in a cloud-synced folder, out of sync, from before the first run.
+
+The chain for a long R pipeline, top to bottom:
+
+![](figures/detachable-pipeline.svg){#fig-detachable-pipeline fig-alt="The detachable pipeline: a just front door over a targets or Snakemake runner, submitted through pueue so the job outlives the session." above="18pt" below="16pt"}
+
+## Alternatives, and when to choose them
+
+- **`just` alone** (§8), when stages are cheap or strictly sequential.
+- **`Snakemake` in an R project**, when the pipeline mixes R with Python or shell steps.
+- **Make**, for a very small pipeline, if you already know it. It judges by file times, so every comment edit refits.
+- **Nextflow**, when the pipeline really deploys to a cluster or a cloud service.
+- **Dagster**, when you want `targets`-style tracking of Python objects and will accept a much larger framework.
+
+## On Windows (WSL2) and Linux
+
+The busy-spin has been seen on macOS. Should the wrapper be needed on Linux, its `script` line takes a different form there: `script -q -c "<command>" /dev/null`.

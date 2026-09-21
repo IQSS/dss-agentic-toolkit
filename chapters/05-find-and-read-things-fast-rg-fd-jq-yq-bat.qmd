@@ -1,0 +1,62 @@
+---
+title: "5. Find and read things fast: `rg`, `fd`, `jq`, `yq`, `bat`"
+---
+
+**We recommend** all five, installed together. **Alternatives:** `grep`, `find`, and `cat`, which every machine already has.
+
+## Without it
+
+You ask the agent to rename `income_adj` everywhere it is used. First it has to find every use. With the standard utilities it chains `find` into `grep`, which reads every file in the folder: the scripts, but also the data, the package library, and git's own records. The search is slow, and the hundreds of irrelevant matches cost tokens and hide the three lines that matter.
+
+Handed a JSON response from an API, it writes a throwaway Python one-liner to pull out one field, and a slightly different one next time.
+
+## What it gives the agent
+
+Five small programs for the looking-up an agent does all day: dozens of searches before a single edit.
+
+| Tool | What it is | The agent uses it to |
+|:--|:--|:--|
+| `rg` (ripgrep) | a faster `grep` | find where a name or pattern lives before editing |
+| `fd` | a simpler `find` | locate files by name or extension |
+| `jq` | JSON processor | read JSON from APIs, settings files, and other tools |
+| `yq` | the same for YAML and TOML | read `.yml` and `.toml` settings |
+| `bat` | file viewer | read a file with line numbers |
+
+`rg` and `fd` skip whatever `.gitignore` lists, so they search your work and not the package library beside it. `jq` matters beyond this section: tools that report their state as JSON (the queue in §7, `gh` in §6) are read through it.
+
+## Do you need it yet?
+
+Yes. These are the cheapest tools in the guide: nothing to configure or maintain, and every later section works better with them.
+
+No, only on a machine where nothing can be installed.
+
+## What we recommend
+
+All five, from the install list (§2). Each is free, a single program, the same on macOS and Ubuntu, and keeps no state.
+
+## Ask for it, and tell the agent
+
+> Install ripgrep, fd, jq, yq and bat with Homebrew. Then add the lines below to my global instruction file.
+
+The standing lines for the instruction file:
+
+- Search file contents with `rg` and find files with `fd`, not chains of `find` and `grep`.
+- Read JSON with `jq`, and YAML or TOML with `yq`, not a one-line Python script.
+
+## Check that it's working
+
+Ask: *where is `income_adj` used in this project?* A good answer lists files and line numbers, and the command the agent ran was `rg`.
+
+What goes wrong when an agent operates it:
+
+- **It still chains `find` and `grep`.** A program on the disk is not yet a habit (§3). Add the standing lines above, and the agent reaches for the new tools.
+- **It reports "not used anywhere" for something in an ignored folder.** `rg` skips what `.gitignore` lists, so a search of rendered output or a data folder finds nothing without `--no-ignore`.
+- **The wrong `yq`.** Two unrelated programs carry that name, with different syntax: Homebrew installs one, Python's package installer the other. Commands written for one fail on the other.
+
+## Alternatives, and when to choose them
+
+- **`grep`, `find`, and `cat`**, on a shared server or a cluster login node where you cannot install anything. Same answers, more slowly and with more noise.
+
+## On Windows (WSL2) and Linux
+
+Installed with Ubuntu's own package manager and not Homebrew, `fd` is named `fdfind`, and on older Ubuntu releases `bat` is named `batcat`. Ask for Homebrew.

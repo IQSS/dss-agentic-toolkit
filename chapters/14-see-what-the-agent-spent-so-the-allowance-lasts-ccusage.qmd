@@ -1,0 +1,59 @@
+---
+title: "14. See what the agent spent, so the allowance lasts: ccusage"
+---
+
+**We recommend** the agent's own usage display for where you stand now, and `ccusage` for the history. **Alternatives:** `claude-trace` (terminal only), the Anthropic Console, hooks.
+
+## Without it
+
+Midway through a revision the agent stops. The five-hour allowance is spent, and the weekly cap is close. You do not know what spent it: yesterday's long session, the high effort setting, or the model fit that streamed its output into the conversation for an hour. Nothing in a session shows a running total, so you cannot tell whether working differently would have made it last.
+
+## What it gives the agent
+
+On a subscription, cost arrives as an allowance, not as dollars: a rolling five-hour window and a weekly cap, shared across everything you do with Claude. The agent's own usage display shows where you stand. According to the vendor's documentation (read 2026-09-21), in the app it is the ring beside the model picker; in a terminal it is `/usage`.
+
+`ccusage` adds the history. The agent already writes a log of every session to disk, under `~/.claude/projects/`. The vendor's documentation counts sessions run in the app among them, and says logs of terminal sessions are deleted after 30 days unless the setting is changed. `ccusage` reads those logs and reports tokens by day, week, month, session, and model, and groups them into the five-hour windows. It works on every session still on disk, so the agent can say which sessions and which projects were heavy, and why.
+
+## Do you need it yet?
+
+Yes, if you have run out before the work was done, or you work with the agent most days.
+
+No, if you have never met the limit. A look at the usage display now and then is enough.
+
+## What we recommend
+
+The usage display first: it is part of the agent, in the app and in the terminal. Then `ccusage`, which the agent can run with nothing installed (`npx ccusage@latest`), and install once you ask for it regularly.
+
+What spends the allowance is the weight of the requests, not their number:
+
+- Every turn resends everything the session has read so far, so a long session costs more per message as it goes.
+- A larger model and a higher effort level cost more per turn.
+- A model fit that runs inside the session, streaming output, spends the window while it waits.
+
+What saves it: one session per task, closed when the task is done; compacting a session that has run long; naming files instead of pasting them; lower effort for mechanical work; and long fits in the queue (§7), with the agent reading the log afterward. The chapter "Cost, and the map" in *Doing Research with AI Agents* has the rest.
+
+## Ask for it, and tell the agent
+
+> Run ccusage and tell me which sessions and which projects used the most tokens this week, and what made the heavy ones heavy.
+
+The standing lines for the instruction file:
+
+- Long fits and builds go to `pueue` (§7). Never stream their output into the session.
+- Read the end of a log, or search it (§5). Do not read whole logs or large data files into the conversation.
+- One task per session. When a task is done, say so, so that I can start a new session.
+
+## Check that it's working
+
+Ask: *what used my allowance this week?* A good answer names the heaviest sessions, with their projects and models, and says what made them heavy: length, model, effort, or output streamed from a job.
+
+What goes wrong when an agent operates it:
+
+- **The dollar column is reported as money owed.** It is what the same tokens would have cost at metered rates. On a subscription it is not a bill. Read it as a measure of weight.
+- **Sessions are missing.** `ccusage` sees only the logs on this machine. Work done on another machine, or in the chat window, is not there.
+- **A trace is treated as an ordinary log.** If you use `claude-trace` (below), its files hold prompts, file paths, code, results, and possibly secrets. They are as confidential as the project's data, and stay out of git and off shared drives.
+
+## Alternatives, and when to choose them
+
+- **`claude-trace`**, when you need to see exactly what a session did: surprising behavior, or several agents whose work has to be reconstructed. It records every prompt, tool call, and response as a browsable transcript in the project's `.claude-trace/` folder. It works by replacing the `claude` command at launch, so it is terminal-only (Part V) and cannot be used from the app.
+- **The Anthropic Console**, if you are billed per token through an API key. It is the authoritative record of charges. It does not say what a session did.
+- **Hooks**, when you want your own record in your own format. The agent can be set to write every tool call to a file. Analyzing that file is then your job.

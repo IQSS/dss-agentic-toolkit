@@ -1,0 +1,82 @@
+---
+title: "8. One command for every task in a project: just"
+---
+
+**We recommend** `just`. **Alternatives:** `make`, `task`, Quarto alone, a pipeline runner (§11).
+
+## Without it
+
+A paper project has a script that cleans the data, one that fits the models, one that draws the figures, and a render step. How to run them lives in a README, in old shell history, and in your head. Asked to rebuild the paper, the agent works the commands out again each session: it reads the scripts, guesses the order, guesses the arguments. One day it skips the cleaning step and renders against stale figures. Nothing fails, and the numbers differ.
+
+## What it gives the agent
+
+One file at the project root, the `justfile`, holding named recipes: `build`, `check`, `clean`. `just --list` prints them, which tells an agent, or a new co-author, what the project can do. The agent runs `just build` and derives nothing.
+
+`just` does none of the work itself. A recipe is usually one line that calls the real tool: a script, a Quarto render (§10), a pipeline runner (§11). The command stays the same whatever is behind it.
+
+The `justfile` also works without the agent. A build anyone can rerun is better evidence of what the work does than a chat history.
+
+## Do you need it yet?
+
+Yes, for any project that will be rebuilt more than once: a paper under revision, a report rerun on each term's data. The test is whether a reviewer in 2030 could rerun the work and get the same result.
+
+No, for a one-off script, or for a nearly finished project with the paper in review. Moving it costs more than it returns. Start with the next project.
+
+`just` does not know which steps are out of date and reruns all of them. When steps take hours, add §11.
+
+## What we recommend
+
+`just`: a single program, a plain-text `justfile`, clear error messages, the same on macOS and Ubuntu. The project still runs without it: every recipe is a command that could be run by hand.
+
+## Ask for it, and tell the agent
+
+> Install just. Write a `justfile` for this project with build, check and clean recipes that call the scripts we already have. Show me `just --list`, then run `just build` and show me what it produced. Add the lines below to the project's instruction file.
+
+The standing lines for the instruction file:
+
+- Run project tasks through `just`. If a task has no recipe, propose one. Do not improvise the command.
+- Work is not finished until `just build` runs clean.
+- Ask before changing the `justfile`. It defines what the build is, so a change to it is mine to review.
+
+## Check that it's working
+
+Ask: *what can this project do, and does it build?* A good answer quotes `just --list`, runs `just build`, and names the files the build wrote, with their times.
+
+What goes wrong when an agent operates it:
+
+- **`just build` hangs at full CPU and writes nothing (R projects, on a Mac).** A person's terminal gives R somewhere to write. An agent running a command directly gives it a pipe or nothing, and R started that way can spin forever on one core. It never fails, so nothing reports it, and the stuck process outlives the session and slows every later job. The fix is a pseudo-terminal, a stand-in for the terminal window a person would have, and it belongs in the project so that no call can forget it. This is what the agent should create, as `bin/rscript-pty`:
+
+```
+#!/bin/sh
+# Run Rscript inside a pseudo-terminal, always.
+command -v script >/dev/null || {
+  echo "no script command: refusing to run R" >&2; exit 127; }
+exec script -q /dev/null Rscript "$@" < /dev/null
+```
+
+Every recipe then calls R through it:
+
+```
+rscript := justfile_directory() + "/bin/rscript-pty"
+
+build:
+    {{rscript}} code/01-clean.R
+    {{rscript}} code/02-fit.R
+```
+
+The wrapper refuses to run without a pseudo-terminal, because falling back to bare `Rscript` would bring the hang back silently. The command sandbox does not allow pseudo-terminals, so this call runs outside it, with your approval (§4).
+
+- **A long build dies with the session.** A build that may run past five minutes goes to the queue (§7). There, output goes to a log file and R does not spin.
+- **Stray scripts.** The agent writes a `build.sh` beside the `justfile`. Several lines of shell belong inside the recipe.
+- **The build passes because the recipe changed.** An agent that cannot make `just build` succeed may edit the recipe until it does. Hence the third standing line.
+
+## Alternatives, and when to choose them
+
+- **`make`**, if you already know it. It is already on the machine, and its syntax is less forgiving.
+- **`task`**, if you would rather write recipes in YAML.
+- **Quarto alone**, when the whole project is one document: `quarto render` is the build (§10).
+- **`targets` or Snakemake** (§11), past about ten interdependent steps, or when steps take hours. `just` stays in front: the command is still `just build`.
+
+## On Windows (WSL2) and Linux
+
+The R hang has been seen on macOS, and the wrapper above is written for it. Should it be needed on Linux, `script` there takes the command through `-c`: `script -q -c "<command>" /dev/null`. A recipe that calls `open` is macOS-only; Linux has `xdg-open`.

@@ -1,0 +1,63 @@
+---
+title: "15. Contain the agent completely: a container"
+---
+
+**We recommend** Colima on a Mac and Docker Engine on Ubuntu and in WSL2, with a `Dockerfile` in each project that needs one. **Alternatives:** Docker Desktop, Rancher Desktop, Dev Containers, Nix, Apptainer.
+
+## Without it
+
+You want the agent to build and run a replication package that neither of you has read. The rules and the sandbox in §4 narrow what that code can reach, but it still runs on your machine, as you.
+
+Or a paper has to rebuild in two years. The lockfile (§9) pins the packages, not the compilers and system libraries Stan needs, or the operating system beneath them. On a new laptop the agent installs whatever is current, and the model does not compile.
+
+## What it gives the agent
+
+A container: a small, separate Linux system running on your machine, which sees only the folders it is handed. One runtime serves both uses.
+
+- **Containment.** The agent runs the untrusted job in a throwaway container and deletes it afterward. This is the fourth layer of §4's model: the first three limit the agent on your machine, and a container gives it a different machine.
+- **A frozen environment.** A `Dockerfile` at the project root is a text file that specifies the whole environment, operating system included. The agent writes it, builds it, and debugs it from the shell, and a paper can ship with its own.
+
+## Do you need it yet?
+
+Most analyses do not need this: pinned packages (§9), a one-command build (§8), and §4's limits suffice.
+
+Yes, in three cases. You are running code you do not trust, or a destructive operation. The agent is using the screen (§17), and should drive a desktop in a container, not yours. Or a deposit has to rebuild a year or two from now, or on a reviewer's machine.
+
+## What we recommend
+
+**On a Mac, Colima:** an open-source, command-line container runtime, installed through Homebrew with the `docker` client. It has no graphical interface, so an agent can set it up. It runs the real Docker engine inside a small Linux virtual machine, and it is free for any use, a university's included.
+
+**In the project, a `Dockerfile`:** a pinned base image (`rocker/r-ver` for R, `python:3.12-slim` for Python), the system libraries, then `renv::restore()` or `uv sync` (§9). The same file builds on a Mac, on Linux, and in WSL2.
+
+## Ask for it, and tell the agent
+
+> Install Colima and the docker command-line client, start it, and show me the hello-world container running. Then write a Dockerfile for this project from `renv.lock`, with the system libraries Stan needs and the base image pinned by digest. Add `just build-image` and `just shell`.
+
+**What only you can do.** On Ubuntu and in WSL2, Docker Engine is a system package, so installing it takes `sudo` and your password. Colima installs through Homebrew without you. If you choose Docker Desktop instead, its graphical installer, the administrator password, and the license it asks you to accept are yours.
+
+The standing lines for the instruction file:
+
+- Code from a source I have not read runs in a throwaway container, with only the folder it needs mounted. Never mount my home folder or pass in credentials.
+- In a `Dockerfile`, pin the base image by digest, not by tag, and restore packages from the lockfile.
+
+## Check that it's working
+
+Ask: *is the container runtime running, and can you build this project's image from nothing?* A good answer shows `docker run --rm hello-world` succeeding, a clean image build, and `just build` inside the container giving the same outputs as outside.
+
+What goes wrong when an agent operates it:
+
+- **The runtime is installed and not running.** On a Mac, no `docker` command works until Colima has been started, and an agent may report the error as Docker missing. Colima's documentation gives `brew services start colima` to start it at login. If it is running and the agent still reports that it cannot reach the container runtime, the sandbox (§4) is the first thing to check.
+- **The agent mounts too much.** A container with your home folder mounted contains nothing. The project's own image, with the project folder writable, is for reproducing an environment, not for untrusted code.
+- **A container is treated as an archive.** Image tags drift, package repositories move, and old CRAN and PyPI versions disappear. A pinned digest and a lockfile handle a rebuild a year or two out. For longer, keep the built image too.
+
+## Alternatives, and when to choose them
+
+- **Docker Desktop**, when you want a managed graphical installer and your use is licensed. It is free only below 250 employees and \$10M in revenue, and its education exemption is aimed at teaching: check before assuming it covers research.
+- **Rancher Desktop**, when you want a graphical view of your containers, free and open source.
+- **Dev Containers**, when you want an editor (§25) to open inside the environment, or the agent itself to run inside a container: Claude Code's documentation describes one for that.
+- **Nix**, for work that must rebuild in fifteen years.
+- **Apptainer**, when the work runs on a university cluster, where Docker is usually not allowed. It converts Docker images.
+
+## On Windows (WSL2) and Linux
+
+Docker Engine installs from `apt` and runs as a `systemd` service, with no virtual machine. On Windows, WSL2 already is the Linux virtual machine, so the same engine goes inside it. Microsoft's documentation says the current Ubuntu from `wsl --install` has `systemd` on by default; an older distribution needs `systemd=true` under `[boot]` in `/etc/wsl.conf`. Docker Engine is free at any size of organization. The paid license belongs to Docker Desktop.

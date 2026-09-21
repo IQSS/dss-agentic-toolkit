@@ -1,0 +1,65 @@
+---
+title: "16. Connect the agent to data and services, and let it remember: MCP; memory"
+---
+
+**We recommend** MCP servers added one project at a time, with almost none always on; and the agent's built-in memory for your preferences, with project facts kept in the instruction file. **Alternatives:** a script in the pipeline, open-source memory frameworks.
+
+## Without it
+
+Your lab's survey responses live in a Postgres database. The agent cannot reach it, so you export a table to CSV each time you want a summary, and the analysis runs on whichever copy was exported last.
+
+The second failure is quieter. Every session starts from nothing, and you explain again that models are fitted in `brms` and that the 2019 wave is excluded.
+
+## What it gives the agent
+
+The Model Context Protocol (MCP) is an open standard for giving an agent new tools while it runs. An MCP server offers a set of actions (query this database, search this library, drive this browser) that any agent speaking the protocol can call. The Claude app's connectors are, according to the vendor's documentation, MCP servers with a graphical setup.
+
+A second protocol, the Agent Client Protocol (ACP), runs the other way: it is how an editor reaches an agent. Nothing in this guide depends on it.
+
+Memory is notes the agent writes to files on your machine and loads in later sessions.
+
+## Do you need it yet?
+
+Yes, when the agent needs something that is not in files: a project database, a reference library, a browser (§17). Memory, once you notice yourself repeating a preference.
+
+No, when the data is already in files the agent reads, or when a program it already runs through the shell does the same job.
+
+## What we recommend
+
+**Add a server for the project that needs it, and keep the always-on set close to empty.** Every connection is more reach (§4). The protocol's own specification warns that it opens paths to data and to running code. Before adding a server, ask what it could do if the agent were talked into misusing it. A connection that carries research data also has to be squared with the rules that govern that data: see the chapter on data confidentiality in *Doing Research with AI Agents*.
+
+A server's credentials come from the vault (§12), never from the server's own settings file, which often sits in the repository.
+
+**For memory, use what the agent has built in**, for preferences only. Project facts go in the project's instruction file (§3), which any agent can read.
+
+## Ask for it, and tell the agent
+
+> Connect yourself to our lab's Postgres database through an MCP server, for this project only. Read the password from my 1Password vault through `.envrc`, never from the server's settings file. Tell me what the server can do before you register it.
+
+**What only you can do.** Sign in to each connected service in a browser when it asks. Create any token or database account the connection uses, with the narrowest rights the service offers (read-only, where it can be), and store it in 1Password.
+
+The standing lines for the instruction file:
+
+- Add a connection only for the project that needs it, and ask me first.
+- A connection's credentials come from 1Password through `.envrc`, never from its settings file.
+- When memory and a project file disagree, the file wins. A rule that matters goes in the instruction file, not in memory.
+
+## Check that it's working
+
+Ask: *which connections do you have here, what can each do, and where does each get its credentials?* A good answer lists each server, its actions, and a vault address with no value. Then ask what it remembers about you and the project, and read the list.
+
+What goes wrong when an agent operates it:
+
+- **A server is registered for every project.** Every session, anywhere, can then reach the lab database.
+- **A token is written into the server's settings file.** It is one commit from public (§12). Have it moved to the vault, and replace the token.
+- **Text the agent reads asks it to use a connection.** A web page or a document can carry instructions aimed at the agent (§17), and a connection is what they would use. This is the reason to keep connections few.
+- **A stale memory.** A renamed file or a reversed decision stays in memory, and the agent acts on it without saying it is a memory. Ask for stale entries to be deleted.
+
+## Alternatives, and when to choose them
+
+- **A script in the pipeline**, when the same query runs every time the analysis is rebuilt. A connection is for exploring; a query the paper depends on belongs in code that runs without the agent (§11).
+- **Open-source memory frameworks** (`mem0`, `Letta`, `Honcho`), when memory has to move between agents from different vendors. The field is unsettled, and the instruction file already moves between agents.
+
+## On Windows (WSL2) and Linux
+
+The vendor's documentation says connectors and plugins are not available in the app's WSL sessions. It says an MCP server registered in a project's `.mcp.json` works in the app as in the terminal, and does not say whether that holds in a WSL session. If a connection you need is missing there, the agent in a terminal inside WSL2 is the other route (§20).

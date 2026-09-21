@@ -1,0 +1,111 @@
+---
+title: "4. Keeping the agent's reach in proportion: permission settings and the OS sandbox"
+---
+
+Every tool you add extends what the agent can do, for mistakes as well as for work. The question is what the agent can touch when it goes wrong, not whether it means harm. Agents misread requests, run commands that do more than intended, and act on things they read in a file. This section keeps such a mistake recoverable, and it comes before the tools so that no later section has to weaken it.
+
+![](figures/security-layers-intro.svg){#fig-security-layers-intro fig-alt="The permission and sandboxing layers as nested containment around an agent action: permission settings innermost, then the OS sandbox, then a container. Captioned: secrets out of scope, and a mistake stays reversible and inspectable." above="10pt" below="14pt"}
+
+## Four layers
+
+Each layer adds a different guarantee.
+
+1. **Guardrails**: deny rules. A listed command or file is refused outright.
+2. **Attended review**: approval prompts. You see a change before it lands.
+3. **Hard isolation**: the operating system's sandbox. The kernel limits what a command can write and where its network traffic can go.
+4. **Containment**: a container, which walls off the whole environment. That is §15.
+
+One settings file configures the first three.
+
+![](figures/security-layers-guarantee.svg){#fig-security-layers-guarantee fig-alt="The four security layers and the guarantee each adds: deny rules and approval prompts bind a cooperating agent; the kernel sandbox and the container hold regardless. Captioned: each layer covers a failure mode the others don't, and none substitutes for another." above="18pt" below="16pt"}
+
+The split that matters is between the first two layers and the last two. Rules and review bind a cooperating agent: a deny rule matches the command as the agent wrote it, and a prompt depends on a person reading it. Both are excellent against accidents, and neither is a wall. A prompt gates an action before the content arrives: you approve "run the scraper" before the page exists, so what protects you afterward cannot depend on being asked again. And once a session has read content you would not fully trust (a scraped page, a third-party README, an issue thread), every later request looks plausible, and approval becomes the least dependable control. What still holds then does not depend on content: what the session can read at all, where its traffic can go, which writes fail outright. Anything that must never happen should not be promptable.
+
+## A starting posture
+
+An agent that asks before every action trains you to click without reading. An agent with no limits can do real damage. Three tiers sit between:
+
+- **Runs without asking.** With the sandbox on, this needs almost no list. R, Python, `pandoc`, LaTeX, and local `git` run without prompts because the kernel bounds them, not because they are exempt.
+- **Asks first.** A sandboxed command that needs more than the bounds allow fails, the agent asks, and you approve that one run. Installing software belongs here.
+- **Forbidden.** Commands too destructive to delegate: a forced push, a hard reset, `rm -rf`, `sudo`.
+
+Claude Code keeps all of this in `~/.claude/settings.json`, shared by the app, the editor extension, and the terminal. It ships with the sandbox off. Ask for the file:
+
+> Write my Claude Code settings file from the starting posture in §4 of the DSS guide, with my own folders in place of the examples. Show me the file before you save it.
+
+```
+{
+  "permissions": {
+    "deny": [
+      "Read(~/confidential/**)",
+      "Edit(~/research/data-raw/**)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)"
+    ],
+    "ask": ["Edit(~/.claude/settings.json)"]
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "network": {
+      "allowedDomains": [
+        "github.com", "api.github.com", "pypi.org",
+        "files.pythonhosted.org", "cran.r-project.org"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": ["~/.cache/uv", "~/.local/share/uv"],
+      "denyWrite": ["~/research/data-raw", "~/.claude/settings.json"]
+    },
+    "excludedCommands": [
+      "git push*", "git pull*", "git fetch*",
+      "gh *", "op *", "pueue *", "pueued *"
+    ]
+  }
+}
+```
+
+Sandboxed commands can write to the project folder and to the few extra paths in `allowWrite`. A `Read` deny keeps a folder out of the agent's context entirely. The network list names the package registries and GitHub; any other site needs your approval. `failIfUnavailable` makes a missing sandbox a hard failure: if Claude Code then refuses to start, install what it names, and leave the flag on.
+
+Tighten or relax this one rule at a time, and keep a short note of why each rule is there: JSON has no room for comments.
+
+**What only you can do.** Answer the prompts. They work only because a person reads each one before approving it.
+
+## The two exemptions later sections rely on
+
+**Commands that cannot run inside the sandbox.** `excludedCommands` lists them: `git push`, `git pull`, `git fetch`, and `gh`, whose credentials sit in the system keychain (§6); `op`, which talks to the 1Password app (§12); and `pueue`, which reaches its service through a socket the sandbox blocks (§7). An exempt command runs with no kernel bounds at all; the deny rules still apply, but they match only its text. So the list stays this short, and R, Python, and shell scripts never go on it. The vendor's documentation (read 2026-09-21) says that when any part of a compound command matches an entry, the whole command runs outside the sandbox, which is one more reason to keep the list short. It does not say whether `pueue` started through another program (`direnv exec`, `bash -c`) matches. If such a call fails in the sandbox, the agent asks to run it outside once.
+
+**R, when the agent runs it directly.** Started by an agent, R's output goes to a pipe, and R then spins at full CPU forever, writing nothing. The fix is a small wrapper in the project's `just` recipes (§8, §9) that runs R inside a pseudo-terminal, and the sandbox does not allow a command to create one. So that one call runs outside the sandbox: the agent asks, and you approve. No setting is needed. The vendor's documentation says a command that fails in the sandbox can be retried outside it, and that the retry goes through the ordinary approval prompt (`allowUnsandboxedCommands`, on by default). Leave that on. R handed to `pueue` has no such problem: its output goes to a log file, and the job runs outside the sandbox already (§7).
+
+The standing lines for the instruction file:
+
+- Never switch the sandbox off or add to its exemptions. If one command cannot run inside it, ask to run that command outside, once.
+- Run R through the project's `just` recipes, never bare.
+
+## Two write channels, two gatekeepers
+
+Claude Code writes files in two ways, and they pass through different layers. Shell commands meet the sandbox: a write outside the allowed folders fails at the kernel, with no prompt and no way for the agent to argue past it. The built-in editing tools never touch the shell, so the kernel never sees them. Their gate is the deny rules written for those tools, and a prompt that shows the change.
+
+The split is deliberate. Shell commands run without prompts because the kernel bounds them. Edits can reach further, and you review each one outside the standing rules. Two consequences:
+
+- **A hard "never touch this" must cover both channels.** Take a folder of raw data. `denyWrite` stops shell writes to `~/research/data-raw`; only the `Edit` deny stops the editing tools. Covered on one channel alone, the folder drops from blocked to blocked unless you approve a prompt. The exhibit has both. Whenever you protect a path, check both lists.
+- **Keep `allowWrite` narrow.** Widening it to spare yourself a prompt trades a reviewed write for an unreviewed one. Let occasional edits outside the project arrive through the prompted channel.
+
+## What the sandbox guarantees, and what it does not
+
+Its bounds hold whatever the agent has read, so it matters most for work that takes in content you do not control: scraping, third-party repositories, documents from outside your group.
+
+One gap stays open. A site the session may read from can also receive data, inside the requests sent to it, so the network list cannot stop information flowing out to where it flows in from. For that kind of work the control that counts is read scope: run it in a project that can read nothing else, and the worst case is bounded by that project's contents.
+
+The same mechanism enforces a data rule. The instruction file states which data the agent may open; a `Read` deny on the folder makes it hold. The companion guide's chapter "Data confidentiality" covers the rule itself.
+
+## Which layers, when
+
+Layers 1 to 3 are set once and stay on. Add the container (§15) for code from the internet you have not read, for destructive operations, and for an agent controlling the screen (§17). All four can run together.
+
+## On Windows (WSL2) and Linux
+
+Anthropic's documentation (read 2026-09-21) says the sandbox runs on macOS, Linux, and WSL2, and not on native Windows. On a Mac it uses a sandbox built into the system, with nothing to install. On Linux and WSL2 it needs two packages, which the documentation names as `bubblewrap` and `socat`; installing them takes `sudo`, which the settings above forbid the agent, so run that one command yourself, as §2 describes. Ask the agent for the exact line. On Ubuntu 24.04 and later, the same page says the default AppArmor policy can stop `bubblewrap` until a small profile is added; ask the agent to check for this and to tell you the fix, which also takes `sudo`.

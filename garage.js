@@ -1,5 +1,5 @@
 // garage.js — the landing page's garage. Hand-maintained, like index.qmd; not part of the sync.
-// Every tool in the room is a section of the map and a real link to its page. The room, the bench and
+// Every tool in the room is a section of the guide and a real link to its page. The room, the bench and
 // the tools are drawn here; the corkboard, its readout and the robot are the static SVG in index.qmd.
 // Pointer: hover previews on the corkboard, a press opens the section. Touch: the first tap pins the
 // section to the corkboard, with a link, and the second opens it.
@@ -11,51 +11,66 @@
   const v = n => "var(--g-" + n + ")";
 
   const GROUPS = {
-    F: { name: "Foundation", long: "Foundation",                 dot: v("foundation") },
-    S: { name: "Terminal",   long: "The terminal surface",       dot: v("surface") },
-    L: { name: "Languages",  long: "Languages and documents",    dot: v("language") },
-    A: { name: "Agents",     long: "Agents and their reach",     dot: v("agents") },
-    C: { name: "Control",    long: "Control and verification",   dot: v("control") },
+    I:   { name: "Part I",   long: "I · What an agent has, and what it lacks", dot: v("foundation") },
+    II:  { name: "Part II",  long: "II · The core set",                        dot: v("language") },
+    III: { name: "Part III", long: "III · Reproducible and safe",              dot: v("control") },
+    IV:  { name: "Part IV",  long: "IV · Reaching further",                    dot: v("agents") },
+    V:   { name: "Part V",   long: "V · Working in the terminal yourself",     dot: v("surface") },
   };
 
   // ---- sections: the tool that stands for each, and what the corkboard says about it ----
+  // Slugs are the site's chapter file names: a retitled chapter needs its slug updated here by hand.
   const CH = [
-    { n: "1",  group: "F", slug: "01-foundation", title: "Foundation", tool: "the workbench",
-      body: "Everything else sits on these two: the package manager that installs the rest of the stack, and the version control that makes an agent's work reversible." },
-    { n: "2",  group: "F", slug: "02-configuration-and-environment", title: "Configuration and Environment", tool: "the drawers and keys",
-      body: "Four tools with one job each: dotfiles, secrets, environment variables and runtime versions, in the order a fresh machine needs them." },
-    { n: "3",  group: "L", slug: "03-documentation-production", title: "Documentation Production", tool: "the pencil cup",
-      body: "Most of this work ships as documents. Quarto for anything that runs code; plain pandoc and a LaTeX template for everything else, this map included." },
-    { n: "4",  group: "S", slug: "04-terminal-emulator", title: "Terminal Emulator", tool: "the strip light",
-      body: "The surface every other tool appears through. It has to be fast and then stay out of the way; the picks differ on the small conveniences." },
-    { n: "5",  group: "S", slug: "05-shell-framework-and-prompt", title: "Shell, Framework, and Prompt", tool: "the hammer",
-      body: "The plainest tool on the board and the one in your hand all day: the shell, the framework that loads its plugins, and the prompt." },
-    { n: "6",  group: "S", slug: "06-session-persistence-and-pane-management", title: "Session Persistence and Pane Management", tool: "the vise",
-      body: "Holds the work while you walk away. A multiplexer keeps the shell alive when the terminal closes, and splits one window into panes for several agents." },
-    { n: "7",  group: "S", slug: "07-long-running-jobs", title: "Long-Running Jobs", tool: "the clock",
-      body: "A model fit that outlives the shell that started it: why jobs die when an agent's session resets, and the job queue that stops it." },
-    { n: "8",  group: "L", slug: "08-programming-languages", title: "Programming Languages", tool: "the wrench set",
-      body: "Three sizes of the same tool. Python, R and Julia, each as a whole stack: the interpreter, its version manager, its environments and its packages." },
-    { n: "9",  group: "L", slug: "09-ide-and-ide-side-agent", title: "IDE and IDE-Side Agent", tool: "the toolbox",
-      body: "Everything in one box. The editor worth opening for a long read-and-write session, and the agent that runs inside it with your open files in view." },
-    { n: "10", group: "A", slug: "10-cli-agentic-coding-tools", title: "CLI Agentic Coding Tools", tool: "the power drill",
-      body: "The one tool here that works under its own power, and the core of the stack: an agent in the terminal that reads files, edits them and runs commands." },
-    { n: "11", group: "A", slug: "11-browser-and-computer-use", title: "Browser and Computer-Use", tool: "the window",
-      body: "Where local work meets the outside: looking things up, fetching public data, checking a rendered report. Three layers that are easy to conflate." },
-    { n: "12", group: "A", slug: "12-integration-and-memory", title: "Integration and Memory", tool: "the power strip and jars",
-      body: "What the agent plugs into and what it keeps. MCP reaches out to tools and data, ACP lets an editor reach the agent, and memory carries across sessions." },
-    { n: "13", group: "C", slug: "13-permissions-and-sandboxing", title: "Permissions and Sandboxing", tool: "the locked cabinet",
-      body: "What can the agent touch if it goes wrong? Deny rules, approval prompts, a kernel sandbox and a container, each adding a guarantee the last one lacks." },
-    { n: "14", group: "C", slug: "14-agent-telemetry", title: "Agent Telemetry", tool: "the multimeter",
-      body: "What did the agent do, and what did it cost? Two questions and two sets of tools, split by vendor because the tooling differs." },
-    { n: "15", group: "C", slug: "15-reproducible-pipelines-and-human-qa", title: "Reproducible Pipelines and Human QA", tool: "the level and square",
-      body: "The check that the work is true. The agent helps build the pipeline; the pipeline then runs without it, so you can re-run, audit and ship." },
-    { n: "16", group: "A", slug: "16-multi-agent-orchestration", title: "Multi-Agent Orchestration", tool: "the charging dock",
-      body: "Several at once, each in its own slot: a working tree, a pane and a branch per agent, so parallel work does not collide." },
-    { n: "17", group: "C", slug: "17-task-management", title: "Task Management", tool: "the clipboard",
-      body: "Two lists that are easy to confuse: the task manager I drive day to day, and the task file written for the agent to work through." },
-    { n: "18", group: "A", slug: "18-personal-ai-assistant", title: "Personal AI Assistant", tool: "the radio",
-      body: "The agent behind your messaging: it schedules, replies, watches and pings. It is built to reach into live accounts, so the security story is different." },
+    { n: "1", group: "I", slug: "01-an-agent-is-a-model-with-tools", title: "An agent is a model with tools", tool: "the robot",
+      body: "What an agent is, what a plain machine gives it, and the three ways to give it more: programs, connections, and instructions." },
+    { n: "2", group: "I", slug: "02-how-tools-reach-the-machine-homebrew-and-one-install-list", title: "How tools reach the machine", tool: "the workbench",
+      body: "Every tool arrives through a package manager, the one thing the agent cannot fetch for itself. The few steps only you can do, on a Mac and on Windows." },
+    { n: "3", group: "I", slug: "03-telling-the-agent-what-it-has-instruction-files-and-skills", title: "Telling the agent what it has", tool: "the clipboard",
+      body: "An installed tool does nothing until the agent knows to reach for it: the file it reads every session, and what a standing line looks like." },
+    { n: "4", group: "I", slug: "04-keeping-the-agents-reach-in-proportion-permission-settings-and-the-os-sandbox", title: "Keeping the agent's reach in proportion", tool: "the locked cabinet",
+      body: "More tools means more reach, for mistakes too. Deny rules, approval prompts, and the sandbox, set before the tools arrive." },
+    { n: "5", group: "II", slug: "05-find-and-read-things-fast-rg-fd-jq-yq-bat", title: "Find and read things fast", tool: "the hammer",
+      body: "The small tools the agent uses hundreds of times a session to find and read things: faster searches, fewer tokens, fewer mistakes." },
+    { n: "6", group: "II", slug: "06-undo-anything-and-work-with-github-git-and-gh", title: "Undo anything, and work with GitHub", tool: "a box on the floor",
+      body: "Every change reviewable and reversible, and GitHub without improvised API calls." },
+    { n: "7", group: "II", slug: "07-run-long-jobs-in-your-own-queue-pueue", title: "Run long jobs in your own queue", tool: "the clock",
+      body: "A queue on your own machine. Long fits outlive the session, and a simulation study keeps every core busy until the list is empty." },
+    { n: "8", group: "II", slug: "08-one-command-for-every-task-in-a-project-just", title: "One command for every task in a project", tool: "the power drill",
+      body: "One command for every task in a project, so the agent stops working out the build afresh each time." },
+    { n: "9", group: "II", slug: "09-pin-the-language-and-its-packages-rig-and-renv-uv", title: "Pin the language and its packages", tool: "the wrench set",
+      body: "A pinned language and pinned packages, so the project rebuilds on another machine, or next year." },
+    { n: "10", group: "II", slug: "10-turn-the-analysis-into-a-paper-or-a-deck-quarto-and-pandoc", title: "Turn the analysis into a paper or a deck", tool: "the pencil cup",
+      body: "From analysis to a paper or a deck: Quarto for documents that run code, pandoc for those that do not." },
+    { n: "11", group: "III", slug: "11-re-run-only-what-changed-targets-and-snakemake", title: "Re-run only what changed", tool: "a box on the floor",
+      body: "A pipeline that knows what is out of date and re-runs only that, for when steps take hours." },
+    { n: "12", group: "III", slug: "12-keep-keys-and-tokens-out-of-your-files-1password-and-direnv", title: "Keep keys and tokens out of your files", tool: "the drawers and keys",
+      body: "The agent uses a key without ever seeing it written down. 1Password holds the values; direnv hands each project only what it needs." },
+    { n: "13", group: "III", slug: "13-check-what-the-agent-changed-tests-and-diff-review", title: "Check what the agent changed", tool: "the level and square",
+      body: "Tests the agent can run and differences it can show, so you can check what it changed." },
+    { n: "14", group: "III", slug: "14-see-what-the-agent-spent-so-the-allowance-lasts-ccusage", title: "See what the agent spent", tool: "the multimeter",
+      body: "Where the token allowance goes, and how to make it last." },
+    { n: "15", group: "III", slug: "15-contain-the-agent-completely-a-container", title: "Contain the agent completely", tool: "the toolbox",
+      body: "A box the agent cannot leave, for untrusted code and for environments that must rebuild exactly." },
+    { n: "16", group: "IV", slug: "16-connect-the-agent-to-data-and-services-and-let-it-remember-mcp-memory", title: "Connect the agent to data and services", tool: "the power strip and jars",
+      body: "What the agent plugs into and what it keeps: connections to data and services, and memory across sessions." },
+    { n: "17", group: "IV", slug: "17-let-the-agent-use-a-browser-and-the-screen", title: "Let the agent use a browser, and the screen", tool: "the window",
+      body: "A browser, and the screen itself, for work that crosses from your machine to the outside." },
+    { n: "18", group: "IV", slug: "18-run-several-agents-at-once-git-worktrees", title: "Run several agents at once", tool: "the charging dock",
+      body: "Several agents at once, each in its own working tree and branch, so parallel work cannot collide." },
+    { n: "19", group: "IV", slug: "19-version-control-for-your-tools-settings-chezmoi", title: "Version control for your tools' settings", tool: "a box on the floor",
+      body: "Version control for the settings files your tools scatter across the home directory." },
+    { n: "20", group: "V", slug: "20-why-use-the-terminal-instead-of-the-app", title: "Why use the terminal instead of the app?", tool: "a box on the floor",
+      body: "What a terminal gives that the app does not, and why most readers can stop before this Part." },
+    { n: "21", group: "V", slug: "21-the-agent-in-a-terminal-claude-code", title: "The agent in a terminal", tool: "the radio",
+      body: "The same agent, started as a command in a terminal." },
+    { n: "22", group: "V", slug: "22-a-terminal-worth-working-in-iterm2-windows-terminal", title: "A terminal worth working in", tool: "the strip light",
+      body: "The window everything in a terminal appears through." },
+    { n: "23", group: "V", slug: "23-the-shell-its-framework-and-the-prompt-zsh-oh-my-zsh-oh-my-posh", title: "The shell, its framework, and the prompt", tool: "a box on the floor",
+      body: "The shell, the framework that loads its plugins, and a prompt that shows the state you would otherwise ask for." },
+    { n: "24", group: "V", slug: "24-keep-sessions-alive-and-watch-several-things-at-once-zellij", title: "Keep sessions alive and watch several things", tool: "the vise",
+      body: "Sessions that survive closing the window, and panes to watch several things at once." },
+    { n: "25", group: "V", slug: "25-an-editor-beside-the-terminal-positron", title: "An editor beside the terminal", tool: "a box on the floor",
+      body: "An editor beside the terminal, for reading and writing at length." },
   ];
   const byN = n => CH.find(c => c.n === n);
 
@@ -347,6 +362,14 @@
       E(t, 0, -30, 17, 3.4, v("metal"));
       E(t, 0, 0, 13, 2.4, v("metal-2"), { opacity: 0.5 });
     },
+    crate(x, y) {
+      return g => {
+        R(g, x, y, 48, 36, v("wood-lt"), { rx: 2 });
+        R(g, x, y, 48, 7, v("wood"), { rx: 2 });
+        R(g, x + 20, y, 8, 36, v("cream"), { opacity: 0.7 });
+        R(g, x, y + 33, 48, 3, v("wood-dk"), { opacity: 0.6 });
+      };
+    },
     toolbox(g) {
       const x = 800, y = 396, w = 104, h = 54, t = 0.07, lid = 19;
       box(g, x, y + lid, w, h - lid, t, v("red-dk"), "#6f2f25", v("red-dk"), false);
@@ -402,21 +425,21 @@
   }
 
   const wall = document.getElementById("wall"), benchL = document.getElementById("bench");
-  tool(wall, "11", DRAW.window, { heavy: true, tag: [222, 170] });
+  tool(wall, "17", DRAW.window, { heavy: true, tag: [222, 170] });
   shelf(wall, 46, 250, 214);
-  tool(wall, "12", DRAW.jars, { tag: [226, 222] });
+  tool(wall, "16", DRAW.jars, { tag: [226, 222] });
   shelf(wall, 46, 350, 214);
-  tool(wall, "18", DRAW.radio, { tag: [100, 376] });
-  tool(wall, "16", DRAW.dock, { tag: [200, 376] });
+  tool(wall, "21", DRAW.radio, { tag: [100, 376] });
+  tool(wall, "18", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
-  tool(wall, "4", DRAW.striplight, { heavy: true, tag: [704, 56] });
-  tool(wall, "8", DRAW.wrenches, { ghost: true, tag: [366, 284] });
+  tool(wall, "22", DRAW.striplight, { heavy: true, tag: [704, 56] });
+  tool(wall, "9", DRAW.wrenches, { ghost: true, tag: [366, 284] });
   tool(wall, "5", DRAW.hammer, { ghost: true, tag: [512, 262] });
-  tool(wall, "10", DRAW.drill, { ghost: true, tag: [652, 232] });
+  tool(wall, "8", DRAW.drill, { ghost: true, tag: [652, 232] });
   tool(wall, "14", DRAW.meter, { ghost: true, tag: [722, 112] });
-  tool(wall, "15", DRAW.level, { ghost: true, tag: [600, 340] });
+  tool(wall, "13", DRAW.level, { ghost: true, tag: [600, 340] });
   tool(wall, "7", DRAW.clock, { ghost: true, tag: [806, 174] });
-  tool(wall, "17", DRAW.clipboard, { ghost: true, tag: [806, 322] });
+  tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [806, 322] });
   cone(wall);
 
   // the bench: back legs and recess, the bench itself, what stands under it, the front legs, what stands on it
@@ -425,18 +448,35 @@
     const under = el("g", {}, benchL);
     R(under, xfl + 20, yf + apron, xfr - xfl - 40, FLOOR - yf - apron, v("recess"));
     for (const fx of [xfl + 8, xfr - 8]) { const b = back(fx, front, t); R(under, b[0] - 7, back(fx, yf, t)[1] + 14, 14, b[1] - back(fx, yf, t)[1] - 14, v("wood-dk"), { opacity: 0.85 }); }
-    tool(benchL, "1", DRAW.bench, { heavy: true, tag: [515, 480] });
-    tool(benchL, "2", DRAW.drawers, { heavy: true, tag: [145, 493] });
-    tool(benchL, "13", DRAW.cabinet, { heavy: true, tag: [825, 493] });
+    tool(benchL, "2", DRAW.bench, { heavy: true, tag: [515, 480] });
+    tool(benchL, "12", DRAW.drawers, { heavy: true, tag: [145, 493] });
+    tool(benchL, "4", DRAW.cabinet, { heavy: true, tag: [825, 493] });
+    // Six sections have no object of their own yet. Each is a box on the floor, in reading order.
+    [["6", 330, 600], ["11", 384, 600], ["19", 438, 600], ["20", 357, 562], ["23", 411, 562], ["25", 384, 524]]
+      .forEach(([n, x, y]) => tool(benchL, n, DRAW.crate(x, y), { tag: [x + 24, y + 20] }));
     // the stool is furniture
-    const st = G(benchL, 520, 650, 1.1);
+    const st = G(benchL, 560, 650, 1.1);
     S(st, "M-20 -62 L-30 0 M20 -62 L30 0 M-25 -24 H25", v("wood-dk"), 5);
     S(st, "M-8 -62 L-11 -8 M8 -62 L11 -8", v("wood-dk"), 4, { opacity: 0.55 });
     R(st, -32, -70, 64, 11, v("red-dk"), { rx: 4 }); E(st, 0, -70, 32, 6, v("red"));
     for (const x of [xfl + 8, xfr - 28]) box(benchL, x, yf + apron, 20, front - yf - apron, 0.035, v("wood"), v("wood-dk"), v("wood"), false);
-    tool(benchL, "6", DRAW.vise, { tag: [222, 442] });
-    tool(benchL, "3", DRAW.pencils, { tag: [510, 442] });
-    tool(benchL, "9", DRAW.toolbox, { tag: [938, 442] });
+    tool(benchL, "24", DRAW.vise, { tag: [222, 442] });
+    tool(benchL, "10", DRAW.pencils, { tag: [510, 442] });
+    tool(benchL, "15", DRAW.toolbox, { tag: [938, 442] });
+  })();
+
+  // The robot is §1: the agent itself. It stands in front of everything, so its link is the last thing drawn.
+  (function () {
+    const ch = byN("1"), svg = document.getElementById("scene");
+    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy", "data-n": "1", tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, svg);
+    el("title", {}, a).textContent = "§1 " + ch.title;
+    const frame = { x: 1040, y: 366, width: 136, height: 312, rx: 10 };
+    el("rect", Object.assign({ class: "hit" }, frame), a);
+    el("rect", Object.assign({ class: "ring" }, frame), a);
+    const tg = el("g", { class: "tag", transform: "translate(1150,560)" }, a);
+    R(tg, -17.5, -8.5, 35, 17, "none", { rx: 4 });
+    C(tg, -9.5, 0, 3.2, GROUPS[ch.group].dot);
+    const tx = el("text", { x: 4, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§1";
   })();
 
   const lg = document.getElementById("legend");
@@ -506,7 +546,7 @@
   }
   const find = a => byN(a.dataset.n);
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (!fine) roHow.textContent = "Tap one to see what it covers, and tap it again to open that section.";
+  if (!fine) roHow.textContent = "Tap one to read it, and tap it again to open it.";
   document.querySelectorAll(".hot").forEach(a => {
     a.addEventListener("click", e => {
       if (fine) return;                          // pointer: hover previews, a press opens the section
