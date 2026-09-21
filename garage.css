@@ -1,0 +1,232 @@
+/* garage.css — styles for the landing page's garage (index.qmd + garage.js). Hand-maintained.
+   Colors are tokens so one drawing works on both of the theme's grounds: the light values sit on
+   :root and body.quarto-dark redefines the ones that change. The theme toggles that class itself.
+   Light is the garage by day. Dark is the same garage at night with the strip light on: the room
+   goes dark and the things under the light keep their color. */
+
+:root {
+  --g-ink: #262c2d;
+  --g-ink-2: #4f5856;
+  --g-muted: #6c7578;
+  --g-rule: #dcd9d2;
+  --g-card: #ece9e1;
+  --g-ground: #f7f4ec;
+  --g-focus: #c8a23c;
+  --g-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* the room */
+  --g-wall: #a9b9b1;
+  --g-wall-line: #94a69d;
+  --g-skirt: #869890;
+  --g-beam: #4a3b2e;
+  --g-beam-2: #5d4b3b;
+  --g-floor: #c6bfb0;
+  --g-floor-line: #b4ad9d;
+  --g-recess: rgba(38, 44, 45, 0.30);
+  --g-shadow: rgba(20, 24, 30, 0.20);
+  --g-sky: #cfe3ea;
+  --g-sky-2: #e4f0f3;
+  --g-frame: #f3efe4;
+  --g-glow: #fff3b8;
+  --g-cone: 0.15;
+
+  /* boards and wood */
+  --g-peg: #e2c780;
+  --g-peg-hole: #c6a655;
+  --g-peg-edge: #b8974a;
+  --g-ghost: #a08238;
+  --g-wood: #c98f52;
+  --g-wood-lt: #dfa96c;
+  --g-wood-dk: #94653a;
+  --g-cork: #c89a6c;
+  --g-cork-2: #b98858;
+  --g-cork-frame: #80552e;
+
+  /* the note on the corkboard is lit paper in both modes, so its ink does not follow the theme */
+  --g-note: #f7f4ec;
+  --g-note-ink: #262c2d;
+  --g-note-ink-2: #4f5856;
+  --g-note-muted: #6c7578;
+  --g-note-rule: #dcd9d2;
+
+  /* the things */
+  --g-metal: #98a3a8;
+  --g-metal-2: #6e7a80;
+  --g-metal-3: #4a555a;
+  --g-steel: #c3cbcf;
+  --g-dark: #2b2f36;
+  --g-red: #b5523f;
+  --g-red-dk: #8a3c2e;
+  --g-red-lt: #cf6a57;
+  --g-mustard: #c8a23c;
+  --g-mustard-2: #e4c25a;
+  --g-mustard-3: #8f7228;
+  --g-blue: #4f6478;
+  --g-blue-dk: #3b4c5c;
+  --g-blue-lt: #6a8098;
+  --g-teal: #3f7f86;
+  --g-teal-dk: #2f6167;
+  --g-teal-lt: #5b9ba1;
+  --g-green: #8fd39a;
+  --g-cream: #efe9d8;
+  --g-lcd: #b9c9a8;
+
+  /* legend dots: the map's own five stage colors, at the strength a 9px dot needs */
+  --g-foundation: #6b83b5;
+  --g-surface: #858c96;
+  --g-language: #6f9a6a;
+  --g-agents: #b5665a;
+  --g-control: #c8a23c;
+
+  /* the robot, from the companion site's console */
+  --c-metal: #98a3a8;
+  --c-metal-2: #6e7a80;
+  --c-metal-3: #4a555a;
+  --c-plate: #b7c0c4;
+  --c-mustard: #c8a23c;
+  --c-mustard-2: #e4c25a;
+  --c-mustard-3: #8f7228;
+  --c-blue: #34568b;
+  --c-blue-2: #5a7cb0;
+  --c-hat-fedora: #55635b;
+  --c-hat-fedora-2: #6f7f76;
+  --c-hat-band: #8f7228;
+  --c-sole: #1f2424;
+  --c-shirt: #efe9d8;
+  --c-ink: #262c2d;
+}
+body.quarto-dark {
+  --g-ink: #e6e9ed;
+  --g-ink-2: #c4cbd3;
+  --g-muted: #9aa5b5;
+  --g-rule: #2b333c;
+  --g-card: #1d232b;
+  --g-ground: #14181e;
+
+  --g-wall: #2f3d3e;
+  --g-wall-line: #273335;
+  --g-skirt: #212b2d;
+  --g-beam: #17120e;
+  --g-beam-2: #231c16;
+  --g-floor: #34363a;
+  --g-floor-line: #2a2c30;
+  --g-recess: rgba(0, 0, 0, 0.45);
+  --g-shadow: rgba(0, 0, 0, 0.40);
+  --g-sky: #172441;
+  --g-sky-2: #22335a;
+  --g-frame: #9a968c;
+  --g-cone: 0.30;
+
+  --g-peg: #b39b5c;
+  --g-peg-hole: #8c7640;
+  --g-peg-edge: #7a6636;
+  --g-ghost: #5f4f26;
+  --g-wood: #a87442;
+  --g-wood-lt: #bd8a55;
+  --g-wood-dk: #74502e;
+  --g-cork: #a57c54;
+  --g-cork-2: #946c46;
+  --g-cork-frame: #5a3c20;
+  --g-note: #e9e4d8;
+
+  --c-hat-fedora: #7c8d83;
+  --c-hat-fedora-2: #94a49a;
+  --c-hat-band: #c8a23c;
+  --c-sole: #2b3336;
+}
+
+/* The landing page uses page-layout: custom, which drops the theme's grid, so the wrapper sets the
+   width itself: the navbar container's 1368px box with its 28px padding, like the training index. */
+.garage-page { max-width: 1368px; margin: 0 auto; padding: 1rem 28px 2rem; }
+body:has(.garage-page) #title-block-header { display: none; }   /* the title lives on the corkboard */
+.garage-scene svg { display: block; width: 100%; height: auto; max-width: 100%; }
+
+/* ---- the corkboard, and the readout pinned to it ----
+   The readout sits in a foreignObject on the note, so its type scales with the drawing. Below 760px
+   that is too small to read, and garage.js moves the readout out under the scene, where it is a card. */
+#board .note { fill: var(--g-note); }
+#board .note-edge { fill: none; stroke: transparent; stroke-width: 3; transition: stroke .15s; }
+#board:has(#readout[data-preview="1"]) .note-edge { stroke: var(--g-mustard); }
+#board foreignObject { pointer-events: none; }
+#board a { pointer-events: auto; }
+#board-home { display: flow-root; font-family: Montserrat, Questrial, sans-serif; color: var(--g-note-ink); }
+
+.garage-readout {
+  background: var(--g-card);
+  border: 1px solid var(--g-rule);
+  border-radius: 6px;
+  padding: 18px 26px 18px;
+  margin-top: 6px;
+  color: var(--g-ink);
+}
+.garage-readout[data-preview="1"] { border-color: var(--g-mustard); }
+.garage-readout .eyebrow {
+  font-family: var(--g-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--g-muted); display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+.garage-readout .eyebrow i {
+  width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--dot, var(--g-mustard));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot, var(--g-mustard)) 25%, transparent);
+}
+.garage-readout h1, .garage-readout h2 {
+  font-size: 1.45rem; line-height: 1.2; margin: 0 0 8px; padding: 0; border: 0; text-wrap: balance; color: var(--g-ink);
+}
+.garage-readout h2 .n { color: var(--g-mustard-3); margin-right: 0.35em; }
+body.quarto-dark .garage-readout h2 .n { color: var(--g-mustard); }
+.garage-readout p { margin: 0 0 6px; color: var(--g-ink-2); }
+.garage-readout .intro p.how b { color: var(--g-ink); font-weight: 600; }
+.garage-readout .go { font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--g-mustard); padding-bottom: 1px; }
+.garage-readout .go:hover, .garage-readout .go:focus-visible { border-bottom-color: currentColor; outline: none; }
+.garage-readout .hint { color: var(--g-muted); font-size: 0.85rem; margin-top: 6px; }
+/* on the board: no card, the note's own ink, and sizes set for the drawing's scale */
+#board .garage-readout { background: none; border: 0; border-radius: 0; padding: 0; margin: 0; color: var(--g-note-ink); }
+#board .garage-readout .eyebrow { font-size: 11px; gap: 8px; margin-bottom: 7px; color: var(--g-note-muted); }
+#board .garage-readout .eyebrow i { width: 9px; height: 9px; }
+#board .garage-readout h1 { font-size: 24px; line-height: 1.15; margin: 0 0 9px; font-weight: 600; color: var(--g-note-ink); }
+#board .garage-readout h2 { font-size: 20px; line-height: 1.18; margin: 0 0 7px; font-weight: 600; color: var(--g-note-ink); }
+#board .garage-readout h2 .n, body.quarto-dark #board .garage-readout h2 .n { color: var(--g-mustard-3); }
+#board .garage-readout p { font-size: 14px; line-height: 1.4; margin: 0 0 8px; color: var(--g-note-ink-2); }
+#board .garage-readout .intro p.how { border-top: 1px solid var(--g-note-rule); padding-top: 8px; margin: 0 0 8px; }
+#board .garage-readout .intro p.how b { color: var(--g-note-ink); }
+#board .garage-readout .go { font-size: 14px; color: var(--c-blue); }
+#board .garage-readout .hint { display: none; }   /* no room on the note; the link is the affordance there */
+
+.garage-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; padding-left: 2px;
+  font-family: var(--g-mono); font-size: 12px; color: var(--g-muted);
+}
+.garage-legend span::before {
+  content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--dot);
+}
+
+/* ---- the tools ----
+   Every tool is a link. Hovering one lifts it toward you; a tool that hangs on the wall leaves its
+   outline behind, the way a shadow board shows what is out. */
+.hot { cursor: pointer; text-decoration: none; }
+.hot:focus { outline: none; }
+.hot .hit { fill: transparent; stroke: none; }
+.hot .ring { fill: none; stroke: transparent; stroke-width: 2.5; opacity: 0; transition: opacity .12s; }
+.hot:focus-visible .ring { stroke: var(--g-focus); opacity: 1; }
+.hot .obj { transform-box: fill-box; transform-origin: 50% 60%; transition: transform .16s ease, filter .16s ease; }
+.hot:hover .obj, .hot:focus-visible .obj, .hot.on .obj { transform: translateY(-5px) scale(1.06); filter: drop-shadow(0 7px 5px var(--g-shadow)); }
+.hot.heavy:hover .obj, .hot.heavy:focus-visible .obj, .hot.heavy.on .obj { transform: none; filter: drop-shadow(0 0 7px var(--g-mustard-2)); }
+.hot .ghost { opacity: 0; transition: opacity .16s; pointer-events: none; }
+.hot .ghost * { fill: none; stroke: var(--g-ghost); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.hot .ghost .d { display: none; }
+.hot:hover .ghost, .hot:focus-visible .ghost, .hot.on .ghost { opacity: 1; }
+.hot .tag rect { fill: var(--g-note); stroke: var(--g-dark); stroke-width: 1; transition: fill .12s; }
+.hot .tag text { font-family: var(--g-mono); font-size: 10.5px; font-weight: 600; fill: var(--g-note-ink); pointer-events: none; }
+.hot:hover .tag rect, .hot:focus-visible .tag rect, .hot.on .tag rect { fill: var(--g-mustard-2); }
+.tiny { font-family: var(--g-mono); font-size: 7px; font-weight: 600; pointer-events: none; }
+
+/* ---- the robot ---- */
+#figure { --coat: #6f7f76; --coat-dk: #55635b; --coat-lt: #8a9a90; --gloves: #7a5535; --gloves-dk: #5c3f27; }
+.coat { fill: var(--coat); }
+.coat-dk { fill: var(--coat-dk); }
+.coat-lt { fill: var(--coat-lt); }
+.arm-seg { transition: transform .3s ease; }
+#figure .iris { transition: r .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .arm-seg, .hot .obj, .hot .ghost, .hot .ring, #board .note-edge, #figure .iris { transition: none; }
+  .hot:hover .obj, .hot:focus-visible .obj, .hot.on .obj { transform: none; }
+}

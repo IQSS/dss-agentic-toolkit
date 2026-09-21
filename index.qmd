@@ -1,14 +1,140 @@
 ---
 title: "Agentic AI Tool Chain"
+page-layout: custom
+sidebar: false
+toc: false
+resources:
+  - garage.css
+  - garage.js
 ---
 
-An opinionated map of the tools that compose an agentic-AI working surface, organized by function.
+::: {.garage-page}
 
-What role each category of tool plays, and which specific tool to reach for first. Written for data scientists. A snapshot in time, biased toward what the author actually runs; every section makes a pick, names alternatives, and explains why.
+```{=html}
+<link rel="stylesheet" href="garage.css">
+<div class="garage-scene">
+<svg id="scene" viewBox="0 0 1200 712" role="img" aria-label="The tool chain as a garage" aria-describedby="scene-desc">
+      <desc id="scene-desc">A garage workshop seen from the front: a pegboard of hand tools and a power drill over a long workbench, shelves and a window to the left, a clock, a clipboard and a corkboard to the right, a drawer unit and a padlocked cabinet under the bench, and a robot in a hat and trench coat standing beside it. Each tool is a section of the map; selecting one pins that section's summary to the corkboard, and the robot points at it.</desc>
+      <defs>
+        <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--g-glow)" stop-opacity="1"/>
+          <stop offset="1" stop-color="var(--g-glow)" stop-opacity="0"/>
+        </linearGradient>
+        <!-- what stands under the bench is hidden above the bottom of the apron -->
+        <clipPath id="underBench"><rect x="0" y="494" width="1200" height="218"/></clipPath>
+      </defs>
 
-::: {.callout-note}
-## This site is being built
+      <!-- ===== the room, and what hangs on the wall: drawn by garage.js ===== -->
+      <g id="room"></g>
+      <g id="wall"></g>
 
-The chapters are generated from the guide's markdown source, and the conversion is not finished yet.
-Until it is, the current PDF is the complete document.
+      <!-- ===== the corkboard, holding the readout ===== -->
+      <g id="board">
+        <rect x="856" y="83" width="336" height="284" fill="var(--g-shadow)"/>
+        <rect x="850" y="76" width="336" height="284" fill="var(--g-cork)" stroke="var(--g-cork-frame)" stroke-width="9"/>
+        <g fill="var(--g-cork-2)">
+          <circle cx="862" cy="96" r="1.6"/><circle cx="1176" cy="120" r="1.6"/><circle cx="860" cy="212" r="1.6"/><circle cx="1177" cy="260" r="1.6"/>
+          <circle cx="905" cy="352" r="1.6"/><circle cx="1010" cy="351" r="1.6"/><circle cx="1130" cy="352" r="1.6"/><circle cx="960" cy="85" r="1.6"/>
+          <circle cx="1100" cy="86" r="1.6"/><circle cx="861" cy="318" r="1.6"/><circle cx="1178" cy="330" r="1.6"/><circle cx="1176" cy="190" r="1.6"/>
+        </g>
+        <rect x="869" y="96" width="304" height="252" fill="var(--g-shadow)"/>
+        <rect class="note" x="866" y="92" width="304" height="252"/>
+        <rect class="note-edge" x="866" y="92" width="304" height="252"/>
+        <circle cx="1018" cy="100" r="6" fill="var(--g-red)"/><circle cx="1016.5" cy="98.5" r="2" fill="var(--g-red-lt)"/>
+        <g id="note-title" style="display:none" font-family="Questrial, Montserrat, sans-serif" font-size="40" text-anchor="middle" fill="var(--g-note-ink)">
+          <text x="1018" y="206">Agentic AI</text><text x="1018" y="256">Tool Chain</text>
+        </g>
+        <foreignObject id="board-fo" x="882" y="110" width="272" height="232">
+          <div xmlns="http://www.w3.org/1999/xhtml" id="board-home">
+            <section class="garage-readout" id="readout" aria-live="polite">
+              <div class="intro" id="ro-intro">
+                <h1>Agentic AI Tool Chain</h1>
+                <p>An opinionated map of the tools I work with, organized by what each one is for.</p>
+                <p class="how"><b>Every tool in the garage is a section of the map.</b> <span id="ro-how">Hover over one to see what it covers, and press it to open that section.</span></p>
+                <a class="go" href="chapters/00-introduction.html" target="_blank" rel="noopener">Start with the introduction →</a>
+              </div>
+              <div class="chapter" id="ro-chapter" hidden>
+                <div class="eyebrow"><i></i><span id="ro-part"></span></div>
+                <h2 id="ro-title"></h2>
+                <p id="ro-body"></p>
+                <a class="go" id="ro-link" href="chapters/00-introduction.html" target="_blank" rel="noopener" hidden>Open section</a>
+                <div class="hint" id="ro-hint" hidden></div>
+              </div>
+            </section>
+          </div>
+        </foreignObject>
+      </g>
+
+      <!-- ===== the bench, what stands under it and on it: drawn by garage.js ===== -->
+      <g id="bench"></g>
+
+      <!-- ===== the robot, from the companion site's console: fedora, calm eyes, sage coat ===== -->
+      <g id="figure" transform="translate(589,361) scale(0.86)">
+        <ellipse cx="600" cy="362" rx="82" ry="10" fill="var(--c-ink)" opacity="0.14"/>
+        <g>
+          <rect x="568" y="292" width="24" height="34" rx="4" fill="var(--c-metal-2)"/>
+          <rect x="608" y="292" width="24" height="34" rx="4" fill="var(--c-metal-2)"/>
+          <circle cx="580" cy="326" r="8" fill="var(--c-metal-3)"/><circle cx="580" cy="326" r="3" fill="var(--c-metal)"/>
+          <circle cx="620" cy="326" r="8" fill="var(--c-metal-3)"/><circle cx="620" cy="326" r="3" fill="var(--c-metal)"/>
+          <rect x="570" y="330" width="20" height="24" fill="var(--c-metal)"/>
+          <rect x="610" y="330" width="20" height="24" fill="var(--c-metal)"/>
+          <path d="M554 356 h40 v-8 h-8 l-6 -6 h-18 a8 8 0 0 0 -8 8z" fill="var(--c-mustard-3)"/>
+          <path d="M646 356 h-40 v-8 h8 l6 -6 h18 a8 8 0 0 1 8 8z" fill="var(--c-mustard-3)"/>
+          <rect x="554" y="352" width="40" height="5" fill="var(--c-sole)"/>
+          <rect x="606" y="352" width="40" height="5" fill="var(--c-sole)"/>
+        </g>
+        <g>
+          <polygon points="550,152 650,152 672,298 528,298" class="coat"/>
+          <polygon points="550,152 600,152 600,298 528,298" class="coat-dk" opacity="0.28"/>
+          <rect x="528" y="292" width="144" height="7" class="coat-dk"/>
+          <polygon points="568,152 600,206 632,152" fill="var(--c-shirt)"/>
+          <rect x="594" y="158" width="12" height="46" fill="var(--c-blue)"/>
+          <polygon points="592,158 608,158 600,166" fill="var(--c-blue-2)"/>
+          <polygon points="594,204 606,204 600,214" fill="var(--c-blue)"/>
+          <polygon points="568,152 600,206 586,214 556,164" class="coat-lt"/>
+          <polygon points="632,152 600,206 614,214 644,164" class="coat-lt"/>
+          <polygon points="568,152 600,206 586,214 556,164" fill="none" stroke="var(--coat-dk)" stroke-width="1.5"/>
+          <polygon points="632,152 600,206 614,214 644,164" fill="none" stroke="var(--coat-dk)" stroke-width="1.5"/>
+          <rect x="550" y="150" width="26" height="8" rx="2" class="coat-dk"/><circle cx="573" cy="154" r="2.5" fill="var(--c-mustard)"/>
+          <rect x="624" y="150" width="26" height="8" rx="2" class="coat-dk"/><circle cx="627" cy="154" r="2.5" fill="var(--c-mustard)"/>
+          <rect x="536" y="228" width="128" height="13" class="coat-dk"/>
+          <rect x="590" y="224" width="20" height="21" rx="2" fill="var(--c-mustard)"/>
+          <rect x="594" y="228" width="12" height="13" class="coat-dk"/>
+          <circle cx="614" cy="258" r="3.2" fill="var(--c-mustard-3)"/><circle cx="614" cy="276" r="3.2" fill="var(--c-mustard-3)"/>
+          <rect x="548" y="252" width="28" height="9" rx="1.5" class="coat-dk"/>
+          <rect x="626" y="252" width="28" height="9" rx="1.5" class="coat-dk"/>
+          <line x1="600" y1="214" x2="600" y2="292" stroke="var(--coat-dk)" stroke-width="1.5"/>
+        </g>
+        <g id="arms"></g>
+        <rect x="588" y="124" width="24" height="30" fill="var(--c-metal-2)"/>
+        <rect x="586" y="132" width="28" height="3" fill="var(--c-metal-3)"/>
+        <rect x="586" y="142" width="28" height="3" fill="var(--c-metal-3)"/>
+        <g id="head">
+          <rect x="540" y="50" width="120" height="80" rx="8" fill="var(--c-metal)"/>
+          <rect x="540" y="50" width="120" height="80" rx="8" fill="none" stroke="var(--c-metal-3)" stroke-width="2.5"/>
+          <rect x="552" y="60" width="96" height="62" rx="5" fill="var(--c-plate)"/>
+          <g fill="var(--c-metal-3)"><circle cx="547" cy="57" r="2.4"/><circle cx="653" cy="57" r="2.4"/><circle cx="547" cy="123" r="2.4"/><circle cx="653" cy="123" r="2.4"/></g>
+          <rect x="526" y="84" width="14" height="10" fill="var(--c-metal-2)"/><circle cx="524" cy="89" r="7" fill="var(--c-metal-3)"/><circle cx="524" cy="89" r="3" fill="var(--c-metal)"/>
+          <rect x="660" y="84" width="14" height="10" fill="var(--c-metal-2)"/><circle cx="676" cy="89" r="7" fill="var(--c-metal-3)"/><circle cx="676" cy="89" r="3" fill="var(--c-metal)"/>
+          <g fill="var(--c-metal-3)"><rect x="582" y="106" width="36" height="2.5"/><rect x="582" y="111" width="36" height="2.5"/><rect x="582" y="116" width="36" height="2.5"/></g>
+          <g id="eyes">
+            <circle cx="576" cy="86" r="15" fill="var(--c-metal-3)"/><circle cx="624" cy="86" r="15" fill="var(--c-metal-3)"/>
+            <circle class="iris" cx="576" cy="86" r="9" fill="#f0d67a"/><circle class="iris" cx="624" cy="86" r="9" fill="#f0d67a"/>
+            <circle cx="572" cy="82" r="3" fill="#fff" opacity="0.8"/><circle cx="620" cy="82" r="3" fill="#fff" opacity="0.8"/>
+          </g>
+          <g id="fedora">
+            <path d="M518 56 Q520 50 528 50 L672 50 Q680 50 682 56 Q640 62 600 62 Q560 62 518 56Z" fill="var(--c-hat-fedora)"/>
+            <path d="M546 52 L554 14 Q580 4 600 6 Q620 4 646 14 L654 52Z" fill="var(--c-hat-fedora)"/>
+            <path d="M574 10 Q600 20 626 10" fill="none" stroke="var(--c-hat-fedora-2)" stroke-width="3"/>
+            <path d="M556 18 L562 48" stroke="var(--c-hat-fedora-2)" stroke-width="2" opacity="0.6"/>
+            <rect x="547" y="40" width="106" height="9" fill="var(--c-hat-band)"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+</div>
+<div class="garage-legend" id="legend"></div>
+<script src="garage.js"></script>
+```
+
 :::
