@@ -110,7 +110,7 @@ That is the idea the rest of the guide rests on. You do not need to learn these 
 
 ## What an agent has on a plain machine
 
-Not much. A new Mac or a fresh Ubuntu gives the agent a shell, the standard Unix utilities, and a system copy of Python. With Apple's Command Line Tools, it has `git`. There is no way to install software, no R the agent can pin to a version, no queue, no build command, nowhere safe to keep a key.
+Not much. A new machine gives the agent a shell and the standard Unix utilities. On a Mac, Apple's Command Line Tools add `git` and a few developer tools with it (§2 takes stock of exactly what). Either way there is no package manager, no R the agent can pin to a version, no queue, no build command, and nowhere safe to keep a key.
 
 An agent does not stop when it lacks a tool. It improvises with what is there, and each improvisation fails in a way that is known in advance:
 
@@ -143,19 +143,46 @@ After that, go by need. Every section in Parts II to IV opens with what the agen
 
 None of this depends on how you talk to your agent. The app, an editor extension, and a terminal all drive the same agent, and the agent drives the same tools.
 
-# 2. How tools reach the machine: Homebrew and one install list
+# 2. Your starting toolkit, and how to grow it: Homebrew
 
-Every tool in this guide arrives the same way: a package manager installs it. So the package manager is the first tool, and the only one the agent cannot fetch for itself. Putting it on the machine takes an administrator password, and on Windows a restart. Those steps are yours. They are the floor, and this section walks through them once. After the floor, you ask and the agent installs.
+You do not start from nothing. If you set up the floor in the companion guide, *Doing Research with AI Agents*, your machine already carries a working set of developer tools, and even a machine that never saw that guide has some of them. This section takes stock of what the agent has before you add anything, shows why most of it wants replacing, and installs the one tool that does the replacing and everything after: a package manager.
 
-## What a package manager gives the agent
+## The toolkit you already have
 
-One command that installs a program, one that updates it, one that removes it, and one that lists what is there. Nothing to click and no installer windows, so an agent can do all of it and read back what happened. The programs land in one known place, so the agent finds them again next session.
+On a Mac, the Command Line Tools you installed for `git` brought more than `git`: a compiler, a build tool, and a copy of Python, and the operating system already had the shells. So before you add anything, the agent has this much:
 
-## What we recommend
+| Tool | Version | Standing |
+|:--|:--|:--|
+| `git` | 2.39 | old; current is 2.5x |
+| `python3` | 3.9 | reached end of life in 2025 |
+| `clang`, the compiler | 17 | current |
+| `make`, a task runner | 3.81, from 2006 | frozen |
+| `bash`, a shell | 3.2, from 2007 | frozen |
+| `zsh`, a shell | 5.9 | current |
 
-Homebrew, on a Mac and inside Ubuntu alike. The commands are identical on both, so every request in this guide reads the same on either platform. It is free, and Homebrew's documentation says it uses administrator rights only while it is being installed.
+Two of these, `bash` and `make`, are frozen: Apple keeps them at these old versions and will not update them, so they never move on their own. `git` and `python3` are not frozen, only old. Only `clang` and `zsh` are current.
+
+`zsh` being current is easy to misread, because it is the shell you type into and the one a Mac uses by default. The agent barely touches it. The app labels every command it runs `Bash`, and that one word hides three separate things:
+
+| | On your Mac |
+|:--|:--|
+| What the app calls the tool | `Bash` |
+| The shell your commands run in | your login shell, `zsh`, current |
+| The shell the agent writes into scripts | `bash`, the frozen 3.2 above |
+
+Every script, `justfile` recipe (§8), and hook the agent writes opens with `bash`, whatever shell you work in. So the old shell on that list is the one the agent actually leans on, which is why the install list below puts a current `bash` in front of it.
+
+## Why a package manager, and which
+
+Everything past this baseline arrives the same way: a package manager installs it. It does two jobs at once. It brings the old tools above up to date, putting a current `git`, `bash`, and the rest alongside Apple's, and it adds what the baseline has none of: a queue, fast search, pinned environments, a build command. It is the first tool to install and the only one the agent cannot install for itself.
+
+What it gives the agent is four commands: one to install a program, one to update it, one to remove it, one to list what is there. Nothing to click and no installer windows, so the agent runs all of it and reads back what happened, and the programs land in one known place, so it finds them again next session.
+
+We recommend **Homebrew**, on a Mac and inside Ubuntu alike. The commands are identical on both, so every request in this guide reads the same on either platform. It is free, and Homebrew's documentation says it uses administrator rights only while it is being installed.
 
 ## The floor: what only you can do
+
+Installing Homebrew is the one step here that needs your hand and your administrator password. If you came from the companion guide, the Command Line Tools are already in, and Homebrew is all that is left; if you are arriving straight here, you install both, and the steps below cover it.
 
 Both routes need administrator rights on the computer. Most Harvard researchers have them on a university laptop. If you do not, ask your local IT support to carry out these steps.
 
@@ -167,7 +194,7 @@ Both routes need administrator rights on the computer. Most Harvard researchers 
 
    > Run `brew doctor` and tell me what it says. If `brew` is not found, it is at `/opt/homebrew/bin/brew`: add it to my shell's startup file.
 
-   It should report `Your system is ready to brew.`
+   The best answer is `Your system is ready to brew.` A list of warnings is also a pass: it means Homebrew was found and ran, which is all this step checks. One warning is common straight after step 1, that a newer Command Line Tools release is available. Apple's installer does not always fetch the newest release, and the one it fetched is enough. The only failing answer is that `brew` cannot be found.
 
 **On an older Mac** (an Intel processor, or macOS 14 or earlier), the package does not run, and you type the commands yourself. Paste each line exactly, press Return, and wait for it to finish before the next.
 
@@ -187,7 +214,7 @@ Both routes need administrator rights on the computer. Most Harvard researchers 
    brew doctor
    ```
 
-   It should print `Your system is ready to brew.`
+   It prints `Your system is ready to brew.`, or a list of warnings, which is also a pass, as above. `command not found` means step 4 was skipped.
 
 **On Windows.** The tools in this guide run in Ubuntu, inside Windows Subsystem for Linux (WSL2). Microsoft's instructions are at [learn.microsoft.com/windows/wsl/install](https://learn.microsoft.com/windows/wsl/install).
 
@@ -213,7 +240,7 @@ Both routes need administrator rights on the computer. Most Harvard researchers 
 
 ## After the floor: one install list
 
-DSS will ship one install list with this guide. It is a `Brewfile`: a plain text file with one line for each tool in Parts II and III. You do not work through it. You point the agent at it:
+DSS will ship one install list with this guide. It is a `Brewfile`: a plain text file with one line for each tool in Parts II and III, including the current `bash`, `git`, and Python that replace the aging baseline above. You do not work through it. You point the agent at it:
 
 > Homebrew is installed. Here is the DSS install list. Tell me what it would install, then install it with `brew bundle`. Set `HOMEBREW_NO_ASK=1` so that Homebrew does not stop to ask for confirmation. Report anything that failed, and stop and tell me if a step needs my password.
 
@@ -237,6 +264,8 @@ The agent will also use installers that belong to other ecosystems. You never ch
 - `apt`: Ubuntu's own system packages, such as a TeX distribution (§10) or a container engine (§15).
 - `uv` and `renv`: a project's Python and R packages (§9).
 - `npm` and `npx`: the JavaScript world's installer. Some usage tools (§14) and many MCP servers (§16) are distributed through it.
+
+That is the whole setup. The table in the Introduction maps every tool by what it lets the agent do, and Part II is the core set, the six that pay for themselves in the first project. Start there.
 
 ## Alternatives, and when to choose them
 

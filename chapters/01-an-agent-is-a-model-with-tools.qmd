@@ -14,7 +14,7 @@ That is the idea the rest of the guide rests on. You do not need to learn these 
 
 ## What an agent has on a plain machine
 
-Not much. A new Mac or a fresh Ubuntu gives the agent a shell, the standard Unix utilities, and a system copy of Python. With Apple's Command Line Tools, it has `git`. There is no way to install software, no R the agent can pin to a version, no queue, no build command, nowhere safe to keep a key.
+Not much. A new machine gives the agent a shell and the standard Unix utilities. On a Mac, Apple's Command Line Tools add `git` and a few developer tools with it (§2 takes stock of exactly what). Either way there is no package manager, no R the agent can pin to a version, no queue, no build command, and nowhere safe to keep a key.
 
 An agent does not stop when it lacks a tool. It improvises with what is there, and each improvisation fails in a way that is known in advance:
 

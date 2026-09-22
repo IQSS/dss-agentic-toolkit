@@ -23,7 +23,7 @@
   const CH = [
     { n: "1", group: "I", slug: "01-an-agent-is-a-model-with-tools", title: "An agent is a model with tools", tool: "the robot",
       body: "What an agent is, what a plain machine gives it, and the three ways to give it more: programs, connections, and instructions." },
-    { n: "2", group: "I", slug: "02-how-tools-reach-the-machine-homebrew-and-one-install-list", title: "How tools reach the machine", tool: "the workbench",
+    { n: "2", group: "I", slug: "02-your-starting-toolkit-and-how-to-grow-it-homebrew", title: "Your starting toolkit, and how to grow it", tool: "the workbench",
       body: "Every tool arrives through a package manager, the one thing the agent cannot fetch for itself. The few steps only you can do, on a Mac and on Windows." },
     { n: "3", group: "I", slug: "03-telling-the-agent-what-it-has-instruction-files-and-skills", title: "Telling the agent what it has", tool: "the clipboard",
       body: "An installed tool does nothing until the agent knows to reach for it: the file it reads every session, and what a standing line looks like." },
