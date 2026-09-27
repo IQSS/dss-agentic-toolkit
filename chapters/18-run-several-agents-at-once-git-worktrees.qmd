@@ -2,58 +2,28 @@
 title: "18. Run several agents at once: git worktrees"
 ---
 
-**We recommend** one git worktree and one branch per agent. **Alternatives:** subagents inside one session, one branch with one agent at a time, `Container Use`.
+Git worktrees give parallel agents separate working folders and branches within the same repository. This chapter explains how to assign tasks, provide each agent's inputs and environment, and review the combined changes. Start with two tasks whose results you can check independently.
 
-## Without it
+## What a worktree separates
 
-You start a second session in the same project folder: one agent is refactoring the cleaning script while the other drafts tests. Both are editing one set of files. The first agent's half-finished edit breaks the second one's test run. Then one of them stages everything and commits the other's unfinished work under its own message.
+Separate working folders reduce the chance that agents overwrite each other's edits. They still share repository history and may share databases, caches, credentials, or outputs outside those folders. Worktrees do not restrict access for security purposes, and changes can still conflict when combined. See the [git worktree manual](https://git-scm.com/docs/git-worktree).
 
-The other outcome is that you do not try. You start a task and wait for it before starting anything else.
-
-## What it gives the agent
-
-A worktree is a second working folder attached to the same git repository (§6), checked out on its own branch. Give each agent its own and parallel work cannot collide: each has its own files and its own history, and they meet only through git. When one finishes, you review its branch (§13), merge it, and the worktree is removed.
-
-None of this depends on how you talk to the agent. The vendor's documentation (read 2026-09-21) says the app runs sessions in parallel, each in its own worktree if you choose, and that both work in its WSL sessions. In a terminal, each worktree gets a pane (§24).
-
-## Do you need it yet?
-
-Yes, when you find yourself waiting on one agent before starting the next thing, and the tasks are independent: different scripts, different parts of the pipeline.
-
-No, not to begin with. Start with one agent and a review loop: the agent drafts, you rebuild (§8, §11) and read the diff (§13). That pays off long before a second agent does. Four to six agents at once is where practiced users level off, not where anyone starts.
-
-## What we recommend
-
-Plain `git worktree`, which comes with git: nothing to install, the same on macOS and Ubuntu, and the agent can create, list, and remove worktrees by command. One agent, one worktree, one branch, one scoped task.
-
-Scale the structure to the overlap. Tasks that touch different files need little ceremony. Tasks that touch shared code need separate branches and a review before each merge.
+For example, one agent could add known-answer checks for a cleaning function while another prepares a figure from an already saved result. Give each a separate output directory. Review both changes, then test their combined state before accepting it.
 
 ## Ask for it, and tell the agent
 
-> I want two tasks done in parallel in this project: [the first] and [the second]. Give each its own git worktree and branch, and work on each in its own session. Do not merge anything. Tell me when a branch is ready for review.
+> Prepare separate worktrees and branches for these two tasks: [task A] and [task B]. Identify shared inputs and resources before starting. Give each task a separate output location and the recorded environment it needs. Preserve existing uncommitted work. Do not merge or remove either worktree until its changes and outputs have been reviewed.
 
-State each task as a goal, not an edit. "Refactor the data-loading function in `02-clean.R` to handle multi-file inputs, preserving the existing column types" keeps an agent inside its task. "Edit `02-clean.R`" does not.
+Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§21). Confirm the actual folder and branch each session uses before either starts editing.
 
-The standing lines for the instruction file:
+## Prepare the inputs deliberately
 
-- One agent, one worktree, one branch. Never commit to a branch another session is using.
-- No agent merges its own work. A person merges, after reading the diff, and inspects anything that touches model fits, diagnostics, or rendered output.
-- When a branch is merged, remove its worktree and delete the branch.
+A new worktree contains the files tracked by git. Ignored data, package libraries, and saved model fits may be absent. Arrange approved access to those inputs and a way to restore the environment before either agent starts. Otherwise it may improvise a substitute for a missing file or repeat an expensive fit. Do not let both agents write to a shared cache without checking that the tool supports it.
 
-## Check that it's working
+Independent implementation for verification needs additional separation. Give fresh sessions the approved inputs and specification without exposing the first implementation or its intermediate results. Worktrees alone do not provide that independence, especially if the reference implementation is in shared history. The research guide's *Verification* chapter explains what to compare and how to interpret agreement.
 
-Ask: *which worktrees exist, which branch is each on, and what is not yet merged?* The agent runs `git worktree list`. A good answer names each folder, its branch, the commits waiting for review, and any worktree that can now be removed.
+## Review and integrate
 
-What goes wrong when an agent operates it:
+Ask for `git worktree list`, each branch's changes, test results, and remaining uncommitted files. Resolve overlapping edits deliberately. Run checks on the combined result, since two individually passing changes can fail together.
 
-- **Two agents edit the same files on different branches.** The collision is only postponed to the merge. Scope each task to a directory or a group of files.
-- **The new worktree is missing things.** A new worktree is a fresh checkout of a commit, so it holds only what git tracks. The raw data, the package library (§9), and the pipeline's cache (§11) are ignored files, so they are absent. The agent reports missing data, reinstalls packages, or re-runs every fit. Settle what each worktree needs before it starts.
-- **Two agents write to one shared resource.** Several can read the same database or settings file; only one should write, and through review.
-- **An agent merges its own branch** because its tests passed. Passing tests do not show that a changed model result is right.
-- **Worktrees and branches pile up.** Ask the check question weekly and have the merged ones removed.
-
-## Alternatives, and when to choose them
-
-- **Subagents inside one session**, for small, bounded pieces (a search, a test run) whose results return to one conversation. Try these first. They end when the session ends (§7).
-- **One branch, one agent at a time**, each session reviewed before the next begins, when tasks do not overlap or you are reviewing changes as they land. On a solo project, committing straight to the main branch is fine.
-- **`Container Use`**, which gives each agent its own container through an MCP server (§16), when you want every agent isolated from your machine by default (§15) and accept the overhead. Worth a look once coordinating worktrees by hand costs more than the parallel work returns.
+Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§7). Extra agents are useful only when their outputs can be specified, checked, and integrated.

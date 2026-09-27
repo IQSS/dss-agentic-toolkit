@@ -2,47 +2,35 @@
 title: "1. An agent is a model with tools"
 ---
 
-An agent is a language model that can call tools, again and again, with each result deciding the next call. Reading a file is a tool. Editing one is a tool. Running a command is a tool. Take the tools away and what is left is a chat window. (Hadley Wickham's ["What is an Agent?"](https://tidydesign.substack.com/p/what-is-an-agent) builds this definition up step by step, and is worth reading first.)
-
-So what an agent can do for your research is set by two things: the model, which you cannot change, and the tools, which you can. This guide is about the second.
+An agent uses tools to read files, make changes, and run programs, then uses the results to decide what to do next. This chapter explains how installed programs, service connections, and instructions extend what it can do for your project. Hadley Wickham's ["What is an Agent?"](https://tidydesign.substack.com/p/what-is-an-agent) gives a fuller explanation of the model-and-tool interaction.
 
 ## One tool reaches all the others
 
-Among the tools every agent has, one is different in kind: the shell, which runs commands on your machine. Through it the agent can reach every program installed there. Install a program and the agent has a new tool. Nothing else needs connecting.
+A coding agent can run shell commands. Through that route it can use installed programs that its execution environment and permissions make available. After adding a program, check that the agent can find it and use it as intended.
 
-That is the idea the rest of the guide rests on. You do not need to learn these programs, or ever run them. Many of them would be tedious to set up and drive by hand, and most researchers never would. The agent installs them, configures them, and operates them. Your part is to decide what it may have, ask for it, tell the agent when to use it, set the limits, and check the results.
+You can ask the agent to install and operate a program without learning its command syntax yourself. You still need to understand what the program does, which files or services it can access, and what evidence will show that it worked. Those are the decisions each tool chapter helps you make.
 
 ## What an agent has on a plain machine
 
-Not much. A new machine gives the agent a shell and the standard Unix utilities. On a Mac, Apple's Command Line Tools add `git` and a few developer tools with it (§2 takes stock of exactly what). Either way there is no package manager, no R the agent can pin to a version, no queue, no build command, and nowhere safe to keep a key.
+A Mac with Apple's Command Line Tools provides git and standard command-line utilities. Your research language and institutional software may add much more. Inventory those first (§2); the missing pieces depend on the machine and the project.
 
-An agent does not stop when it lacks a tool. It improvises with what is there, and each improvisation fails in a way that is known in advance:
+An agent may improvise when a tool or procedure is missing. Common failures include:
 
 | Asked to… | With a plain install, the agent… | What goes wrong | § |
 |:--|:--|:--|:--|
-| run a six-hour model fit | starts it inside its own session | the fit dies when the session ends | 7 |
+| run a six-hour model fit | launches it without a durable job record | interruption or failure may go unnoticed | 7 |
 | run 400 simulations | runs them one at a time, or all at once | a week, or a frozen machine | 7 |
 | install a package | puts it in the system-wide library | the project cannot be rebuilt elsewhere | 9 |
 | rebuild the analysis | works out the commands again each time | a different result on a different day | 8, 11 |
 | use an API key | pastes it into a script | the key ends up in the repository | 12 |
 | find where a variable is used | chains slow, general-purpose commands | more time, more tokens, more mistakes | 5 |
 
-Each row is a section of this guide. Each section names the tool that replaces the improvisation.
+The tools in those sections make execution and review more dependable. They still need a clear specification and checks on the result.
 
 ## Three ways to give an agent more
 
-**Programs it reaches through the shell.** A job queue, a build command, a package manager for R or Python, a secrets store. This is most of the guide: Parts II and III.
+**Installed programs.** Through its command tool, the agent can use a job queue, run the project's build command, manage R or Python packages, or retrieve credentials from a secrets store. Parts II and III cover these tools.
 
-**Connections to things outside the machine.** A browser, a database, a reference library, your calendar. These arrive through the Model Context Protocol (MCP), a standard way for an agent to call a service. Part IV covers them.
+**Connected tools and services.** Connections can give the agent access to a browser, database, or reference library. The Model Context Protocol (MCP) provides a standard way to make such tools available; the server supplying them may run locally or remotely. Part IV explains how to choose and check a connection.
 
-**Instructions.** An installed tool does nothing until the agent knows to reach for it. A few lines in the file the agent reads at the start of every session ("any job over five minutes goes to the queue") are what turn a program on the disk into a habit. §3 covers these, and every later section ends with the lines that belong to it.
-
-More tools also means more reach, for mistakes as well as for work. §4 is about keeping that reach in proportion, and it comes before the tools for that reason.
-
-## How to use this guide
-
-Part I is the ground: how tools get onto the machine (§2), how the agent learns what it has (§3), and how to bound it (§4). Read it once.
-
-After that, go by need. Every section in Parts II to IV opens with what the agent does without the tool, and says plainly whether you need it yet. Most readers will want all of Part II and some of Part III. Part V is for readers who want to work in a terminal themselves, which nothing before it requires.
-
-None of this depends on how you talk to your agent. The app, an editor extension, and a terminal all drive the same agent, and the agent drives the same tools.
+**Instructions.** Tell the agent when to use each tool and what evidence to return. Installing a queue does not teach it to record a task identifier or check the result. §3 covers those standing instructions.

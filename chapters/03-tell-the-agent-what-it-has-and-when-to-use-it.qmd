@@ -1,0 +1,25 @@
+---
+title: "3. Tell the agent what it has and when to use it"
+---
+
+A newly installed tool can go unused, or be used incorrectly, unless the agent has instructions for it. This chapter shows how to record when to use a tool, what limits apply, and which results to report. The research guide's *The files the agent reads* and *Repeatable workflows* chapters explain the instruction files and skills that hold those procedures.
+
+## Start with short, specific instructions
+
+A machine-wide convention can live in your personal `CLAUDE.md`. A project's commands, resource limits, and data-access rules belong with that project. Keep an established instruction layout rather than creating a second one for this guide.
+
+For example:
+
+- Submit long jobs through pueue, record the task identifier, and verify both completion status and expected outputs.
+- Fetch required credentials from the approved vault for the command that needs them. Never print or commit their values.
+- Use the project's recorded environment. Report proposed dependency changes before applying them.
+
+Each line names an action and a check. “Use pueue” alone leaves the agent to guess how to establish that a job succeeded. Keep a short inventory of installed tools and their purpose alongside these instructions.
+
+## Package procedures only when they recur
+
+A skill can hold a recurring procedure such as submitting a job, inspecting its status, and reporting failure. Start with a standing instruction; add the longer procedure if you repeatedly need the same correction. Hooks can run checks at specified events, but are executable configuration that needs review. Neither instructions nor hooks replace a data-access boundary (§4).
+
+## Check that the instruction is used
+
+In a fresh session, ask which project instructions apply and how the agent would run a long job. Have it identify the file it read, then demonstrate the procedure on a harmless task. A confident summary alone does not prove the file was loaded or the procedure works.

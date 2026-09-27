@@ -3,9 +3,9 @@
 # upstream_commit is the last commit that touched the source file or figures/, not HEAD:
 # a commit to the document's template or meta-files does not make this site stale.
 upstream_repo: https://github.com/stevenworthington/agentic-ai-tool-chain.git
-upstream_commit: b9e87e8ee145db2466ececd1cd78b6043733e19c
+upstream_commit: 2814e3785cf74bedd14fcc7e3e266c82222fb24c
 upstream_dirty: false
 source_path: source/agentic-ai-tool-chain.md
-source_sha256: bd5039023e13d3bda78620dfa047710e599da99b97102395cca01d420115e98d
+source_sha256: 685d5d9e1e260c9f062ba1bd829fcf91b09fcd8a72f78f96a351325476c605db
 chapters: 26
 figures: 26

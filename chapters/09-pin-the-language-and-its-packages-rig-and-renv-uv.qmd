@@ -2,76 +2,56 @@
 title: "9. Pin the language and its packages: rig and renv; uv"
 ---
 
-**We recommend** `rig` and `renv` for R, and `uv` for Python. **Alternatives:** `pixi`, `micromamba`, `mise`, a container.
+To repeat an analysis, preserve the versions of its language and packages. **We recommend** renv for R packages, rig when several R versions are needed, and uv for Python projects whose dependencies it can manage. This chapter covers recording an existing environment, setting up a new one, and checking that the recorded versions can be restored.
 
 ## Without it
 
-Asked to install a package, an agent runs `install.packages("brms")` or `pip install pandas`, and the package lands in the one library the whole machine shares. It works, and nothing in the project records which version was used. A co-author clones the repository a year later, gets that year's versions, and the model no longer reproduces. Or you upgrade R for a new project and an old one stops running.
+A package update can change an analysis even when its source code has not changed. If the project never recorded its environment, restoring the earlier behavior becomes guesswork.
 
 ## What it gives the agent
 
-Each project gets its own package library and a lockfile: a plain-text list of every package the project uses, including the ones those packages depend on, each with its exact version and source. The lockfile is committed to `git` (§6). The library is not, because one command rebuilds it from the lockfile: `renv::restore()` in R, `uv sync` in Python.
+A lockfile records exact package versions and their dependencies. R projects using renv use `renv.lock`; uv projects use `pyproject.toml`, `uv.lock`, and a Python-version record. The installed library can be rebuilt from those records, subject to platform support and the continued availability of packages and system dependencies.
 
-So an environment can be lost at any time, to an upgrade, a new laptop, or a mistake, and rebuilt on any machine. When the agent adds a package, the lockfile changes in the same step, and the change shows in the diff.
-
-The language is pinned too: `rig` keeps several versions of R side by side, and `uv` records the project's Python version in a committed file.
+Rig manages R installations; renv manages project packages. Uv can manage both the Python interpreter and project environment. A lockfile does not preserve the operating system or guarantee identical numerical results on all hardware.
 
 ## Do you need it yet?
 
-Yes, for any project someone else will run (a co-author, a reviewer, you in two years) and any project you will return to after upgrading R or Python. In practice that is every project.
-
-No, for a scratch script you will throw away.
+Record the environment whenever results need to be repeated. For an existing project, preserve the working versions before any migration. Stata users should record Stata and community-command versions and their sources; retain the master do-file. A second programming language is not required.
 
 ## What we recommend
 
-**R: `rig` and `renv`.** `rig` installs R and switches between versions. `renv` keeps the project library and writes `renv.lock`. Underneath `renv` we switch on `pak` as the installer: it downloads in parallel, resolves every dependency before installing anything, and installs from GitHub as readily as from CRAN.
+Use [renv](https://rstudio.github.io/renv/articles/renv.html) for R, and [uv projects](https://docs.astral.sh/uv/concepts/projects/) for Python. Keep an established environment manager if it already provides the needed record and restoration route. Add rig when you need to install or select a particular R version, not as a reason to upgrade every project.
 
-`rig` installs CRAN's official builds of R, which write to system folders and ask for an administrator password once per R version. That fails our user-level criterion, and it is how R is normally installed.
-
-**Python: `uv`.** One program installs Python, creates the environment, and resolves packages. It writes `pyproject.toml`, `uv.lock`, and `.python-version`, all committed; the environment folder, `.venv`, is not.
-
-**Default to `uv`; switch to `pixi` when any dependency lives outside PyPI**: compiled scientific libraries from conda-forge (GDAL, PROJ, HDF5, NetCDF), GPU builds of PyTorch or JAX, Bioconda, or R packages mixed with Python. The test is what is in the dependency tree, not the kind of project. An analysis that needs only `pandas` and `scikit-learn` stays on `uv`; a small script that needs GDAL goes to `pixi`.
-
-The lockfiles of `uv` and `pixi` resolve for each platform, so one committed on a Mac gives a co-author on Ubuntu the same versions.
+A package addition should produce changes to the lockfile that you can account for. For example, adding one plotting package may also add packages it depends on. It should not silently replace most of the packages used for modeling. Have the agent explain the changed versions, run the affected checks, and test restoration in a separate environment before relying on the record.
 
 ## Ask for it, and tell the agent
 
-> For R: install rig, use it to install the current release of R, and switch on pak as renv's installer. Then set this project up with renv: install the packages the scripts use from CRAN, write `renv.lock`, and show me `renv::status()`.
->
-> For Python: install uv, then set this project up with it, with a pinned Python version and a `uv.lock`. Show me the project's code importing its packages.
+For an existing analysis:
 
-**What only you can do.** R's installer needs your administrator password. Run that one command yourself, as §2 describes; ask the agent for the exact line.
+> Inventory the language, installed package versions, system dependencies, and current environment records. Preserve a baseline result. If a lockfile is missing, propose a way to capture the working environment without upgrading it. Show the resulting manifest and verify restoration in a separate environment. Do not change the original library or language version to make the migration easier.
 
-The standing lines for the instruction file:
+For a new project:
 
-- Every project has a lockfile with exact versions, committed. If it is missing, create it from the current environment before changing anything else.
-- Install packages only through `renv::install()` or `uv add`, then update and commit the lockfile in the same step. Never install into the system library.
-- In a cloud-synced folder, exclude `renv/` or `.venv` from sync while it is empty, confirm the exclusion, and only then fill it.
+> Set up a project environment for the agreed language version and packages: renv for R, or uv for Python. Record the complete dependency resolution, run a small import and analysis check, and show the lockfile. Keep generated libraries out of git and cloud synchronization before populating them.
+
+**What only you can do.** Approve any system installation or password step. Installing a new R version may need administrator access. Credentials and package repositories also need the access decision in §4.
+
+Standing instructions: use the project's environment manager, review lockfile changes alongside code changes, and keep the original working environment until a migration is verified.
 
 ## Check that it's working
 
-Ask: *is this project's environment pinned, and does it match its lockfile?* For R, a good answer gives the R version and quotes `renv::status()`: "No issues found -- the project is in a consistent state." For Python, the agent imports the project's packages through `uv run` and reports their versions.
+For R, inspect `renv::status()`, the R version, and the lockfile diff. For Python, test the recorded environment with a locked restore, such as `uv sync --locked`, followed by the project's checks. A [locked sync](https://docs.astral.sh/uv/concepts/projects/sync/) refuses a stale lockfile instead of resolving an update silently. Test in a separate environment because syncing can remove packages not in the lockfile.
 
-What goes wrong when an agent operates it:
+Common failures are unrecorded packages, missing system libraries, and a lockfile update that changes far more than intended. In renv, use the ordinary project snapshot after an approved change; selecting a single package for a snapshot can omit the rest of the environment. In either tool, inspect the complete dependency record rather than counting only direct imports.
 
-- **The lockfile drifts.** The agent installs a package and does not update the lockfile. `renv::status()` reports it; `renv::snapshot()` pins the current state, and `renv::restore()` goes back.
-- **A one-package snapshot wipes the lockfile.** `renv::snapshot(packages = "brms")` does not add one package. It rewrites the lockfile to hold only that package and what it depends on: a hundred entries become a dozen, and the diff shows thousands of deleted lines. The agent should call `renv::snapshot()` with no arguments and check `renv::status()` before committing.
-- **`renv/` or `.venv` inside a cloud-synced folder.** The same trap as `.git` (§6), and larger: recent Python packages ship debug files that take a modest environment past 50,000 files. The exclusion goes on the empty folder, before anything is installed. Added afterward it does not help: the agent should rebuild the environment outside the synced folder and link to it.
-- **R hangs at full CPU.** Every R command an agent runs directly, `renv` calls included, goes through §8's wrapper. A long restore goes to the queue (§7), where R does not spin.
-- **A restore fails on a missing system library.** R packages with compiled code (`sf`, `terra`, `rstan`, `rJava`) and Python packages without prebuilt binaries (sometimes `psycopg2`, `lxml`, image libraries) need libraries from the operating system: GDAL, PROJ, GEOS, `pkg-config`, `openssl`, `libxml2`, a Fortran compiler. Neither `renv::restore()` nor `uv sync` installs those. The error names the missing library. What the agent does next depends on the tool:
-    - *Under `renv`:* install the named library and retry. On a Mac, `brew install gdal proj geos` for spatial packages, `brew install openssl@3 libxml2` for SSL and XML, `brew install gcc` for Fortran. On Ubuntu, the matching packages through `sudo apt install`: `libgdal-dev`, `libgeos-dev`, `libproj-dev`; `libssl-dev`, `libxml2-dev`; `gfortran`.
-    - *Under `uv`:* the same, then retry. If it fails again, the package is a poor fit for `uv`, and the project should move to `pixi`.
-    - *Under `pixi`:* add the library to the project, as in `pixi add gdal proj geos`. conda-forge ships the libraries alongside the Python packages that use them, which makes `pixi` the first choice for a Python project with such dependencies.
-    - *Afterward:* list the commands under "System dependencies" in the project's README, for the next fresh machine.
+A restore may need system libraries such as a compiler or spatial-data library. Record their installation requirements in the README. If the project depends on a conda-based scientific stack, consider pixi or retain its existing conda environment rather than repeatedly forcing those dependencies through a different manager. A single failed installation is a diagnosis to investigate, not an automatic reason to migrate.
 
-## Alternatives, and when to choose them
+On the author's affected Mac execution route, R environment commands use §8's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§6).
 
-- **`pixi`**, by the test above, or when one project mixes Python and R and you want one lockfile. conda-forge carries about 2,000 R packages against CRAN's 21,000, so R-led work stays on `renv`.
-- **`micromamba`**, for an existing conda project whose `environment.yml` you do not want to rewrite.
-- **`mise`**, when one project must pin several tools at once: a Python version, a Node version, a `pandoc` version. Its R support is thin, so R stays with `rig`. One trap: `mise use` writes the pin, and `mise install` does not.
-- **A container** (§15), when the operating system's libraries have to be pinned as well.
-- **`pip` with `venv`, `poetry`, `pyenv`**, only for an existing project that already uses them. `uv` covers what each did.
+## If the environment needs more
+
+Use a container (§15) when system dependencies also need to be packaged. Keep an existing conda or other managed environment when it is adequate. Platform-specific binaries can differ, so test restoration on the collaborator's target platform before promising portability.
 
 ## On Windows (WSL2) and Linux
 
-`renv` and `uv` work the same way as on a Mac. `rig`'s documentation gives Homebrew for macOS only. For Ubuntu it gives its own `apt` repository and the package `r-rig`, and everything after that is identical. `sudo apt install` asks for your Linux password, which only you can type. Projects inside WSL2's own filesystem are not cloud-synced, so the sync trap does not arise; §2 covers what that means for backup.
+Create the environment where the tools run: inside Ubuntu for WSL2. Use [rig's platform instructions](https://rig.r-lib.org/install.html) if adding R versions; the macOS installer is not the Linux installer. Check system-library requirements on that platform and document them with the project.

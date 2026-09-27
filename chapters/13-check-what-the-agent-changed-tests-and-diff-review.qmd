@@ -2,61 +2,28 @@
 title: "13. Check what the agent changed: tests and diff review"
 ---
 
-**We recommend** `testthat` for R, or `pytest` with `pandera` for Python, run from one `just check` command, and `difftastic` for showing what changed. **Alternatives:** the app's diff view alone, Great Expectations, another host's check runner.
+This chapter explains how to have the agent add small tests for consequential mistakes and how to review changes that tests cannot settle. Start with the project's existing tools: testthat or assertions in R, pytest or assertions in Python, and assertions in Stata. An assertion is a check that stops a script when an expected condition fails. Add a test framework when it makes those checks easier to maintain.
 
-## Without it
+## Ask for evidence about behavior
 
-You ask the agent to speed up the data-cleaning step. It does, and the script still runs. It has also dropped a factor level in a merge, and every estimate downstream moved a little. Nothing failed, so nothing told you.
+A script can run successfully and still drop observations or compute the wrong contrast. A useful check has an expected result established independently of the implementation. Repeating the same calculation in a test can repeat the same error.
 
-Without checks, the agent's only evidence that a change is safe is that the code ran. Your only view of the change is a line diff in which it has also re-indented half the file.
-
-## What it gives the agent
-
-Checks it can run by itself after every change, with one command, that fail loudly. Unit tests call one function with known inputs and compare the output. Assertions guard what would silently change a result: the rows after a merge, the factor levels, the missing values.
-
-And a way to show you what changed in meaning, not in layout. `difftastic` parses the code and compares its structure, so re-indentation and moved blocks drop out. It covers R and Python.
-
-On GitHub, the same command can run on every push and pull request, so nobody has to remember it.
-
-## Do you need it yet?
-
-Yes, as soon as the agent edits code whose results you will report.
-
-No, for exploration you will read once and throw away.
-
-## What we recommend
-
-- **R:** `testthat` for unit tests, and plain assertions (`stopifnot()`) in the scripts.
-- **Python:** `pytest` for unit tests, and `pandera` to state what a data frame must look like (column types, ranges, missing values) before the analysis runs.
-- **Both:** a linter and a formatter (`lintr` and `styler` for R, `ruff` for Python), run at every commit by `pre-commit`. They catch typos and layout noise, not statistical errors.
-
-All of it runs from `just check` (§8), the same command for you, the agent, and a collaborator.
-
-For reading changes, the agent uses `difftastic` and you use the app's own diff view. Read closely where a passing build would miss a problem: model code, data handling, contrast coding, the `justfile` and pipeline files.
+For a many-to-one join, use a tiny invented example with three observations and two lookup rows. Establish the expected matches and row count yourself. Then add a duplicate lookup key: the check should fail before the join expands the data. Include an unmatched observation and verify that the specified flag or exclusion rule is followed. These cases test the required behavior against known answers, without copying the cleaning function into its own test.
 
 ## Ask for it, and tell the agent
 
-> Install the test tools for this project's language, and difftastic. Add a `just check` recipe that runs the tests, the data assertions, and the linter. Write a first set of tests and assertions, and tell me what each one checks.
+> Identify changes in this task that could alter the analytic sample or reported results. Add small known-answer checks for those behaviors using the project's existing test tools. Include a case that should fail. Expose the quick checks through the project command surface, and explain what they do not establish. Do not refit all models unless the change requires it.
 
-The standing lines for the instruction file:
+Separate quick checks from expensive recalibration and the full reproduction run (§8). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow §8 if R checks hang when launched through the agent.
 
-- Run `just check` after every code change, and report the result before calling the work done.
-- Never edit, skip, or delete a failing check to make it pass. Show me the failure.
-- When I ask what changed, use `difftastic`.
+## Inspect the changes that tests cannot settle
 
-## Check that it's working
+Use the app's diff view to inspect changed specifications, exclusions, dependencies, and execution rules. Difftastic is an optional structural diff tool that can reduce formatting noise in supported languages; it still does not interpret the scientific meaning of a change. Keep the ordinary diff available.
 
-Ask: *run the checks, and tell me what each one covers and what none of them covers.* A good answer gives the number passed and failed, what each check asserts, and which steps have no check. Then ask: *what changed in behavior since the last commit?*
+A formatter makes code layout consistent; a linter inspects code for specified style issues and some programming mistakes. Use them when they help the project, and review their adoption separately from an analysis correction. Reformatting a whole file during a small edit can make the substantive change harder to see.
 
-What goes wrong when an agent operates it:
+## Check the checks
 
-- **The agent makes a failing check pass by changing the check.** Look at the diff of the test files.
-- **`just check` hangs at full CPU.** R run directly by an agent spins (§11), so this recipe goes through the pseudo-terminal wrapper too.
-- **"Only formatting changed" is wrong.** On very large files, or files it cannot parse, `difftastic` falls back to a line diff.
-- **The checks pass and the analysis is wrong.** Tests show that the code does what the tests say, not that the model is right. Which checks an analysis needs is research practice: see "Verification" in *Doing Research with AI Agents*.
+Ask the agent to run the deliberately failing example and the valid one, report outcomes, and restore the intended test inputs. Review changes to tests as carefully as changes to analysis code. A specification change can justify updating a test, but the reason must be explicit; deleting a failing check to finish the task is not a correction.
 
-## Alternatives, and when to choose them
-
-- **The app's diff view alone**, when changes are small and you read all of them.
-- **Great Expectations**, when data quality is itself the product: many sources with conflicting schemas.
-- **GitLab CI or another host's runner**, when the repository is not on GitHub.
+Tests establish only the properties they examine. The research guide's *Verification* chapter explains the complementary role of independent implementations, methodological review, and calibration. Passing tests alone establishes none of those broader conclusions.

@@ -2,35 +2,43 @@
 title: "Introduction"
 ---
 
-An AI agent is a language model with tools. This guide is about giving your agent more of them.
+This guide shows how to add tools to an agent you already use: tools for managing long computations, preserving software environments, producing documents, and connecting to approved research services.
 
-As installed, the agent in your project folder can read files, edit them, and run commands. That is already enough to do real work, which is what the companion guide, *Doing Research with AI Agents*, is about. But the commands it can run are only the ones your machine has, and a new machine has few. So the agent improvises: it runs a six-hour model fit inside a session that will not last six hours, installs packages where no one else can reproduce them, pastes an API key into a script. Each of these fails in a known way, and each has a known fix: a small, free program that does the job properly.
+An agent that can read files, edit them, and run your analysis software can already do useful research work. The companion guide, [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/), explains how to delegate and verify that work. Additional tools help when a task needs more support: a long fit needs a saved status record, a working analysis needs its package versions preserved, or a script needs a credential without storing it in the code.
 
-You will not run these programs yourself. The agent installs them, sets them up, and operates them. Several would be tedious to drive by hand, and most researchers never would. With an agent, that stops mattering. Your part is to decide what the agent may have, ask for it, tell the agent when to use it, set its limits, and check its work. Each section gives you the words for that.
+In Parts I–IV, you ask the agent to install, configure, and run the tools from the app. You decide which tools the project needs, what they may access, and whether their results meet the request. Each section provides a setup request and checks you can use. Steps requiring your sign-in, password, or approval are identified separately. Part V covers optional terminal use.
 
 ## Who this is for
 
-Researchers who already work with an agent and have hit a limit: a fit that died overnight, a simulation that would take a week run one job at a time, a key sitting in a script, an analysis nobody else can rebuild. You write R or Python for your own work. You are not a developer, and you do not need to have opened a terminal.
+Researchers who already work with an agent and have hit a limit: a fit that died overnight, a simulation that would take a week run one job at a time, a key sitting in a script, an analysis nobody else can rebuild. You may work in R, Python, or Stata. The general tools apply to all three; the environment and pipeline sections identify their language-specific routes. Stata users can retain a master do-file and recorded community-command versions without adopting another language. You do not need to have opened a terminal.
 
 We are Data Science Services at Harvard's Institute for Quantitative Social Science. What we recommend here is what we use every day. Where we describe something we do not use ourselves, we say that it comes from the vendor's documentation.
 
 ## What each section tells you
 
-Every tool section is built the same way: what the agent does *without* the tool, and how that goes wrong; what the tool *gives* the agent; whether you *need it yet*; what we *recommend*; the words to *ask for it*, with anything only you can do, and the lines to put in the agent's instruction file; how to *check that it's working*, including what goes wrong when an agent is the one operating it; and the *alternatives*, each with the situation in which it is the better choice.
+Each tool section explains the problem it solves, when you need it, the recommended path, and what to inspect after the agent uses it. Copyable requests help you start; examples show the files and results to expect. Existing tools that already meet your needs can stay.
 
-Part I is the ground and is worth reading once. After that, go by need. Most readers will want all of Part II and some of Part III, and can stop there.
+We favor tools with clear documentation, maintained releases, inspectable inputs and outputs, and a reproducible way to record configuration. We also consider institutional availability, data access, and the burden of maintaining the tool. Open-source and local tools are useful where they provide that control, but they are not requirements in every category.
+
+Read the common setup and access limits in Part I, then choose a small progression:
+
+1. Add search tools (§5) and GitHub access (§6) if useful for your current project.
+2. Preserve the project's environment (§9), give its existing commands clear names (§8), and add appropriate checks (§13).
+3. Add a queue (§7), document rendering (§10), or a pipeline runner (§11) when the work requires it.
+
+Check the built-in usage display early (§14); the additional tool for reviewing past usage is optional. Turn to connections, containers, or parallel agents when a task needs them. Section 19 explains how to keep a recoverable record of settings stored across your machine.
 
 ## The five Parts
 
-**Part I. What an agent has, and what it lacks.** Start here. These four sections are the ground everything else stands on: what an agent is and how it is extended, how tools get onto your machine, how the agent learns what it has, and how to keep what it can reach in proportion to what you trust it with.
+**Part I. What an agent has, and what it lacks.** Start with how an agent uses installed programs and connected services. Then learn how to add tools, give the agent instructions for using them, and configure their access limits.
 
-**Part II. The core set.** Six tools that pay for themselves in the first project. Together they replace the improvisations an agent falls back on: slow searching, changes that cannot be undone, jobs that die with the session, build steps worked out afresh each time, packages nobody else can reproduce, and results that never become a document.
+**Part II. Tools for recurring work.** Search, version control, queues, project commands, environments, and rendering. Choose the sections that solve a current problem; a queue or publishing engine is not a prerequisite for using an agent.
 
-**Part III. Reproducible and safe.** Part II gave the agent tools for getting work done. Part III is about work that holds up after the agent has gone. One idea runs through it: the agent helps you build the pipeline, but the pipeline runs without the agent. The steps, the keys, the checks, and the environment live in plain files in the project, so the work can be re-run, audited, and handed on whether or not any agent is running. The same sections bound what the agent can spend and reach while it helps.
+**Part III. Reproducible and safe.** Record the analysis steps, software requirements, and checks so the work can be repeated without reconstructing the agent conversation. These sections cover pipeline runners, credential handling, tests, usage reports, and containers for separate execution environments.
 
-**Part IV. Reaching further.** None of what follows is needed to start. These four sections are for when the core set is in place and the work asks for more: data that is not in files, a website with no API, two tasks that could run side by side, settings you want to be able to undo. Each one widens what the agent can touch, so read §4 before adding any of them.
+**Part IV. Reaching further.** Use these sections when the agent needs to query a service, inspect a website, work alongside another agent, or manage settings kept in several locations. Connections and parallel work require additional decisions about access and coordination. Read §4 before granting new access.
 
-**Part V. Working in the terminal yourself.** Nothing in Parts I to IV asks you to work in a terminal. The agent installs and runs every tool there, and the app is enough to ask for them and to check them. The exceptions are a few steps that need your password or your answer, where you paste a line the agent gives you (§2). This Part is for readers who want to work in a terminal themselves. §20 gives the reasons someone might. §21 to §25 describe the stack from the agent outward: the terminal, the shell, the multiplexer, and an editor beside them.
+**Part V. Working in the terminal yourself.** If you want to run commands or use Claude directly in a terminal, §20 introduces the basics and §21 walks through a first session. Sections 22–25 cover optional conveniences, including terminal panes, informative prompts, persistent sessions, and an editor for inspecting code and results.
 
 ## The tools, by what they let the agent do
 
@@ -44,9 +52,9 @@ Part I is the ground and is worth reading once. After that, go by need. Most rea
 | 2 | get tools onto the machine | [Homebrew]{.tool} |
 | 3 | know what it has, and when to use it | instruction files, skills |
 | 4 | work within limits you set | permission settings, the OS sandbox |
-| | **II. The core set** | |
+| | **II. Tools for recurring work** | |
 | 5 | find and read things fast | [rg]{.tool}, [fd]{.tool}, [jq]{.tool}, [yq]{.tool}, [bat]{.tool} |
-| 6 | undo anything, and work with GitHub | [git]{.tool}, [gh]{.tool} |
+| 6 | review and recover tracked files; work with GitHub | [git]{.tool}, [gh]{.tool} |
 | 7 | run long jobs in your own queue | [pueue]{.tool} |
 | 8 | use one command for every task in a project | [just]{.tool} |
 | 9 | pin the language and its packages | [rig]{.tool} + [renv]{.tool}; [uv]{.tool} |
@@ -56,14 +64,14 @@ Part I is the ground and is worth reading once. After that, go by need. Most rea
 | 12 | use keys and tokens without writing them down | [1Password]{.tool}, [direnv]{.tool} |
 | 13 | show you what it changed, and test it | test tools, [difftastic]{.tool} |
 | 14 | account for what it did and what it cost | usage and session tools |
-| 15 | work inside a box it cannot leave | a container |
+| 15 | limit a separate execution environment | a container |
 | | **IV. Reaching further** | |
-| 16 | reach data and services, and remember | MCP; memory |
+| 16 | reach approved data and services | MCP |
 | 17 | use a browser, and the screen | a browser connection; computer use |
 | 18 | work alongside other agents | [git]{.tool} worktrees |
 | 19 | keep your tools' settings under version control | [chezmoi]{.tool} |
 | | **V. Working in the terminal yourself** | |
-| 20 | (why you might, and why most readers need not) | |
+| 20 | learn the terminal basics and decide whether to use it | |
 | 21 | run in a terminal | [Claude Code]{.tool} |
 | 22 | | a terminal: [iTerm2]{.tool}; [Windows Terminal]{.tool} |
 | 23 | | a shell and prompt: [zsh]{.tool}, [Oh My Posh]{.tool} |
@@ -75,16 +83,14 @@ Part I is the ground and is worth reading once. After that, go by need. Most rea
 
 ## Macs, Windows, and Linux
 
-Everything here runs on macOS and on Ubuntu Linux. On Windows, that means Ubuntu running inside Windows through WSL2 (Windows Subsystem for Linux), which Microsoft ships and which §2 sets up. Inside it, every instruction in this guide is the same as on a Mac. We do not cover tools installed directly on Windows: several of them, and the agent's own safety sandbox, do not work there.
+The main routes are macOS and Ubuntu Linux. Windows readers use Ubuntu through WSL2 (Windows Subsystem for Linux), which §2 introduces. Platform-specific installation, authentication, and process behavior still need checking. Native Windows tools are outside this guide.
 
-How you talk to the agent does not change any of this. The app, an editor extension, and a terminal all drive the same agent, and it drives the same tools. Two things are worth knowing early if you use the app on Windows. According to the vendor's documentation (read September 2026), the app reaches tools inside WSL2 only in a *WSL session*, which you choose when you start a session; an ordinary Windows session will not see them. And in a WSL session the app's connectors are not available, which matters for §16. The same documentation says WSL sessions may be switched off on a computer your institution manages.
+The agent must run in the environment where its tools and files are available. An app session, an editor session, and a terminal session may have different paths, credentials, and supported connections. Two things are worth knowing early if you use the app on Windows. According to the vendor's documentation (read September 2026), the app reaches tools inside WSL2 only in a *WSL session*, which you choose when you start a session; an ordinary Windows session will not see them. And in a WSL session the app's connectors are not available, which matters for §16. The same documentation says WSL sessions may be switched off on a computer your institution manages.
 
 Day to day, we work on Macs, in the app and in the terminal, and one of us works in a terminal inside WSL2. What this guide says about the app on Windows and on Linux comes from the vendor's documentation.
 
 ## How this guide is kept current
 
-The parts age at different rates. Some rest on slow-moving foundations and we review them once a year: the package manager, version control, pinned environments, the queue, pipelines, secrets, permissions and sandboxing, document production. Others can change within a quarter, and we review them every six months: the agents themselves, the app and what it can reach, browser and computer use, MCP, and running several agents at once.
-
-What each section is *for* will outlast the tool it names. If a recommendation here has gone stale, the need it answers has not, and the section's alternatives are the first place to look.
+The parts age at different rates. Permission settings, authentication, app interfaces, and institutional policy need checking at each release and before consequential use. The underlying purposes of version control, queues, and recorded environments change more slowly. Links point to primary documentation so the installed version can be checked.
 
 This edition was reviewed in September 2026.

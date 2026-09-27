@@ -1,0 +1,43 @@
+---
+title: "6. Review and recover tracked files: git and `gh`"
+---
+
+Git records versions of files you deliberately track, so you can review changes and recover earlier work. This chapter builds on the research guide's commit-and-review routine: it covers GitHub access through `gh`, a small review exercise, and precautions for repositories in cloud-synced folders. Add GitHub access only when the project needs collaboration or an approved remote copy.
+
+## What the tools give the agent
+
+A git diff shows how tracked text changed. A commit records an inspectable version. Neither can undo an external upload, a database change, an overwritten untracked file, or exposure of confidential data. Keep backups and access controls appropriate to those risks.
+
+The GitHub command-line tool, `gh`, lets the agent inspect issue reports, proposed changes called pull requests, and checks run by GitHub. It can also prepare changes for collaborators. Decide whether the files may be sent to the hosting service before creating or using a remote repository; private repositories still transfer their contents there.
+
+## Set up access only when needed
+
+Use your lab's existing host. For GitHub, we recommend `gh` with HTTPS authentication. The [authentication manual](https://cli.github.com/manual/gh_auth_login) explains its browser flow and credential storage: it uses the system credential store when available, but can fall back to a plain-text file. Check the reported storage location rather than assuming a keychain is in use.
+
+> Install gh if needed and check this repository's existing remote and authentication configuration. Help me sign in through the browser without pasting a token into chat. Configure git's HTTPS credential integration if appropriate. Report authentication status and the credential storage method without showing a secret. Do not create a remote or push files yet.
+
+You complete the browser sign-in. Have the agent inspect existing name and email settings before changing them. Keep functioning SSH or institutional-host authentication if there is no reason to replace it.
+
+## Check a small change
+
+Ask the agent to show the repository status, make an agreed edit to a practice file, and display its diff. After review, have it stage that file by name, selecting it for the commit, and inspect the proposed file list before committing. If the repository already contains uncommitted changes, identify and preserve them. Leave unrelated work untouched.
+
+For GitHub, start with a read-only operation such as inspecting the approved repository. A blocked call may reflect network, credential-store, or sandbox restrictions. Review that route under §4 rather than exempting all git and GitHub operations from the sandbox.
+
+Standing instructions: inspect status before editing; preserve unrelated changes; stage intended files; review the outgoing diff before a push; obtain approval before publishing or rewriting shared history.
+
+## Keep repository internals out of cloud synchronization
+
+Git's internal `.git` directory changes frequently and should not be treated as a cloud-synced working document. For a new repository under Dropbox on macOS, the local procedure used here is to initialize it, exclude `.git` before the first commit, and verify the exclusion:
+
+```
+git init
+xattr -w com.dropbox.ignored 1 .git
+xattr -p com.dropbox.ignored .git
+```
+
+Run and check these steps separately. The last command should report `1` before any commit populates the repository history. The same before-population rule applies to generated libraries and large caches. This is Dropbox-specific, not a command for other sync services.
+
+If Dropbox has already indexed a populated directory, adding the attribute is not a reliable way to remove its existing contents from synchronization. Do not repeatedly rebuild that directory while trying to exclude it. Move the generated storage outside the synced tree, preserving needed files, and use an appropriate link or configuration path. An existing repository requires a checked migration, not deletion of its history.
+
+In WSL2, keep the repository and its git operations inside the Linux environment. Do not alternate Windows and Linux tools over the same working directory without checking filesystem, credential, and line-ending behavior.

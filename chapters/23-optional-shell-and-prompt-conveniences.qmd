@@ -1,0 +1,17 @@
+---
+title: "23. Optional shell and prompt conveniences"
+---
+
+A shell interprets commands, and its prompt marks where you enter the next one. This chapter shows how an optional Oh My Posh prompt can display the current directory, git branch, and failed-command status, helping you check where you are before acting. Keep the shell your machine already provides: usually zsh on a current Mac, and often bash in Ubuntu.
+
+## Add information before decoration
+
+The useful question is whether you can tell which project and branch a command will affect. First use `pwd` and `git status`. If you switch projects often, a prompt that displays that information can help prevent mistakes.
+
+[Oh My Posh](https://ohmyposh.dev/docs/) is the configurable prompt used here. It can work with an existing shell; adopting it does not require replacing the shell or adding a framework such as Oh My Zsh. Keep a simple existing prompt if it already provides the information you need.
+
+> Preserve my existing shell startup files and show the proposed diff. If a prompt change would help, configure Oh My Posh to show the directory, git branch, and failed-command status. Test a fresh shell and explain how to restore the previous prompt. Do not replace unrelated aliases or environment settings.
+
+Shell startup files execute commands, so review changes before opening a fresh shell. A harmless prompt change should not add credentials, start services, or change which R or Python a project uses. Test both your interactive shell and the agent's actual execution environment; they may load different startup files.
+
+Further interactive conveniences can wait until you have a repeated need. They are not prerequisites for agent work, and installing a collection of aliases can make copied commands harder to understand.

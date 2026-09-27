@@ -1,0 +1,30 @@
+---
+title: "24. Keep terminal sessions available: Zellij"
+---
+
+Zellij groups terminal panes into a named session that you can leave and return to from another terminal window. This chapter shows how to try that with a harmless session and explains what continues running while you are away. It is useful when closing a window or losing a remote connection would otherwise disrupt your working layout.
+
+## Try a session without important work
+
+After installing Zellij through the selected package manager, create a practice session:
+
+```
+zellij --session practice
+```
+
+Use the on-screen key hints to create a second pane and detach. In another terminal window, inspect and reattach:
+
+```
+zellij list-sessions
+zellij attach practice
+```
+
+Check that both panes and their harmless contents remain. The [Zellij user guide](https://zellij.dev/documentation/) documents keybindings and configuration; use the installed version's hints if a custom configuration changes them.
+
+## Separate the session from the job
+
+Detaching leaves the session's processes running while the host and session remain available. It does not protect against shutdown, lost storage, or a program failure. Restoring a layout after a restart is different from resuming the processes that previously occupied it.
+
+Use pueue for a local job's submission record and result (§7), or the institutional scheduler on a cluster. Zellij provides a convenient place to inspect those jobs and their logs. On a remote machine, the session lives there; reconnecting your laptop does not revive a remote process that has died.
+
+Keep an established multiplexer if it already works for you. The useful check is being able to detach and recover a harmless session before relying on it during important work.

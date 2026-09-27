@@ -1,0 +1,31 @@
+---
+title: "15. Run in a separate environment: containers"
+---
+
+A container provides a separate software environment in which to run a program. This chapter covers two uses: packaging an analysis so a collaborator can run it, and restricting the resources available to unfamiliar code. It explains how to have the agent propose a configuration and check each purpose separately. The folders, credentials, network access, and privileges you provide determine what code inside can reach.
+
+## What it gives the agent
+
+A Dockerfile is a recipe for building the environment from a starting image, system packages, research-language dependencies, and project files. The resulting *image* is the packaged software used to start a container. Sharing it can help a collaborator run the same software. The Dockerfile alone does not preserve package repositories, external services, hardware behavior, or downloads whose versions were not fixed.
+
+A folder shared from your computer into the container is called a *host mount*. If that mount is writable, code in the container can change the files in it. Supplied credentials are also available to that code. Broad system privileges or access to Docker's control socket can defeat much of the intended separation. Review [Docker's security model](https://docs.docker.com/engine/security/) and [bind mounts](https://docs.docker.com/engine/storage/bind-mounts/) when deciding what the container may access.
+
+## The recommended route
+
+On a Mac, Colima with the Docker CLI is the command-line setup used here. Follow [Colima's setup](https://github.com/abiosoft/colima) for the current supported route. On Ubuntu or WSL2, use a supported Docker Engine installation. Keep an institutionally managed Docker Desktop installation if it is already approved and suitable; there is no need to replace it to follow this chapter.
+
+Containers are optional for an ordinary analysis with an adequate environment record. They become useful when system dependencies are difficult to reproduce, a collaborator needs a portable environment, or code needs a more restricted execution space.
+
+## Ask for a limited first run
+
+> Propose a container configuration for this reproduction package. List every host mount, its read/write status, network access, credentials, and runtime privileges. Start with a harmless test, no credentials, and only the required input mounted read-only plus a separate output directory. Show that allowed output works and that an unmounted practice file is inaccessible before running the package.
+
+For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§9). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
+
+## Check both uses separately
+
+A successful reproduction establishes that this build ran under this configuration. It does not show the container safely contains arbitrary untrusted code. Conversely, blocking access to a test file does not establish that numerical results match the original analysis.
+
+Inspect mounts and privileges before each materially different workload. Do not mount the whole home directory for convenience. A container used to build a trusted project may reasonably have different access from one used to inspect an unknown replication package; label and review those configurations separately.
+
+For institutional clusters, use the runtime the service supports, often Apptainer, with the research-computing team's instructions. Container installation and its daemon can require privileges outside the agent's ordinary sandbox (§4); approval for that setup is separate from permission to run every future container.

@@ -1,0 +1,17 @@
+---
+title: "25. An editor beside the agent: Positron"
+---
+
+Positron is an optional editor for inspecting R or Python code, data, and plots in one window. This chapter shows how to open a project in its recorded environment and review changes made by an agent working in the app or terminal. Keep RStudio, Stata, or an existing editor when it already supports your work.
+
+## Open an existing project
+
+Install through [Positron's official site](https://positron.posit.co/) if you want to try it, then open a practice project folder. Select the R or Python interpreter that belongs to the recorded project environment (§9). Confirm the version and library path before executing code; an editor can discover several installations.
+
+Run a small existing analysis, inspect a dataframe in the [Data Explorer](https://positron.posit.co/data-explorer), and view its saved plot. Filtering or sorting the displayed table is useful for inspection, but those temporary views do not replace reproducible cleaning code.
+
+## Review the agent's work in the editor
+
+Have the agent make a small agreed change through your existing app or terminal session. Inspect the changed file, its diff, and its output in Positron. Both programs are working on the same files, so avoid simultaneous conflicting edits.
+
+An AI extension or database connection is a separate addition with its own access and account requirements. You do not need one for this workflow. Keep the initial trial focused on whether the editor makes code, data, and results easier for you to inspect.

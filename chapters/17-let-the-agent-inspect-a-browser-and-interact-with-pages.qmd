@@ -1,0 +1,27 @@
+---
+title: "17. Let the agent inspect a browser and interact with pages"
+---
+
+Browser access is useful for checking a rendered report or carrying out a limited interaction that a direct download cannot provide. For data acquisition, first follow the research guide's *Getting data* chapter: prefer a documented API or export when it meets the need and is permitted.
+
+## The recommended starting point
+
+Use [Playwright MCP](https://github.com/microsoft/playwright-mcp) for a browser the agent controls in a separate profile. Start with a local report or a public test page, without account credentials. A separate browser profile helps avoid accidental use of your existing logins, but is not a complete security boundary.
+
+The agent can inspect page structure, navigate, interact, and capture evidence of the rendered result. For a report, ask it to compare a displayed number with the saved result and inspect a figure at the size readers will see. Reading HTML alone cannot establish that the layout is usable.
+
+> Configure the official Playwright MCP server for this project using a reviewed version. Open the local test report in a separate browser profile with no signed-in accounts. Inspect the table, figure, and navigation. Report concrete problems with screenshots or page locations, and compare one displayed result with its source file.
+
+Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §4 and configure them under §16.
+
+## When the browser needs an account
+
+Claude's browser integration can work in a signed-in browser when the account and interface support it. Follow the current [Chrome integration documentation](https://code.claude.com/docs/en/chrome) and institutional approval process. Grant the specific site access needed for the task, and review consequential actions such as submitting a form or changing a record.
+
+Whatever the agent reads may become part of model processing. Do not expose participant portals, private correspondence, or other confidential systems merely because you can open them yourself. A web page can also carry malicious instructions; account access increases what following them could affect.
+
+## Make recurring collection reproducible
+
+An agent can help discover a permitted route and prototype the interaction. Once the collection steps are stable, save a script, inputs, outputs, and failure handling. Test it on a small sample before increasing volume. Browser-driven collection can be reproducible, but a conversational record of clicks alone is a weak reproduction package.
+
+Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§15). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.

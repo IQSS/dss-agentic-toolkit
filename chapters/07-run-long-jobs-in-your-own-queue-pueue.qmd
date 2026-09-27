@@ -2,67 +2,61 @@
 title: "7. Run long jobs in your own queue: pueue"
 ---
 
-**We recommend** `pueue`. **Alternatives:** `targets` with `crew`, GNU `parallel`, `nohup`, a cluster scheduler.
+**We recommend** pueue when the agent needs to manage long computations on your machine and check them later. It keeps a record of submitted jobs, their output, and their status, and limits how many run at once. This chapter covers setting up the queue, choosing that limit, and verifying completion.
 
 ## Without it
 
-Ask an agent to fit a `brms` model that takes six hours and it starts the fit inside its own session. Sessions end: the context fills and compacts, you clear the conversation, the app reclaims an idle shell. When the session goes, the operating system tells every process it started to stop, and the fit stops with them, mid-chain, with nothing logged. You find out the next morning.
-
-The second failure is slower. A calibration study is 400 runs and the laptop has twelve cores. Left to itself, the agent runs them one after another, which takes a week, or starts all 400 at once, which takes the machine down.
+A long fit started from an agent session can be interrupted or become difficult to monitor from a later session. Even if the fit continues, the agent may have no reliable record of its progress. Starting many fits at once can also exhaust memory or make them compete for the same processor capacity.
 
 ## What it gives the agent
 
-A queue that belongs to the machine, not to the session. `pueue` runs a small background service that starts at login. A job the agent hands to it becomes the service's job, so nothing that happens to the agent's session can reach it. The queue holds as many jobs as you like, runs a set number at a time, and starts the next the moment one finishes, so every core stays busy until the list is empty. It keeps each job's output and its result, and reports both in a form the agent can read, so the agent can tell you what is running, what finished, and what failed.
+[Pueue](https://github.com/Nukesor/pueue) separates submission from execution. A background service owns the jobs, records their commands and working directories, limits simultaneous runs, and retains their output and outcomes. The agent can leave the submission session and inspect the same job later.
+
+Because the queue service runs the job, closing the submitting conversation or terminal need not stop it. The machine must still be awake and the service available; a reboot or WSL shutdown can stop the computation. After an interruption, inspect the queue and output files before restarting. A queue record tells you what happened to a job, but resuming a fit partway through requires progress saved by the fitting program itself.
 
 ## Do you need it yet?
 
-Yes, if anything you run outlasts a sitting, or if you have more runs than cores. That covers Bayesian fits, simulation and calibration studies, scrapes, and long builds.
-
-No, if your jobs finish in a few minutes. The agent's ordinary background tasks are enough for those.
-
-You do not need a cluster for this. A queue on your own machine keeps your existing workflow: the same project folder, the same packages, no second environment to maintain.
+Use it for recurring long fits, substantial simulations, or a batch of independent jobs. For a short task, the agent can run the command directly and read its outcome before continuing. Keep an established cluster scheduler for work already running on a cluster.
 
 ## What we recommend
 
-`pueue`, with the number of parallel jobs set a little below your core count. It is free, it behaves the same on macOS and Ubuntu, and it keeps its state in plain files.
+Install pueue and configure its service for your platform. Start with one concurrent job. Measure peak memory and threads for a representative run, then set a limit that leaves capacity for the machine's other work. Four fits using four threads each are sixteen competing threads, even though the queue shows only four jobs.
 
-One thing to know: a queued job runs as you, outside whatever limits you have set on the agent (§4). The agent's permission rules see the command that submits the job, not what the script does once it runs. Have the agent show you a script before it queues one you have not read.
+A queued job runs with the queue service's permissions, outside the agent's command sandbox (§4). Review the command that will start it, the inputs it may read, and where it will write outputs. The queue manages execution; it does not impose the agent's access restrictions on the job.
 
 ## Ask for it, and tell the agent
 
-> Install pueue and set its service to start when I log in. Set it to run ten jobs at a time. Then add to my global instruction file the rules for long jobs below.
+> Install pueue and configure the service for this machine. Start with one job at a time. Demonstrate it with a harmless short job, recording the task ID, working directory, log, and final result. Before queuing research jobs, inspect their memory and thread requirements and propose a concurrency limit. Explain the service's access and any sandbox exception needed; do not add a blanket exemption.
 
-The standing lines for the instruction file:
-
-- Any job that might run longer than five minutes goes to `pueue`, never into your own session.
-- For many similar runs, queue them all as one group and let the queue pace them.
-- Never tell me a job is running, or finished, without checking its status first.
+Add these standing instructions: submit long jobs through the agreed queue; record each task ID; confirm actual status before reporting progress; read the final outcome and inspect the expected artifact before claiming success.
 
 ## Check that it's working
 
-Ask: *what is in the queue?* A good answer lists each job with its state (queued, running, done, failed) and, for a failed job, the last lines of its output.
-
-What goes wrong when an agent operates it:
-
-- **It reports success for a job that crashed.** `pueue wait` returns the same exit code whether the job succeeded or failed, so an agent that checks only that will say "done" either way. The result has to be read from the queue's status. This is what the agent should run:
+If the project has a saved `just` recipe named `fit` (§8), the agent can submit it to the queue, inspect its status, and read its output with these commands:
 
 ```
-pueue wait $ID
-OK='.tasks[$id].status.Done.result == "Success"'
-pueue status --json | jq -e --arg id "$ID" "$OK" >/dev/null \
-  && echo DONE || { echo FAILED; pueue log $ID; }
+FIT_TASK=$(pueue add --print-task-id -- just fit)
+pueue status
+pueue log "$FIT_TASK"
 ```
 
-- **The agent's sandbox blocks the queue.** `pueue` talks to its service through a socket the command sandbox (§4) does not allow by default. The symptom is an agent that says the service is not running when it is. §4's settings include the exemption.
-- **A `targets` pipeline sits at full CPU and writes nothing.** That is a separate problem with one fix, in §11.
+The task may first be queued, then running, then complete. “Submitted” establishes only that the queue accepted it. While it runs, look for an advancing log or expected intermediate output. At completion, inspect both the stored result and the fit artifact.
 
-## Alternatives, and when to choose them
+This is the outcome check for the JSON shape used by pueue 4.0.4:
 
-- **`targets` with `crew`** (§11), when the parallel work is steps inside one R pipeline. The two combine: `targets` runs the steps in parallel, and `pueue` holds the pipeline so it outlives the session.
-- **GNU `parallel`**, for a one-off batch you will watch finish. It paces the runs but keeps no record, and it dies with the session.
-- **`nohup`**, for a single job on a machine where you cannot install anything. It survives the session, but there is no queue and no status, so the agent has to watch a log file.
-- **A cluster scheduler**, if you already have a cluster workflow you are happy with, or the job does not fit on your machine. We do not assume one.
+```
+pueue wait "$FIT_TASK"
+pueue status --json | jq -e --arg id "$FIT_TASK"   '.tasks[$id].status.Done.result == "Success"'
+```
+
+`pueue wait` does not establish success; it returns after waiting even when a task fails. If the result is unsuccessful or the expected artifact is absent, read the log and report the failure. Do not resubmit repeatedly without checking whether an earlier process is still active.
+
+The common setup failures are an absent service, a blocked service socket, and a command running from the wrong directory or environment. Distinguish them from a model error. For the observed macOS R hang, use §8's troubleshooting procedure for both direct and queued execution until your route is verified.
+
+## If you already use a runner
+
+Targets and Snakemake (§11) manage dependencies within a pipeline; pueue can submit the outer pipeline command. A cluster scheduler manages jobs on institutional compute. Keep these roles distinct rather than installing a second queue to replace a working one.
 
 ## On Windows (WSL2) and Linux
 
-Homebrew runs the service through `systemd` instead of macOS's `launchd`. You ask for it in the same words. Microsoft's documentation says the current Ubuntu from `wsl --install` has `systemd` on by default, and that a `systemd` service does not keep WSL2 alive: ask the agent to confirm that a queued job outlives the session.
+Use the service inside the same environment as the project. In WSL2, verify its lifetime explicitly: Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) notes that systemd services do not keep a WSL instance alive. Do not promise an overnight job will survive closing Windows or shutting down the distribution.

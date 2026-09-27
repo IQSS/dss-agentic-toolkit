@@ -1,0 +1,25 @@
+---
+title: "14. Understand usage: the built-in display and ccusage"
+---
+
+Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill.
+
+## What to inspect first
+
+Check the app's usage controls or the terminal's `/usage` command. Limits depend on the account and can change; use the current [Claude usage guidance](https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits) and your institutional plan rather than a fixed number in this guide.
+
+Long conversations, large inputs and outputs, model choice, and reasoning effort can increase usage. A model fit computing on your laptop does not itself consume language-model tokens merely because time passes. Repeatedly asking the agent for progress updates or having it read large logs can create additional calls to the language model.
+
+## What ccusage adds
+
+[ccusage](https://ccusage.com/guide/) summarizes compatible local logs by periods and sessions. Its coverage depends on which sessions were logged, retained, and available on this machine. Deleted logs, work on other machines, and unsupported interfaces can leave gaps. Cost estimates depend on the tool's pricing assumptions and are not an invoice.
+
+> Check Claude's built-in usage information first. If the retained logs can answer my question, use a reviewed version of ccusage to summarize this week's largest sessions. Report the covered dates and missing sources. Separate measured token totals from hypotheses about why a session was expensive. Do not upload the logs or quote confidential contents.
+
+Review and record the package version before running it. A package executed through npx is still downloaded code, even if it is not installed permanently.
+
+## Use the result to change a habit
+
+Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§7).
+
+A missing session is a coverage problem to investigate, not evidence of zero use. Retained logs may themselves contain confidential material; apply the project's access and retention rules to them.
