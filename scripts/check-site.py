@@ -5,8 +5,9 @@ Used by both sites from CI, after `quarto render`. See
 training/dss-training-ops/docs/plans/2026-08-30-agentic-sites-conversion-plan.md, Phase 4.
 
 Every failure this looks for is one that leaves a page that renders fine and reads wrong: an authoring
-note in the page source, a figure that 404s, a cross-reference to a chapter that moved. None of them
-would fail a render, which is why they need a check of their own.
+note in the page source, a figure that 404s, a cross-reference to a chapter that moved, a landing-page
+control whose chapter was retitled. None of them would fail a render, which is why they need a check
+of their own.
 
     check-site.py [--site _site] [--source source]
 
@@ -31,7 +32,7 @@ def normalise(text: str) -> str:
     return " ".join(text.split())
 
 
-def check(site: Path, source_dir: Path) -> list[str]:
+def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     problems: list[str] = []
     pages = sorted(site.rglob("*.html"))
     if not pages:
@@ -116,6 +117,20 @@ def check(site: Path, source_dir: Path) -> list[str]:
         for stray in re.findall(r"§\d+[a-z]?", prose):
             problems.append(f"{page.relative_to(site)}: {stray} is not a link — "
                             "no such chapter in _quarto.yml's chapter-map?")
+    # 7. Every console recipe points at a chapter that exists. The landing page is a hand-drawn
+    # console (console.js on the research site, garage.js on the toolkit site) whose controls link to
+    # chapters by slug, and it builds those links in JavaScript at runtime -- so they never appear in
+    # the rendered HTML and check 4 cannot see them. A retitled chapter changes its slug and leaves
+    # the recipe pointing at nothing, which is exactly how the landing page went stale on 2026-09-27
+    # while every static link resolved. Checked against chapters/*.qmd, the sync's output, rather
+    # than against _site: Quarto never prunes _site, so a stale render of the old slug can still be
+    # sitting there and would let a dead recipe pass.
+    chapters = {p.stem for p in (root / "chapters").glob("*.qmd")}
+    for js in sorted(root.glob("*.js")):
+        for slug in re.findall(r'slug:\s*"([^"]+)"', js.read_text(errors="replace")):
+            if slug not in chapters:
+                problems.append(f"{js.name}: recipe slug {slug} has no chapters/{slug}.qmd — "
+                                "a retitled or removed chapter; update the console's recipe list")
     return problems
 
 
@@ -135,7 +150,9 @@ def main() -> None:
     if not source_dir.is_dir():
         sys.exit(f"error: no source copy at {source_dir}")
 
-    problems = check(site, source_dir)
+    # The site root is the parent of the source copy: the console file and chapters/ live there,
+    # and _site does not (locally it is a symlink to a build directory outside the repository).
+    problems = check(site, source_dir, source_dir.parent)
     if problems:
         print(f"{len(problems)} problem(s) in the rendered site:")
         for p in problems[:40]:
@@ -145,7 +162,8 @@ def main() -> None:
         sys.exit(1)
     pages = len(list(site.rglob("*.html")))
     print(f"rendered site is clean: {pages} pages, no leaked comments, no raw LaTeX, "
-          "every image and link resolves, every section reference in prose is a link")
+          "every image and link resolves, every section reference in prose is a link, "
+          "every console recipe points at a chapter")
 
 
 if __name__ == "__main__":

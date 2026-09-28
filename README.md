@@ -1,4 +1,4 @@
-# dss-agentic-toolchain
+# dss-agentic-toolkit
 
 An opinionated map of the tools that compose an agentic-AI working surface, organized by function.
 

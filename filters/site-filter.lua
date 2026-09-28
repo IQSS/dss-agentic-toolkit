@@ -1,6 +1,6 @@
 --[[ site-filter.lua — everything the two agentic-AI sites need that is genuinely HTML-only.
 
-Shared by dss-agentic-research and dss-agentic-toolchain; wired into each `_quarto.yml` under
+Shared by dss-agentic-research and dss-agentic-toolkit; wired into each `_quarto.yml` under
 `filters:`. See dss-training-ops/docs/plans/2026-08-30-agentic-sites-conversion-plan.md, Phase 3.
 
 It runs at render time rather than at sync time on purpose: the chapters are byte-for-byte slices of
