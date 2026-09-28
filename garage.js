@@ -452,10 +452,11 @@
     a.insertBefore(el("rect", Object.assign({ class: "hit" }, frame)), a.firstChild);
     el("rect", Object.assign({ class: "ring" }, frame), a);
     const tg = el("g", { class: "tag", transform: "translate(" + o.tag[0] + "," + o.tag[1] + ")" }, a);
-    const wd = n.length > 1 ? 42 : 35;
+    // The tag carries the section number only; Part membership is the legend's and the readout's job
+    // (the per-tag colour dot was dropped 2026-09-27 as too small to read against the wall).
+    const wd = n.length > 1 ? 34 : 28;
     R(tg, -wd / 2, -8.5, wd, 17, "none", { rx: 4 });
-    C(tg, -wd / 2 + 8, 0, 3.2, GROUPS[ch.group].dot);
-    const tx = el("text", { x: 4, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§" + n;
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§" + n;
     return a;
   }
 
@@ -525,9 +526,8 @@
     el("rect", Object.assign({ class: "hit" }, frame), a);
     el("rect", Object.assign({ class: "ring" }, frame), a);
     const tg = el("g", { class: "tag", transform: "translate(1150,560)" }, a);
-    R(tg, -17.5, -8.5, 35, 17, "none", { rx: 4 });
-    C(tg, -9.5, 0, 3.2, GROUPS[ch.group].dot);
-    const tx = el("text", { x: 4, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§1";
+    R(tg, -14, -8.5, 28, 17, "none", { rx: 4 });
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§1";
   })();
 
   const lg = document.getElementById("legend");
@@ -597,7 +597,7 @@
   }
   const find = a => byN(a.dataset.n);
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (!fine) roHow.textContent = "Tap one to read it, and tap it again to open it.";
+  if (!fine) roHow.textContent = "Tap one to see what it covers, and tap it again to open that chapter.";
   document.querySelectorAll(".hot").forEach(a => {
     a.addEventListener("click", e => {
       if (fine) return;                          // pointer: hover previews, a press opens the section
