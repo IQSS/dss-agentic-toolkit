@@ -29,4 +29,6 @@ materials themselves.
 
 ## License
 
-CC BY 4.0.
+Code is MIT, see `LICENSE`: the scripts, the Lua filters, the site configuration, and the landing
+page's JavaScript and CSS. The guide's text and figures are CC BY 4.0, see `LICENSE-content`. The code
+examples inside the guide are MIT too, so they can be copied into a project without attribution.
