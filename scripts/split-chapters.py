@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Slice a single-file document into one Quarto page per chapter.
 
-Used by both agentic-AI sites (dss-agentic-research, dss-agentic-toolchain) from their `just sync`.
+Used by both agentic-AI sites (dss-agentic-research, dss-agentic-toolkit) from their `just sync`.
 See training/dss-training-ops/docs/plans/2026-08-30-agentic-sites-conversion-plan.md, Phase 2.
 
 The chapters are *slices*, not renderings. This script never round-trips the markdown through

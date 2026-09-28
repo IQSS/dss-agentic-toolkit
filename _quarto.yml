@@ -24,8 +24,8 @@ website:
   title: "Extending Your Agent's Toolkit"
   # Cloudflare Pages, direct upload from `just deploy`. Behind Cloudflare Access while the
   # content is polished; it changes if the site ever moves to IQSS.
-  site-url: https://dss-agentic-toolchain.pages.dev
-  repo-url: https://github.com/stevenworthington/dss-agentic-toolchain
+  site-url: https://dss-agentic-toolkit.pages.dev
+  repo-url: https://github.com/stevenworthington/dss-agentic-toolkit
   page-navigation: true
   sidebar:
     style: floating

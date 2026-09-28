@@ -8,7 +8,7 @@ verify: check-upstream check
 # re-runs, and the checks below fail until it does.
 sync:
     ../dss-training-ops/scripts/split-chapters.py \
-      --upstream ../../publishing/agentic-ai-tool-chain \
+      --upstream ../../publishing/agentic-ai-toolkit \
       --site .
 
 # Is this site current with the upstream document and the shared tooling? Green means `just sync`
@@ -16,7 +16,7 @@ sync:
 # would put a credential in the workflow -- so it is asked here, by whoever is working in the repo.
 check-upstream:
     ../dss-training-ops/scripts/check-upstream.py --site . \
-      --upstream ../../publishing/agentic-ai-tool-chain \
+      --upstream ../../publishing/agentic-ai-toolkit \
       --tooling ../dss-training-ops/scripts
 
 # Build the site into _site
@@ -41,7 +41,7 @@ preview:
 watch:
     #!/usr/bin/env bash
     set -euo pipefail
-    up=../../publishing/agentic-ai-tool-chain
+    up=../../publishing/agentic-ai-toolkit
     sync="../dss-training-ops/scripts/split-chapters.py --upstream $up --site . --allow-dirty"
     $sync
     watchexec --watch "$up/source" --watch "$up/figures" --exts md,svg -- $sync &
@@ -49,7 +49,7 @@ watch:
     trap 'kill "$watcher" 2>/dev/null || true' EXIT INT TERM
     quarto preview
 
-# Publish to Cloudflare Pages -- project `dss-agentic-toolchain`, https://dss-agentic-toolchain.pages.dev
+# Publish to Cloudflare Pages -- project `dss-agentic-toolkit`, https://dss-agentic-toolkit.pages.dev
 # Direct upload, deliberately not a git integration: CI renders and checks but never publishes, so no
 # Cloudflare credential lives in the workflow. It depends on `verify`, so a site that is stale against
 # its upstream document, or that fails either check, cannot be published by accident.
@@ -62,4 +62,4 @@ deploy: verify
     set -euo pipefail
     export CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-$(op read 'op://Credentials/cloudflare-api-token-dss-pages/credential')}"
     export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-$(op read 'op://Credentials/cloudflare-api-token-dss-pages/username')}"
-    wrangler pages deploy _site --project-name dss-agentic-toolchain --branch main
+    wrangler pages deploy _site --project-name dss-agentic-toolkit --branch main
