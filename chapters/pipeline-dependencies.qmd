@@ -1,8 +1,10 @@
 ---
-title: "11. Re-run only what changed: targets and Snakemake"
+title: "8. Rerun only affected steps: targets and Snakemake"
 ---
 
-When an analysis has expensive steps, you may want to rerun only the work affected by a change. A pipeline runner records those dependencies and decides what needs updating. This chapter explains how to have the agent build and check a small pipeline: targets for R, or Snakemake for a file-based workflow spanning several programs. A short analysis may need only its existing master script.
+When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change.
+
+In the heat-and-birthweight project, changing specification B should rerun fit B and the figure that uses it, while reusing fit A. Changing the common cleaning rule should affect both fits. Targets for R and Snakemake for file-based workflows can implement those relationships; a short project may need only its existing master script.
 
 ## What a pipeline runner does
 
@@ -35,10 +37,10 @@ A first pipeline can call your existing scripts. It may then treat a whole scrip
 
 For targets, inspect `tar_outdated()` and the graph. For Snakemake, use `snakemake -n` for a dry run. Test the three changes in the table on a small invented dataset, compare the predicted and actual reruns, and confirm unchanged outputs are reused. Neither route has been tested as a complete new-installation walkthrough for this edition; verify it in the project's environment.
 
-For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§7). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; §8 gives the conservative troubleshooting baseline without separate workers.
+For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§9). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix A gives the conservative troubleshooting baseline without separate workers.
 
-These tools do different parts of the work. A just recipe (§8) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§7) manages submission and execution of the overall job.
+These tools do different parts of the work. A just recipe (§6) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§9) manages submission and execution of the overall job.
 
-![](figures/detachable-pipeline.svg){#fig-detachable-pipeline fig-alt="A project command invokes a dependency runner; a queue can manage that outer job. Dependency tracking, process lifetime, and execution permissions require separate checks." above="18pt" below="16pt"}
+![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="Analysis data feed fits A and B. Both feed a figure. A change to fit B reruns that branch and the figure while fit A is reused."}
 
-Keep generated caches out of git and configure cloud-sync exclusions before populating them (§6). Required validation scripts and environment records remain part of the reproducible project, even when their generated results are cached. Keep an established pipeline framework if it already supplies the needed dependency tracking and execution record.
+Keep generated caches out of git and configure cloud-sync exclusions before populating them (§4). Required validation scripts and environment records remain part of the reproducible project, even when their generated results are cached. Keep an established pipeline framework if it already supplies the needed dependency tracking and execution record.

@@ -11,67 +11,60 @@
   const v = n => "var(--g-" + n + ")";
 
   const GROUPS = {
-    I:   { name: "Part I",   long: "I · What an agent has, and what it lacks", dot: v("foundation") },
-    II:  { name: "Part II",  long: "II · The core set",                        dot: v("language") },
-    III: { name: "Part III", long: "III · Reproducible and safe",              dot: v("control") },
-    IV:  { name: "Part IV",  long: "IV · Reaching further",                    dot: v("agents") },
-    V:   { name: "Part V",   long: "V · Working in the terminal yourself",     dot: v("surface") },
+    I:   { name: "Part I",   long: "I · Set up and protect the work", dot: v("foundation") },
+    II:  { name: "Part II",  long: "II · Run and reproduce the work",                        dot: v("language") },
+    III: { name: "Part III", long: "III · Extend access and coordinate work",              dot: v("control") },
+    IV:  { name: "Part IV",  long: "IV · Optional terminal work",                    dot: v("agents") },
+    V:   { name: "Reference",   long: "Reference",     dot: v("surface") },
   };
 
   // ---- sections: the tool that stands for each, and what the corkboard says about it ----
   // Slugs are the site's chapter file names: a retitled chapter needs its slug updated here by hand.
   const CH = [
-    { n: "1", group: "I", slug: "01-an-agent-is-a-model-with-tools", title: "An agent is a model with tools", tool: "the robot",
-      body: "What an agent is, what a plain machine gives it, and the three ways to give it more: programs, connections, and instructions." },
-    { n: "2", group: "I", slug: "02-get-tools-onto-the-machine-homebrew", title: "Get tools onto the machine", tool: "the workbench",
-      body: "Every tool arrives through a package manager, the one thing the agent cannot fetch for itself. The few steps only you can do, on a Mac and on Windows." },
-    { n: "3", group: "I", slug: "03-tell-the-agent-what-it-has-and-when-to-use-it", title: "Tell the agent what it has and when to use it", tool: "the clipboard",
-      body: "An installed tool does nothing until the agent knows to reach for it: the file it reads every session, and what a standing line looks like." },
-    { n: "4", group: "I", slug: "04-keeping-the-agents-reach-in-proportion-permission-settings-and-the-os-sandbox", title: "Keeping the agent's reach in proportion", tool: "the locked cabinet",
-      body: "More tools means more reach, for mistakes too. Deny rules, approval prompts, and the sandbox, set before the tools arrive." },
-    { n: "5", group: "II", slug: "05-find-and-read-things-fast-rg-fd-jq-yq-bat", title: "Find and read things fast", tool: "the hammer",
-      body: "The small tools the agent uses hundreds of times a session to find and read things: faster searches, fewer tokens, fewer mistakes." },
-    { n: "6", group: "II", slug: "06-review-and-recover-tracked-files-git-and-gh", title: "Review and recover tracked files", tool: "the tape measure",
-      body: "Every change reviewable and reversible, and GitHub without improvised API calls." },
-    { n: "7", group: "II", slug: "07-run-long-jobs-in-your-own-queue-pueue", title: "Run long jobs in your own queue", tool: "the clock",
-      body: "A queue on your own machine. Long fits outlive the session, and a simulation study keeps every core busy until the list is empty." },
-    { n: "8", group: "II", slug: "08-one-command-for-every-task-in-a-project-just", title: "One command for every task in a project", tool: "the power drill",
-      body: "One command for every task in a project, so the agent stops working out the build afresh each time." },
-    { n: "9", group: "II", slug: "09-pin-the-language-and-its-packages-rig-and-renv-uv", title: "Pin the language and its packages", tool: "the wrench set",
-      body: "A pinned language and pinned packages, so the project rebuilds on another machine, or next year." },
-    { n: "10", group: "II", slug: "10-turn-the-analysis-into-a-paper-or-a-deck-quarto-and-pandoc", title: "Turn the analysis into a paper or a deck", tool: "the pencil cup",
-      body: "From analysis to a paper or a deck: Quarto for documents that run code, pandoc for those that do not." },
-    { n: "11", group: "III", slug: "11-re-run-only-what-changed-targets-and-snakemake", title: "Re-run only what changed", tool: "the gears",
-      body: "A pipeline that knows what is out of date and re-runs only that, for when steps take hours." },
-    { n: "12", group: "III", slug: "12-keep-keys-and-tokens-out-of-your-files-1password-and-direnv", title: "Keep keys and tokens out of your files", tool: "the drawers and keys",
-      body: "The agent uses a key without ever seeing it written down. 1Password holds the values; direnv hands each project only what it needs." },
-    { n: "13", group: "III", slug: "13-check-what-the-agent-changed-tests-and-diff-review", title: "Check what the agent changed", tool: "the level and square",
-      body: "Tests the agent can run and differences it can show, so you can check what it changed." },
-    { n: "14", group: "III", slug: "14-understand-usage-the-built-in-display-and-ccusage", title: "Understand usage", tool: "the multimeter",
-      body: "Where the token allowance goes, and how to make it last." },
-    { n: "15", group: "III", slug: "15-run-in-a-separate-environment-containers", title: "Run in a separate environment", tool: "the toolbox",
-      body: "A box the agent cannot leave, for untrusted code and for environments that must rebuild exactly." },
-    { n: "16", group: "IV", slug: "16-connect-the-agent-to-data-and-services-mcp", title: "Connect the agent to data and services", tool: "the power strip and jars",
-      body: "What the agent plugs into and what it keeps: connections to data and services, and memory across sessions." },
-    { n: "17", group: "IV", slug: "17-let-the-agent-inspect-a-browser-and-interact-with-pages", title: "Let the agent inspect a browser and interact with pages", tool: "the window",
-      body: "A browser, and the screen itself, for work that crosses from your machine to the outside." },
-    { n: "18", group: "IV", slug: "18-run-several-agents-at-once-git-worktrees", title: "Run several agents at once", tool: "the charging dock",
-      body: "Several agents at once, each in its own working tree and branch, so parallel work cannot collide." },
-    { n: "19", group: "IV", slug: "19-keep-a-history-of-tool-settings-chezmoi", title: "Keep a history of tool settings", tool: "the parts organizer",
-      body: "Version control for the settings files your tools scatter across the home directory." },
-    { n: "20", group: "V", slug: "20-starting-in-the-terminal", title: "Starting in the terminal", tool: "the light switch",
-      body: "What a terminal gives that the app does not, and why most readers can stop before this Part." },
-    { n: "21", group: "V", slug: "21-your-first-claude-session-in-the-terminal", title: "Your first Claude session in the terminal", tool: "the radio",
-      body: "The same agent, started as a command in a terminal." },
-    { n: "22", group: "V", slug: "22-optional-terminal-conveniences-iterm2-and-windows-terminal", title: "Optional terminal conveniences", tool: "the strip light",
-      body: "The window everything in a terminal appears through." },
-    { n: "23", group: "V", slug: "23-optional-shell-and-prompt-conveniences", title: "Optional shell and prompt conveniences", tool: "the screwdrivers",
-      body: "The shell, the framework that loads its plugins, and a prompt that shows the state you would otherwise ask for." },
-    { n: "24", group: "V", slug: "24-keep-terminal-sessions-available-zellij", title: "Keep terminal sessions available", tool: "the vise",
-      body: "Sessions that survive closing the window, and panes to watch several things at once." },
-    { n: "25", group: "V", slug: "25-an-editor-beside-the-agent-positron", title: "An editor beside the agent", tool: "the drafting lamp",
-      body: "An editor beside the terminal, for reading and writing at length." },
+    { n: "0", group: "I", slug: "choose-tools", title: "Choose tools for a research need", tool: "the robot",
+      body: "Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence." },
+    { n: "1", group: "I", slug: "adding-tools", title: "Add a tool without disrupting a project: Homebrew", tool: "the workbench",
+      body: "Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book." },
+    { n: "2", group: "I", slug: "tool-access", title: "Control what added tools can access", tool: "the locked cabinet",
+      body: "A new execution route can change what research material the agent reaches. Check the route before relying on restrictions configured for a different tool. The research guide's chapter 3 owns the decision about permitted data; this chapter helps enforce it." },
+    { n: "3", group: "I", slug: "finding-files", title: "Find research files efficiently: rg, fd, jq, yq, bat", tool: "the hammer",
+      body: "Finding the right file quickly helps an agent use the project's actual evidence instead of guessing from an incomplete description. Search and structured-data tools also keep irrelevant output out of the conversation." },
+    { n: "4", group: "I", slug: "version-control", title: "Recover earlier work: git and gh", tool: "the tape measure",
+      body: "Research revisions should be recoverable. Git records selected versions so you can return to a working state when a change produces the wrong output, while retaining a record of why later work differs. The agent can maintain that record; learning every git command is unnecessary." },
+    { n: "5", group: "II", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
+      body: "A working analysis depends on its software as well as its code. Recording the environment makes it possible to restore that combination after an update or on another machine, and to explain an unexpected change in results." },
+    { n: "6", group: "II", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
+      body: "A saved command lets you repeat a research task without reconstructing its steps in another conversation. It also makes the scope visible: updating a figure should not unexpectedly launch every model fit." },
+    { n: "7", group: "II", slug: "runnable-checks", title: "Make consequential checks easy to rerun", tool: "the level and square",
+      body: "A quick check can catch an implementation mistake before it contaminates a costly analysis. Save checks for behavior that matters to the sample or reported result, and include a case that should fail." },
+    { n: "8", group: "II", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
+      body: "When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change." },
+    { n: "9", group: "II", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
+      body: "Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return." },
+    { n: "10", group: "II", slug: "research-documents", title: "Generate documents from research outputs: Quarto and pandoc", tool: "the pencil cup",
+      body: "A report is easier to keep accurate when it is built from maintained text and saved results. Document tools can update tables, figures, references, and layout together instead of leaving numbers copied by hand in several places." },
+    { n: "11", group: "III", slug: "credentials", title: "Keep credentials out of research files: 1Password and direnv", tool: "the drawers and keys",
+      body: "A data-acquisition command may need a credential, but the research code and its published history should not contain the secret. Supply it only to the process that needs access and check what that process records." },
+    { n: "12", group: "III", slug: "service-connections", title: "Connect to research data and services: MCP", tool: "the power strip and jars",
+      body: "A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope." },
+    { n: "13", group: "III", slug: "browser-work", title: "Inspect and interact with a browser", tool: "the window",
+      body: "A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text." },
+    { n: "14", group: "III", slug: "parallel-work", title: "Divide work between agents: git worktrees", tool: "the charging dock",
+      body: "Parallel work is useful when tasks can proceed separately and their results can be checked before integration. Separate working copies prevent two agents from overwriting the same files while you coordinate the combined result." },
+    { n: "15", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
+      body: "An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package." },
+    { n: "16", group: "III", slug: "shared-settings", title: "Keep records of shared settings: chezmoi", tool: "the parts organizer",
+      body: "Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine." },
+    { n: "17", group: "IV", slug: "terminal-commands", title: "Run saved research commands yourself", tool: "the light switch",
+      body: "The terminal is useful when you want to run a saved command yourself, work on a remote machine, or inspect a job log beside the agent. It is an optional interface to the same files and programs, not a prerequisite for the research workflow." },
+    { n: "18", group: "IV", slug: "terminal-agents", title: "Use an agent from the terminal: Claude Code", tool: "the radio",
+      body: "A terminal agent can be used interactively or called as one recorded step in a larger workflow. The latter becomes useful when each item needs language-model judgment and you want a saved input, output, and failure status for every run." },
+    { n: "A", group: "V", slug: "working-environment", title: "Optional working environment", tool: "the strip light",
+      body: "Optional conveniences support an existing workflow; none is a prerequisite." },
+    { n: "B", group: "V", slug: "usage-tools", title: "Account-usage tools", tool: "the multimeter",
+      body: "Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill." },
   ];
+  const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
 
   // ---- svg helpers ----
@@ -443,7 +436,7 @@
     // A section opens in a new tab: this page is the way into the map and stays put, the same rule the
     // companion site's console follows.
     const a = el("a", { href: SITE + ch.slug + ".html", class: "hot" + (o.heavy ? " heavy" : ""), "data-n": n, tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, layer);
-    el("title", {}, a).textContent = "§" + n + " " + ch.title;
+    el("title", {}, a).textContent = chapterLabel(n) + " " + ch.title;
     if (o.ghost) draw(el("g", { class: "ghost" }, a));
     const obj = el("g", { class: "obj" }, a);
     draw(obj);
@@ -456,7 +449,7 @@
     // (the per-tag colour dot was dropped 2026-09-27 as too small to read against the wall).
     const wd = n.length > 1 ? 34 : 28;
     R(tg, -wd / 2, -8.5, wd, 17, "none", { rx: 4 });
-    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§" + n;
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = n === "0" ? "Start" : n;
     return a;
   }
 
@@ -474,23 +467,23 @@
   }
 
   const wall = document.getElementById("wall"), benchL = document.getElementById("bench");
-  tool(wall, "17", DRAW.window, { heavy: true, tag: [222, 170] });
-  tool(wall, "20", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
+  tool(wall, "13", DRAW.window, { heavy: true, tag: [222, 170] });
+  tool(wall, "17", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
   shelf(wall, 46, 250, 214);
-  tool(wall, "16", DRAW.jars, { tag: [226, 222] });
+  tool(wall, "12", DRAW.jars, { tag: [226, 222] });
   shelf(wall, 46, 350, 214);
-  tool(wall, "21", DRAW.radio, { tag: [100, 376] });
-  tool(wall, "18", DRAW.dock, { tag: [200, 376] });
+  tool(wall, "18", DRAW.radio, { tag: [100, 376] });
+  tool(wall, "14", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
-  tool(wall, "22", DRAW.striplight, { heavy: true, tag: [704, 56] });
-  tool(wall, "9", DRAW.wrenches, { ghost: true, tag: [440, 252] });
-  tool(wall, "23", DRAW.screwdrivers, { ghost: true, tag: [312, 318] });
-  tool(wall, "5", DRAW.hammer, { ghost: true, tag: [512, 262] });
-  tool(wall, "8", DRAW.drill, { ghost: true, tag: [652, 232] });
-  tool(wall, "14", DRAW.meter, { ghost: true, tag: [722, 112] });
-  tool(wall, "13", DRAW.level, { ghost: true, tag: [600, 340] });
-  tool(wall, "7", DRAW.clock, { ghost: true, tag: [806, 174] });
-  tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [806, 322] });
+  tool(wall, "A", DRAW.striplight, { heavy: true, tag: [704, 56] });
+  tool(wall, "5", DRAW.wrenches, { ghost: true, tag: [440, 252] });
+  tool(wall, "A", DRAW.screwdrivers, { ghost: true, tag: [312, 318] });
+  tool(wall, "3", DRAW.hammer, { ghost: true, tag: [512, 262] });
+  tool(wall, "6", DRAW.drill, { ghost: true, tag: [652, 232] });
+  tool(wall, "B", DRAW.meter, { ghost: true, tag: [722, 112] });
+  tool(wall, "7", DRAW.level, { ghost: true, tag: [600, 340] });
+  tool(wall, "9", DRAW.clock, { ghost: true, tag: [806, 174] });
+  tool(wall, "1", DRAW.clipboard, { ghost: true, tag: [806, 322] });
   cone(wall);
 
   // the bench: back legs and recess, the bench itself, what stands under it, the front legs, what stands on it
@@ -499,35 +492,35 @@
     const under = el("g", {}, benchL);
     R(under, xfl + 20, yf + apron, xfr - xfl - 40, FLOOR - yf - apron, v("recess"));
     for (const fx of [xfl + 8, xfr - 8]) { const b = back(fx, front, t); R(under, b[0] - 7, back(fx, yf, t)[1] + 14, 14, b[1] - back(fx, yf, t)[1] - 14, v("wood-dk"), { opacity: 0.85 }); }
-    tool(benchL, "2", DRAW.bench, { heavy: true, tag: [515, 480] });
-    tool(benchL, "12", DRAW.drawers, { heavy: true, tag: [145, 493] });
-    tool(benchL, "4", DRAW.cabinet, { heavy: true, tag: [825, 493] });
-    tool(benchL, "11", DRAW.gears, { tag: [492, 536] });
-    tool(benchL, "19", DRAW.organizer, { heavy: true, tag: [408, 654] });
+    tool(benchL, "1", DRAW.bench, { heavy: true, tag: [515, 480] });
+    tool(benchL, "11", DRAW.drawers, { heavy: true, tag: [145, 493] });
+    tool(benchL, "2", DRAW.cabinet, { heavy: true, tag: [825, 493] });
+    tool(benchL, "8", DRAW.gears, { tag: [492, 536] });
+    tool(benchL, "16", DRAW.organizer, { heavy: true, tag: [408, 654] });
     // the stool is furniture
     const st = G(benchL, 560, 650, 1.1);
     S(st, "M-20 -62 L-30 0 M20 -62 L30 0 M-25 -24 H25", v("wood-dk"), 5);
     S(st, "M-8 -62 L-11 -8 M8 -62 L11 -8", v("wood-dk"), 4, { opacity: 0.55 });
     R(st, -32, -70, 64, 11, v("red-dk"), { rx: 4 }); E(st, 0, -70, 32, 6, v("red"));
     for (const x of [xfl + 8, xfr - 28]) box(benchL, x, yf + apron, 20, front - yf - apron, 0.035, v("wood"), v("wood-dk"), v("wood"), false);
-    tool(benchL, "24", DRAW.vise, { tag: [222, 442] });
-    tool(benchL, "6", DRAW.tape, { tag: [322, 396] });
-    tool(benchL, "25", DRAW.lamp, { tag: [722, 430] });
+    tool(benchL, "A", DRAW.vise, { tag: [222, 442] });
+    tool(benchL, "4", DRAW.tape, { tag: [322, 396] });
+    tool(benchL, "A", DRAW.lamp, { tag: [722, 430] });
     tool(benchL, "10", DRAW.pencils, { tag: [510, 442] });
     tool(benchL, "15", DRAW.toolbox, { tag: [938, 442] });
   })();
 
   // The robot is §1: the agent itself. It stands in front of everything, so its link is the last thing drawn.
   (function () {
-    const ch = byN("1"), svg = document.getElementById("scene");
-    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy", "data-n": "1", tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, svg);
-    el("title", {}, a).textContent = "§1 " + ch.title;
+    const ch = byN("0"), svg = document.getElementById("scene");
+    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy", "data-n": "0", tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, svg);
+    el("title", {}, a).textContent = "Start · " + ch.title;
     const frame = { x: 1040, y: 366, width: 136, height: 312, rx: 10 };
     el("rect", Object.assign({ class: "hit" }, frame), a);
     el("rect", Object.assign({ class: "ring" }, frame), a);
     const tg = el("g", { class: "tag", transform: "translate(1150,560)" }, a);
     R(tg, -14, -8.5, 28, 17, "none", { rx: 4 });
-    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§1";
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "Start";
   })();
 
   const lg = document.getElementById("legend");
@@ -580,9 +573,9 @@
     ro.style.setProperty("--dot", GROUPS[ch.group].dot);
     ro.dataset.preview = preview ? "1" : "0";
     roPart.textContent = GROUPS[ch.group].name + " · " + ch.tool;
-    roTitle.innerHTML = '<span class="n">§' + ch.n + "</span>" + ch.title;
+    roTitle.innerHTML = '<span class="n">' + chapterLabel(ch.n) + "</span>" + ch.title;
     roBody.textContent = ch.body;
-    roLink.href = SITE + ch.slug + ".html"; roLink.textContent = "Open §" + ch.n + " →"; roLink.hidden = preview;
+    roLink.href = SITE + ch.slug + ".html"; roLink.textContent = "Open " + chapterLabel(ch.n) + " →"; roLink.hidden = preview;
     roHint.textContent = preview ? "" : "Tap the tool again to open the section, or use the link.";
     roHint.hidden = preview;
     document.querySelectorAll(".hot.on").forEach(a => a.classList.remove("on"));

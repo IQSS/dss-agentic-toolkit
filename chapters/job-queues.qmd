@@ -1,0 +1,61 @@
+---
+title: "9. Keep unattended jobs moving: pueue"
+---
+
+Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return.
+
+Suppose the heat-and-birthweight sensitivity analysis needs 100 independent fits, but the computer can comfortably run four at once. You submit the batch before leaving. As each fit finishes, the queue starts another without waiting for you or an agent to intervene. The next morning you inspect the saved results and failed jobs. This is an illustrative workload, not a promise that all 100 fits finish overnight.
+
+![](figures/job-queues.svg){#fig-job-queues fig-alt="Many waiting jobs feed four available execution slots. Whenever a running job finishes, pueue automatically starts the next waiting job. Completed jobs retain outputs and success or failure status." above="8pt" below="8pt"}
+
+## Separate submission from execution
+
+[Pueue](https://github.com/Nukesor/pueue) runs a background service that manages commands submitted to it. The service records the command, working directory, output, and status, and limits simultaneous jobs. Closing the conversation that submitted a job need not stop its computation.
+
+The computer must remain awake and the service available. A reboot can interrupt work. After an interruption, inspect the queue and outputs before restarting: the queue's record does not itself let a model fit resume halfway through. That requires checkpoints saved by the fitting program.
+
+Use a queue for recurring long fits, simulations, or batches of independent work. Run short commands directly when their outcome can be checked immediately. Keep an institutional scheduler for work already running on a cluster.
+
+## Choose a limit from the jobs' resource needs
+
+Start with one representative job and inspect its memory use and internal threads. Then choose a concurrency limit that leaves room for the rest of the machine's work. Four queued fits using four threads each can demand sixteen threads; four available slots do not mean the fits each use one core.
+
+Ask the agent to inspect the command and environment before submitting a large batch. A queued command runs with the queue service's access, which can differ from the agent command tool's sandbox (§2). Configure the intended route and test it with harmless inputs. The queue controls when a job runs; it does not automatically inherit the agent's access restrictions.
+
+> Set up pueue for this machine if it is not already available. Demonstrate the queue using harmless short jobs and a concurrency limit of one, so I can see one job wait and then start automatically. Record the task IDs, working directories, logs, and final results. Before queuing the sensitivity fits, inspect a representative job's memory and threads and propose a suitable limit. Preserve the existing project environment and explain any required access exception.
+
+## Check the outcome, including failures
+
+Have the agent retain each task ID. Submission confirms that the service accepted the command; it does not establish that the command ran successfully.
+
+| State | Evidence to inspect |
+|---|---|
+| Waiting | The recorded command, inputs, working directory, and place in the queue |
+| Running | Actual process status plus an advancing log or expected intermediate output |
+| Succeeded | Successful stored result and the expected output artifact |
+| Failed | Failure status and log explaining what stopped; no silent resubmission |
+
+For a project with the `fit` recipe from §6, the agent can submit `just fit`:
+
+```
+pueue add --print-task-id -- just fit
+pueue status
+```
+
+Use the returned ID in subsequent commands. If the returned ID were 42, the checks would be:
+
+```
+pueue log 42
+pueue wait 42
+pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
+```
+
+This JSON check follows pueue 4.0.4's stored-result shape. `pueue wait` returns after waiting even when the job failed; its own successful exit does not prove job success. Also inspect the fit artifact. A successful command that wrote to the wrong folder has not completed the research task.
+
+Common setup failures include an absent service, a blocked service socket, and the wrong working directory or environment. Distinguish these from model errors. For the observed macOS R problem, follow the [R troubleshooting procedure](#working-environment) for both direct and queued execution until the actual route is verified.
+
+## Combine a queue with a pipeline when useful
+
+Targets and Snakemake (§8) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§6), a dependency runner (§8), and a queue solve different problems; use the ones the project needs.
+
+On WSL2, run the service in the project's environment and test its lifetime. Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) says that systemd services do not keep a WSL instance alive. Do not assume work survives shutting down the distribution or Windows.

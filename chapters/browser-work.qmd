@@ -1,8 +1,10 @@
 ---
-title: "17. Let the agent inspect a browser and interact with pages"
+title: "13. Inspect and interact with a browser"
 ---
 
-Browser access is useful for checking a rendered report or carrying out a limited interaction that a direct download cannot provide. For data acquisition, first follow the research guide's *Getting data* chapter: prefer a documented API or export when it meets the need and is permitted.
+A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text.
+
+For example, a table may contain correct estimates but cut off its confidence-interval column on a narrow screen. Ask the agent to inspect that page at the reader's width and compare a displayed value with the saved result. For acquisition, prefer a permitted API or export before automating browser interaction.
 
 ## The recommended starting point
 
@@ -12,7 +14,7 @@ The agent can inspect page structure, navigate, interact, and capture evidence o
 
 > Configure the official Playwright MCP server for this project using a reviewed version. Open the local test report in a separate browser profile with no signed-in accounts. Inspect the table, figure, and navigation. Report concrete problems with screenshots or page locations, and compare one displayed result with its source file.
 
-Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §4 and configure them under §16.
+Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §12.
 
 ## When the browser needs an account
 

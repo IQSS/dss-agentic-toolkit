@@ -51,15 +51,15 @@ resources:
             <section class="garage-readout" id="readout" aria-live="polite">
               <div class="intro" id="ro-intro">
                 <h1>Extend Your Agent's Toolkit</h1>
-                <p>An agent is a model with tools. This guide gives yours more of them.</p>
+                <p>Add tools when your research needs them. Run, check, and reproduce the work.</p>
                 <p class="how"><b>Every chapter of the guide is a tool in the garage.</b> <span id="ro-how">Hover over one to see what it covers, and press it to open that chapter.</span></p>
-                <a class="go" href="chapters/00-introduction.html" target="_blank" rel="noopener">Start with the introduction →</a>
+                <a class="go" href="chapters/choose-tools.html" target="_blank" rel="noopener">Start with the introduction →</a>
               </div>
               <div class="chapter" id="ro-chapter" hidden>
                 <div class="eyebrow"><i></i><span id="ro-part"></span></div>
                 <h2 id="ro-title"></h2>
                 <p id="ro-body"></p>
-                <a class="go" id="ro-link" href="chapters/00-introduction.html" target="_blank" rel="noopener" hidden>Open section</a>
+                <a class="go" id="ro-link" href="chapters/choose-tools.html" target="_blank" rel="noopener" hidden>Open section</a>
                 <div class="hint" id="ro-hint" hidden></div>
               </div>
             </section>

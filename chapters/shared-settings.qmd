@@ -1,16 +1,18 @@
 ---
-title: "19. Keep a history of tool settings: chezmoi"
+title: "16. Keep records of shared settings: chezmoi"
 ---
 
-As you add tools, their settings can become scattered across several folders. Chezmoi keeps maintained copies together and puts them where each tool expects to read them. This chapter explains how to record changes, test an update, and restore earlier settings. It is optional when project-local configuration already covered by git meets your needs.
+Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine.
+
+For example, a correction to your shared coding conventions should survive a new laptop and should not be overwritten by an older managed copy. Chezmoi records source files and applies them to their expected locations. Project-only configuration already tracked by git may need nothing more.
 
 ## What it gives the agent
 
 Chezmoi keeps source versions of selected settings and writes them to the locations each program reads. A private git repository can record changes to that source. This makes it possible to inspect a proposed update and recover a previous configuration.
 
-![](figures/chezmoi-source-and-applied.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi keeps source versions in a settings repository and applies them to the paths programs read. Both locations need review and protection." above="16pt" below="14pt"}
+![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi keeps source versions in a settings repository and applies them to the paths programs read. Both locations need review and protection." above="16pt" below="14pt"}
 
-There are two copies to consider: the source managed by chezmoi and the applied file used by the program. Protect both when a file defines the agent's permissions. If the source remains editable, the agent could change it and later have chezmoi overwrite the protected active setting (§4).
+There are two copies to consider: the source managed by chezmoi and the applied file used by the program. Protect both when a file defines the agent's permissions. If the source remains editable, the agent could change it and later have chezmoi overwrite the protected active setting (§2).
 
 ## Start with a harmless setting
 

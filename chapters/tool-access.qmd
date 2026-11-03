@@ -1,10 +1,12 @@
 ---
-title: "4. Keeping the agent's reach in proportion: permission settings and the OS sandbox"
+title: "2. Control what added tools can access"
 ---
 
-An added tool may reach files or services through a different process, account, or connection from the agent's existing tools. This chapter explains how to configure permission rules and the operating-system sandbox, inspect exceptions, and test access with harmless files. The companion guide's *Boundaries* and *Data confidentiality* chapters explain how to decide which research material the agent may use.
+A new execution route can change what research material the agent reaches. Check the route before relying on restrictions configured for a different tool. The research guide's chapter 3 owns the decision about permitted data; this chapter helps enforce it.
 
-![](figures/security-layers-intro.svg){#fig-security-layers-intro fig-alt="Permission checks, sandboxed execution, and optional containers provide different protections. Each applies only to the tools and access routes it covers." above="10pt" below="14pt"}
+For example, an ordinary agent command may run inside a sandbox, while a job submitted to pueue runs under a separate queue service. Restricting the submission command does not establish that the queued job has the same limits. Test both routes with harmless files.
+
+![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Ordinary commands and queued jobs can run under different processes and permissions. Check the files, network, and credentials available to each route."}
 
 ## Combine the controls
 
@@ -12,7 +14,6 @@ Written instructions tell the language model what you want it to do. Permission 
 
 None covers every route automatically. A file permission rule can block a direct read without blocking an arbitrary unsandboxed script that opens the file. A connector or browser may reach data through credentials rather than local paths. Git can recover tracked edits but cannot reverse disclosure.
 
-![](figures/security-layers-guarantee.svg){#fig-security-layers-guarantee fig-alt="Rules match recognized actions, prompts ask for a decision, the sandbox limits covered processes, and a container limits access according to its mounts, credentials, network, and privileges." above="18pt" below="16pt"}
 
 ## One maintained configuration example
 
@@ -59,7 +60,7 @@ This example adds no network destinations or command exemptions. Settings from o
 
 ## Exceptions change the boundary
 
-The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (§8). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
+The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix A). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
 
 If an authorized workflow needs a reviewed unsandboxed invocation, document its scope and protection separately. Do not describe that command as sandboxed. In particular, a job submitted to pueue runs under the queue service's account and permissions; the submission command's sandbox does not contain the resulting job. Credentials supplied to a process are available to that process even when a vault stored them safely.
 
@@ -69,7 +70,7 @@ For a protected analysis, use an execution environment with the required access 
 
 Test direct file access and subprocess access separately, using disposable files. Confirm the expected failures and an allowed operation that still succeeds. Test again after changing path rules, command exemptions, or the tool used to run the work. These tests reveal configuration errors; they do not prove containment against every possible program.
 
-Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (§19). Protecting only the applied file can leave an editable source copy that later restores broader access.
+Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (§16). Protecting only the applied file can leave an editable source copy that later restores broader access.
 
 ## On Windows (WSL2) and Linux
 

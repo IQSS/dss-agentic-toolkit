@@ -1,12 +1,11 @@
 ---
-title: "9. Pin the language and its packages: rig and renv; uv"
+title: "5. Preserve a software environment: rig, renv, and uv"
 ---
 
-To repeat an analysis, preserve the versions of its language and packages. **We recommend** renv for R packages, rig when several R versions are needed, and uv for Python projects whose dependencies it can manage. This chapter covers recording an existing environment, setting up a new one, and checking that the recorded versions can be restored.
+A working analysis depends on its software as well as its code. Recording the environment makes it possible to restore that combination after an update or on another machine, and to explain an unexpected change in results.
 
-## Without it
+For example, a collaborator reruns the heat-and-birthweight scripts but obtains different intervals after installing newer package versions. A version record lets you first test the original environment, then investigate an upgrade as a deliberate change. Without that record, the earlier behavior is harder to recover.
 
-A package update can change an analysis even when its source code has not changed. If the project never recorded its environment, restoring the earlier behavior becomes guesswork.
 
 ## What it gives the agent
 
@@ -14,11 +13,11 @@ A lockfile records exact package versions and their dependencies. R projects usi
 
 Rig manages R installations; renv manages project packages. Uv can manage both the Python interpreter and project environment. A lockfile does not preserve the operating system or guarantee identical numerical results on all hardware.
 
-## Do you need it yet?
+## Start from the existing project
 
 Record the environment whenever results need to be repeated. For an existing project, preserve the working versions before any migration. Stata users should record Stata and community-command versions and their sources; retain the master do-file. A second programming language is not required.
 
-## What we recommend
+## Choose a manageable setup
 
 Use [renv](https://rstudio.github.io/renv/articles/renv.html) for R, and [uv projects](https://docs.astral.sh/uv/concepts/projects/) for Python. Keep an established environment manager if it already provides the needed record and restoration route. Add rig when you need to install or select a particular R version, not as a reason to upgrade every project.
 
@@ -34,7 +33,7 @@ For a new project:
 
 > Set up a project environment for the agreed language version and packages: renv for R, or uv for Python. Record the complete dependency resolution, run a small import and analysis check, and show the lockfile. Keep generated libraries out of git and cloud synchronization before populating them.
 
-**What only you can do.** Approve any system installation or password step. Installing a new R version may need administrator access. Credentials and package repositories also need the access decision in §4.
+**What only you can do.** Approve any system installation or password step. Installing a new R version may need administrator access. Credentials and package repositories also need the access decision in §2.
 
 Standing instructions: use the project's environment manager, review lockfile changes alongside code changes, and keep the original working environment until a migration is verified.
 
@@ -46,7 +45,13 @@ Common failures are unrecorded packages, missing system libraries, and a lockfil
 
 A restore may need system libraries such as a compiler or spatial-data library. Record their installation requirements in the README. If the project depends on a conda-based scientific stack, consider pixi or retain its existing conda environment rather than repeatedly forcing those dependencies through a different manager. A single failed installation is a diagnosis to investigate, not an automatic reason to migrate.
 
-On the author's affected Mac execution route, R environment commands use §8's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§6).
+On the author's affected Mac execution route, R environment commands use Appendix A's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§4).
+
+## Read the version change
+
+An illustrative lockfile review might show one plotting package added with two dependencies, while the model package remains at its recorded version. That is a different change from upgrading the model package. Have the agent list the actual additions, removals, and version changes, then run the checks affected by them.
+
+![](figures/research-environments.svg){#fig-research-environments fig-alt="The language and packages are recorded in a version record, then restored in a separate environment and checked against a baseline output."}
 
 ## If the environment needs more
 

@@ -1,8 +1,10 @@
 ---
-title: "5. Find and read things fast: `rg`, `fd`, `jq`, `yq`, `bat`"
+title: "3. Find research files efficiently: rg, fd, jq, yq, bat"
 ---
 
-These tools help the agent locate files, find text in them, and extract fields from structured data without writing a new program for each lookup. Start with ripgrep (`rg`) for text searches and `jq` for JSON, a common format for data returned by online services. This chapter shows what each tool returns and how to check that a search or selection found the intended material.
+Finding the right file quickly helps an agent use the project's actual evidence instead of guessing from an incomplete description. Search and structured-data tools also keep irrelevant output out of the conversation.
+
+Suppose a reviewer questions how `hot_days` enters an analysis. A search should identify its construction, model formula, and figure labels, with paths and line numbers. A JSON query can then inspect the source field in a saved acquisition response. The task is to locate evidence you can follow, not to print the whole project.
 
 ## What they give the agent
 
@@ -27,6 +29,10 @@ If the task also involves YAML, specify which `yq` is installed: unrelated progr
 A search such as `rg -n income_adj code/` should return the locations you can inspect in the named files. In a practice file, add one known occurrence and confirm it is found. If a search returns nothing, ask the agent to report its scope before concluding that a variable is unused.
 
 For JSON, ask for one named field from a small saved response and compare it with the original. A missing field and an explicit null value may need different handling; a short command still needs the right interpretation.
+
+## Read a small result
+
+An invented search might return `code/prepare.R:18: hot_days` and `code/model.R:31: hot_days`. Open those lines to distinguish construction from use. For a saved JSON object `{"county":"001","hot_days":7}`, the selection `.hot_days` should return `7`. These tiny examples establish what a successful lookup means before broadening the search.
 
 ## Keep adequate existing tools
 

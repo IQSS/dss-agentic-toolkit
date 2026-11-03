@@ -1,8 +1,10 @@
 ---
-title: "10. Turn the analysis into a paper or a deck: Quarto and pandoc"
+title: "10. Generate documents from research outputs: Quarto and pandoc"
 ---
 
-This chapter shows how the agent can generate a paper, report, or slide deck from saved source files. Use Quarto when the document needs to combine text with executed code and results, or pandoc with a template for conversion and layout without running an analysis. Keep a working Word, R Markdown, or notebook workflow when it already serves the collaboration.
+A report is easier to keep accurate when it is built from maintained text and saved results. Document tools can update tables, figures, references, and layout together instead of leaving numbers copied by hand in several places.
+
+For example, a corrected estimate in the heat-and-birthweight project should reach Table 1 and the sentence that describes it. Quarto can combine prose, code, and results; pandoc can convert maintained text through a template. Keep a working Word or notebook collaboration route when it already meets the need.
 
 ## What the tools give the agent
 
@@ -22,9 +24,9 @@ For a text-only PDF, request pandoc and a template instead. TinyTeX is a small T
 
 Open the output and inspect the result, figure, citations, and layout. Change one value in the invented input, rebuild, and verify the corresponding reported result changes. For the manuscript, check a selected result against the saved analysis output. A recent modification time alone cannot establish that the right analysis ran.
 
-Save the rendering command and its options as a project recipe (§8), and record the language packages, TeX dependencies, and fonts needed for hand-off. Preserve a Word route when coauthors need it; conversion still requires checking tables, equations, references, and tracked changes.
+Save the rendering command and its options as a project recipe (§6), and record the language packages, TeX dependencies, and fonts needed for hand-off. Preserve a Word route when coauthors need it; conversion still requires checking tables, equations, references, and tracked changes.
 
-For an R process that hangs when launched by an agent on macOS, use the single troubleshooting procedure in §8. Queueing the render is not itself a guarantee that the problem disappears.
+For an R process that hangs when launched by an agent on macOS, use the single troubleshooting procedure in §6. Queueing the render is not itself a guarantee that the problem disappears.
 
 One specific template error encountered with TeX Live 2026 is “No counter 'none' defined” for a captionless table. The pandoc-to-XeLaTeX templates used here include this compatibility block in their preamble:
 

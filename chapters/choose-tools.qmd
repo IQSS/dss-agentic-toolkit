@@ -1,0 +1,53 @@
+---
+title: "Choose tools for a research need"
+---
+
+Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence.
+
+Suppose your heat-and-birthweight project now needs 100 simulation runs. You want a few running at once, the rest waiting, and a record of failures to inspect later. A queue addresses that need. It does not choose the simulation design, decide whether the estimates are valid, or make a sleeping laptop compute. Understanding that division of work is more useful than installing a large collection of tools.
+
+The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app; no terminal knowledge is required for chapters 1–16. Sign-ins, passwords, and decisions about access remain yours.
+
+## Find the problem you need to solve
+
+| Research need | Start here |
+|:--|:--|
+| **Set up and protect the work** | |
+| Add one missing capability without upgrading everything | §1: Homebrew |
+| Check what a new tool can read, change, or send | §2: access controls |
+| Find a variable or inspect a saved service response | §3: rg, fd, jq, yq, bat |
+| Recover a working state after an unsuccessful change | §4: git and gh |
+| **Run and reproduce the work** | |
+| Restore the language and packages used for an analysis | §5: rig, renv, uv |
+| Repeat a research task with one saved command | §6: just |
+| Catch consequential mistakes before fitting | §7: runnable checks |
+| Rerun only steps affected by a change | §8: targets and Snakemake |
+| Keep a batch moving unattended | §9: pueue |
+| Rebuild a report from saved research outputs | §10: Quarto and pandoc |
+| **Extend access and coordinate work** | |
+| Supply a credential without storing it in research code | §11: 1Password and direnv |
+| Reach an approved reference library or service | §12: MCP |
+| Inspect a rendered page or interact with a website | §13: browser tools |
+| Give parallel agents separate working copies | §14: git worktrees |
+| Package or restrict a separate execution environment | §15: containers |
+| Keep a recoverable record of personal tool settings | §16: chezmoi |
+| **Work from a terminal, optionally** | |
+| Run a saved command yourself | §17: terminal commands |
+| Run an agent interactively or as a recorded batch step | §18: terminal agents |
+| **Reference** | |
+| Terminal, shell, editor, and R execution conveniences | Appendix A |
+| Inspect historical account usage with an extra tool | Appendix B |
+
+## Add only what the project needs
+
+Installed programs extend what the agent can do through its command tool. Connections expose functions supplied by another service. Instructions tell the agent when and how to use either. Installation alone does not teach a reliable procedure: a queue needs resource limits and an outcome check; an environment manager needs a maintained version record.
+
+Each chapter begins with the research problem and an example, then gives a setup request and evidence to inspect. Most examples are deliberately small and invented. Where a procedure comes from a recorded run or has not yet had a clean-installation trial, the text says so. We are Data Science Services at Harvard's Institute for Quantitative Social Science; the examples draw on our research-support work.
+
+## Use the environment you have
+
+The main routes are macOS and Ubuntu Linux; Windows readers can use Ubuntu through WSL2. R, Python, and Stata users can keep their research language. A master do-file may already provide the workflow you need, and Stata's language and community-command versions still need recording.
+
+An app, terminal, remote session, and WSL session may have different tools and credentials. Check the actual session in which research will run. For Windows, consult the [desktop WSL documentation](https://code.claude.com/docs/en/desktop-wsl) before assuming that a locally installed tool or connector is available there. Platform-specific clean-installation trials are recorded separately from tests on the author's configured Mac.
+
+Product interfaces and access controls change faster than the purposes of these tools. Consult the linked primary documentation for the installed version, and test the small example before trusting the tool with consequential work. This November draft is prepared for author review; publication and remaining account-dependent trials follow that review.

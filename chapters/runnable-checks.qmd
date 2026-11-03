@@ -1,8 +1,10 @@
 ---
-title: "13. Check what the agent changed: tests and diff review"
+title: "7. Make consequential checks easy to rerun"
 ---
 
-This chapter explains how to have the agent add small tests for consequential mistakes and how to review changes that tests cannot settle. Start with the project's existing tools: testthat or assertions in R, pytest or assertions in Python, and assertions in Stata. An assertion is a check that stops a script when an expected condition fails. Add a test framework when it makes those checks easier to maintain.
+A quick check can catch an implementation mistake before it contaminates a costly analysis. Save checks for behavior that matters to the sample or reported result, and include a case that should fail.
+
+For example, duplicating a county-month key in the heat table must stop the join before it duplicates birth records. A valid fixture must also pass. These two outcomes tell you more than a test that merely repeats the count produced by the agent's own code.
 
 ## Ask for evidence about behavior
 
@@ -14,7 +16,7 @@ For a many-to-one join, use a tiny invented example with three observations and 
 
 > Identify changes in this task that could alter the analytic sample or reported results. Add small known-answer checks for those behaviors using the project's existing test tools. Include a case that should fail. Expose the quick checks through the project command surface, and explain what they do not establish. Do not refit all models unless the change requires it.
 
-Separate quick checks from expensive recalibration and the full reproduction run (§8). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow §8 if R checks hang when launched through the agent.
+Separate quick checks from expensive recalibration and the full reproduction run (§6). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow Appendix A if R checks hang when launched through the agent.
 
 ## Inspect the changes that tests cannot settle
 

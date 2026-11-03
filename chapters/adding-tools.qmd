@@ -1,0 +1,55 @@
+---
+title: "1. Add a tool without disrupting a project: Homebrew"
+---
+
+Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book.
+
+For example, the agent repeatedly writes small programs just to select fields from saved JSON responses. Installing `jq` gives it a maintained tool for that job. Verify it on one harmless response while leaving the project's R or Python environment unchanged.
+
+## What you need first
+
+On a Mac, ask the agent to check the installed tools, machine architecture, and Homebrew's current prerequisites. The research guide's first exercise does not require git or Apple's Command Line Tools; adding tools here may require them. Keep an existing institutional package-management arrangement if it meets the need; do not build a competing setup without a reason.
+
+The current [Homebrew installation instructions](https://docs.brew.sh/Installation) provide both the supported command-line route and a macOS package installer. Use those instructions rather than a copied installer command from an old guide. A password or installer dialog is a step for you, not a credential to paste into the conversation. If a terminal step is required, §17 explains how to open Terminal and paste one command. The macOS package route is documented here, but has not been tested as a complete new-user walkthrough for this edition.
+
+## Ask for a small installation
+
+> Inventory the tools this project already has and how they are managed. If Homebrew is needed, identify the supported installation route for this machine and explain any step I must perform myself. Then install ripgrep and jq if absent. Show their versions and use them on harmless example files. Do not upgrade the project's research language or package environment.
+
+Once Homebrew works, the agent can install further tools as you reach the relevant section. You do not need the whole toolkit at once. For noninteractive installs, Homebrew documents the `HOMEBREW_NO_ASK` setting; it does not remove operating-system authorization requirements. Record installed tools and why the project needs them.
+
+A personal `Brewfile` can record a growing installation set. It is useful for rebuilding a machine, but is not a substitute for the project's pinned research environment (§5). This guide uses section-by-section installation, so no separate bundle is needed to start.
+
+## Check that it works
+
+Ask the agent to show `brew --version`, the installed tool versions, and the small example's output. A `brew doctor` warning needs interpretation; it does not necessarily mean an installation failed. A command that cannot be found may be absent or may be outside the agent process's search path. After installation, a fresh app session may be needed to inherit that path.
+
+Keep installation review separate from research work. An installer may request network access or write outside the project. Approving that operation does not authorize later commands to use the same access without review (§2).
+
+## Windows through WSL2, and Linux
+
+This guide's Windows route is Ubuntu inside WSL2, not native Windows tools. Follow Microsoft's [WSL installation instructions](https://learn.microsoft.com/windows/wsl/install), including any administrator step and restart. Keep the project and its Linux tools inside the same distribution; a Windows installation of a program is not automatically a Linux installation.
+
+Homebrew supports Linux under its documented requirements. Follow its Linux instructions rather than copying the macOS installer. If your institution already supplies packages through Ubuntu or a managed environment, use those when adequate and record any differences in command names. The tools' platform notes identify consequential differences rather than promising identical operation everywhere.
+
+A newly installed tool can go unused, or be used incorrectly, unless the agent has instructions for it. This chapter shows how to record when to use a tool, what limits apply, and which results to report. The research guide's *The files the agent reads* and *Repeatable workflows* chapters explain the instruction files and skills that hold those procedures.
+
+## Start with short, specific instructions
+
+A machine-wide convention can live in your personal `CLAUDE.md`. A project's commands, resource limits, and data-access rules belong with that project. Keep an established instruction layout rather than creating a second one for this guide.
+
+For example:
+
+- Submit long jobs through pueue, record the task identifier, and verify both completion status and expected outputs.
+- Fetch required credentials from the approved vault for the command that needs them. Never print or commit their values.
+- Use the project's recorded environment. Report proposed dependency changes before applying them.
+
+Each line names an action and a check. “Use pueue” alone leaves the agent to guess how to establish that a job succeeded. Keep a short inventory of installed tools and their purpose alongside these instructions.
+
+## Package procedures only when they recur
+
+A skill can hold a recurring procedure such as submitting a job, inspecting its status, and reporting failure. Start with a standing instruction; add the longer procedure if you repeatedly need the same correction. Hooks can run checks at specified events, but are executable configuration that needs review. Neither instructions nor hooks replace a data-access boundary (§2).
+
+## Check that the instruction is used
+
+In a fresh session, ask which project instructions apply and how the agent would run a long job. Have it identify the file it read, then demonstrate the procedure on a harmless task. A confident summary alone does not prove the file was loaded or the procedure works.

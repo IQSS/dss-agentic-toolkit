@@ -1,8 +1,10 @@
 ---
-title: "18. Run several agents at once: git worktrees"
+title: "14. Divide work between agents: git worktrees"
 ---
 
-Git worktrees give parallel agents separate working folders and branches within the same repository. This chapter explains how to assign tasks, provide each agent's inputs and environment, and review the combined changes. Start with two tasks whose results you can check independently.
+Parallel work is useful when tasks can proceed separately and their results can be checked before integration. Separate working copies prevent two agents from overwriting the same files while you coordinate the combined result.
+
+For example, one agent can revise figure labels while another adds a data check. Git worktrees give each a branch and folder in the same repository. Neither task is complete until its changes are integrated and the combined workflow passes the relevant checks.
 
 ## What a worktree separates
 
@@ -14,7 +16,7 @@ For example, one agent could add known-answer checks for a cleaning function whi
 
 > Prepare separate worktrees and branches for these two tasks: [task A] and [task B]. Identify shared inputs and resources before starting. Give each task a separate output location and the recorded environment it needs. Preserve existing uncommitted work. Do not merge or remove either worktree until its changes and outputs have been reviewed.
 
-Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§21). Confirm the actual folder and branch each session uses before either starts editing.
+Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§18). Confirm the actual folder and branch each session uses before either starts editing.
 
 ## Prepare the inputs deliberately
 
@@ -26,4 +28,4 @@ Independent implementation for verification needs additional separation. Give fr
 
 Ask for `git worktree list`, each branch's changes, test results, and remaining uncommitted files. Resolve overlapping edits deliberately. Run checks on the combined result, since two individually passing changes can fail together.
 
-Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§7). Extra agents are useful only when their outputs can be specified, checked, and integrated.
+Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§9). Extra agents are useful only when their outputs can be specified, checked, and integrated.

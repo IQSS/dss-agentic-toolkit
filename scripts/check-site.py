@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from html.parser import HTMLParser
 from pathlib import Path
 
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
@@ -32,12 +33,33 @@ def normalise(text: str) -> str:
     return " ".join(text.split())
 
 
+class PageReferences(HTMLParser):
+    """Collect actual attributes, excluding HTML-shaped strings inside scripts."""
+
+    def __init__(self, text: str):
+        super().__init__()
+        self.ids: set[str] = set()
+        self.images: list[str] = []
+        self.links: list[str] = []
+        self.feed(text)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        if values.get("id"):
+            self.ids.add(values["id"])
+        if tag == "img" and values.get("src"):
+            self.images.append(values["src"])
+        if values.get("href"):
+            self.links.append(values["href"])
+
+
 def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     problems: list[str] = []
     pages = sorted(site.rglob("*.html"))
     if not pages:
         return [f"no rendered pages under {site}; did `quarto render` run?"]
     html = {p: p.read_text(errors="replace") for p in pages}
+    references = {page: PageReferences(text) for page, text in html.items()}
 
     # 1. No comment from the source survives into the page. Comparing against the source rather than
     # banning comments outright is what keeps this honest: the theme emits a dozen layout markers of
@@ -61,7 +83,7 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
 
     # 3. Every image resolves.
     for page, text in html.items():
-        for src in re.findall(r'<img[^>]+src="([^"]+)"', text):
+        for src in references[page].images:
             if src.startswith(("http://", "https://", "data:")):
                 continue
             # Root-absolute, like the links in check 4: resolved against the site root, since a
@@ -73,9 +95,9 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     # 4. Every link resolves: a fragment to an id on this page, a path to a file that exists, and a
     # path with a fragment to an id in that file. Footnote refs and backrefs are fragments too, so
     # this covers them.
-    ids = {page: set(re.findall(r'id="([^"]+)"', text)) for page, text in html.items()}
+    ids = {page: refs.ids for page, refs in references.items()}
     for page, text in html.items():
-        for href in re.findall(r'href="([^"]+)"', text):
+        for href in references[page].links:
             if href.startswith(("http://", "https://", "mailto:", "#/", "data:")) or href in ("", "#"):
                 continue
             path, _, fragment = href.partition("#")
@@ -103,7 +125,7 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     # are exactly the visits nobody is watching.
     notfound = site / "404.html"
     if notfound.is_file():
-        for href in re.findall(r'href="([^"]+)"', html.get(notfound, notfound.read_text())):
+        for href in references[notfound].links:
             if href.startswith(("http://", "https://", "mailto:", "#", "data:", "/")) or href == "":
                 continue
             problems.append(f"404.html: link to {href} is relative; the page is served at whatever "

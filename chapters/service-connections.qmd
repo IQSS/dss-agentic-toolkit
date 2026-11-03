@@ -1,14 +1,20 @@
 ---
-title: "16. Connect the agent to data and services: MCP"
+title: "12. Connect to research data and services: MCP"
 ---
 
-A connection can let the agent search a reference library, query a database, or use a service without exchanging files by hand. This chapter explains how to choose an approved MCP connection, limit its access, and check it with a known record. Add one when it solves a recurring task and the service, data, and permissions are approved for that use.
+A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope.
+
+For example, a reference-library connection could retrieve a paper's title and DOI for comparison with a manuscript citation. Test it with a record you know and read-only access before using it across a collection. Reading a known record checks connectivity; it does not establish that every returned summary is accurate.
 
 ## What a connection adds
 
 The Model Context Protocol (MCP) gives an agent a standard way to call tools supplied by a server. That server may run locally or remotely. Its functions and credentials determine whether the agent can read, write, or send information. The protocol itself does not establish that a server is trustworthy or appropriate for research data.
 
 A reference-library connection might return titles and abstracts. A database connection might return rows or also permit updates. Ask which operations are exposed, which account authorizes them, and where returned content is processed. A read-only service can still disclose data to the model.
+
+## Check for an existing app connection first
+
+If your institution already provides the needed connector in the app, use its documented sign-in and scope rather than installing another server. A built-in connection is an app capability; custom MCP setup is an extension you must maintain. Check availability in the actual local, cloud, or WSL session you use. Both routes still require a permitted destination for the returned data.
 
 ## Start with one approved, limited connection
 
@@ -18,7 +24,7 @@ At Harvard, check the current [HUIT Claude guidance](https://www.huit.harvard.ed
 
 > Identify the approved connection for [service] and the operations this task needs. Show its source, data destinations, credentials, and requested access before configuring it. Use a test collection with no confidential material and read-only access first. Retrieve one record I can check independently. Do not send messages or change service records.
 
-You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§12).
+You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§11).
 
 ## Check what it can reach
 

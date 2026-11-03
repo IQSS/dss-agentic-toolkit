@@ -67,6 +67,7 @@ COPIED_TOOLING = (
 )
 
 H1 = re.compile(r"^# (?P<text>.+?)\s*$")
+EXPLICIT_ID = re.compile(r"\s+\{#(?P<id>[a-z][a-z0-9]*(?:-[a-z0-9]+)*)\}\s*$")
 NUMBERED = re.compile(r"^(?P<num>\d+)\.\s+(?P<rest>.+)$")
 APPENDIX = re.compile(r"^Appendix\s+(?P<letter>[A-Z])\.\s+(?P<rest>.+)$")
 PART_MARKER = re.compile(r"^<!--\s*=+\s*(?P<title>.+?)\s*=+\s*-->\s*$")
@@ -135,6 +136,12 @@ def find_chapters(lines: list[str]) -> tuple[list[dict], list[dict]]:
         if not head:
             continue
         text = head.group("text")
+        explicit = EXPLICIT_ID.search(text)
+        identifier = explicit.group("id") if explicit else None
+        if explicit:
+            text = text[:explicit.start()].rstrip()
+        elif "{#" in text:
+            sys.exit(f"error: invalid chapter id on line {i + 1}; use {{#lowercase-kebab-id}}")
         num = NUMBERED.match(text)
         app = APPENDIX.match(text)
         if num:
@@ -145,7 +152,12 @@ def find_chapters(lines: list[str]) -> tuple[list[dict], list[dict]]:
         else:
             # An unnumbered chapter (the tool-chain's Introduction). Sorts first, cited as nothing.
             key, slug = None, f"00-{slugify(text)}"
-        chapters.append({"key": key, "title": text, "slug": slug, "start": i})
+        if identifier:
+            slug = identifier
+        if any(chapter["slug"] == slug for chapter in chapters):
+            sys.exit(f"error: duplicate chapter id or filename {slug!r} on line {i + 1}")
+        chapters.append({"key": key, "title": text, "slug": slug, "start": i,
+                         "identifier": identifier})
 
     if fence is not None:
         sys.exit(f"error: unterminated code fence ({fence}) -- the split would be wrong, refusing")
@@ -451,7 +463,7 @@ def dark_css(figures: list[str]) -> str:
         "",
     ]
     for name in figures:
-        lines.append(f'body.quarto-dark main img[src$="{name}.svg"] '
+        lines.append(f'body.quarto-dark img[src$="{name}.svg"] '
                      f'{{ content: url("figures/{name}-dark.svg"); }}')
     return "\n".join(lines) + "\n"
 
@@ -479,6 +491,8 @@ def anchor_map(lines: list[str], chapters: list[dict]) -> dict[str, str]:
         # The chapter's own H1 becomes the page title, which carries no heading anchor of its own,
         # so a link to it is a link to the page with no fragment.
         owner.setdefault(heading_id(c["title"]), f"/chapters/{c['slug']}.qmd")
+        if c.get("identifier"):
+            owner[c["identifier"]] = f"/chapters/{c['slug']}.qmd"
         for ln in lines[c["start"] + 1:c["end"]]:
             m = FENCE.match(ln)
             if m:

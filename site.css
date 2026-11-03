@@ -81,3 +81,7 @@ main:has(.chapter-agent) #title-block-header .quarto-title { display: none; }
 @media (max-width: 700px) {
   .chapter-agent { float: none; width: min(60%, 250px); margin: 0 auto 16px; }
 }
+
+/* Transparent SVGs need a reading surface when enlarged over the lightbox overlay. */
+.glightbox-container .gslide-image img { background: #f7f4ec; }
+body.quarto-dark .glightbox-container .gslide-image img { background: #14181e; }

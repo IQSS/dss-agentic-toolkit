@@ -1,8 +1,10 @@
 ---
-title: "15. Run in a separate environment: containers"
+title: "15. Run work in a separate environment: containers"
 ---
 
-A container provides a separate software environment in which to run a program. This chapter covers two uses: packaging an analysis so a collaborator can run it, and restricting the resources available to unfamiliar code. It explains how to have the agent propose a configuration and check each purpose separately. The folders, credentials, network access, and privileges you provide determine what code inside can reach.
+An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package.
+
+For example, a container for a public replication example might receive only a copy of its approved inputs and an empty output directory, with no personal credentials. Test both the expected result and the intended access restrictions. Packaging software and containing access are different claims.
 
 ## What it gives the agent
 
@@ -20,7 +22,7 @@ Containers are optional for an ordinary analysis with an adequate environment re
 
 > Propose a container configuration for this reproduction package. List every host mount, its read/write status, network access, credentials, and runtime privileges. Start with a harmless test, no credentials, and only the required input mounted read-only plus a separate output directory. Show that allowed output works and that an unmounted practice file is inaccessible before running the package.
 
-For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§9). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
+For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§5). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
 
 ## Check both uses separately
 
@@ -28,4 +30,4 @@ A successful reproduction establishes that this build ran under this configurati
 
 Inspect mounts and privileges before each materially different workload. Do not mount the whole home directory for convenience. A container used to build a trusted project may reasonably have different access from one used to inspect an unknown replication package; label and review those configurations separately.
 
-For institutional clusters, use the runtime the service supports, often Apptainer, with the research-computing team's instructions. Container installation and its daemon can require privileges outside the agent's ordinary sandbox (§4); approval for that setup is separate from permission to run every future container.
+For institutional clusters, use the runtime the service supports, often Apptainer, with the research-computing team's instructions. Container installation and its daemon can require privileges outside the agent's ordinary sandbox (§2); approval for that setup is separate from permission to run every future container.

@@ -1,0 +1,105 @@
+---
+title: "Appendix A. Optional working environment"
+---
+
+Optional conveniences support an existing workflow; none is a prerequisite.
+
+## Terminal applications
+
+If you want commands and job output visible side by side, a terminal with split panes can help. This chapter shows a small layout to try in iTerm2 on a Mac or Windows Terminal with Ubuntu WSL2. These applications also offer searchable output and reusable profiles. Keep the terminal you already use if it meets your needs.
+
+### Try one useful layout
+
+On a Mac, ask the agent to help install [iTerm2](https://iterm2.com/documentation.html) without replacing existing shell settings. Open the project in one pane and a read-only queue status command in another. Search the output for a task identifier, copy its result, and close the extra pane. If that improves your work, save the layout or profile.
+
+On Windows, use the Ubuntu profile in [Windows Terminal](https://learn.microsoft.com/windows/terminal/). Confirm the working directory and Linux environment with the commands from §17. A neighboring PowerShell tab is a different environment.
+
+Use legible fonts and a restrained color scheme. Special fonts are only needed if your chosen prompt requires their symbols. No terminal replacement or theme is required to run Claude or any of the project's saved commands.
+
+## Shell and prompt
+
+A shell interprets commands, and its prompt marks where you enter the next one. This chapter shows how an optional Oh My Posh prompt can display the current directory, git branch, and failed-command status, helping you check where you are before acting. Keep the shell your machine already provides: usually zsh on a current Mac, and often bash in Ubuntu.
+
+### Add information before decoration
+
+The useful question is whether you can tell which project and branch a command will affect. First use `pwd` and `git status`. If you switch projects often, a prompt that displays that information can help prevent mistakes.
+
+[Oh My Posh](https://ohmyposh.dev/docs/) is the configurable prompt used here. It can work with an existing shell; adopting it does not require replacing the shell or adding a framework such as Oh My Zsh. Keep a simple existing prompt if it already provides the information you need.
+
+> Preserve my existing shell startup files and show the proposed diff. If a prompt change would help, configure Oh My Posh to show the directory, git branch, and failed-command status. Test a fresh shell and explain how to restore the previous prompt. Do not replace unrelated aliases or environment settings.
+
+Shell startup files execute commands, so review changes before opening a fresh shell. A harmless prompt change should not add credentials, start services, or change which R or Python a project uses. Test both your interactive shell and the agent's actual execution environment; they may load different startup files.
+
+Further interactive conveniences can wait until you have a repeated need. They are not prerequisites for agent work, and installing a collection of aliases can make copied commands harder to understand.
+
+## Persistent terminal sessions
+
+Zellij groups terminal panes into a named session that you can leave and return to from another terminal window. This chapter shows how to try that with a harmless session and explains what continues running while you are away. It is useful when closing a window or losing a remote connection would otherwise disrupt your working layout.
+
+### Try a session without important work
+
+After installing Zellij through the selected package manager, create a practice session:
+
+```
+zellij --session practice
+```
+
+Use the on-screen key hints to create a second pane and detach. In another terminal window, inspect and reattach:
+
+```
+zellij list-sessions
+zellij attach practice
+```
+
+Check that both panes and their harmless contents remain. The [Zellij user guide](https://zellij.dev/documentation/) documents keybindings and configuration; use the installed version's hints if a custom configuration changes them.
+
+### Separate the session from the job
+
+Detaching leaves the session's processes running while the host and session remain available. It does not protect against shutdown, lost storage, or a program failure. Restoring a layout after a restart is different from resuming the processes that previously occupied it.
+
+Use pueue for a local job's submission record and result (§9), or the institutional scheduler on a cluster. Zellij provides a convenient place to inspect those jobs and their logs. On a remote machine, the session lives there; reconnecting your laptop does not revive a remote process that has died.
+
+Keep an established multiplexer if it already works for you. The useful check is being able to detach and recover a harmless session before relying on it during important work.
+
+## An editor beside the agent
+
+Positron is an optional editor for inspecting R or Python code, data, and plots in one window. This chapter shows how to open a project in its recorded environment and review changes made by an agent working in the app or terminal. Keep RStudio, Stata, or an existing editor when it already supports your work.
+
+### Open an existing project
+
+Install through [Positron's official site](https://positron.posit.co/) if you want to try it, then open a practice project folder. Select the R or Python interpreter that belongs to the recorded project environment (§5). Confirm the version and library path before executing code; an editor can discover several installations.
+
+Run a small existing analysis, inspect a dataframe in the [Data Explorer](https://positron.posit.co/data-explorer), and view its saved plot. Filtering or sorting the displayed table is useful for inspection, but those temporary views do not replace reproducible cleaning code.
+
+### Review the agent's work in the editor
+
+Have the agent make a small agreed change through your existing app or terminal session. Inspect the changed file, its diff, and its output in Positron. Both programs are working on the same files, so avoid simultaneous conflicting edits.
+
+An AI extension or database connection is a separate addition with its own access and account requirements. You do not need one for this workflow. Keep the initial trial focused on whether the editor makes code, data, and results easier for you to inspect.
+
+## Troubleshooting R launched by an agent on macOS
+
+On the author's Mac, R has sometimes stalled when an agent launches it with output sent to another program or discarded, rather than connected to a terminal. The process keeps using a processor core but produces no output. This is an observed local problem, not a general property of R or every agent. Giving the process a *pseudo-terminal*, a software-created terminal connection, has been the dependable workaround in this environment.
+
+The project should put the workaround in one executable file, `bin/rscript-pty`, rather than relying on the agent to remember it at each call:
+
+```
+#!/bin/sh
+command -v script >/dev/null 2>&1 || {
+  echo "No script command; cannot allocate a pseudo-terminal" >&2
+  exit 127
+}
+exec script -q /dev/null Rscript "$@" < /dev/null
+```
+
+Have the agent route every R recipe through this helper, including checks and environment commands. For targets, run the pipeline in that same process with `callr_function = NULL` and disable crew for the initial test. Separately launched workers may not inherit the terminal connection. Verify a small run and its output before scaling up.
+
+Earlier local tests succeeded with pueue's file-based logging and with crew. They do not establish that every queued or worker configuration is safe. The consistent baseline here retains the wrapper for queued R jobs too. Enable parallel workers only after testing the actual execution route and recording the evidence.
+
+If the agent sandbox blocks pseudo-terminal allocation, the strict settings in §2 will refuse the call. Use a separately reviewed execution route or run the saved script in your own application; do not silently disable the sandbox. For Quarto that executes R, the equivalent macOS wrapper surrounds the whole render:
+
+```
+script -q /dev/null quarto render paper.qmd < /dev/null
+```
+
+Check the process and artifact as well as the returned status. If a process appears stuck, establish its identity and progress before stopping it; do not launch several replacements. Linux has a different `script` interface, so the macOS wrapper should not be copied unchanged there.
