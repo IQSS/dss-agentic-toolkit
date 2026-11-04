@@ -26,51 +26,51 @@ document.addEventListener("DOMContentLoaded", function () {
   // Stable slugs are the chapter filenames; numbers and groups follow the current manuscript.
   const CH = [
     { n: "1", group: "I", slug: "choose-tools", title: "Choose tools for a research need", tool: "the robot",
-      body: "Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence." },
+      body: "Ask an agent to install and use tools for a specific research need. Choose the capability you need, then follow its chapter independently." },
     { n: "2", group: "I", slug: "tool-access", title: "Control what added tools can access", tool: "the locked cabinet",
-      body: "A new execution route can change what research material the agent reaches. Check the route before relying on restrictions configured for a different tool. The research guide's chapter 3 owns the decision about permitted data; this chapter helps enforce it." },
-    { n: "3", group: "II", slug: "adding-tools", title: "Add a tool without disrupting a project: Homebrew", tool: "the workbench",
-      body: "Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book." },
+      body: "Decide which files, commands, accounts, and network destinations the task needs. Have the agent configure and check access for each execution route." },
+    { n: "3", group: "II", slug: "adding-tools", title: "Install and manage tools with Homebrew", tool: "the workbench",
+      body: "Homebrew installs and manages tools and their supporting software. Ask the agent to use the established package manager and record new tools." },
     { n: "4", group: "II", slug: "version-control", title: "Recover earlier work: git and gh", tool: "the tape measure",
-      body: "Research revisions should be recoverable. Git records selected versions so you can return to a working state when a change produces the wrong output, while retaining a record of why later work differs. The agent can maintain that record; learning every git command is unnecessary." },
+      body: "Have the agent maintain meaningful checkpoints and recover earlier work without discarding unrelated changes. Add sharing when the project needs it." },
     { n: "5", group: "II", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
-      body: "A saved command lets you repeat a research task without reconstructing its steps in another conversation. It also makes the scope visible: updating a figure should not unexpectedly launch every model fit." },
+      body: "Give modular research steps dependable names. Just saves commands; a smoke test checks the actual workflow before a large batch." },
     { n: "6", group: "II", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
-      body: "Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return." },
-    { n: "7", group: "II", slug: "finding-files", title: "Find research files efficiently: rg, fd, jq, yq, bat", tool: "the hammer",
-      body: "Finding the right file quickly helps an agent use the project's actual evidence instead of guessing from an incomplete description. Search and structured-data tools also keep irrelevant output out of the conversation." },
+      body: "Submit prepared jobs and let pueue start the next one automatically when capacity is available. Have the agent report outputs and failures." },
+    { n: "7", group: "II", slug: "finding-files", title: "Find research files efficiently: ripgrep, fd, jq, yq, bat", tool: "the hammer",
+      body: "Use modern search and structured-data tools to locate evidence efficiently. The agent reports relevant files and values without loading the whole project." },
     { n: "8", group: "III", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
-      body: "A working analysis depends on its software as well as its code. Recording the environment makes it possible to restore that combination after an update or on another machine, and to explain an unexpected change in results." },
+      body: "Record the language version separately from project packages. Have the agent restore both and check the working analysis." },
     { n: "9", group: "III", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
-      body: "When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change." },
-    { n: "10", group: "III", slug: "research-documents", title: "Generate documents from research outputs: Quarto and pandoc", tool: "the pencil cup",
-      body: "A report is easier to keep accurate when it is built from maintained text and saved results. Document tools can update tables, figures, references, and layout together instead of leaving numbers copied by hand in several places." },
-    { n: "11", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
-      body: "An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package." },
+      body: "Combine named just commands with targets or Snakemake. The pipeline tracks dependencies and reruns affected steps while reusing current results." },
+    { n: "11", group: "III", slug: "research-documents", title: "Generate documents from research outputs: Quarto and Pandoc", tool: "the pencil cup",
+      body: "Build maintained text and saved results into Markdown, Word, PDF, or HTML. Have the agent set up the renderer and check the produced document." },
+    { n: "10", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
+      body: "Package system software, restrict task access, or run a local model with selected tools. Configure each container for its specific research purpose." },
     { n: "12", group: "IV", slug: "credentials", title: "Keep credentials out of research files: 1Password and direnv", tool: "the drawers and keys",
-      body: "A data-acquisition command may need a credential, but the research code and its published history should not contain the secret. Supply it only to the process that needs access and check what that process records." },
+      body: "Keep API keys out of code and conversation. Supply credentials to the commands that need them and reduce accidental disclosure and unauthorized usage." },
     { n: "13", group: "IV", slug: "service-connections", title: "Connect to research data and services: MCP", tool: "the power strip and jars",
-      body: "A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope." },
+      body: "Connect the agent to useful application operations. A literature-library example explains when MCP adds value alongside files, commands, and APIs." },
     { n: "14", group: "IV", slug: "browser-work", title: "Inspect and interact with a browser", tool: "the window",
-      body: "A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text." },
-    { n: "15", group: "V", slug: "parallel-work", title: "Divide work between agents: git worktrees", tool: "the charging dock",
-      body: "Parallel work is useful when tasks can proceed separately and their results can be checked before integration. Separate working copies prevent two agents from overwriting the same files while you coordinate the combined result." },
+      body: "Have the agent inspect and test a website as it builds it, or navigate a source to collect research data. Preserve recurring collection as a saved workflow." },
+    { n: "15", group: "V", slug: "parallel-work", title: "Divide work between agents: shared projects and git worktrees", tool: "the charging dock",
+      body: "Divide tasks between agents with clear file ownership. Use a shared project or separate git worktrees according to the work and coordinate combined results." },
     { n: "16", group: "V", slug: "headless-agents", title: "Run agents from saved requests", tool: "the vise",
-      body: "A terminal agent can be used interactively or called as one recorded step in a larger workflow. The latter becomes useful when each item needs language-model judgment and you want a saved input, output, and failure status for every run." },
+      body: "Launch saved agent requests from an app or script. Record each case and output, smoke-test the workflow, and configure context deliberately." },
     { n: "17", group: "V", slug: "local-models", title: "Run a model on your own computer", tool: "the desk lamp",
-      body: "Set up a local model runtime, download a model, and check it on harmless inputs. Connect it to an agent after the basic setup works. Keep deployment checks separate from research quality and data-access decisions." },
-    { n: "18", group: "VI", slug: "terminal-commands", title: "Run saved research commands yourself", tool: "the light switch",
-      body: "The terminal is useful when you want to run a saved command yourself, work on a remote machine, or inspect a job log beside the agent. It is an optional interface to the same files and programs, not a prerequisite for the research workflow." },
-    { n: "19", group: "VI", slug: "terminal-agents", title: "Use an agent from the terminal: Claude Code", tool: "the radio",
-      body: "An interactive terminal session gives you another way to work with an agent in a project folder. It can be useful when your commands and job logs are already open there. The project files and research decisions remain the same whichever interface you use." },
+      body: "Run a trained model on your computer and connect it to an agent. Keep setup checks separate from research quality and data-access decisions." },
+    { n: "E", group: "REFERENCE", slug: "terminal-history", title: "Terminal vocabulary", tool: "the light switch",
+      body: "Learn why terminal, shell, TTY, and related names persist. The history explains the interface without requiring a shell-programming tutorial." },
+    { n: "18", group: "VI", slug: "terminal-agents", title: "Use an agent from the terminal: Claude Code", tool: "the radio",
+      body: "Open the project, start Claude, and give research requests. Run saved just workflows directly when useful; shell commands and agent requests are different inputs." },
     { n: "A", group: "REFERENCE", slug: "working-environment", title: "Optional working environment", tool: "the strip light",
-      body: "Optional conveniences support an existing workflow; none is a prerequisite." },
+      body: "Keep useful terminal layouts, session tools, prompts, and editors beside the agent. Add conveniences only where they help your work." },
     { n: "B", group: "REFERENCE", slug: "shared-settings", title: "Keep records of shared settings: chezmoi", tool: "the parts organizer",
-      body: "Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine." },
+      body: "Have chezmoi preserve personal settings and apply them where programs read them. Keep managed source and applied copies aligned." },
     { n: "C", group: "REFERENCE", slug: "usage-tools", title: "Account-usage tools", tool: "the multimeter",
-      body: "Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill." },
+      body: "Check the app usage display first. Use an additional report when retained session logs can answer a question about past usage." },
     { n: "D", group: "REFERENCE", slug: "troubleshooting", title: "Troubleshooting", tool: "the level and square",
-      body: "Diagnose the recorded case of R stalling when launched by an agent on macOS. Use the tested terminal wrapper and check the actual process and output. This is a specific local problem, not a general property of R." },
+      body: "Diagnose the observed R-on-macOS execution problem and the recorded PDF table error. Check the actual process, output, and build log." },
   ];
   const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
@@ -476,11 +476,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const wall = document.getElementById("wall"), benchL = document.getElementById("bench");
   tool(wall, "14", DRAW.window, { heavy: true, tag: [222, 170] });
-  tool(wall, "18", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
+  tool(wall, "E", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
   shelf(wall, 46, 250, 214);
   tool(wall, "13", DRAW.jars, { tag: [226, 222] });
   shelf(wall, 46, 350, 214);
-  tool(wall, "19", DRAW.radio, { tag: [100, 376] });
+  tool(wall, "18", DRAW.radio, { tag: [100, 376] });
   tool(wall, "15", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
   tool(wall, "A", DRAW.striplight, { heavy: true, tag: [704, 56] });
@@ -514,8 +514,8 @@ document.addEventListener("DOMContentLoaded", function () {
     tool(benchL, "16", DRAW.vise, { tag: [222, 442] });
     tool(benchL, "4", DRAW.tape, { tag: [322, 396] });
     tool(benchL, "17", DRAW.lamp, { tag: [722, 430] });
-    tool(benchL, "10", DRAW.pencils, { tag: [510, 442] });
-    tool(benchL, "11", DRAW.toolbox, { tag: [938, 442] });
+    tool(benchL, "11", DRAW.pencils, { tag: [510, 442] });
+    tool(benchL, "10", DRAW.toolbox, { tag: [938, 442] });
   })();
 
   // The robot is §1: the agent itself. It stands in front of everything, so its link is the last thing drawn.

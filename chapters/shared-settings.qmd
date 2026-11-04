@@ -2,28 +2,22 @@
 title: "Appendix B. Keep records of shared settings: chezmoi"
 ---
 
-Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine.
+Personal tool settings often live in several folders. A maintained record makes them easier to restore after a mistake or on a new computer. [Chezmoi](https://www.chezmoi.io/) manages selected configuration files and puts them in the locations where programs expect to find them. The agent can maintain that record for you.
 
-For example, a correction to your shared coding conventions should survive a new laptop and should not be overwritten by an older managed copy. Chezmoi records source files and applies them to their expected locations. Project-only configuration already tracked by git may need nothing more.
+For example, you revise your shared coding conventions on one laptop. You want the new version preserved and available on another machine, without an older managed copy overwriting it later. Chezmoi supplies that source-to-installed-file relationship; a private [git](https://git-scm.com/) repository can record the source's history.
 
-## What it gives the agent
+## Understand the two copies
 
-Chezmoi keeps source versions of selected settings and writes them to the locations each program reads. A private git repository can record changes to that source. This makes it possible to inspect a proposed update and recover a previous configuration.
+The *source* is the copy managed by chezmoi. The *applied file* is the copy read by the program. Applying the source updates the installed location. If the agent changes the applied file directly, it must capture the change back into the source before a later apply restores the older version.
 
 ![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi keeps source versions in a settings repository and applies them to the paths programs read. Both locations need review and protection." above="16pt" below="14pt"}
 
-There are two copies to consider: the source managed by chezmoi and the applied file used by the program. Protect both when a file defines the agent's permissions. If the source remains editable, the agent could change it and later have chezmoi overwrite the protected active setting (§2).
+> Inspect how my personal settings are managed. Use the existing chezmoi setup if present, or configure it for the selected settings that need recovery across machines. Preserve current files, exclude credentials and account state, and record source and applied locations. When changing an applied file, capture the change back into the managed source, check that the copies agree, and commit the intended update. Do not publish the settings repository.
 
-## Start with a harmless setting
+The agent follows the [quick-start documentation](https://www.chezmoi.io/quick-start/), checks proposed differences, and verifies that the target program reads the expected configuration. You decide which settings should be shared. Project-only configuration already tracked in the project's repository may need no additional manager.
 
-> Inspect how my settings are already managed. If chezmoi would help, propose a small initial set and preserve backups before importing it. Exclude credentials and sensitive account details. Show the source and applied paths, the proposed diff, and a way to restore the previous version. Do not publish the settings repository.
+## Preserve machine differences and access controls
 
-Use the [chezmoi quick start](https://www.chezmoi.io/quick-start/) for the current workflow. Start with a harmless setting, inspect `chezmoi diff`, and apply it after review. Confirm the program sees the change, then rehearse restoring the previous setting before managing permission files.
+Chezmoi templates can express differences between machines, such as executable paths. Have the agent check the result on each target environment before relying on it. A shell startup file referencing a missing program can break the next session; Windows settings and a [WSL](https://learn.microsoft.com/windows/wsl/) Linux home are not interchangeable.
 
-## Keep the record and the active files aligned
-
-If the agent edits an applied file directly, it must capture that change back to chezmoi's source before a later apply overwrites it. Review the resulting source diff and commit the intended change. Do not broadly capture a directory that might contain tokens or account state.
-
-Templates can express differences between machines, but test them before applying to a working setup. A startup file that references a missing program can break the next shell session. On WSL2, manage the Linux home deliberately rather than assuming it is the same as the Windows user's settings.
-
-Keep an existing institutional configuration manager when it already does this job. Adding chezmoi should make settings easier to inspect and restore, not create a second authority that continually overwrites the first.
+Protect both copies when a file controls agent permissions. An editable source can later overwrite a protected applied file. The [access-control chapter](#tool-access) explains that risk. Do not import entire settings directories without checking for tokens and account data. Keep an institutional configuration manager if it already does this job; two managers repeatedly overwriting each other make recovery harder.

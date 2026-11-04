@@ -1,33 +1,31 @@
 ---
-title: "3. Add a tool without disrupting a project: Homebrew"
+title: "3. Install and manage tools with Homebrew"
 ---
 
-Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book.
+A package manager installs software, obtains the supporting software it needs, and provides a consistent way to update or remove it. [Homebrew](https://brew.sh/) does this for many of the tools in this guide. Once it is available, you can ask the agent to add a tool by name instead of working through a different download and installer for each one.
 
-For example, the agent repeatedly writes small programs just to select fields from saved JSON responses. Installing `jq` gives it a maintained tool for that job. Verify it on one harmless response while leaving the project's R or Python environment unchanged.
+Suppose you want the agent to run a batch of model fits unattended. It needs [pueue](https://github.com/Nukesor/pueue), the queue described in [chapter 6](#job-queues). Homebrew can install pueue; the agent then configures the queue and uses it for your project. Installation makes the program available, while your instructions tell the agent when to use it.
 
-## What you need first
+## Establish the installation route once
 
-On a Mac, ask the agent to check the installed tools, machine architecture, and Homebrew's current prerequisites. The research guide's first exercise does not require git or Apple's Command Line Tools; adding tools here may require them. Keep an existing institutional package-management arrangement if it meets the need; do not build a competing setup without a reason.
+Ask the agent to check whether Homebrew and the required tool are already installed. Keep an institution's working package-management arrangement where it meets the need. On a Mac, the agent should identify the machine architecture and current prerequisites before following [Homebrew's installation instructions](https://docs.brew.sh/Installation). Those instructions include a package installer for supported Apple Silicon Macs and a command-line route.
 
-The current [Homebrew installation instructions](https://docs.brew.sh/Installation) provide both the supported command-line route and a macOS package installer. Use those instructions rather than a copied installer command from an old guide. A password or installer dialog is a step for you, not a credential to paste into the conversation. If a terminal step is required, §18 explains how to open Terminal and paste one command. The macOS package route is documented here, but has not been tested as a complete new-user walkthrough for this edition.
+The agent can prepare the installation and explain any action you must take. You handle password prompts, installer dialogs, and institutional authorization; never paste a password into the conversation. If you need to enter a command yourself, the [terminal chapter](#terminal-agents) explains the interface. The package route is documented, but this edition has not tested it as a complete installation on a new Mac.
 
-## Ask for a small installation
+> Check whether Homebrew and pueue are already available in this session. If Homebrew is missing, identify the supported installation route and any step I must complete. Install pueue if needed, check that the agent can invoke it, and configure it for this project's unattended jobs. Record the installation and how future sessions should use it.
 
-> Inventory the tools this project already has and how they are managed. If Homebrew is needed, identify the supported installation route for this machine and explain any step I must perform myself. Then install ripgrep and jq if absent. Show their versions and use them on harmless example files. Do not upgrade the project's research language or package environment.
+For an installed Homebrew, the tool-installation command in this example is `brew install pueue`. The agent runs it and handles ordinary installation diagnosis. Homebrew's noninteractive options do not remove operating-system password requirements.
 
-Once Homebrew works, the agent can install further tools as you reach the relevant section. You do not need the whole toolkit at once. For noninteractive installs, Homebrew documents the `HOMEBREW_NO_ASK` setting; it does not remove operating-system authorization requirements. Record installed tools and why the project needs them.
+## Keep installation records useful
 
-A personal `Brewfile` can record a growing installation set. It is useful for rebuilding a machine, but is not a substitute for the project's pinned research environment (§8). This guide uses section-by-section installation, so no separate bundle is needed to start.
+The agent should report what it installed and the version available to the session doing the work. A program may be installed but missing from that session's `PATH`, the directories searched for commands. Have the agent diagnose that before reinstalling it; a newly opened app session may inherit updated settings.
 
-## Check that it works
+A `Brewfile` records a set of Homebrew packages, which helps rebuild a machine. It does not lock every dependency of a research analysis. Keep the project's language and package records separately, using the [environment tools](#environments). Updates to machine tools and changes to an analysis environment should be deliberate, especially when existing results depend on particular versions.
 
-Ask the agent to show `brew --version`, the installed tool versions, and the small example's output. A `brew doctor` warning needs interpretation; it does not necessarily mean an installation failed. A command that cannot be found may be absent or may be outside the agent process's search path. After installation, a fresh app session may be needed to inherit that path.
+Add a standing instruction: use the established package manager, check for an existing installation, record new tools, and use them in the relevant project workflow. There is no need to install every tool in this book.
 
-Keep installation review separate from research work. An installer may request network access or write outside the project. Approving that operation does not authorize later commands to use the same access without review (§2).
+## Windows and Linux
 
-## Windows through WSL2, and Linux
+This guide's Windows route uses Ubuntu through [Windows Subsystem for Linux (WSL2)](https://learn.microsoft.com/windows/wsl/install). Keep the project and Linux tools in the same distribution. A Windows installation is not automatically available as a Linux program.
 
-This guide's Windows route is Ubuntu inside WSL2, not native Windows tools. Follow Microsoft's [WSL installation instructions](https://learn.microsoft.com/windows/wsl/install), including any administrator step and restart. Keep the project and its Linux tools inside the same distribution; a Windows installation of a program is not automatically a Linux installation.
-
-Homebrew supports Linux under its documented requirements. Follow its Linux instructions rather than copying the macOS installer. If your institution already supplies packages through Ubuntu or a managed environment, use those when adequate and record any differences in command names. The tools' platform notes identify consequential differences rather than promising identical operation everywhere.
+Homebrew also supports Linux under its documented requirements. If an institution already supplies suitable packages through Ubuntu or a managed environment, use those. The agent should record any important differences in command names or configuration. Follow the platform's own installation instructions rather than copying the Mac setup.

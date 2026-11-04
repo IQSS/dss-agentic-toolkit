@@ -1,38 +1,67 @@
 ---
-title: "19. Use an agent from the terminal: Claude Code"
+title: "18. Use an agent from the terminal: Claude Code"
+aliases:
+  - /chapters/terminal-commands.html
 ---
 
-An interactive terminal session gives you another way to work with an agent in a project folder. It can be useful when your commands and job logs are already open there. The project files and research decisions remain the same whichever interface you use.
+<!-- aliases: terminal-commands -->
 
-For example, open a project containing a small, nonconfidential `notes.md`, ask the agent to summarize it, then request one small edit and inspect the saved file. This chapter covers that interactive session; saved unattended runs and local models have separate chapters.
+A terminal gives you another way to work with an agent in a project folder. It is useful when your project commands and job logs are already open there, or when you are working on a remote machine. You can give the same natural-language requests you would use in the app, then run the project's saved commands directly when that is convenient.
 
-## Install and start
+For example, ask the agent to revise a figure using the saved analysis results. After it has finished, you can run `just figures` yourself to regenerate the plot. The project files and commands stay the same whichever interface you use.
 
-Follow the current [Claude Code quickstart](https://code.claude.com/docs/en/quickstart) for the supported installation route on your platform. Having the desktop app does not by itself establish that the `claude` command is installed. Ask the agent to check first. Complete account sign-in yourself and select the institutional subscription route you intend to use.
+## The terminal is the window; the shell reads commands
 
-Open the project folder containing your `notes.md` in a terminal (§18 explains navigating to a folder), then run:
+A *terminal* displays typed input and program output. A *shell* is the program that interprets commands entered there. On a Mac, open Terminal through Spotlight. For this guide's Windows route, open Ubuntu through [WSL2](https://learn.microsoft.com/windows/wsl/) in [Windows Terminal](https://learn.microsoft.com/windows/terminal/). These examples use a Unix shell, not PowerShell.
+
+Every shell has a working directory. Use `cd` to enter your project folder; replace this path with your actual path and retain quotes if it contains spaces:
+
+```
+cd "/Users/your-name/Research/my-project"
+```
+
+`pwd` displays the current folder. [Appendix A](#working-environment) covers optional terminal conveniences; [Appendix E](#terminal-history) explains the history behind terms such as terminal, shell, and TTY.
+
+## Start Claude in the project
+
+Have the agent check whether the [Claude Code](https://code.claude.com/docs/en/overview) CLI is installed; having the desktop app does not establish that the [`claude`](https://claude.ai/) command is available. Follow the current [installation and sign-in instructions](https://code.claude.com/docs/en/quickstart) for your platform and intended account. Once installed, type this at the shell prompt:
 
 ```
 claude
 ```
 
-Read the folder-trust prompt before accepting it. Ask Claude to identify the project instructions it loaded and summarize `notes.md` without changing anything. Then request one small edit and inspect the saved file. The research guide explains project instructions and evidence for accepting a task.
+Complete any initial sign-in and folder-trust step. Once Claude is running, type a research request in ordinary language, such as “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent rather than entering a shell command. It can read the project instructions, use its permitted tools, and report the result.
 
-The project directory determines ordinary relative paths; it is not by itself a boundary on everything the process can read. The access configuration in §2 still matters.
+Use `/exit` to leave the agent and return to the shell. The selected project directory supplies ordinary relative paths; it does not by itself restrict everything the agent can access. The [access configuration](#tool-access) still applies.
 
-## Controls you will use
+## Run saved project commands directly
 
-[Research chapter 5](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give an agent. As of September 2026, the terminal documentation describes these controls; check their availability against the installed version's help and [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode):
+If the project uses [just](https://just.systems/), these shell commands list its recipes and run the figure task:
+
+```
+just --list
+just figures
+```
+
+The recipes must already exist in the project's justfile. Ask the agent to create or explain them using [chapter 5](#project-commands). This lets you repeat a saved workflow without needing the LLM to reconstruct the execution steps.
+
+If a tool is missing, you can ask the agent to install it. With [Homebrew](https://brew.sh/) already available, the equivalent shell command for just is `brew install just`. [Chapter 3](#adding-tools) owns the package-manager setup. A “command not found” message may mean either that the tool is absent or that the shell cannot find it; have the agent diagnose that before reinstalling anything.
+
+## Use the session controls you need
+
+The [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode) and installed help describe the current controls. Common examples include:
 
 | Control | Purpose |
 |:--|:--|
-| `/model` | Choose an available model and inspect its options |
-| `/effort` | Set reasoning effort where supported |
-| `/permissions` | Inspect and change permission rules |
-| `/sandbox` | Inspect sandbox configuration |
-| `/context` | Inspect context use |
-| `/compact` | Summarize the current conversation to reduce context |
-| `/usage` | Inspect account usage information |
-| `/exit` | Leave the interactive session |
+| `/model` | Choose an available model and inspect its options. |
+| `/effort` | Set reasoning effort where supported. |
+| `/permissions` | Inspect or change permission rules. |
+| `/sandbox` | Inspect sandbox configuration. |
+| `/context` | Inspect context use. |
+| `/compact` | Summarize the conversation to reduce context. |
+| `/usage` | Inspect account usage information. |
+| `/exit` | Leave the agent and return to the shell. |
 
-Shift-Tab cycles the available permission modes. The cycle can depend on account and configuration; check the displayed mode rather than assuming a fixed sequence. Use Auto for ordinary work inside reviewed boundaries, Plan when you want to settle the approach first, and Manual when inspecting individual approvals is useful. Save important decisions and next steps to project files before compacting or ending a session.
+Permission modes and shortcuts vary with the installed version and account. Check the displayed mode. The research guide's [settings chapter](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give the agent. Have it save important decisions and next steps to project files before ending a session.
+
+For unattended jobs, use the [queue workflow](#job-queues); closing a window is not a job-management strategy. For noninteractive agent calls, use the [headless chapter](#headless-agents). A terminal interface does not change where a hosted model processes the context it receives.

@@ -76,9 +76,11 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
                                 f"reached the page — {normalise(body)[:70]}…")
 
     # 2. Raw LaTeX. Pandoc drops it for HTML without a word, which is the failure this whole pipeline
-    # exists to prevent, so its absence is asserted rather than assumed.
+    # exists to prevent, so its absence is asserted rather than assumed. Intentional
+    # code examples (including inline commands in troubleshooting) are not leaks.
     for page, text in html.items():
-        if "tikzpicture" in text or "\\begin{" in text:
+        prose = re.sub(r"<pre\b.*?</pre>|<code\b.*?</code>", "", text, flags=re.S)
+        if "tikzpicture" in prose or "\\begin{" in prose:
             problems.append(f"{page.relative_to(site)}: raw LaTeX reached the page")
 
     # 3. Every image resolves.

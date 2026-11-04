@@ -2,28 +2,30 @@
 title: "14. Inspect and interact with a browser"
 ---
 
-A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text.
+Browser access lets an agent see and interact with a website as a user would. That is useful both when building a research website and when acquiring data from an existing one. The agent can follow links, use filters, inspect rendered content, and turn what it learns into code or saved data.
 
-For example, a table may contain correct estimates but cut off its confidence-interval column on a narrow screen. Ask the agent to inspect that page at the reader's width and compare a displayed value with the saved result. For acquisition, prefer a permitted API or export before automating browser interaction.
+Suppose the agent builds a dashboard for a study. It should open the dashboard, change a filter, inspect the resulting plot, and fix a clipped label or broken control. In a data-acquisition task, it might navigate a public portal, choose a release, and retrieve the required records. These are concrete reasons to give it a browser; ordinary local Word or PDF production does not require website access.
 
-## The recommended starting point
+## Give the agent access to the relevant site
 
-Use [Playwright MCP](https://github.com/microsoft/playwright-mcp) for a browser the agent controls in a separate profile. Start with a local report or a public test page, without account credentials. A separate browser profile helps avoid accidental use of your existing logins, but is not a complete security boundary.
+[Playwright MCP](https://github.com/microsoft/playwright-mcp) supplies browser operations through an [MCP connection](https://modelcontextprotocol.io/). An existing app browser integration may already do what the task needs. Have the agent check the available route before installing another one, then configure the required site access using current documentation.
 
-The agent can inspect page structure, navigate, interact, and capture evidence of the rendered result. For a report, ask it to compare a displayed number with the saved result and inspect a figure at the size readers will see. Reading HTML alone cannot establish that the layout is usable.
+> Use browser access to inspect this project's website while building it. Open the locally served version, exercise the important navigation and controls, and check the pages at desktop and phone widths. Fix problems you find and report the pages and actions checked. Use screenshots or page locations to explain anything that still needs my decision.
 
-> Configure the official Playwright MCP server for this project using a reviewed version. Open the local test report in a separate browser profile with no signed-in accounts. Inspect the table, figure, and navigation. Report concrete problems with screenshots or page locations, and compare one displayed result with its source file.
+A website can be served locally during development; it does not need to be public. Source-code inspection alone cannot establish whether a control works or whether a figure is readable at its displayed size. Have the agent inspect the rendered result as part of the actual development workflow.
 
-Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §13.
+## Use the browser to understand a data source
 
-## When the browser needs an account
+For collection, start with the research guide's [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder): an appropriate API or structured download, then static HTML parsing, then scripted browsing, then interactive agent browsing when that is needed. An agent can use a browser to discover a better structured route; not every scrape should become a long sequence of clicks.
 
-Claude's browser integration can work in a signed-in browser when the account and interface support it. Follow the current [Chrome integration documentation](https://code.claude.com/docs/en/chrome) and institutional approval process. Grant the specific site access needed for the task, and review consequential actions such as submitting a form or changing a record.
+> Inspect this data source and find a permitted way to obtain [the required records]. Prefer an API or export when available. Use browser interaction where the content or controls require it. Save the original responses or downloads and their provenance. For recurring collection, create a reusable script with explicit inputs, saved outputs, request limits, and failure reporting.
 
-Whatever the agent reads may become part of model processing. Do not expose participant portals, private correspondence, or other confidential systems merely because you can open them yourself. A web page can also carry malicious instructions; account access increases what following them could affect.
+Have the agent smoke-test a representative portion of the actual collection before scaling up. A conversation describing clicks is not enough to reproduce a large extraction. Preserve the useful exploration as a repeatable procedure and retain failed requests for diagnosis.
 
-## Make recurring collection reproducible
+## Choose the browser profile and account deliberately
 
-An agent can help discover a permitted route and prototype the interaction. Once the collection steps are stable, save a script, inputs, outputs, and failure handling. Test it on a small sample before increasing volume. Browser-driven collection can be reproducible, but a conversational record of clicks alone is a weak reproduction package.
+A separate browser profile can keep a task from inheriting your usual logins. Some work needs an authenticated service; the agent should explain which account and actions it needs before you sign in. [Claude's Chrome integration](https://code.claude.com/docs/en/chrome) is one documented route for supported signed-in browsing.
 
-Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§11). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.
+The model may receive whatever the browser reads. Your ability to open a participant portal does not establish permission to send its contents to a hosted model. Keep access and consequential actions, such as submitting forms or changing records, within the assigned task. [Chapter 2](#tool-access) covers these decisions.
+
+Computer use extends interaction beyond browser pages to desktop applications. Keep it for a task that requires that access, in an appropriately configured environment. It is not required to follow the core workflows here.

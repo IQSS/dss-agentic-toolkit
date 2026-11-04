@@ -2,24 +2,20 @@
 title: "Appendix C. Account-usage tools"
 ---
 
-Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill.
+Start with the usage display in the app you already use. For most researchers, it is the quickest way to check the account's current allowance or limits. An extra reporting tool is useful only when you have a question the built-in display does not answer.
 
-## What to inspect first
+For example, after several large research sessions you may want to know which sessions accounted for most of the recorded usage. [Ccusage](https://ccusage.com/) can summarize compatible retained local logs by period and session. That can help identify costly patterns, but its coverage and estimates are different from an account's official allowance or invoice.
 
-Check the app's usage controls or the terminal's `/usage` command. Limits depend on the account and can change; use the current [Claude usage guidance](https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits) and your institutional plan rather than a fixed number in this guide.
+## Check the app first
 
-Long conversations, large inputs and outputs, model choice, and reasoning effort can increase usage. A model fit computing on your laptop does not itself consume language-model tokens merely because time passes. Repeatedly asking the agent for progress updates or having it read large logs can create additional calls to the language model.
+Use [Claude's usage guidance](https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits) and the information for your actual institutional plan. In a terminal session, `/usage` supplies a built-in route. Limits and controls change, so this guide does not reproduce a fixed allowance.
 
-## What ccusage adds
+Large inputs, long conversations, output length, model choice, and reasoning effort can affect usage. A model fit running on your laptop does not consume LLM tokens merely because time passes. Repeated requests for updates or large log reads can create additional model calls.
 
-[ccusage](https://ccusage.com/guide/) summarizes compatible local logs by periods and sessions. Its coverage depends on which sessions were logged, retained, and available on this machine. Deleted logs, work on other machines, and unsupported interfaces can leave gaps. Cost estimates depend on the tool's pricing assumptions and are not an invoice.
+## Ask the agent for a historical report when useful
 
-> Check Claude's built-in usage information first. If the retained logs can answer my question, use a reviewed version of ccusage to summarize this week's largest sessions. Report the covered dates and missing sources. Separate measured token totals from hypotheses about why a session was expensive. Do not upload the logs or quote confidential contents.
+> Check the built-in usage information first. If compatible retained logs can answer my question, use ccusage to identify this week's largest recorded sessions. Report covered dates and missing sources, and distinguish measured token totals from explanations you infer about the cause. Keep log contents local and avoid reproducing confidential text.
 
-Review and record the package version before running it. A package executed through npx is still downloaded code, even if it is not installed permanently.
+The agent should check the current [tool documentation](https://ccusage.com/guide/), version, and available logs before running it. Deleted logs, another machine's sessions, or unsupported interfaces can leave gaps. A missing session does not mean zero use. Monetary estimates depend on pricing assumptions and are not a subscription balance or bill.
 
-## Use the result to change a habit
-
-Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§6).
-
-A missing session is a coverage problem to investigate, not evidence of zero use. Retained logs may themselves contain confidential material; apply the project's access and retention rules to them.
+Use the report to decide whether a habit should change: reading whole data files into context, repeatedly sending large logs, or extending a conversation long after its task is complete. Have the agent retrieve relevant log excerpts and use the [queue workflow](#job-queues) for long computation. Keep the logs themselves under the project's access and retention rules.

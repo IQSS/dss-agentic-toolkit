@@ -1,39 +1,36 @@
 ---
-title: "10. Generate documents from research outputs: Quarto and pandoc"
+title: "11. Generate documents from research outputs: Quarto and Pandoc"
 ---
 
-A report is easier to keep accurate when it is built from maintained text and saved results. Document tools can update tables, figures, references, and layout together instead of leaving numbers copied by hand in several places.
+Building a manuscript from maintained text and saved results helps keep tables, figures, and reported numbers consistent as an analysis changes. [Quarto](https://quarto.org/) and [Pandoc](https://pandoc.org/) give the agent a repeatable way to produce those documents in the format you need.
 
-For example, a corrected estimate in the heat-and-birthweight project should reach Table 1 and the sentence that describes it. Quarto can combine prose, code, and results; pandoc can convert maintained text through a template. Keep a working Word or notebook collaboration route when it already meets the need.
+In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), an updated estimate should reach both the results table and the sentence describing it. The agent can connect those locations to saved analysis output, then regenerate the manuscript. Coauthors can still receive a Word document; they do not need to adopt your source format to read it.
 
-## What the tools give the agent
+## Choose the output your collaborators need
 
-A Quarto source file can hold prose, code, citations, and references to figures and tables. The agent edits that source and renders the result. This makes it easier to keep reported numbers connected to the analysis, provided the document executes the appropriate code or reads current result files.
+| Output | Typical use | Build requirements |
+|:--|:--|:--|
+| Markdown | Maintain readable text, citations, and links in a project. | A text source and the selected Markdown output format. |
+| Word (`.docx`) | Exchange editable drafts with coauthors. | Quarto or Pandoc; a Word reference document can supply styles. |
+| PDF through [LaTeX](https://www.latex-project.org/) | Produce a typeset manuscript with controlled equations, citations, and layout. | Quarto or Pandoc plus a TeX distribution and required fonts. |
+| HTML | Publish a report or website with links and interactive material. | The selected HTML renderer and any required assets. |
 
-A render does not always rerun the analysis. Quarto's [execution documentation](https://quarto.org/docs/projects/code-execution.html) explains caching, frozen results, and notebook execution. Record whether the build executes models, reuses saved fits, or only formats existing output. Include the required refresh in the release check.
+Quarto combines prose, code execution, and publishing configuration, using Pandoc for document conversion. Pandoc can also be used directly when the source already contains the required text and results. Neither needs to replace a functioning writing workflow merely for uniformity.
 
-Pandoc converts text sources into formats such as Word, HTML, and PDF. For a designed PDF, a LaTeX template can specify fonts and layout. The XeLaTeX route requires a TeX installation and the fonts named by the template.
+## Explain the PDF software before installing it
 
-## Ask for a small first document
+[LaTeX](https://www.latex-project.org/) is a typesetting system that turns text and formatting instructions into a document. A *TeX distribution* supplies the programs and packages needed to run it. This matters for the PDF-via-LaTeX route; Markdown and Word output do not require a TeX installation.
 
-> Inspect the project's existing writing workflow. If Quarto is appropriate, set up a one-page document in the recorded language environment, with one result computed from a tiny invented dataset and one plot. Add a build command that renders it to the required format. State what executes during that command and what is reused. Show me the rendered file before adapting the manuscript.
+Have the agent check for an existing working distribution first. For Quarto, its [PDF setup instructions](https://quarto.org/docs/output-formats/pdf-basics.html) provide a [TinyTeX](https://yihui.org/tinytex/) route using `quarto install tinytex`. Keep an adequate [MacTeX](https://tug.org/mactex/) or [TeX Live](https://tug.org/texlive/) installation. If a recipe invokes Pandoc separately, the agent must also check that it can find the selected engine, such as XeLaTeX, and the template's fonts. Other PDF routes exist; this chapter describes the LaTeX route used for these guides.
 
-For a text-only PDF, request pandoc and a template instead. TinyTeX is a small TeX distribution supported by Quarto; an existing MacTeX or TeX Live installation can stay. Follow [Quarto's PDF setup](https://quarto.org/docs/output-formats/pdf-basics.html), and check that an independently invoked pandoc can find XeLaTeX. A larger TeX installation reduces missing-package problems but does not guarantee an identical build years later.
+## Have the agent build the project's document
 
-## Check the document, not just the command
+> Inspect this project's manuscript source, saved results, references, and required output formats. Configure Quarto or Pandoc to generate the actual document, reusing the existing workflow where practical. Link reported values, tables, and figures to saved analysis outputs. Install missing rendering software through the appropriate route, and add a [just](https://just.systems/) recipe for the build. Explain what the command recomputes and what it reuses. Render the document and check its contents and layout.
 
-Open the output and inspect the result, figure, citations, and layout. Change one value in the invented input, rebuild, and verify the corresponding reported result changes. For the manuscript, check a selected result against the saved analysis output. A recent modification time alone cannot establish that the right analysis ran.
+Keep the [just](https://just.systems/) recipe and rendering configuration with the project. A document build need not refit every model: it can read maintained results. Quarto's [execution settings](https://quarto.org/docs/projects/code-execution.html) govern caching and frozen outputs. Have the agent document how final results are refreshed so that a successful render is not mistaken for a rerun of the analysis.
 
-Save the rendering command and its options as a project recipe (§5), and record the language packages, TeX dependencies, and fonts needed for hand-off. Preserve a Word route when coauthors need it; conversion still requires checking tables, equations, references, and tracked changes.
+## Check the saved document
 
-For an R process that hangs when launched by an agent on macOS, use the single troubleshooting procedure in §5. Queueing the render is not itself a guarantee that the problem disappears.
+The agent should inspect the actual Word, PDF, or HTML output, check representative reported values against their sources, and flag missing citations, broken tables, or clipped figures. You review the research interpretation and prose. The research guide's [manuscript chapter](https://dss-agentic-research.pages.dev/chapters/research-writing.html) explains how to track whether the right numbers reach the paper.
 
-One specific template error encountered with TeX Live 2026 is “No counter 'none' defined” for a captionless table. The pandoc-to-XeLaTeX templates used here include this compatibility block in their preamble:
-
-```
-\makeatletter
-\@ifundefined{c@none}{\newcounter{none}}{}
-\makeatother
-```
-
-Other failures need their own diagnosis. Check missing fonts and packages in the render log rather than changing the document's statistical code to obtain a PDF.
+Record rendering dependencies and preserve source references and templates for handoff. A Word conversion still needs inspection of equations and tables. For an [R](https://www.r-project.org/) render that stalls on the author's Mac, use [Appendix D](#r-on-macos). That appendix also records the specific TeX Live captionless-table error encountered in these guides; missing fonts or packages need their own diagnosis.

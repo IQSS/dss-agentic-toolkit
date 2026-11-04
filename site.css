@@ -52,6 +52,21 @@ table tr:has(.matrix-band-1) > td {
   .matrix-daily { background-color: #2f5f47; color: #dff0e6; }
 }
 
+/* Both guides: one point below body text, with subtle, theme-aware row bands. */
+main { --guide-table-band: rgba(0, 0, 0, 0.045); }
+body.quarto-dark main { --guide-table-band: rgba(255, 255, 255, 0.07); }
+main table { font-size: calc(1rem - 1pt); }
+main table > tbody > tr:nth-child(odd) > * {
+  background-color: var(--guide-table-band);
+}
+/* Grouped lookup tables shade the section labels rather than alternate rows. */
+main .toolkit-lookup table > tbody > tr > * {
+  background-color: transparent;
+}
+main .toolkit-lookup table > tbody > tr:has(td:first-child strong) > * {
+  background-color: var(--guide-table-band);
+}
+
 /* ---- the chapter agent ----
    The landing page's robot, dressed by that chapter's own recipe and floated at the head of the
    page, so the figure a reader hovered on the console is the one that greets them inside. The

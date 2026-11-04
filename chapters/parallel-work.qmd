@@ -1,31 +1,31 @@
 ---
-title: "15. Divide work between agents: git worktrees"
+title: "15. Divide work between agents: shared projects and git worktrees"
 ---
 
-Parallel work is useful when tasks can proceed separately and their results can be checked before integration. Separate working copies prevent two agents from overwriting the same files while you coordinate the combined result.
+Several agents can make progress at once when their tasks are clearly divided. Give each a defined responsibility and specify how its output connects to the others. Separate working copies are one option; agents working on different files can often share the same project directory.
 
-For example, one agent can revise figure labels while another adds a data check. Git worktrees give each a branch and folder in the same repository. Neither task is complete until its changes are integrated and the combined workflow passes the relevant checks.
+For example, one agent can develop modeling code while another develops visualization code. Agree on the saved results the plotting code will read, including column names and units. The agents can work concurrently on their own files, then run the model-to-figure workflow together. This is a common arrangement without [git worktrees](https://git-scm.com/docs/git-worktree).
 
-## What a worktree separates
+## Give each agent ownership of its files
 
-Separate working folders reduce the chance that agents overwrite each other's edits. They still share repository history and may share databases, caches, credentials, or outputs outside those folders. Worktrees do not restrict access for security purposes, and changes can still conflict when combined. See the [git worktree manual](https://git-scm.com/docs/git-worktree).
+> Divide this task between a modeling agent and a visualization agent. Agree on the model-output format first. Assign each agent the files it may edit, keep shared configuration changes coordinated, and have a lead agent run the combined workflow and resolve mismatches. Preserve existing edits and report what each agent completed.
 
-For example, one agent could add known-answer checks for a cleaning function while another prepares a figure from an already saved result. Give each a separate output directory. Review both changes, then test their combined state before accepting it.
+Distinct file ownership avoids many collisions, but the tasks may still share a dependency file, pipeline definition, output directory, or repository state. Have the lead agent coordinate those changes and git operations. Do not let one agent clean or reset files another is using. Shared helper functions should have an assigned editor rather than become a place where everyone makes unannounced changes.
 
-## Ask for it, and tell the agent
+The interface between tasks matters as much as the file list. If the model agent changes an output column, the visualization agent needs to know. Record those decisions in project files so they survive individual conversations.
 
-> Prepare separate worktrees and branches for these two tasks: [task A] and [task B]. Identify shared inputs and resources before starting. Give each task a separate output location and the recorded environment it needs. Preserve existing uncommitted work. Do not merge or remove either worktree until its changes and outputs have been reviewed.
+## Use worktrees when tasks need separate working versions
 
-Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§19). Confirm the actual folder and branch each session uses before either starts editing.
+A git worktree gives an agent another working directory attached to the same repository, usually on a separate branch. It is useful when agents need to edit overlapping files, explore alternative changes, or test against a stable version while other work continues. Each edits its own copy; overlapping changes can still conflict when combined.
 
-## Prepare the inputs deliberately
+> Prepare separate worktrees for these overlapping tasks, preserving current uncommitted work. Identify the inputs and environment each needs, assign separate output locations, and keep shared resources coordinated. Integrate the completed changes and run the combined checks before removing any working copy.
 
-A new worktree contains the files tracked by git. Ignored data, package libraries, and saved model fits may be absent. Arrange approved access to those inputs and a way to restore the environment before either agent starts. Otherwise it may improvise a substitute for a missing file or repeat an expensive fit. Do not let both agents write to a shared cache without checking that the tool supports it.
+Worktrees share repository history and may still reach shared data, caches, credentials, or services. They do not provide a security sandbox. A new working copy also may not contain ignored data, installed libraries, or saved fits. Have the agent supply approved inputs and restore the recorded environment deliberately instead of improvising replacements or repeating expensive fits.
 
-Independent implementation for verification needs additional separation. Give fresh sessions the approved inputs and specification without exposing the first implementation or its intermediate results. Worktrees alone do not provide that independence, especially if the reference implementation is in shared history. The research guide's *Verification* chapter explains what to compare and how to interpret agreement.
+## Bring the results together
 
-## Review and integrate
+The coordinating agent should check that the pieces work together, whether they were developed in one directory or several. Two individually successful tasks can disagree about file formats or assumptions. A representative end-to-end run can reveal that before the full analysis.
 
-Ask for `git worktree list`, each branch's changes, test results, and remaining uncommitted files. Resolve overlapping edits deliberately. Run checks on the combined result, since two individually passing changes can fail together.
+For worktrees, the agent handles branch integration and preserves needed work before cleanup. It should report conflicts or research choices requiring your judgment. You need not manually inspect every diff or run git commands to coordinate the work.
 
-Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§6). Extra agents are useful only when their outputs can be specified, checked, and integrated.
+Parallel development differs from the research guide's [independent-implementation check](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html). That check requires fresh agents to receive the same specification without seeing each other's implementations. A worktree alone does not provide that informational separation, especially when the first implementation remains in shared history.

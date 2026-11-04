@@ -2,38 +2,28 @@
 title: "13. Connect to research data and services: MCP"
 ---
 
-A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope.
+An agent may need to work with records held in an application rather than ordinary project files. A connection can expose useful operations such as searching a reference library, retrieving a document, or querying a database. The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) provides a common way for an agent application to discover and call those operations. A suitable existing connection can save repeated exports or custom integration code.
 
-For example, a reference-library connection could retrieve a paper's title and DOI for comparison with a manuscript citation. Test it with a record you know and read-only access before using it across a collection. Reading a known record checks connectivity; it does not establish that every returned summary is accurate.
+For the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html), imagine keeping the relevant literature in a [Zotero](https://www.zotero.org/) collection. You want the agent to retrieve records and available papers or notes, then update the project's evidence table and bibliography. Direct library access makes that a repeatable project task instead of a series of manual attachments.
 
-## What a connection adds
+## Decide whether a connection adds something useful
 
-The Model Context Protocol (MCP) gives an agent a standard way to call tools supplied by a server. That server may run locally or remotely. Its functions and credentials determine whether the agent can read, write, or send information. The protocol itself does not establish that a server is trustworthy or appropriate for research data.
+An MCP *server* is the program exposing the operations. It can run on your own computer or remotely; MCP does not mean that the service is necessarily hosted elsewhere. The [architecture documentation](https://modelcontextprotocol.io/docs/learn/architecture) explains those arrangements.
 
-A reference-library connection might return titles and abstracts. A database connection might return rows or also permit updates. Ask which operations are exposed, which account authorizes them, and where returned content is processed. A read-only service can still disclose data to the model.
+Compare the connection with the access the agent already has. A local file export may be sufficient for a fixed set of references. A maintained command-line tool or direct API may be simpler for an agent with shell access. MCP is helpful when an appropriate server already exposes the operations you need in the app you use; it is not inherently better than every local tool.
 
-## Check for an existing app connection first
+The community [Zotero MCP project](https://github.com/54yyyu/zotero-mcp) illustrates this choice: it documents library search and reading through MCP, and also supplies a CLI route. It is a candidate integration, not an official Zotero service or evidence of institutional approval. Have the agent check the current supported operations and choose a route that fits the actual client and task.
 
-If your institution already provides the needed connector in the app, use its documented sign-in and scope rather than installing another server. A built-in connection is an app capability; custom MCP setup is an extension you must maintain. Check availability in the actual local, cloud, or WSL session you use. Both routes still require a permitted destination for the returned data.
+## Connect the literature task
 
-## Start with one approved, limited connection
+> Identify a suitable permitted connection to my Zotero collection for this review. Check existing app connections and command-line access before adding another integration. Retrieve relevant records and available papers or notes, then update the project's evidence table and bibliography. Record source identifiers and unresolved records. Follow our literature-search procedure for DOI and claim verification. Do not modify the library unless that is part of the assigned task.
 
-Use a service's official or institutionally approved connection when available, with read-only access if the task only requires reading. Follow [Claude's MCP documentation](https://code.claude.com/docs/en/mcp) for the actual interface and installation scope. Prefer project-specific configuration when only one project needs the service.
+The agent handles configuration and verifies that the real task returns the expected records. You complete necessary authentication and decide the permitted account and operations. Keep credentials out of shared configuration using the [credential workflow](#credentials). At Harvard, consult the current [HUIT Claude guidance](https://www.huit.harvard.edu/claude) for connector requirements before enabling one; availability in a catalogue is not institutional approval.
 
-At Harvard, check the current [HUIT Claude guidance](https://www.huit.harvard.edu/claude) before connecting a service. As of September 2026, HUIT requires review and approval of connectors. A connector's presence in a catalog does not establish institutional approval.
+Successful retrieval does not certify a citation or a claim. The research guide's [literature chapter](https://dss-agentic-research.pages.dev/chapters/literature.html) owns the search, verification, and evidence procedure. A skill can hold that procedure; the connection supplies access to the library. Keep abstracts, full texts actually read, and unresolved references distinguishable in the saved outputs.
 
-> Identify the approved connection for [service] and the operations this task needs. Show its source, data destinations, credentials, and requested access before configuring it. Use a test collection with no confidential material and read-only access first. Retrieve one record I can check independently. Do not send messages or change service records.
+## Record the access you enabled
 
-You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§12).
+Have the agent record the server, operations, account, and data destinations, using the client's [MCP setup documentation](https://code.claude.com/docs/en/mcp). Keep project-specific configuration with the relevant project where supported. A read-only connection can still send retrieved content to the model, and a local shell sandbox does not automatically constrain a remote service.
 
-## Check what it can reach
-
-Verify the known test record and inspect which tools the connection exposes. If available, use a harmless test to confirm write operations are unavailable. Check the connection's own controls: a local shell sandbox does not automatically constrain a separately hosted service.
-
-Treat returned text as source material rather than instructions. A document can contain directions aimed at the agent, including requests to visit another site or reveal files. Restrict access so that a mistaken response has fewer possible consequences.
-
-## Keep project decisions in project files
-
-A connection may offer memory, and Claude may retain notes between sessions. The research guide explains how to keep durable conventions and decisions in inspectable files. Do not add a memory service merely to duplicate those files. If you do use one, decide what it stores, who can read it, and how it is corrected or deleted.
-
-Interface support differs. In particular, check the current desktop documentation before relying on a connector in a WSL session. A CLI-configured server and an app connector may have different availability and authentication routes.
+Treat retrieved documents as material to analyze, not instructions that can change the agent's task or permissions. Keep detailed access decisions in [chapter 2](#tool-access). If a service offers persistent memory, use it only for a defined need and document what it stores and how to correct or delete it; it need not duplicate project instruction files.

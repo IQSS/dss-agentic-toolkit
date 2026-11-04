@@ -2,24 +2,23 @@
 title: "2. Control what added tools can access"
 ---
 
-A new execution route can change what research material the agent reaches. Check the route before relying on restrictions configured for a different tool. The research guide's chapter 3 owns the decision about permitted data; this chapter helps enforce it.
+An agent may need your project's code and approved inputs without needing access to other studies, personal files, or every account you use. Adding a tool can give it another way to reach those resources. Decide what the work requires, then have the agent configure the corresponding file, command, and network controls. The research guide's [data-governance chapter](https://dss-agentic-research.pages.dev/chapters/research-limits.html) explains which data may be processed where.
 
-For example, an ordinary agent command may run inside a sandbox, while a job submitted to pueue runs under a separate queue service. Restricting the submission command does not establish that the queued job has the same limits. Test both routes with harmless files.
+For example, an agent developing analysis code could read simulated inputs and write figures, while the original participant records remain inaccessible. If it later submits a job through [pueue](https://github.com/Nukesor/pueue), that job runs under a separate queue service. The service's access must also fit the task; restrictions on the command that submits a job do not automatically restrict the job itself.
 
 ![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Ordinary commands and queued jobs can run under different processes and permissions. Check the files, network, and credentials available to each route."}
 
-## Combine the controls
+## Decide which files and services the task needs
 
-Written instructions tell the language model what you want it to do. Permission rules let Claude Code allow, refuse, or ask about matching tool calls. Approval prompts let you review those proposed actions. A sandbox restricts file and network access for programs running inside it, using operating-system controls. Containers (§11) can provide an additional separate environment, depending on their configuration.
+Give the agent concrete locations and allowed actions: read these inputs, write to these output folders, contact these services, and leave these other resources inaccessible. Include browser sessions and connected accounts as well as local files. A read-only connection can still send its contents to a hosted model.
 
-None covers every route automatically. A file permission rule can block a direct read without blocking an arbitrary unsandboxed script that opens the file. A connector or browser may reach data through credentials rather than local paths. Git can recover tracked edits but cannot reverse disclosure.
+Written project instructions explain your intentions. In [Claude Code](https://code.claude.com/docs/en/overview), permission rules determine whether matching tool calls are allowed, refused, or require approval. A sandbox uses operating-system controls to restrict the programs running inside it. [Containers](#containers) can provide a separately configured environment. Each has a different job; an instruction to avoid a folder is not an operating-system restriction on reading it.
 
+## Have the agent configure and check the controls
 
-## One maintained configuration example
+The following example belongs in a project's `.claude/settings.json`. It keeps approved raw inputs readable but blocks changes to them, denies access to a restricted-data folder, and protects the project settings. Adapt it to the actual paths and managed policy using the current [permissions](https://code.claude.com/docs/en/permissions) and [sandbox](https://code.claude.com/docs/en/sandboxing) documentation.
 
-This is the example shared with the research guide. It belongs in the project's `.claude/settings.json`; the path forms below are chosen for that location. The syntax was checked against the September 2026 documentation. This is a starting example, not a tested certification of a restricted-data environment. Adapt it to the actual paths and institutional policy, then test with harmless files. Current syntax is documented in [Claude permissions](https://code.claude.com/docs/en/permissions) and [sandbox configuration](https://code.claude.com/docs/en/sandboxing).
-
-```
+```json
 {
   "permissions": {
     "deny": [
@@ -43,35 +42,21 @@ This is the example shared with the research guide. It belongs in the project's 
       "denyRead": ["./data/restricted"],
       "denyWrite": ["./data/restricted", "./data/raw", "./.claude"]
     },
-    "network": {
-      "allowedDomains": []
-    }
+    "network": {"allowedDomains": []}
   }
 }
 ```
 
-Here, restricted files are denied to both file tools and sandboxed processes. Approved raw inputs remain readable but cannot be edited. The example blocks writes to project settings as well. It does not enumerate every sensitive folder on your machine or constrain all connected tools. Keep material that must be inaccessible outside the process's effective access, not merely outside the selected folder.
+The file-tool rules and sandbox paths use different path conventions. This example is project-scoped; it does not list every sensitive location on your computer. Settings from other scopes may also contribute permissions. Have the agent inspect the effective configuration rather than assuming this file replaces every existing setting.
 
-This example adds no network destinations or command exemptions. Settings from other scopes can contribute entries, so inspect the effective configuration rather than assuming this file clears existing permissions. Add a destination only for a known need; a permitted destination can receive information as well as return it. Broad registry and GitHub allowlists are therefore not a data-loss guarantee.
+> Configure access for this task: [approved inputs, writable outputs, permitted services, excluded resources]. Inspect the existing project and managed settings first. Explain which controls cover file tools, shell commands, queued jobs, and connected services. Propose the necessary changes, then test allowed and denied operations with harmless substitute files. Report actual outcomes and any routes that remain untested.
 
-> Inspect the effective project and managed settings. Propose changes based on this example, using the actual approved paths. Explain which tools each rule covers and list any remaining access routes. Show the proposed configuration before it is applied. Test direct reads, scripted reads, and writes using harmless allowed and denied test files; do not use confidential data for the tests or bypass a failed restriction.
+You decide permitted access and handle any personal or institutional authorization. The agent performs the configuration checks. Using harmless files here tests whether restrictions work before protected material is involved; it is not a separate practice exercise. These tests can reveal mistakes but cannot certify every possible execution route.
 
-**What only you can do.** Decide the permitted access and review any proposed widening. Your institution's managed policy may prevent a change. If a control refuses an action, establish why it was refused before deciding how to proceed; do not have the agent try another tool simply to evade the restriction.
+## Handle a blocked operation deliberately
 
-## Exceptions change the boundary
+A blocked command may need a queue socket, a system installation, an application connection, or a pseudo-terminal for the [observed R-on-macOS issue](#r-on-macos). Have the agent identify the required access and explain a specific solution. Avoid blanket exemptions for entire categories of commands.
 
-The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix D). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
+If approved work runs outside the sandbox, record what protects that execution instead. A queued job uses the queue service's permissions. A browser may use a signed-in account. A command supplied with a credential can read that credential. For restricted analysis, use an environment that meets the data requirements rather than widening access until a command works.
 
-If an authorized workflow needs a reviewed unsandboxed invocation, document its scope and protection separately. Do not describe that command as sandboxed. In particular, a job submitted to pueue runs under the queue service's account and permissions; the submission command's sandbox does not contain the resulting job. Credentials supplied to a process are available to that process even when a vault stored them safely.
-
-For a protected analysis, use an execution environment with the required access controls instead of weakening them to accommodate a tool. A convenient local workaround may be inappropriate there.
-
-## Check both execution and editing
-
-Test direct file access and subprocess access separately, using disposable files. Confirm the expected failures and an allowed operation that still succeeds. Test again after changing path rules, command exemptions, or the tool used to run the work. These tests reveal configuration errors; they do not prove containment against every possible program.
-
-Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (Appendix B). Protecting only the applied file can leave an editable source copy that later restores broader access.
-
-## On Windows (WSL2) and Linux
-
-The sandbox is supported on macOS, Linux, and WSL2, with platform-specific requirements in the linked documentation. Native Windows is outside this guide. Have the agent check the installed version's requirements and any managed-device restrictions before configuring it. A missing sandbox is not repaired by selecting a more cautious permission mode.
+Keep the resulting configuration with the project and repeat relevant checks when the execution route changes. Protect both active settings and any managed source copies that can overwrite them; [Appendix B](#shared-settings) explains that distinction. On Linux or [WSL2](https://learn.microsoft.com/windows/wsl/), ask the agent to check platform-specific sandbox requirements. Native Windows is outside this guide's setup route.

@@ -6,89 +6,49 @@ aliases:
 
 <!-- aliases: runnable-checks -->
 
-A saved command lets you repeat a research task without reconstructing its steps in another conversation. It also makes the scope visible: updating a figure should not unexpectedly launch every model fit.
+A *command runner* gives names to the operations your project needs: fit a model, rebuild figures, check inputs, or regenerate the paper. [Just](https://just.systems/) stores those commands in a small text file called a `justfile`. The agent can use the same commands repeatedly, and you or a collaborator can run them without another conversation with a model.
 
-For example, `just figures` can read saved heat-effect estimates and redraw the plots, while `just fit` refits the approved model. The small `justfile` names those tasks; the scripts contain the analysis. Keep an existing master do-file or Makefile when it already does this well.
+In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), changing a figure label should not require refitting every model. A command such as `just figures` can redraw plots from saved estimates, while `just fit` runs the model. The benefit comes from both a modular analysis and dependable commands for selecting the work to run.
 
+## Give the commands independently runnable work
 
-## What it gives the agent
+Installing just does not make a monolithic analysis selective. Have the agent identify coherent steps with explicit inputs and saved outputs: prepare the analysis data, fit a specified model, generate a figure. Put shared functions in reusable code. A step may be a script or a function; there is no target number of files.
 
-A `justfile` records named commands called *recipes*. Each recipe calls the scripts or tools that perform a project task, and `just --list` displays the available names. Just does not determine which results need updating or resume an interrupted fit. A recipe can call a pipeline runner (§9) when that dependency tracking is needed.
+The agent then records commands for those steps and useful combinations. The research guide's [modular-workflow chapter](https://dss-agentic-research.pages.dev/chapters/research-workflows.html) explains the research benefits. Here the task is to make that structure easy to execute consistently, preserving the analysis's intended behavior.
 
-## Start from the existing project
+> Inspect the current analysis and identify which steps can run independently. Preserve a working baseline, then organize the code so we can refit a selected model, regenerate figures from saved estimates, and rebuild the complete analysis. Reuse shared functions. Add just recipes with clear inputs and outputs, and record when future agents should use each one. Run a smoke test before a full batch and report any changed results.
 
-Add just when remembering and repeating the commands has become a problem. For an existing paper, first document and test the current execution sequence. An adequate master script can provide a reproducible hand-off without adding another tool.
+Keep an existing master do-file, [Make](https://www.gnu.org/software/make/) setup, or other working command system when it already provides the needed execution. Avoid creating a second list of commands that drifts from the first.
 
-## Choose a manageable setup
+## How just fits with other runners
 
-Use a small set of recipes named for the tasks they perform. This R example assumes the named analysis scripts already exist. It calls them through `bin/rscript-pty`, a small helper script described in Appendix D; that helper must also be present and executable.
+| Tool | What it does for the project |
+|:--|:--|
+| just | Saves named commands for individual tasks and useful combinations. |
+| Make | Uses declared file dependencies and timestamps to decide which outputs need rebuilding; also commonly exposes named project commands. |
+| [targets](https://docs.ropensci.org/targets/) | Tracks dependencies in an [R](https://www.r-project.org/) workflow and reuses results that remain current. |
+| [Snakemake](https://snakemake.readthedocs.io/) | Coordinates rules that produce files from inputs, often across languages and computing environments. |
 
-```
-rscript := justfile_directory() + "/bin/rscript-pty"
+Just and a dependency-aware runner work well together. A `just build` recipe can invoke targets or Snakemake; that runner decides which analysis steps need updating. Other just recipes can open a preview, check the project, or render a document. [Chapter 9](#pipeline-dependencies) develops this combination.
 
-# Fast known-answer checks; no model refits.
-check:
-    {{rscript}} code/check-inputs.R
+## Make the recipes part of normal agent work
 
-# Fit the approved analysis.
-fit:
-    {{rscript}} code/model.R
+Ask the agent to install just through [Homebrew](https://brew.sh/) or the project's established tool manager, then create and maintain the recipes. Each recipe should name an outcome rather than a long implementation detail. `just --list` lists the available tasks.
 
-# Recreate figures from saved results.
-figures:
-    {{rscript}} code/figures.R
+A concise project instruction might read: “Use the justfile for analysis and document commands. After a figure-only change, rebuild the affected figure from saved results. After changing a model, rerun the affected fit and downstream outputs. Report the commands used and whether their expected outputs were produced.”
 
-# Full ordered reproduction.
-build:
-    {{rscript}} run-all.R
-```
+The full reproduction command should still exist. Selective execution makes development efficient; the complete command gives collaborators a documented route through the project.
 
-A figure-label change should usually run the quick checks and figure recipe. A changed estimator may require refitting and recalibration. The full release check should run the documented reproduction sequence. Choose validation from what changed, rather than running an hours-long build after every edit.
+## Run a smoke test before the main batch {#smoke-tests}
 
-## Ask for it, and tell the agent
+A *smoke test* is a small, representative run through the actual workflow to catch execution problems before committing substantial time or computation. Have the agent run one model specification, a few simulation repetitions, or a small document batch through all the relevant stages. It should confirm that inputs are found, required software runs, and expected outputs are saved in the right form and location.
 
-> Install just if needed. Inspect this project's existing execution sequence and propose a small justfile with quick checks, the main analysis, figures from saved results, and a full build. Keep the underlying analysis unchanged. Show the recipes and their expected outputs before running expensive work. Add the instruction to run checks appropriate to the change and report exactly which passed.
+Use the same code and environment as the main batch, with a smaller workload selected by a recorded option. Keep smoke-test outputs separate so they cannot be mistaken for final results. A pipeline that runs successfully may still implement the wrong method; scientific checks have a different purpose.
 
-Review changes that alter what a recipe includes or checks. The agent should not remove a failing step merely to obtain a successful exit. Do not add a destructive cleanup recipe unless the project needs one and its scope is explicit.
+> Add a smoke-test command that runs a representative case through this workflow using its existing code. Keep its outputs separate from the full analysis. Run it, diagnose any failure, and confirm the expected artifacts before launching the batch. Save the command so future agents can repeat it after relevant changes.
 
-## Check that it's working
+## Keep substantive checks runnable {#runnable-checks}
 
-Ask the agent to show `just --list`, then run one inexpensive recipe on a harmless input. Inspect the resulting file and the command's success or failure status. The [just manual](https://just.systems/man/en/listing-available-recipes.html) documents recipe listing; use the installed version's help for other options.
+Expose useful checks through the same command system. If a join must preserve the number of observations, have the agent add a check that fails when duplicate keys would expand the data. Checks should reflect the specification and use independently established expected behavior, rather than repeat the implementation's own calculation.
 
-Try the complete sequence in a new local practice folder, using your existing research language:
-
-1. Ask the agent to check whether just is installed and follow §3 if it is missing. Record the language and package environment (§8); this exercise needs no new analysis packages.
-2. Have it create `practice.csv` with two columns, `id` and `value`, and exactly three rows: `(1, 10)`, `(2, 20)`, `(3, 30)`. These are invented data. The output should be a text report stating `rows: 3` and `sum: 60`.
-3. Ask for a script that checks unique IDs and the expected columns, then writes the report. Add `check` and `build` recipes, plus a short project instruction naming their purpose.
-4. Run `just --list`, then the check and build. Open the report and compare it with the expected count and sum above. Ask the agent to identify the input and script it actually used.
-5. Duplicate ID 2 in the practice input and run the check again. It should fail with a duplicate-ID message. Restore the original three rows, rerun, and inspect the output. Save a checkpoint if this practice folder uses git.
-
-A successful valid case and an intentional failure show more than a report saying the installation worked. This is a proposed teaching exercise, not a recorded execution in this edition.
-
-## If you already have a build command
-
-Keep a working Makefile, master do-file, or document render command. Just can provide a convenient front end without replacing it. Add targets or Snakemake only when dependency tracking is useful (§9).
-
-## Keep consequential checks easy to rerun {#runnable-checks}
-
-A quick check can catch an implementation mistake before it contaminates a costly analysis. Save checks for behavior that matters to the sample or reported result, and include a case that should fail.
-
-For example, duplicating a county-month key in the heat table must stop the join before it duplicates birth records. A valid fixture must also pass. These two outcomes tell you more than a test that merely repeats the count produced by the agent's own code.
-
-### Ask for evidence about behavior
-
-A script can run successfully and still drop observations or compute the wrong contrast. A useful check has an expected result established independently of the implementation. Repeating the same calculation in a test can repeat the same error.
-
-For a many-to-one join, use a tiny invented example with three observations and two lookup rows. Establish the expected matches and row count yourself. Then add a duplicate lookup key: the check should fail before the join expands the data. Include an unmatched observation and verify that the specified flag or exclusion rule is followed. These cases test the required behavior against known answers, without copying the cleaning function into its own test.
-
-### Ask for runnable checks
-
-> Identify changes in this task that could alter the analytic sample or reported results. Add small known-answer checks for those behaviors using the project's existing test tools. Include a case that should fail. Expose the quick checks through the project command surface, and explain what they do not establish. Do not refit all models unless the change requires it.
-
-Separate quick checks from expensive recalibration and the full reproduction run (§5). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow Appendix D if R checks hang when launched through the agent.
-
-### Check the checks
-
-Ask the agent to run the deliberately failing example and the valid one, report outcomes, and restore the intended test inputs. Review changes to tests as carefully as changes to analysis code. A specification change can justify updating a test, but the reason must be explicit; deleting a failing check to finish the task is not a correction.
-
-Tests establish only the properties they examine. The research guide's [simulation](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent-implementation](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) chapters explain the complementary checks on the workflow and methods. Passing tests alone establishes none of those broader conclusions.
+Keep quick execution checks separate from expensive validation. The research guide explains [simulation against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html). The recipes make those procedures easy to run; they do not decide whether the methods or conclusions are appropriate. For the observed R-on-macOS execution problem, have the agent route relevant recipes through the [documented wrapper](#r-on-macos).

@@ -1,0 +1,36 @@
+---
+title: "Appendix E. Terminal vocabulary"
+---
+
+Terminal vocabulary becomes easier to understand once you know that many of the names describe physical equipment. The modern window kept the interaction pattern after the equipment changed. This short history explains the terms used in the [terminal chapter](#terminal-agents); [Appendix A](#working-environment) covers today's optional tools.
+
+## A terminal was a device at the end of a connection
+
+Before a personal computer routinely had its own keyboard and screen, people could communicate with a computer through a separate terminal. A teletype combined a keyboard with a printer: typed characters went to the connected machine, and its responses appeared on paper. Museum collections preserve examples of [teletypes used as computer terminals](https://collections.museumsvictoria.com.au/items/407696).
+
+The abbreviation *TTY*, from teletype, stayed in computing vocabulary. Screen-based terminals displayed text instead of printing it. A modern *terminal emulator* is software that provides that style of interaction in a window, including the keyboard input and text display. The terminal is not the agent or the command interpreter; it is the interface through which you communicate with a running program.
+
+## The shell interprets commands
+
+A *shell* is a program that reads commands and starts other programs. It provides an interface to operating-system facilities and is also a programming language, so it can execute a saved script as well as a command you type. [Bash](https://www.gnu.org/software/bash/) and [zsh](https://www.zsh.org/) are examples. The [Bash manual](https://www.gnu.org/s/bash/manual/bash.html) describes this command-interpreter role.
+
+The *prompt* indicates that the shell is waiting for input. When you enter `claude`, the shell starts [Claude Code](https://code.claude.com/docs/en/overview). Claude then displays its own interface for your requests. On exiting Claude, you return to the shell prompt. A text window can therefore contain quite different kinds of interaction; knowing which program is receiving your input is more useful than memorizing the window's appearance.
+
+## Why a program asks whether it has a TTY
+
+The operating system preserves a terminal interface even when no physical terminal is attached. A *pseudo-terminal* (PTY) is a software connection that behaves like a terminal for the program using it. Terminal emulators use this mechanism; see the [pseudo-terminal manual](https://man7.org/linux/man-pages/man7/pty.7.html).
+
+A program can behave differently when attached to a terminal than when receiving input from a file or another process. It may display a prompt, use interactive controls, or buffer output differently. An agent's command tool may supply pipes instead of a terminal connection. This distinction helps explain the specifically observed [R-on-macOS problem](#r-on-macos), where a pseudo-terminal wrapper is used. It does not mean every unattended program needs one.
+
+## A few related names
+
+| Term | What it refers to |
+|:--|:--|
+| Command-line interface (CLI) | A program interface controlled with commands and arguments. |
+| Working directory | The folder from which relative file paths are resolved. |
+| `PATH` | The directories searched to locate an executable command. |
+| Standard input/output/error | Separate channels through which a program receives input and returns ordinary output or diagnostics. |
+| Pipe | A connection that passes one program's output to another's input. |
+| Environment variable | A named value supplied to a running program and usually inherited by programs it starts. |
+
+You can ask the agent to explain these in the context of a command it proposes. The useful aim is to recognize what the command will do and which program will receive it, rather than learn a shell language before beginning research work.

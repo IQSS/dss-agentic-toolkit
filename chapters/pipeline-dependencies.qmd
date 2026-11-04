@@ -2,19 +2,11 @@
 title: "9. Rerun only affected steps: targets and Snakemake"
 ---
 
-When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change.
+A named command makes a workflow easy to invoke. A dependency-aware pipeline runner adds a decision: which results need rebuilding after something changes? Use [just](https://just.systems/) to expose the project's commands and [targets](https://docs.ropensci.org/targets/) or [Snakemake](https://snakemake.readthedocs.io/) to track the analysis steps underneath. They can work together: `just build` starts the pipeline, which reuses results that remain current.
 
-In the heat-and-birthweight project, changing specification B should rerun fit B and the figure that uses it, while reusing fit A. Changing the common cleaning rule should affect both fits. Targets for R and Snakemake for file-based workflows can implement those relationships; a short project may need only its existing master script.
+In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), changing specification B should rerun fit B and its downstream figure while reusing fit A. Changing the shared cleaning rule should affect both fits. Recording those relationships saves computation and helps prevent a manuscript from using outputs that no longer match the analysis.
 
-## What a pipeline runner does
-
-If one model changes, the runner can refit that model and rebuild the figures that use it while retaining other completed results. After an interruption, it can also reuse valid completed steps. Resuming partway through an individual model fit requires support from the fitting program; the runner does not provide it automatically.
-
-Targets tracks declared R objects, functions, and file inputs. Snakemake tracks declared files and also considers changes in rule code, parameters, inputs, and software environments. Neither sees a dependency you failed to declare. An API response, an external script, or a manually edited file may therefore need explicit tracking. See the [targets manual](https://books.ropensci.org/targets/) and [Snakemake's rerun controls](https://snakemake.readthedocs.io/en/stable/executing/cli.html).
-
-## Start with a small dependency graph
-
-Consider a cleaning step followed by two models and a figure made from both:
+## Declare what each step depends on
 
 | Step | Depends on | Produces |
 |:--|:--|:--|
@@ -23,24 +15,22 @@ Consider a cleaning step followed by two models and a figure made from both:
 | Fit B | Analysis data and specification B | Saved fit B |
 | Figure | Both saved fits and plotting code | Figure and plotting values |
 
-Ask the agent to show a dependency graph, a diagram of which steps require the results of others, before running the pipeline. Changing only the figure label should rebuild the figure. Changing specification B should rebuild fit B and the figure. A change to the cleaning rules should affect both fits. Test whether the pipeline actually follows those expectations.
+Targets tracks declared [R](https://www.r-project.org/) objects, functions, and file inputs. Snakemake describes rules for producing files and considers declared inputs, code, parameters, and environments when deciding what to rerun. Both need the agent to declare external dependencies explicitly. A changing API response or script cannot be tracked correctly if the workflow never records it as an input. See the [targets manual](https://books.ropensci.org/targets/) and [Snakemake's execution documentation](https://snakemake.readthedocs.io/en/stable/executing/cli.html).
 
-## Ask for it, and tell the agent
+After an interruption, the runner can reuse completed results that remain valid. Resuming halfway through an individual fit requires checkpoints from the fitting program itself.
 
-> Preserve this analysis's working environment and baseline results. Set up the smallest useful targets pipeline, first wrapping existing scripts if needed. Declare script files and external inputs explicitly. Show the graph and proposed resource limits before executing expensive work. Keep separate quick-check and full-build commands, and tell me which steps each runs.
+## Have the agent connect the existing analysis
 
-For a mixed-language project, request a Snakefile instead. Its rules should name input files, output files, and the command or script that connects them. Have the agent install the runner within the appropriate recorded environment, not as an unrecorded global dependency.
+> Preserve the current environment and baseline results. Build a targets pipeline for this R analysis, declaring data, script files, functions, and outputs as dependencies. Keep the justfile as the project's command interface: its build recipe should invoke the pipeline, while separate recipes expose quick checks and document rendering. Show the dependency graph and expected reruns, run a representative smoke test, and check that unchanged results are reused.
 
-A first pipeline can call your existing scripts. It may then treat a whole script as one step, whereas a pipeline built from smaller functions can track changes more precisely. Whether a comment edit triggers a rerun depends on how the script and its contents are tracked.
+For a mixed-language or file-based project, request Snakemake with a `Snakefile` instead. Have the agent install the runner through the project's recorded environment. Existing scripts can become pipeline steps; more modular code gives the runner finer-grained work to select. The [command-runner chapter](#project-commands) explains that structural change.
 
-## Check the graph before scaling up
+## Verify selective execution before scaling up
 
-For targets, inspect `tar_outdated()` and the graph. For Snakemake, use `snakemake -n` for a dry run. Test the three changes in the table on a small invented dataset, compare the predicted and actual reruns, and confirm unchanged outputs are reused. Neither route has been tested as a complete new-installation walkthrough for this edition; verify it in the project's environment.
-
-For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§6). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix D gives the conservative troubleshooting baseline without separate workers.
-
-These tools do different parts of the work. A just recipe (§5) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§6) manages submission and execution of the overall job.
+Have the agent inspect planned work with `tar_outdated()` for targets or a Snakemake dry run. Then run a [smoke test](#smoke-tests) through representative real project steps. Ask it to check the expected responses to a figure-only change, one model change, and a shared-input change. It should compare predicted and actual reruns and keep those checks separate from the full expensive analysis.
 
 ![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="Analysis data feed fits A and B. Both feed a figure. A change to fit B reruns that branch and the figure while fit A is reused."}
 
-Keep generated caches out of git and configure cloud-sync exclusions before populating them (§4). Required validation scripts and environment records remain part of the reproducible project, even when their generated results are cached. Keep an established pipeline framework if it already supplies the needed dependency tracking and execution record.
+Set memory and thread limits for the workload. Targets can use [crew](https://wlandau.github.io/crew/) for parallel workers; on the author's affected Mac, the [R troubleshooting procedure](#r-on-macos) starts without separately launched workers until that execution route has been checked. A [pueue](https://github.com/Nukesor/pueue) job can manage the outer pipeline command when it will run unattended. The pipeline determines what needs computing; the queue manages when the submitted job runs.
+
+Keep caches out of [git](https://git-scm.com/) and configure cloud-sync exclusions before populating them. Keep the pipeline definitions, checks, and environment records with the project. Preserve a framework that already supplies these capabilities rather than replacing it solely to follow this example.
