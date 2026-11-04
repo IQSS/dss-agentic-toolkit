@@ -10,7 +10,7 @@ For example, an ordinary agent command may run inside a sandbox, while a job sub
 
 ## Combine the controls
 
-Written instructions tell the language model what you want it to do. Permission rules let Claude Code allow, refuse, or ask about matching tool calls. Approval prompts let you review those proposed actions. A sandbox restricts file and network access for programs running inside it, using operating-system controls. Containers (§15) can provide an additional separate environment, depending on their configuration.
+Written instructions tell the language model what you want it to do. Permission rules let Claude Code allow, refuse, or ask about matching tool calls. Approval prompts let you review those proposed actions. A sandbox restricts file and network access for programs running inside it, using operating-system controls. Containers (§11) can provide an additional separate environment, depending on their configuration.
 
 None covers every route automatically. A file permission rule can block a direct read without blocking an arbitrary unsandboxed script that opens the file. A connector or browser may reach data through credentials rather than local paths. Git can recover tracked edits but cannot reverse disclosure.
 
@@ -60,7 +60,7 @@ This example adds no network destinations or command exemptions. Settings from o
 
 ## Exceptions change the boundary
 
-The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix A). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
+The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix D). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
 
 If an authorized workflow needs a reviewed unsandboxed invocation, document its scope and protection separately. Do not describe that command as sandboxed. In particular, a job submitted to pueue runs under the queue service's account and permissions; the submission command's sandbox does not contain the resulting job. Credentials supplied to a process are available to that process even when a vault stored them safely.
 
@@ -70,7 +70,7 @@ For a protected analysis, use an execution environment with the required access 
 
 Test direct file access and subprocess access separately, using disposable files. Confirm the expected failures and an allowed operation that still succeeds. Test again after changing path rules, command exemptions, or the tool used to run the work. These tests reveal configuration errors; they do not prove containment against every possible program.
 
-Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (§16). Protecting only the applied file can leave an editable source copy that later restores broader access.
+Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (Appendix B). Protecting only the applied file can leave an editable source copy that later restores broader access.
 
 ## On Windows (WSL2) and Linux
 

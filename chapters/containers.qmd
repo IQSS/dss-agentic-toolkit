@@ -1,5 +1,5 @@
 ---
-title: "15. Run work in a separate environment: containers"
+title: "11. Run work in a separate environment: containers"
 ---
 
 An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package.
@@ -22,7 +22,7 @@ Containers are optional for an ordinary analysis with an adequate environment re
 
 > Propose a container configuration for this reproduction package. List every host mount, its read/write status, network access, credentials, and runtime privileges. Start with a harmless test, no credentials, and only the required input mounted read-only plus a separate output directory. Show that allowed output works and that an unmounted practice file is inaccessible before running the package.
 
-For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§5). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
+For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§8). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
 
 ## Check both uses separately
 

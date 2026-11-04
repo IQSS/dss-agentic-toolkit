@@ -4,43 +4,51 @@ subtitle: "A Guide for Researchers"
 version: "2.2 draft"
 ---
 
-# Choose tools for a research need {#choose-tools}
+<!-- ===================== PART I — FOUNDATIONS ===================== -->
+
+# 1. Choose tools for a research need {#choose-tools}
 
 Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence.
 
 Suppose your heat-and-birthweight project now needs 100 simulation runs. You want a few running at once, the rest waiting, and a record of failures to inspect later. A queue addresses that need. It does not choose the simulation design, decide whether the estimates are valid, or make a sleeping laptop compute. Understanding that division of work is more useful than installing a large collection of tools.
 
-The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app; no terminal knowledge is required for chapters 1–16. Sign-ins, passwords, and decisions about access remain yours.
+The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app. Most chapters do not require you to use a terminal. Sign-ins, passwords, and decisions about access remain yours.
+
+Use this book as a reference. After this overview and the boundaries chapter, choose the capability your research needs. Each tool chapter can be used independently; follow its links when you need a supporting setup or explanation.
 
 ## Find the problem you need to solve
 
 | Research need | Start here |
 |:--|:--|
-| **Set up and protect the work** | |
-| Add one missing capability without upgrading everything | §1: Homebrew |
-| Check what a new tool can read, change, or send | §2: access controls |
-| Find a variable or inspect a saved service response | §3: rg, fd, jq, yq, bat |
-| Recover a working state after an unsuccessful change | §4: git and gh |
-| **Run and reproduce the work** | |
-| Restore the language and packages used for an analysis | §5: rig, renv, uv |
-| Repeat a research task with one saved command | §6: just |
-| Catch consequential mistakes before fitting | §7: runnable checks |
-| Rerun only steps affected by a change | §8: targets and Snakemake |
-| Keep a batch moving unattended | §9: pueue |
-| Rebuild a report from saved research outputs | §10: Quarto and pandoc |
-| **Extend access and coordinate work** | |
-| Supply a credential without storing it in research code | §11: 1Password and direnv |
-| Reach an approved reference library or service | §12: MCP |
-| Inspect a rendered page or interact with a website | §13: browser tools |
-| Give parallel agents separate working copies | §14: git worktrees |
-| Package or restrict a separate execution environment | §15: containers |
-| Keep a recoverable record of personal tool settings | §16: chezmoi |
-| **Work from a terminal, optionally** | |
-| Run a saved command yourself | §17: terminal commands |
-| Run an agent interactively or as a recorded batch step | §18: terminal agents |
+| **Foundations** | |
+| Check what a new tool can read, change, or send | §2: Control what added tools can access |
+| **Essential tools** | |
+| Install tools through a maintained package manager | §3: Add a tool without disrupting a project: Homebrew |
+| Record changes and recover a working state | §4: Recover earlier work: git and gh |
+| Repeat research tasks with saved commands | §5: Give research tasks reliable commands: just |
+| Keep a batch moving unattended | §6: Keep unattended jobs moving: pueue |
+| Find research files or inspect a saved service response | §7: Find research files efficiently: rg, fd, jq, yq, bat |
+| **Reproducible research workflows** | |
+| Restore the language and packages used for an analysis | §8: Preserve a software environment: rig, renv, and uv |
+| Rerun only steps affected by a change | §9: Rerun only affected steps: targets and Snakemake |
+| Rebuild documents from saved research outputs | §10: Generate documents from research outputs: Quarto and pandoc |
+| Run work in a separately configured environment | §11: Run work in a separate environment: containers |
+| **Connect to data and services** | |
+| Supply credentials without storing them in research code | §12: Keep credentials out of research files: 1Password and direnv |
+| Reach an approved library or service | §13: Connect to research data and services: MCP |
+| Inspect or interact with a website | §14: Inspect and interact with a browser |
+| **Run and coordinate agents** | |
+| Give parallel agents separate working copies | §15: Divide work between agents: git worktrees |
+| Run an agent from recorded requests with controlled inputs | §16: Run agents from saved requests |
+| Set up and check inference on your own computer | §17: Run a model on your own computer |
+| **Work from the terminal** | |
+| Run saved commands yourself | §18: Run saved research commands yourself |
+| Work interactively with an agent in a terminal | §19: Use an agent from the terminal: Claude Code |
 | **Reference** | |
-| Terminal, shell, editor, and R execution conveniences | Appendix A |
-| Inspect historical account usage with an extra tool | Appendix B |
+| Choose terminal, shell, session, or editor conveniences | Appendix A: Optional working environment |
+| Keep a recoverable record of personal tool settings | Appendix B: Keep records of shared settings: chezmoi |
+| Inspect account usage with an extra tool | Appendix C: Account-usage tools |
+| Diagnose the recorded R-on-macOS execution problem | Appendix D: Troubleshooting |
 
 ## Add only what the project needs
 
@@ -48,51 +56,11 @@ Installed programs extend what the agent can do through its command tool. Connec
 
 Each chapter begins with the research problem and an example, then gives a setup request and evidence to inspect. Most examples are deliberately small and invented. Where a procedure comes from a recorded run or has not yet had a clean-installation trial, the text says so. We are Data Science Services at Harvard's Institute for Quantitative Social Science; the examples draw on our research-support work.
 
-## Use the environment you have
-
-The main routes are macOS and Ubuntu Linux; Windows readers can use Ubuntu through WSL2. R, Python, and Stata users can keep their research language. A master do-file may already provide the workflow you need, and Stata's language and community-command versions still need recording.
-
-An app, terminal, remote session, and WSL session may have different tools and credentials. Check the actual session in which research will run. For Windows, consult the [desktop WSL documentation](https://code.claude.com/docs/en/desktop-wsl) before assuming that a locally installed tool or connector is available there. Platform-specific clean-installation trials are recorded separately from tests on the author's configured Mac.
-
-Product interfaces and access controls change faster than the purposes of these tools. Consult the linked primary documentation for the installed version, and test the small example before trusting the tool with consequential work. This November draft is prepared for author review; publication and remaining account-dependent trials follow that review.
-
-<!-- ===================== PART I — SET UP AND PROTECT THE WORK ===================== -->
-
-# 1. Add a tool without disrupting a project: Homebrew {#adding-tools}
-
-Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book.
-
-For example, the agent repeatedly writes small programs just to select fields from saved JSON responses. Installing `jq` gives it a maintained tool for that job. Verify it on one harmless response while leaving the project's R or Python environment unchanged.
-
-## What you need first
-
-On a Mac, ask the agent to check the installed tools, machine architecture, and Homebrew's current prerequisites. The research guide's first exercise does not require git or Apple's Command Line Tools; adding tools here may require them. Keep an existing institutional package-management arrangement if it meets the need; do not build a competing setup without a reason.
-
-The current [Homebrew installation instructions](https://docs.brew.sh/Installation) provide both the supported command-line route and a macOS package installer. Use those instructions rather than a copied installer command from an old guide. A password or installer dialog is a step for you, not a credential to paste into the conversation. If a terminal step is required, §17 explains how to open Terminal and paste one command. The macOS package route is documented here, but has not been tested as a complete new-user walkthrough for this edition.
-
-## Ask for a small installation
-
-> Inventory the tools this project already has and how they are managed. If Homebrew is needed, identify the supported installation route for this machine and explain any step I must perform myself. Then install ripgrep and jq if absent. Show their versions and use them on harmless example files. Do not upgrade the project's research language or package environment.
-
-Once Homebrew works, the agent can install further tools as you reach the relevant section. You do not need the whole toolkit at once. For noninteractive installs, Homebrew documents the `HOMEBREW_NO_ASK` setting; it does not remove operating-system authorization requirements. Record installed tools and why the project needs them.
-
-A personal `Brewfile` can record a growing installation set. It is useful for rebuilding a machine, but is not a substitute for the project's pinned research environment (§5). This guide uses section-by-section installation, so no separate bundle is needed to start.
-
-## Check that it works
-
-Ask the agent to show `brew --version`, the installed tool versions, and the small example's output. A `brew doctor` warning needs interpretation; it does not necessarily mean an installation failed. A command that cannot be found may be absent or may be outside the agent process's search path. After installation, a fresh app session may be needed to inherit that path.
-
-Keep installation review separate from research work. An installer may request network access or write outside the project. Approving that operation does not authorize later commands to use the same access without review (§2).
-
-## Windows through WSL2, and Linux
-
-This guide's Windows route is Ubuntu inside WSL2, not native Windows tools. Follow Microsoft's [WSL installation instructions](https://learn.microsoft.com/windows/wsl/install), including any administrator step and restart. Keep the project and its Linux tools inside the same distribution; a Windows installation of a program is not automatically a Linux installation.
-
-Homebrew supports Linux under its documented requirements. Follow its Linux instructions rather than copying the macOS installer. If your institution already supplies packages through Ubuntu or a managed environment, use those when adequate and record any differences in command names. The tools' platform notes identify consequential differences rather than promising identical operation everywhere.
+## Tell the agent how to use installed tools
 
 A newly installed tool can go unused, or be used incorrectly, unless the agent has instructions for it. This chapter shows how to record when to use a tool, what limits apply, and which results to report. The research guide's *The files the agent reads* and *Repeatable workflows* chapters explain the instruction files and skills that hold those procedures.
 
-## Start with short, specific instructions
+### Start with short, specific instructions
 
 A machine-wide convention can live in your personal `CLAUDE.md`. A project's commands, resource limits, and data-access rules belong with that project. Keep an established instruction layout rather than creating a second one for this guide.
 
@@ -104,13 +72,21 @@ For example:
 
 Each line names an action and a check. “Use pueue” alone leaves the agent to guess how to establish that a job succeeded. Keep a short inventory of installed tools and their purpose alongside these instructions.
 
-## Package procedures only when they recur
+### Package procedures only when they recur
 
 A skill can hold a recurring procedure such as submitting a job, inspecting its status, and reporting failure. Start with a standing instruction; add the longer procedure if you repeatedly need the same correction. Hooks can run checks at specified events, but are executable configuration that needs review. Neither instructions nor hooks replace a data-access boundary (§2).
 
-## Check that the instruction is used
+### Check that the instruction is used
 
 In a fresh session, ask which project instructions apply and how the agent would run a long job. Have it identify the file it read, then demonstrate the procedure on a harmless task. A confident summary alone does not prove the file was loaded or the procedure works.
+
+## Use the environment you have
+
+The main routes are macOS and Ubuntu Linux; Windows readers can use Ubuntu through WSL2. R, Python, and Stata users can keep their research language. A master do-file may already provide the workflow you need, and Stata's language and community-command versions still need recording.
+
+An app, terminal, remote session, and WSL session may have different tools and credentials. Check the actual session in which research will run. For Windows, consult the [desktop WSL documentation](https://code.claude.com/docs/en/desktop-wsl) before assuming that a locally installed tool or connector is available there. Platform-specific clean-installation trials are recorded separately from tests on the author's configured Mac.
+
+Product interfaces and access controls change faster than the purposes of these tools. Consult the linked primary documentation for the installed version, and test the small example before trusting the tool with consequential work. This November draft is prepared for author review; publication and remaining account-dependent trials follow that review.
 
 # 2. Control what added tools can access {#tool-access}
 
@@ -122,7 +98,7 @@ For example, an ordinary agent command may run inside a sandbox, while a job sub
 
 ## Combine the controls
 
-Written instructions tell the language model what you want it to do. Permission rules let Claude Code allow, refuse, or ask about matching tool calls. Approval prompts let you review those proposed actions. A sandbox restricts file and network access for programs running inside it, using operating-system controls. Containers (§15) can provide an additional separate environment, depending on their configuration.
+Written instructions tell the language model what you want it to do. Permission rules let Claude Code allow, refuse, or ask about matching tool calls. Approval prompts let you review those proposed actions. A sandbox restricts file and network access for programs running inside it, using operating-system controls. Containers (§11) can provide an additional separate environment, depending on their configuration.
 
 None covers every route automatically. A file permission rule can block a direct read without blocking an arbitrary unsandboxed script that opens the file. A connector or browser may reach data through credentials rather than local paths. Git can recover tracked edits but cannot reverse disclosure.
 
@@ -172,7 +148,7 @@ This example adds no network destinations or command exemptions. Settings from o
 
 ## Exceptions change the boundary
 
-The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix A). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
+The example refuses unsandboxed fallback. Some tools may need access it does not provide: a queue socket, an application integration, system installation, or a pseudo-terminal for the locally observed R issue (Appendix D). Diagnose the particular failure before deciding how to handle it. Do not add broad exemptions for every `gh`, `op`, or queue command as part of the baseline.
 
 If an authorized workflow needs a reviewed unsandboxed invocation, document its scope and protection separately. Do not describe that command as sandboxed. In particular, a job submitted to pueue runs under the queue service's account and permissions; the submission command's sandbox does not contain the resulting job. Credentials supplied to a process are available to that process even when a vault stored them safely.
 
@@ -182,13 +158,252 @@ For a protected analysis, use an execution environment with the required access 
 
 Test direct file access and subprocess access separately, using disposable files. Confirm the expected failures and an allowed operation that still succeeds. Test again after changing path rules, command exemptions, or the tool used to run the work. These tests reveal configuration errors; they do not prove containment against every possible program.
 
-Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (§16). Protecting only the applied file can leave an editable source copy that later restores broader access.
+Keep the effective settings and any exceptions documented outside the model's conversation. Review changes to both project and personal settings, including copies managed by chezmoi (Appendix B). Protecting only the applied file can leave an editable source copy that later restores broader access.
 
 ## On Windows (WSL2) and Linux
 
 The sandbox is supported on macOS, Linux, and WSL2, with platform-specific requirements in the linked documentation. Native Windows is outside this guide. Have the agent check the installed version's requirements and any managed-device restrictions before configuring it. A missing sandbox is not repaired by selecting a more cautious permission mode.
 
-# 3. Find research files efficiently: rg, fd, jq, yq, bat {#finding-files}
+<!-- ===================== PART II — ESSENTIAL TOOLS ===================== -->
+
+# 3. Add a tool without disrupting a project: Homebrew {#adding-tools}
+
+Adding a tool should give the project a missing capability without disturbing an analysis that already works. Inventory the existing installation first, then make the smallest useful addition. Homebrew manages many of the command-line programs used in this book.
+
+For example, the agent repeatedly writes small programs just to select fields from saved JSON responses. Installing `jq` gives it a maintained tool for that job. Verify it on one harmless response while leaving the project's R or Python environment unchanged.
+
+## What you need first
+
+On a Mac, ask the agent to check the installed tools, machine architecture, and Homebrew's current prerequisites. The research guide's first exercise does not require git or Apple's Command Line Tools; adding tools here may require them. Keep an existing institutional package-management arrangement if it meets the need; do not build a competing setup without a reason.
+
+The current [Homebrew installation instructions](https://docs.brew.sh/Installation) provide both the supported command-line route and a macOS package installer. Use those instructions rather than a copied installer command from an old guide. A password or installer dialog is a step for you, not a credential to paste into the conversation. If a terminal step is required, §18 explains how to open Terminal and paste one command. The macOS package route is documented here, but has not been tested as a complete new-user walkthrough for this edition.
+
+## Ask for a small installation
+
+> Inventory the tools this project already has and how they are managed. If Homebrew is needed, identify the supported installation route for this machine and explain any step I must perform myself. Then install ripgrep and jq if absent. Show their versions and use them on harmless example files. Do not upgrade the project's research language or package environment.
+
+Once Homebrew works, the agent can install further tools as you reach the relevant section. You do not need the whole toolkit at once. For noninteractive installs, Homebrew documents the `HOMEBREW_NO_ASK` setting; it does not remove operating-system authorization requirements. Record installed tools and why the project needs them.
+
+A personal `Brewfile` can record a growing installation set. It is useful for rebuilding a machine, but is not a substitute for the project's pinned research environment (§8). This guide uses section-by-section installation, so no separate bundle is needed to start.
+
+## Check that it works
+
+Ask the agent to show `brew --version`, the installed tool versions, and the small example's output. A `brew doctor` warning needs interpretation; it does not necessarily mean an installation failed. A command that cannot be found may be absent or may be outside the agent process's search path. After installation, a fresh app session may be needed to inherit that path.
+
+Keep installation review separate from research work. An installer may request network access or write outside the project. Approving that operation does not authorize later commands to use the same access without review (§2).
+
+## Windows through WSL2, and Linux
+
+This guide's Windows route is Ubuntu inside WSL2, not native Windows tools. Follow Microsoft's [WSL installation instructions](https://learn.microsoft.com/windows/wsl/install), including any administrator step and restart. Keep the project and its Linux tools inside the same distribution; a Windows installation of a program is not automatically a Linux installation.
+
+Homebrew supports Linux under its documented requirements. Follow its Linux instructions rather than copying the macOS installer. If your institution already supplies packages through Ubuntu or a managed environment, use those when adequate and record any differences in command names. The tools' platform notes identify consequential differences rather than promising identical operation everywhere.
+
+# 4. Recover earlier work: git and gh {#version-control}
+
+Research revisions should be recoverable. Git records selected versions so you can return to a working state when a change produces the wrong output, while retaining a record of why later work differs. The agent can maintain that record; learning every git command is unnecessary.
+
+For example, a revised sample rule unexpectedly removes half the observations. Preserve the failed check and its explanation, then ask the agent to restore the relevant rule from the last accepted checkpoint without discarding unrelated manuscript edits. Add a remote host only when collaboration or approved backup requires it.
+
+## What the tools give the agent
+
+A git diff shows how tracked text changed. A commit records an inspectable version. Neither can undo an external upload, a database change, an overwritten untracked file, or exposure of confidential data. Keep backups and access controls appropriate to those risks.
+
+The GitHub command-line tool, `gh`, lets the agent inspect issue reports, proposed changes called pull requests, and checks run by GitHub. It can also prepare changes for collaborators. Decide whether the files may be sent to the hosting service before creating or using a remote repository; private repositories still transfer their contents there.
+
+## Set up access only when needed
+
+Use your lab's existing host. For GitHub, we recommend `gh` with HTTPS authentication. The [authentication manual](https://cli.github.com/manual/gh_auth_login) explains its browser flow and credential storage: it uses the system credential store when available, but can fall back to a plain-text file. Check the reported storage location rather than assuming a keychain is in use.
+
+> Install gh if needed and check this repository's existing remote and authentication configuration. Help me sign in through the browser without pasting a token into chat. Configure git's HTTPS credential integration if appropriate. Report authentication status and the credential storage method without showing a secret. Do not create a remote or push files yet.
+
+You complete the browser sign-in. Have the agent inspect existing name and email settings before changing them. Keep functioning SSH or institutional-host authentication if there is no reason to replace it.
+
+## Check a small change
+
+Begin locally: have the agent check whether git exists, initialize it only if the project has no repository, and show the files proposed for tracking. Check the ignore rules and preserve any existing edits. Supply your own author identity if it is missing; the agent should not invent it. A local checkpoint requires no GitHub account.
+
+After a practice edit, ask for restoration of that named file from the checkpoint. Open it and verify the old content, while checking that an unrelated file remains unchanged. This tests recovery rather than merely showing that a commit command succeeded.
+
+Ask the agent to show the repository status, make an agreed edit to a practice file, and display its diff. After review, have it stage that file by name, selecting it for the commit, and inspect the proposed file list before committing. If the repository already contains uncommitted changes, identify and preserve them. Leave unrelated work untouched.
+
+For GitHub, start with a read-only operation such as inspecting the approved repository. A blocked call may reflect network, credential-store, or sandbox restrictions. Review that route under §2 rather than exempting all git and GitHub operations from the sandbox.
+
+Standing instructions: inspect status before editing; preserve unrelated changes; stage intended files; review the outgoing diff before a push; obtain approval before publishing or rewriting shared history.
+
+## Inspect changes before accepting them
+
+Use the app's diff view to inspect changed specifications, exclusions, dependencies, and execution rules. Difftastic is an optional structural diff tool that can reduce formatting noise in supported languages; it still does not interpret the scientific meaning of a change. Keep the ordinary diff available.
+
+A formatter makes code layout consistent; a linter inspects code for specified style issues and some programming mistakes. Use them when they help the project, and review their adoption separately from an analysis correction. Reformatting a whole file during a small edit can make the substantive change harder to see.
+
+## Keep repository internals out of cloud synchronization
+
+Git's internal `.git` directory changes frequently and should not be treated as a cloud-synced working document. For a new repository under Dropbox on macOS, the local procedure used here is to initialize it, exclude `.git` before the first commit, and verify the exclusion:
+
+```
+git init
+xattr -w com.dropbox.ignored 1 .git
+xattr -p com.dropbox.ignored .git
+```
+
+Run and check these steps separately. The last command should report `1` before any commit populates the repository history. The same before-population rule applies to generated libraries and large caches. This is Dropbox-specific, not a command for other sync services.
+
+If Dropbox has already indexed a populated directory, adding the attribute is not a reliable way to remove its existing contents from synchronization. Do not repeatedly rebuild that directory while trying to exclude it. Move the generated storage outside the synced tree, preserving needed files, and use an appropriate link or configuration path. An existing repository requires a checked migration, not deletion of its history.
+
+In WSL2, keep the repository and its git operations inside the Linux environment. Do not alternate Windows and Linux tools over the same working directory without checking filesystem, credential, and line-ending behavior.
+
+# 5. Give research tasks reliable commands: just {#project-commands}
+
+<!-- aliases: runnable-checks -->
+
+A saved command lets you repeat a research task without reconstructing its steps in another conversation. It also makes the scope visible: updating a figure should not unexpectedly launch every model fit.
+
+For example, `just figures` can read saved heat-effect estimates and redraw the plots, while `just fit` refits the approved model. The small `justfile` names those tasks; the scripts contain the analysis. Keep an existing master do-file or Makefile when it already does this well.
+
+
+## What it gives the agent
+
+A `justfile` records named commands called *recipes*. Each recipe calls the scripts or tools that perform a project task, and `just --list` displays the available names. Just does not determine which results need updating or resume an interrupted fit. A recipe can call a pipeline runner (§9) when that dependency tracking is needed.
+
+## Start from the existing project
+
+Add just when remembering and repeating the commands has become a problem. For an existing paper, first document and test the current execution sequence. An adequate master script can provide a reproducible hand-off without adding another tool.
+
+## Choose a manageable setup
+
+Use a small set of recipes named for the tasks they perform. This R example assumes the named analysis scripts already exist. It calls them through `bin/rscript-pty`, a small helper script described in Appendix D; that helper must also be present and executable.
+
+```
+rscript := justfile_directory() + "/bin/rscript-pty"
+
+# Fast known-answer checks; no model refits.
+check:
+    {{rscript}} code/check-inputs.R
+
+# Fit the approved analysis.
+fit:
+    {{rscript}} code/model.R
+
+# Recreate figures from saved results.
+figures:
+    {{rscript}} code/figures.R
+
+# Full ordered reproduction.
+build:
+    {{rscript}} run-all.R
+```
+
+A figure-label change should usually run the quick checks and figure recipe. A changed estimator may require refitting and recalibration. The full release check should run the documented reproduction sequence. Choose validation from what changed, rather than running an hours-long build after every edit.
+
+## Ask for it, and tell the agent
+
+> Install just if needed. Inspect this project's existing execution sequence and propose a small justfile with quick checks, the main analysis, figures from saved results, and a full build. Keep the underlying analysis unchanged. Show the recipes and their expected outputs before running expensive work. Add the instruction to run checks appropriate to the change and report exactly which passed.
+
+Review changes that alter what a recipe includes or checks. The agent should not remove a failing step merely to obtain a successful exit. Do not add a destructive cleanup recipe unless the project needs one and its scope is explicit.
+
+## Check that it's working
+
+Ask the agent to show `just --list`, then run one inexpensive recipe on a harmless input. Inspect the resulting file and the command's success or failure status. The [just manual](https://just.systems/man/en/listing-available-recipes.html) documents recipe listing; use the installed version's help for other options.
+
+Try the complete sequence in a new local practice folder, using your existing research language:
+
+1. Ask the agent to check whether just is installed and follow §3 if it is missing. Record the language and package environment (§8); this exercise needs no new analysis packages.
+2. Have it create `practice.csv` with two columns, `id` and `value`, and exactly three rows: `(1, 10)`, `(2, 20)`, `(3, 30)`. These are invented data. The output should be a text report stating `rows: 3` and `sum: 60`.
+3. Ask for a script that checks unique IDs and the expected columns, then writes the report. Add `check` and `build` recipes, plus a short project instruction naming their purpose.
+4. Run `just --list`, then the check and build. Open the report and compare it with the expected count and sum above. Ask the agent to identify the input and script it actually used.
+5. Duplicate ID 2 in the practice input and run the check again. It should fail with a duplicate-ID message. Restore the original three rows, rerun, and inspect the output. Save a checkpoint if this practice folder uses git.
+
+A successful valid case and an intentional failure show more than a report saying the installation worked. This is a proposed teaching exercise, not a recorded execution in this edition.
+
+## If you already have a build command
+
+Keep a working Makefile, master do-file, or document render command. Just can provide a convenient front end without replacing it. Add targets or Snakemake only when dependency tracking is useful (§9).
+
+## Keep consequential checks easy to rerun {#runnable-checks}
+
+A quick check can catch an implementation mistake before it contaminates a costly analysis. Save checks for behavior that matters to the sample or reported result, and include a case that should fail.
+
+For example, duplicating a county-month key in the heat table must stop the join before it duplicates birth records. A valid fixture must also pass. These two outcomes tell you more than a test that merely repeats the count produced by the agent's own code.
+
+### Ask for evidence about behavior
+
+A script can run successfully and still drop observations or compute the wrong contrast. A useful check has an expected result established independently of the implementation. Repeating the same calculation in a test can repeat the same error.
+
+For a many-to-one join, use a tiny invented example with three observations and two lookup rows. Establish the expected matches and row count yourself. Then add a duplicate lookup key: the check should fail before the join expands the data. Include an unmatched observation and verify that the specified flag or exclusion rule is followed. These cases test the required behavior against known answers, without copying the cleaning function into its own test.
+
+### Ask for runnable checks
+
+> Identify changes in this task that could alter the analytic sample or reported results. Add small known-answer checks for those behaviors using the project's existing test tools. Include a case that should fail. Expose the quick checks through the project command surface, and explain what they do not establish. Do not refit all models unless the change requires it.
+
+Separate quick checks from expensive recalibration and the full reproduction run (§5). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow Appendix D if R checks hang when launched through the agent.
+
+### Check the checks
+
+Ask the agent to run the deliberately failing example and the valid one, report outcomes, and restore the intended test inputs. Review changes to tests as carefully as changes to analysis code. A specification change can justify updating a test, but the reason must be explicit; deleting a failing check to finish the task is not a correction.
+
+Tests establish only the properties they examine. The research guide's [simulation](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent-implementation](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) chapters explain the complementary checks on the workflow and methods. Passing tests alone establishes none of those broader conclusions.
+
+# 6. Keep unattended jobs moving: pueue {#job-queues}
+
+Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return.
+
+Suppose the heat-and-birthweight sensitivity analysis needs 100 independent fits, but the computer can comfortably run four at once. You submit the batch before leaving. As each fit finishes, the queue starts another without waiting for you or an agent to intervene. The next morning you inspect the saved results and failed jobs. This is an illustrative workload, not a promise that all 100 fits finish overnight.
+
+![](figures/job-queues.svg){#fig-job-queues fig-alt="Many waiting jobs feed four available execution slots. Whenever a running job finishes, pueue automatically starts the next waiting job. Completed jobs retain outputs and success or failure status." above="8pt" below="8pt"}
+
+## Separate submission from execution
+
+[Pueue](https://github.com/Nukesor/pueue) runs a background service that manages commands submitted to it. The service records the command, working directory, output, and status, and limits simultaneous jobs. Closing the conversation that submitted a job need not stop its computation.
+
+The computer must remain awake and the service available. A reboot can interrupt work. After an interruption, inspect the queue and outputs before restarting: the queue's record does not itself let a model fit resume halfway through. That requires checkpoints saved by the fitting program.
+
+Use a queue for recurring long fits, simulations, or batches of independent work. Run short commands directly when their outcome can be checked immediately. Keep an institutional scheduler for work already running on a cluster.
+
+## Choose a limit from the jobs' resource needs
+
+Start with one representative job and inspect its memory use and internal threads. Then choose a concurrency limit that leaves room for the rest of the machine's work. Four queued fits using four threads each can demand sixteen threads; four available slots do not mean the fits each use one core.
+
+Ask the agent to inspect the command and environment before submitting a large batch. A queued command runs with the queue service's access, which can differ from the agent command tool's sandbox (§2). Configure the intended route and test it with harmless inputs. The queue controls when a job runs; it does not automatically inherit the agent's access restrictions.
+
+> Set up pueue for this machine if it is not already available. Demonstrate the queue using harmless short jobs and a concurrency limit of one, so I can see one job wait and then start automatically. Record the task IDs, working directories, logs, and final results. Before queuing the sensitivity fits, inspect a representative job's memory and threads and propose a suitable limit. Preserve the existing project environment and explain any required access exception.
+
+## Check the outcome, including failures
+
+Have the agent retain each task ID. Submission confirms that the service accepted the command; it does not establish that the command ran successfully.
+
+| State | Evidence to inspect |
+|---|---|
+| Waiting | The recorded command, inputs, working directory, and place in the queue |
+| Running | Actual process status plus an advancing log or expected intermediate output |
+| Succeeded | Successful stored result and the expected output artifact |
+| Failed | Failure status and log explaining what stopped; no silent resubmission |
+
+For a project with the `fit` recipe from §5, the agent can submit `just fit`:
+
+```
+pueue add --print-task-id -- just fit
+pueue status
+```
+
+Use the returned ID in subsequent commands. If the returned ID were 42, the checks would be:
+
+```
+pueue log 42
+pueue wait 42
+pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
+```
+
+This JSON check follows pueue 4.0.4's stored-result shape. `pueue wait` returns after waiting even when the job failed; its own successful exit does not prove job success. Also inspect the fit artifact. A successful command that wrote to the wrong folder has not completed the research task.
+
+Common setup failures include an absent service, a blocked service socket, and the wrong working directory or environment. Distinguish these from model errors. For the observed macOS R problem, follow the [R troubleshooting procedure](#working-environment) for both direct and queued execution until the actual route is verified.
+
+## Combine a queue with a pipeline when useful
+
+Targets and Snakemake (§9) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§5), a dependency runner (§9), and a queue solve different problems; use the ones the project needs.
+
+On WSL2, run the service in the project's environment and test its lifetime. Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) says that systemd services do not keep a WSL instance alive. Do not assume work survives shutting down the distribution or Windows.
+
+# 7. Find research files efficiently: rg, fd, jq, yq, bat {#finding-files}
 
 Finding the right file quickly helps an agent use the project's actual evidence instead of guessing from an incomplete description. Search and structured-data tools also keep irrelevant output out of the conversation.
 
@@ -226,57 +441,9 @@ An invented search might return `code/prepare.R:18: hot_days` and `code/model.R:
 
 On a server where installations are restricted, the standard search and file tools may be sufficient. A managed Ubuntu installation may use names such as `fdfind` or `batcat`; record the actual commands rather than installing a second copy merely to match this page.
 
-# 4. Recover earlier work: git and gh {#version-control}
+<!-- ===================== PART III — REPRODUCIBLE RESEARCH WORKFLOWS ===================== -->
 
-Research revisions should be recoverable. Git records selected versions so you can return to a working state when a change produces the wrong output, while retaining a record of why later work differs. The agent can maintain that record; learning every git command is unnecessary.
-
-For example, a revised sample rule unexpectedly removes half the observations. Preserve the failed check and its explanation, then ask the agent to restore the relevant rule from the last accepted checkpoint without discarding unrelated manuscript edits. Add a remote host only when collaboration or approved backup requires it.
-
-## What the tools give the agent
-
-A git diff shows how tracked text changed. A commit records an inspectable version. Neither can undo an external upload, a database change, an overwritten untracked file, or exposure of confidential data. Keep backups and access controls appropriate to those risks.
-
-The GitHub command-line tool, `gh`, lets the agent inspect issue reports, proposed changes called pull requests, and checks run by GitHub. It can also prepare changes for collaborators. Decide whether the files may be sent to the hosting service before creating or using a remote repository; private repositories still transfer their contents there.
-
-## Set up access only when needed
-
-Use your lab's existing host. For GitHub, we recommend `gh` with HTTPS authentication. The [authentication manual](https://cli.github.com/manual/gh_auth_login) explains its browser flow and credential storage: it uses the system credential store when available, but can fall back to a plain-text file. Check the reported storage location rather than assuming a keychain is in use.
-
-> Install gh if needed and check this repository's existing remote and authentication configuration. Help me sign in through the browser without pasting a token into chat. Configure git's HTTPS credential integration if appropriate. Report authentication status and the credential storage method without showing a secret. Do not create a remote or push files yet.
-
-You complete the browser sign-in. Have the agent inspect existing name and email settings before changing them. Keep functioning SSH or institutional-host authentication if there is no reason to replace it.
-
-## Check a small change
-
-Begin locally: have the agent check whether git exists, initialize it only if the project has no repository, and show the files proposed for tracking. Check the ignore rules and preserve any existing edits. Supply your own author identity if it is missing; the agent should not invent it. A local checkpoint requires no GitHub account.
-
-After a practice edit, ask for restoration of that named file from the checkpoint. Open it and verify the old content, while checking that an unrelated file remains unchanged. This tests recovery rather than merely showing that a commit command succeeded.
-
-Ask the agent to show the repository status, make an agreed edit to a practice file, and display its diff. After review, have it stage that file by name, selecting it for the commit, and inspect the proposed file list before committing. If the repository already contains uncommitted changes, identify and preserve them. Leave unrelated work untouched.
-
-For GitHub, start with a read-only operation such as inspecting the approved repository. A blocked call may reflect network, credential-store, or sandbox restrictions. Review that route under §2 rather than exempting all git and GitHub operations from the sandbox.
-
-Standing instructions: inspect status before editing; preserve unrelated changes; stage intended files; review the outgoing diff before a push; obtain approval before publishing or rewriting shared history.
-
-## Keep repository internals out of cloud synchronization
-
-Git's internal `.git` directory changes frequently and should not be treated as a cloud-synced working document. For a new repository under Dropbox on macOS, the local procedure used here is to initialize it, exclude `.git` before the first commit, and verify the exclusion:
-
-```
-git init
-xattr -w com.dropbox.ignored 1 .git
-xattr -p com.dropbox.ignored .git
-```
-
-Run and check these steps separately. The last command should report `1` before any commit populates the repository history. The same before-population rule applies to generated libraries and large caches. This is Dropbox-specific, not a command for other sync services.
-
-If Dropbox has already indexed a populated directory, adding the attribute is not a reliable way to remove its existing contents from synchronization. Do not repeatedly rebuild that directory while trying to exclude it. Move the generated storage outside the synced tree, preserving needed files, and use an appropriate link or configuration path. An existing repository requires a checked migration, not deletion of its history.
-
-In WSL2, keep the repository and its git operations inside the Linux environment. Do not alternate Windows and Linux tools over the same working directory without checking filesystem, credential, and line-ending behavior.
-
-<!-- ===================== PART II — RUN AND REPRODUCE THE WORK ===================== -->
-
-# 5. Preserve a software environment: rig, renv, and uv {#environments}
+# 8. Preserve a software environment: rig, renv, and uv {#environments}
 
 A working analysis depends on its software as well as its code. Recording the environment makes it possible to restore that combination after an update or on another machine, and to explain an unexpected change in results.
 
@@ -321,7 +488,7 @@ Common failures are unrecorded packages, missing system libraries, and a lockfil
 
 A restore may need system libraries such as a compiler or spatial-data library. Record their installation requirements in the README. If the project depends on a conda-based scientific stack, consider pixi or retain its existing conda environment rather than repeatedly forcing those dependencies through a different manager. A single failed installation is a diagnosis to investigate, not an automatic reason to migrate.
 
-On the author's affected Mac execution route, R environment commands use Appendix A's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§4).
+On the author's affected Mac execution route, R environment commands use Appendix D's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§4).
 
 ## Read the version change
 
@@ -331,108 +498,13 @@ An illustrative lockfile review might show one plotting package added with two d
 
 ## If the environment needs more
 
-Use a container (§15) when system dependencies also need to be packaged. Keep an existing conda or other managed environment when it is adequate. Platform-specific binaries can differ, so test restoration on the collaborator's target platform before promising portability.
+Use a container (§11) when system dependencies also need to be packaged. Keep an existing conda or other managed environment when it is adequate. Platform-specific binaries can differ, so test restoration on the collaborator's target platform before promising portability.
 
 ## On Windows (WSL2) and Linux
 
 Create the environment where the tools run: inside Ubuntu for WSL2. Use [rig's platform instructions](https://rig.r-lib.org/install.html) if adding R versions; the macOS installer is not the Linux installer. Check system-library requirements on that platform and document them with the project.
 
-# 6. Give research tasks reliable commands: just {#project-commands}
-
-A saved command lets you repeat a research task without reconstructing its steps in another conversation. It also makes the scope visible: updating a figure should not unexpectedly launch every model fit.
-
-For example, `just figures` can read saved heat-effect estimates and redraw the plots, while `just fit` refits the approved model. The small `justfile` names those tasks; the scripts contain the analysis. Keep an existing master do-file or Makefile when it already does this well.
-
-
-## What it gives the agent
-
-A `justfile` records named commands called *recipes*. Each recipe calls the scripts or tools that perform a project task, and `just --list` displays the available names. Just does not determine which results need updating or resume an interrupted fit. A recipe can call a pipeline runner (§8) when that dependency tracking is needed.
-
-## Start from the existing project
-
-Add just when remembering and repeating the commands has become a problem. For an existing paper, first document and test the current execution sequence. An adequate master script can provide a reproducible hand-off without adding another tool.
-
-## Choose a manageable setup
-
-Use a small set of recipes named for the tasks they perform. This R example assumes the named analysis scripts already exist. It calls them through `bin/rscript-pty`, a small helper script described in Appendix A; that helper must also be present and executable.
-
-```
-rscript := justfile_directory() + "/bin/rscript-pty"
-
-# Fast known-answer checks; no model refits.
-check:
-    {{rscript}} code/check-inputs.R
-
-# Fit the approved analysis.
-fit:
-    {{rscript}} code/model.R
-
-# Recreate figures from saved results.
-figures:
-    {{rscript}} code/figures.R
-
-# Full ordered reproduction.
-build:
-    {{rscript}} run-all.R
-```
-
-A figure-label change should usually run the quick checks and figure recipe. A changed estimator may require refitting and recalibration. The full release check should run the documented reproduction sequence. Choose validation from what changed, rather than running an hours-long build after every edit.
-
-## Ask for it, and tell the agent
-
-> Install just if needed. Inspect this project's existing execution sequence and propose a small justfile with quick checks, the main analysis, figures from saved results, and a full build. Keep the underlying analysis unchanged. Show the recipes and their expected outputs before running expensive work. Add the instruction to run checks appropriate to the change and report exactly which passed.
-
-Review changes that alter what a recipe includes or checks. The agent should not remove a failing step merely to obtain a successful exit. Do not add a destructive cleanup recipe unless the project needs one and its scope is explicit.
-
-## Check that it's working
-
-Ask the agent to show `just --list`, then run one inexpensive recipe on a harmless input. Inspect the resulting file and the command's success or failure status. The [just manual](https://just.systems/man/en/listing-available-recipes.html) documents recipe listing; use the installed version's help for other options.
-
-Try the complete sequence in a new local practice folder, using your existing research language:
-
-1. Ask the agent to check whether just is installed and follow §1 if it is missing. Record the language and package environment (§5); this exercise needs no new analysis packages.
-2. Have it create `practice.csv` with two columns, `id` and `value`, and exactly three rows: `(1, 10)`, `(2, 20)`, `(3, 30)`. These are invented data. The output should be a text report stating `rows: 3` and `sum: 60`.
-3. Ask for a script that checks unique IDs and the expected columns, then writes the report. Add `check` and `build` recipes, plus a short project instruction naming their purpose.
-4. Run `just --list`, then the check and build. Open the report and compare it with the expected count and sum above. Ask the agent to identify the input and script it actually used.
-5. Duplicate ID 2 in the practice input and run the check again. It should fail with a duplicate-ID message. Restore the original three rows, rerun, and inspect the output. Save a checkpoint if this practice folder uses git.
-
-A successful valid case and an intentional failure show more than a report saying the installation worked. This is a proposed teaching exercise, not a recorded execution in this edition.
-
-## If you already have a build command
-
-Keep a working Makefile, master do-file, or document render command. Just can provide a convenient front end without replacing it. Add targets or Snakemake only when dependency tracking is useful (§8).
-
-# 7. Make consequential checks easy to rerun {#runnable-checks}
-
-A quick check can catch an implementation mistake before it contaminates a costly analysis. Save checks for behavior that matters to the sample or reported result, and include a case that should fail.
-
-For example, duplicating a county-month key in the heat table must stop the join before it duplicates birth records. A valid fixture must also pass. These two outcomes tell you more than a test that merely repeats the count produced by the agent's own code.
-
-## Ask for evidence about behavior
-
-A script can run successfully and still drop observations or compute the wrong contrast. A useful check has an expected result established independently of the implementation. Repeating the same calculation in a test can repeat the same error.
-
-For a many-to-one join, use a tiny invented example with three observations and two lookup rows. Establish the expected matches and row count yourself. Then add a duplicate lookup key: the check should fail before the join expands the data. Include an unmatched observation and verify that the specified flag or exclusion rule is followed. These cases test the required behavior against known answers, without copying the cleaning function into its own test.
-
-## Ask for it, and tell the agent
-
-> Identify changes in this task that could alter the analytic sample or reported results. Add small known-answer checks for those behaviors using the project's existing test tools. Include a case that should fail. Expose the quick checks through the project command surface, and explain what they do not establish. Do not refit all models unless the change requires it.
-
-Separate quick checks from expensive recalibration and the full reproduction run (§6). Required validation belongs in the maintained project, even if it began as an exploratory script. Follow Appendix A if R checks hang when launched through the agent.
-
-## Inspect the changes that tests cannot settle
-
-Use the app's diff view to inspect changed specifications, exclusions, dependencies, and execution rules. Difftastic is an optional structural diff tool that can reduce formatting noise in supported languages; it still does not interpret the scientific meaning of a change. Keep the ordinary diff available.
-
-A formatter makes code layout consistent; a linter inspects code for specified style issues and some programming mistakes. Use them when they help the project, and review their adoption separately from an analysis correction. Reformatting a whole file during a small edit can make the substantive change harder to see.
-
-## Check the checks
-
-Ask the agent to run the deliberately failing example and the valid one, report outcomes, and restore the intended test inputs. Review changes to tests as carefully as changes to analysis code. A specification change can justify updating a test, but the reason must be explicit; deleting a failing check to finish the task is not a correction.
-
-Tests establish only the properties they examine. The research guide's *Verification* chapter explains the complementary role of independent implementations, methodological review, and calibration. Passing tests alone establishes none of those broader conclusions.
-
-# 8. Rerun only affected steps: targets and Snakemake {#pipeline-dependencies}
+# 9. Rerun only affected steps: targets and Snakemake {#pipeline-dependencies}
 
 When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change.
 
@@ -469,73 +541,13 @@ A first pipeline can call your existing scripts. It may then treat a whole scrip
 
 For targets, inspect `tar_outdated()` and the graph. For Snakemake, use `snakemake -n` for a dry run. Test the three changes in the table on a small invented dataset, compare the predicted and actual reruns, and confirm unchanged outputs are reused. Neither route has been tested as a complete new-installation walkthrough for this edition; verify it in the project's environment.
 
-For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§9). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix A gives the conservative troubleshooting baseline without separate workers.
+For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§6). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix D gives the conservative troubleshooting baseline without separate workers.
 
-These tools do different parts of the work. A just recipe (§6) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§9) manages submission and execution of the overall job.
+These tools do different parts of the work. A just recipe (§5) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§6) manages submission and execution of the overall job.
 
 ![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="Analysis data feed fits A and B. Both feed a figure. A change to fit B reruns that branch and the figure while fit A is reused."}
 
 Keep generated caches out of git and configure cloud-sync exclusions before populating them (§4). Required validation scripts and environment records remain part of the reproducible project, even when their generated results are cached. Keep an established pipeline framework if it already supplies the needed dependency tracking and execution record.
-
-# 9. Keep unattended jobs moving: pueue {#job-queues}
-
-Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return.
-
-Suppose the heat-and-birthweight sensitivity analysis needs 100 independent fits, but the computer can comfortably run four at once. You submit the batch before leaving. As each fit finishes, the queue starts another without waiting for you or an agent to intervene. The next morning you inspect the saved results and failed jobs. This is an illustrative workload, not a promise that all 100 fits finish overnight.
-
-![](figures/job-queues.svg){#fig-job-queues fig-alt="Many waiting jobs feed four available execution slots. Whenever a running job finishes, pueue automatically starts the next waiting job. Completed jobs retain outputs and success or failure status." above="8pt" below="8pt"}
-
-## Separate submission from execution
-
-[Pueue](https://github.com/Nukesor/pueue) runs a background service that manages commands submitted to it. The service records the command, working directory, output, and status, and limits simultaneous jobs. Closing the conversation that submitted a job need not stop its computation.
-
-The computer must remain awake and the service available. A reboot can interrupt work. After an interruption, inspect the queue and outputs before restarting: the queue's record does not itself let a model fit resume halfway through. That requires checkpoints saved by the fitting program.
-
-Use a queue for recurring long fits, simulations, or batches of independent work. Run short commands directly when their outcome can be checked immediately. Keep an institutional scheduler for work already running on a cluster.
-
-## Choose a limit from the jobs' resource needs
-
-Start with one representative job and inspect its memory use and internal threads. Then choose a concurrency limit that leaves room for the rest of the machine's work. Four queued fits using four threads each can demand sixteen threads; four available slots do not mean the fits each use one core.
-
-Ask the agent to inspect the command and environment before submitting a large batch. A queued command runs with the queue service's access, which can differ from the agent command tool's sandbox (§2). Configure the intended route and test it with harmless inputs. The queue controls when a job runs; it does not automatically inherit the agent's access restrictions.
-
-> Set up pueue for this machine if it is not already available. Demonstrate the queue using harmless short jobs and a concurrency limit of one, so I can see one job wait and then start automatically. Record the task IDs, working directories, logs, and final results. Before queuing the sensitivity fits, inspect a representative job's memory and threads and propose a suitable limit. Preserve the existing project environment and explain any required access exception.
-
-## Check the outcome, including failures
-
-Have the agent retain each task ID. Submission confirms that the service accepted the command; it does not establish that the command ran successfully.
-
-| State | Evidence to inspect |
-|---|---|
-| Waiting | The recorded command, inputs, working directory, and place in the queue |
-| Running | Actual process status plus an advancing log or expected intermediate output |
-| Succeeded | Successful stored result and the expected output artifact |
-| Failed | Failure status and log explaining what stopped; no silent resubmission |
-
-For a project with the `fit` recipe from §6, the agent can submit `just fit`:
-
-```
-pueue add --print-task-id -- just fit
-pueue status
-```
-
-Use the returned ID in subsequent commands. If the returned ID were 42, the checks would be:
-
-```
-pueue log 42
-pueue wait 42
-pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
-```
-
-This JSON check follows pueue 4.0.4's stored-result shape. `pueue wait` returns after waiting even when the job failed; its own successful exit does not prove job success. Also inspect the fit artifact. A successful command that wrote to the wrong folder has not completed the research task.
-
-Common setup failures include an absent service, a blocked service socket, and the wrong working directory or environment. Distinguish these from model errors. For the observed macOS R problem, follow the [R troubleshooting procedure](#working-environment) for both direct and queued execution until the actual route is verified.
-
-## Combine a queue with a pipeline when useful
-
-Targets and Snakemake (§8) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§6), a dependency runner (§8), and a queue solve different problems; use the ones the project needs.
-
-On WSL2, run the service in the project's environment and test its lifetime. Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) says that systemd services do not keep a WSL instance alive. Do not assume work survives shutting down the distribution or Windows.
 
 # 10. Generate documents from research outputs: Quarto and pandoc {#research-documents}
 
@@ -561,9 +573,9 @@ For a text-only PDF, request pandoc and a template instead. TinyTeX is a small T
 
 Open the output and inspect the result, figure, citations, and layout. Change one value in the invented input, rebuild, and verify the corresponding reported result changes. For the manuscript, check a selected result against the saved analysis output. A recent modification time alone cannot establish that the right analysis ran.
 
-Save the rendering command and its options as a project recipe (§6), and record the language packages, TeX dependencies, and fonts needed for hand-off. Preserve a Word route when coauthors need it; conversion still requires checking tables, equations, references, and tracked changes.
+Save the rendering command and its options as a project recipe (§5), and record the language packages, TeX dependencies, and fonts needed for hand-off. Preserve a Word route when coauthors need it; conversion still requires checking tables, equations, references, and tracked changes.
 
-For an R process that hangs when launched by an agent on macOS, use the single troubleshooting procedure in §6. Queueing the render is not itself a guarantee that the problem disappears.
+For an R process that hangs when launched by an agent on macOS, use the single troubleshooting procedure in §5. Queueing the render is not itself a guarantee that the problem disappears.
 
 One specific template error encountered with TeX Live 2026 is “No counter 'none' defined” for a captionless table. The pandoc-to-XeLaTeX templates used here include this compatibility block in their preamble:
 
@@ -575,9 +587,41 @@ One specific template error encountered with TeX Live 2026 is “No counter 'non
 
 Other failures need their own diagnosis. Check missing fonts and packages in the render log rather than changing the document's statistical code to obtain a PDF.
 
-<!-- ===================== PART III — EXTEND ACCESS AND COORDINATE WORK ===================== -->
+# 11. Run work in a separate environment: containers {#containers}
 
-# 11. Keep credentials out of research files: 1Password and direnv {#credentials}
+An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package.
+
+For example, a container for a public replication example might receive only a copy of its approved inputs and an empty output directory, with no personal credentials. Test both the expected result and the intended access restrictions. Packaging software and containing access are different claims.
+
+## What it gives the agent
+
+A Dockerfile is a recipe for building the environment from a starting image, system packages, research-language dependencies, and project files. The resulting *image* is the packaged software used to start a container. Sharing it can help a collaborator run the same software. The Dockerfile alone does not preserve package repositories, external services, hardware behavior, or downloads whose versions were not fixed.
+
+A folder shared from your computer into the container is called a *host mount*. If that mount is writable, code in the container can change the files in it. Supplied credentials are also available to that code. Broad system privileges or access to Docker's control socket can defeat much of the intended separation. Review [Docker's security model](https://docs.docker.com/engine/security/) and [bind mounts](https://docs.docker.com/engine/storage/bind-mounts/) when deciding what the container may access.
+
+## The recommended route
+
+On a Mac, Colima with the Docker CLI is the command-line setup used here. Follow [Colima's setup](https://github.com/abiosoft/colima) for the current supported route. On Ubuntu or WSL2, use a supported Docker Engine installation. Keep an institutionally managed Docker Desktop installation if it is already approved and suitable; there is no need to replace it to follow this chapter.
+
+Containers are optional for an ordinary analysis with an adequate environment record. They become useful when system dependencies are difficult to reproduce, a collaborator needs a portable environment, or code needs a more restricted execution space.
+
+## Ask for a limited first run
+
+> Propose a container configuration for this reproduction package. List every host mount, its read/write status, network access, credentials, and runtime privileges. Start with a harmless test, no credentials, and only the required input mounted read-only plus a separate output directory. Show that allowed output works and that an unmounted practice file is inaccessible before running the package.
+
+For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§8). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
+
+## Check both uses separately
+
+A successful reproduction establishes that this build ran under this configuration. It does not show the container safely contains arbitrary untrusted code. Conversely, blocking access to a test file does not establish that numerical results match the original analysis.
+
+Inspect mounts and privileges before each materially different workload. Do not mount the whole home directory for convenience. A container used to build a trusted project may reasonably have different access from one used to inspect an unknown replication package; label and review those configurations separately.
+
+For institutional clusters, use the runtime the service supports, often Apptainer, with the research-computing team's instructions. Container installation and its daemon can require privileges outside the agent's ordinary sandbox (§2); approval for that setup is separate from permission to run every future container.
+
+<!-- ===================== PART IV — CONNECT TO DATA AND SERVICES ===================== -->
+
+# 12. Keep credentials out of research files: 1Password and direnv {#credentials}
 
 A data-acquisition command may need a credential, but the research code and its published history should not contain the secret. Supply it only to the process that needs access and check what that process records.
 
@@ -615,7 +659,7 @@ If direnv does not load in the agent's noninteractive shell, `direnv exec .` can
 
 Standing instructions: never paste credentials into chat or source files; report variable names rather than values; avoid dumping the environment; use the narrowest credential scope and lifetime available. Do not introduce an AI-provider API key into the agent's environment unless API billing is intentional and approved.
 
-# 12. Connect to research data and services: MCP {#service-connections}
+# 13. Connect to research data and services: MCP {#service-connections}
 
 A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope.
 
@@ -639,7 +683,7 @@ At Harvard, check the current [HUIT Claude guidance](https://www.huit.harvard.ed
 
 > Identify the approved connection for [service] and the operations this task needs. Show its source, data destinations, credentials, and requested access before configuring it. Use a test collection with no confidential material and read-only access first. Retrieve one record I can check independently. Do not send messages or change service records.
 
-You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§11).
+You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§12).
 
 ## Check what it can reach
 
@@ -653,7 +697,7 @@ A connection may offer memory, and Claude may retain notes between sessions. The
 
 Interface support differs. In particular, check the current desktop documentation before relying on a connector in a WSL session. A CLI-configured server and an app connector may have different availability and authentication routes.
 
-# 13. Inspect and interact with a browser {#browser-work}
+# 14. Inspect and interact with a browser {#browser-work}
 
 A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text.
 
@@ -667,7 +711,7 @@ The agent can inspect page structure, navigate, interact, and capture evidence o
 
 > Configure the official Playwright MCP server for this project using a reviewed version. Open the local test report in a separate browser profile with no signed-in accounts. Inspect the table, figure, and navigation. Report concrete problems with screenshots or page locations, and compare one displayed result with its source file.
 
-Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §12.
+Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §13.
 
 ## When the browser needs an account
 
@@ -679,9 +723,11 @@ Whatever the agent reads may become part of model processing. Do not expose part
 
 An agent can help discover a permitted route and prototype the interaction. Once the collection steps are stable, save a script, inputs, outputs, and failure handling. Test it on a small sample before increasing volume. Browser-driven collection can be reproducible, but a conversational record of clicks alone is a weak reproduction package.
 
-Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§15). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.
+Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§11). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.
 
-# 14. Divide work between agents: git worktrees {#parallel-work}
+<!-- ===================== PART V — RUN AND COORDINATE AGENTS ===================== -->
+
+# 15. Divide work between agents: git worktrees {#parallel-work}
 
 Parallel work is useful when tasks can proceed separately and their results can be checked before integration. Separate working copies prevent two agents from overwriting the same files while you coordinate the combined result.
 
@@ -697,7 +743,7 @@ For example, one agent could add known-answer checks for a cleaning function whi
 
 > Prepare separate worktrees and branches for these two tasks: [task A] and [task B]. Identify shared inputs and resources before starting. Give each task a separate output location and the recorded environment it needs. Preserve existing uncommitted work. Do not merge or remove either worktree until its changes and outputs have been reviewed.
 
-Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§18). Confirm the actual folder and branch each session uses before either starts editing.
+Use the app's supported worktree controls or have the agent prepare them with git. Terminal users can open a session in each worktree (§19). Confirm the actual folder and branch each session uses before either starts editing.
 
 ## Prepare the inputs deliberately
 
@@ -709,155 +755,17 @@ Independent implementation for verification needs additional separation. Give fr
 
 Ask for `git worktree list`, each branch's changes, test results, and remaining uncommitted files. Resolve overlapping edits deliberately. Run checks on the combined result, since two individually passing changes can fail together.
 
-Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§9). Extra agents are useful only when their outputs can be specified, checked, and integrated.
+Remove a worktree only after confirming its needed work is committed or preserved and its branch is no longer needed. Keep parallelism within the machine's memory and compute limits (§6). Extra agents are useful only when their outputs can be specified, checked, and integrated.
 
-# 15. Run work in a separate environment: containers {#containers}
-
-An unfamiliar replication package should not inherit every file and credential available on your laptop. A separate environment can limit that access and record the software needed to rerun the package.
-
-For example, a container for a public replication example might receive only a copy of its approved inputs and an empty output directory, with no personal credentials. Test both the expected result and the intended access restrictions. Packaging software and containing access are different claims.
-
-## What it gives the agent
-
-A Dockerfile is a recipe for building the environment from a starting image, system packages, research-language dependencies, and project files. The resulting *image* is the packaged software used to start a container. Sharing it can help a collaborator run the same software. The Dockerfile alone does not preserve package repositories, external services, hardware behavior, or downloads whose versions were not fixed.
-
-A folder shared from your computer into the container is called a *host mount*. If that mount is writable, code in the container can change the files in it. Supplied credentials are also available to that code. Broad system privileges or access to Docker's control socket can defeat much of the intended separation. Review [Docker's security model](https://docs.docker.com/engine/security/) and [bind mounts](https://docs.docker.com/engine/storage/bind-mounts/) when deciding what the container may access.
-
-## The recommended route
-
-On a Mac, Colima with the Docker CLI is the command-line setup used here. Follow [Colima's setup](https://github.com/abiosoft/colima) for the current supported route. On Ubuntu or WSL2, use a supported Docker Engine installation. Keep an institutionally managed Docker Desktop installation if it is already approved and suitable; there is no need to replace it to follow this chapter.
-
-Containers are optional for an ordinary analysis with an adequate environment record. They become useful when system dependencies are difficult to reproduce, a collaborator needs a portable environment, or code needs a more restricted execution space.
-
-## Ask for a limited first run
-
-> Propose a container configuration for this reproduction package. List every host mount, its read/write status, network access, credentials, and runtime privileges. Start with a harmless test, no credentials, and only the required input mounted read-only plus a separate output directory. Show that allowed output works and that an unmounted practice file is inaccessible before running the package.
-
-For a reproducible environment, specify the exact base image in the Dockerfile using its *digest*, a fingerprint of its contents, and restore recorded dependencies (§5). Record the platform architecture and build instructions. If future rebuilding matters, preserve the built image through an approved archive route as well as the recipe, and test restoration. None of this guarantees indefinite compatibility.
-
-## Check both uses separately
-
-A successful reproduction establishes that this build ran under this configuration. It does not show the container safely contains arbitrary untrusted code. Conversely, blocking access to a test file does not establish that numerical results match the original analysis.
-
-Inspect mounts and privileges before each materially different workload. Do not mount the whole home directory for convenience. A container used to build a trusted project may reasonably have different access from one used to inspect an unknown replication package; label and review those configurations separately.
-
-For institutional clusters, use the runtime the service supports, often Apptainer, with the research-computing team's instructions. Container installation and its daemon can require privileges outside the agent's ordinary sandbox (§2); approval for that setup is separate from permission to run every future container.
-
-# 16. Keep records of shared settings: chezmoi {#shared-settings}
-
-Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine.
-
-For example, a correction to your shared coding conventions should survive a new laptop and should not be overwritten by an older managed copy. Chezmoi records source files and applies them to their expected locations. Project-only configuration already tracked by git may need nothing more.
-
-## What it gives the agent
-
-Chezmoi keeps source versions of selected settings and writes them to the locations each program reads. A private git repository can record changes to that source. This makes it possible to inspect a proposed update and recover a previous configuration.
-
-![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi keeps source versions in a settings repository and applies them to the paths programs read. Both locations need review and protection." above="16pt" below="14pt"}
-
-There are two copies to consider: the source managed by chezmoi and the applied file used by the program. Protect both when a file defines the agent's permissions. If the source remains editable, the agent could change it and later have chezmoi overwrite the protected active setting (§2).
-
-## Start with a harmless setting
-
-> Inspect how my settings are already managed. If chezmoi would help, propose a small initial set and preserve backups before importing it. Exclude credentials and sensitive account details. Show the source and applied paths, the proposed diff, and a way to restore the previous version. Do not publish the settings repository.
-
-Use the [chezmoi quick start](https://www.chezmoi.io/quick-start/) for the current workflow. Start with a harmless setting, inspect `chezmoi diff`, and apply it after review. Confirm the program sees the change, then rehearse restoring the previous setting before managing permission files.
-
-## Keep the record and the active files aligned
-
-If the agent edits an applied file directly, it must capture that change back to chezmoi's source before a later apply overwrites it. Review the resulting source diff and commit the intended change. Do not broadly capture a directory that might contain tokens or account state.
-
-Templates can express differences between machines, but test them before applying to a working setup. A startup file that references a missing program can break the next shell session. On WSL2, manage the Linux home deliberately rather than assuming it is the same as the Windows user's settings.
-
-Keep an existing institutional configuration manager when it already does this job. Adding chezmoi should make settings easier to inspect and restore, not create a second authority that continually overwrites the first.
-
-<!-- ===================== PART IV — WORK FROM A TERMINAL, OPTIONALLY ===================== -->
-
-# 17. Run saved research commands yourself {#terminal-commands}
-
-The terminal is useful when you want to run a saved command yourself, work on a remote machine, or inspect a job log beside the agent. It is an optional interface to the same files and programs, not a prerequisite for the research workflow.
-
-For example, you can open the project folder in Terminal and run `just figures` to rebuild a plot from saved estimates. This chapter explains the folder, command, and output so you can recognize what ran. Appendix A covers optional terminal and editor conveniences.
-
-## The terminal and the shell
-
-A terminal is a window for typed commands and their output. A shell is the program inside it that interprets the commands. On a Mac, open Terminal through Spotlight (Command-Space, then type Terminal). For this guide's Windows route, open the Ubuntu environment installed through WSL2 (§1), either directly or through Windows Terminal. The examples below use a Unix shell, not PowerShell.
-
-A prompt marks where the shell is waiting for input. Type or paste a command after it and press Return. Do not copy a prompt character from a tutorial as part of the command. A command can read or change files immediately, so have the agent explain an unfamiliar one before you run it.
-
-Every shell has a *working directory*: the folder it uses when a command names a file without giving its full location. To see that folder and its contents, try:
-
-```
-pwd
-ls
-```
-
-`pwd` prints that folder's path; `ls` lists its contents. Use `cd` to move to the project. Replace the example path with your own, retaining quotes if it contains spaces:
-
-```
-cd "/Users/your-name/Research/heat-birthweight"
-pwd
-ls
-```
-
-A path beginning with `/` is *absolute*: it gives a location starting at the top of the filesystem. A *relative* path such as `code/model.R` starts from the working directory. `~` means your home directory, and `cd ..` moves up one level. Confirm the working directory before running a command that writes files.
-
-## Run a saved command
-
-If the project has a justfile (§6), `just --list` shows its named recipes. Run an inexpensive check first. A *command not found* message can mean the program is absent or that its directory is missing from `PATH`, the list of folders the shell searches for programs. Ask the agent to identify the cause before reinstalling anything.
-
-Programs normally print ordinary output and errors to the terminal. To save both, an example is:
-
-```
-just check > check.log 2>&1
-```
-
-This overwrites `check.log`; use a new name when an earlier log matters. Saving a log does not put the job in a queue; use §9 for long work. Control-C requests interruption of the program currently running in the terminal. It does not undo files already written or guarantee that other processes started by that program have stopped.
-
-An environment variable is a named value available to a running program and usually to programs it starts. Credentials are often supplied this way. Use the vault procedure in §11 rather than typing secret values into commands, shell history, or startup files. A program that receives the value can read it.
-
-## What a terminal does and does not keep alive
-
-A terminal window displays a process; a multiplexer can preserve its session when that window closes (§17). A queue records and manages submitted jobs (§9). A pipeline runner determines which analysis steps need rerunning (§8). None makes computation continue while a laptop is asleep or after a process has been terminated.
-
-For a remote server, use the institution's approved access and scheduling procedures. Installing an agent on that server is a separate data-processing decision: being close to the files does not mean their contents stay away from the model provider.
-
-# 18. Use an agent from the terminal: Claude Code {#terminal-agents}
+# 16. Run agents from saved requests {#headless-agents}
 
 A terminal agent can be used interactively or called as one recorded step in a larger workflow. The latter becomes useful when each item needs language-model judgment and you want a saved input, output, and failure status for every run.
 
 For example, a batch of approved documents can be assessed one case at a time without an ongoing conversation. The research guide's peer-review example additionally controls what each reviewer and judge receives. Starting a headless process enables unattended work; controlling its context requires further configuration and tests.
 
-## Install and start
+## What you need first
 
-Follow the current [Claude Code quickstart](https://code.claude.com/docs/en/quickstart) for the supported installation route on your platform. Having the desktop app does not by itself establish that the `claude` command is installed. Ask the agent to check first. Complete account sign-in yourself and select the institutional subscription route you intend to use.
-
-In the practice folder from §17, run:
-
-```
-claude
-```
-
-Read the folder-trust prompt before accepting it. Ask Claude to identify the project instructions it loaded and summarize `notes.md` without changing anything. Then request one small edit and inspect the saved file. The research guide explains project instructions and evidence for accepting a task.
-
-The project directory determines ordinary relative paths; it is not by itself a boundary on everything the process can read. The access configuration in §2 still matters.
-
-## Controls you will use
-
-[Research chapter 5](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give an agent. As of September 2026, the terminal documentation describes these controls; check their availability against the installed version's help and [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode):
-
-| Control | Purpose |
-|:--|:--|
-| `/model` | Choose an available model and inspect its options |
-| `/effort` | Set reasoning effort where supported |
-| `/permissions` | Inspect and change permission rules |
-| `/sandbox` | Inspect sandbox configuration |
-| `/context` | Inspect context use |
-| `/compact` | Summarize the current conversation to reduce context |
-| `/usage` | Inspect account usage information |
-| `/exit` | Leave the interactive session |
-
-Shift-Tab cycles the available permission modes. The cycle can depend on account and configuration; check the displayed mode rather than assuming a fixed sequence. Use Auto for ordinary work inside reviewed boundaries, Plan when you want to settle the approach first, and Manual when inspecting individual approvals is useful. Save important decisions and next steps to project files before compacting or ending a session.
+Ask the agent to check that the `claude` command is installed through the supported [Claude Code setup route](https://code.claude.com/docs/en/quickstart). Complete the intended account sign-in yourself. The interactive walkthrough is in §19; you do not need to complete it before testing a saved request.
 
 ## A command that finishes without a conversation
 
@@ -896,15 +804,17 @@ Put a unique invented marker in case A and a different one in case B. Give run B
 
 Save the configuration and the actual evidence, including refusals. A model saying it cannot remember the marker is weaker evidence than an observed access denial. A test covers the routes and version exercised; it does not certify future tools or all possible attacks. If a route cannot be tested, name it as unverified rather than calling the entire setup isolated.
 
-This is a teaching procedure, not a completed containment trial for the reader's installation. The historical peer-review wrappers motivated it; they are not a substitute for testing the current tool and account. After these checks, validate a small batch against the research rubric before scaling up. A queue (§9) can manage the outer jobs, but its execution permissions need their own check.
+This is a teaching procedure, not a completed containment trial for the reader's installation. The historical peer-review wrappers motivated it; they are not a substitute for testing the current tool and account. After these checks, validate a small batch against the research rubric before scaling up. A queue (§6) can manage the outer jobs, but its execution permissions need their own check.
 
-## Run a model locally {#local-models}
+# 17. Run a model on your own computer {#local-models}
 
 A local model can keep inference on approved hardware and preserve access to a chosen set of weights. It can also be substantially less capable than the hosted model you normally use. The research guide's [Run and adapt models for your research](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) explains that choice, its connection to data governance, and when fine-tuning may help. This section establishes a small trial before adding a model to a research pipeline.
 
-### Install and start a local runtime
+For example, first ask a small downloaded model to return a category for an invented input, then test whether an agent using that model can read an assigned harmless file. These trials check the setup before you consider a research task.
 
-Use an existing approved model service if your institution supplies one. For a Mac trial, [Ollama](https://docs.ollama.com/quickstart) supplies a local model runtime. Check for an existing installation first. With Homebrew already configured (§1), the command-line installation is:
+## Install and start a local runtime
+
+Use an existing approved model service if your institution supplies one. For a Mac trial, [Ollama](https://docs.ollama.com/quickstart) supplies a local model runtime. Check for an existing installation first. With Homebrew already configured (§3), the command-line installation is:
 
 ```
 brew install ollama
@@ -920,7 +830,7 @@ OLLAMA_NO_CLOUD=1 OLLAMA_HOST=127.0.0.1:11434 OLLAMA_CONTEXT_LENGTH=65536 ollama
 
 Check for an existing server before starting another. Confirm the startup log says cloud features are disabled and the server is listening on localhost. This command does not set up a login service. Configuring a persistent service is a separate step; apply the same local-only setting to the process that actually serves requests. These settings govern Ollama, not every network-capable tool an agent might use.
 
-### Download a small model and test inference
+## Download a small model and test inference
 
 A modest trial model is [Qwen3 4B](https://ollama.com/library/qwen3:4b), distributed here as about 2.5 GB of quantized weights. This is a setup example, not a recommendation for a particular research measurement. In another terminal:
 
@@ -934,7 +844,9 @@ Ask a harmless question, then exit the interactive session with `/bye`. Record t
 
 For an extraction or classification step, require a structured response and validate it. A small trial on this Mac illustrates why: the unrestricted request for one category produced explanatory text and hit the output limit. Supplying a JSON schema produced the required category object. That establishes behavior on the invented test input, not accuracy on research data. Keep malformed responses and retries in the record.
 
-### Connect the model to an agent
+## Connect the model to an agent
+
+This trial also requires the `claude` command. Ask the agent to check its installation before starting; §19 covers setup and interactive use, and §16 explains controlled headless runs.
 
 [Ollama’s Claude Code integration](https://docs.ollama.com/integrations/claude-code) connects compatible models through an Anthropic-compatible endpoint. Its launcher can configure the integration; inspect proposed configuration changes before replacing an existing hosted-model setup. A process-scoped trial can instead supply the local endpoint and model explicitly.
 
@@ -946,11 +858,99 @@ The harmless local trial completed a two-turn file-reading task and returned the
 
 For restricted work, enforce the required file and network boundaries (§2), review the full chain of custody, and evaluate task quality before scaling up. Small distilled DeepSeek releases, large Kimi models, and Apple’s built-in model have different deployment and access routes; do not assume that every local model is an interchangeable backend for this launcher.
 
-### Apple’s on-device model {#apple-on-device}
+## Apple’s on-device model {#apple-on-device}
 
 Apple supplies an alternative that uses the system model. On macOS 27, the built-in [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) supports interactive use, saved scripting steps, and structured responses. Check `fm --help` and `fm respond --help` on the intended Mac before constructing a trial. The documented default is on-device inference; selecting Private Cloud Compute changes where the request is processed.
 
-For Python workflows, Apple’s [Foundation Models SDK](https://github.com/apple/python-apple-fm-sdk) requires macOS 26 or later, Xcode 26 or later, Python 3.10 or later, and Apple Intelligence enabled on a compatible Mac. Add the SDK to the project’s recorded environment (§5), check model availability, and start with an invented input and a fixed output schema. Keep the package version and system information with the results. These Apple routes were checked against documentation on November 3, 2026; they have not been run in this guide’s local trial.
+For Python workflows, Apple’s [Foundation Models SDK](https://github.com/apple/python-apple-fm-sdk) requires macOS 26 or later, Xcode 26 or later, Python 3.10 or later, and Apple Intelligence enabled on a compatible Mac. Add the SDK to the project’s recorded environment (§8), check model availability, and start with an invented input and a fixed output schema. Keep the package version and system information with the results. These Apple routes were checked against documentation on November 3, 2026; they have not been run in this guide’s local trial.
+
+<!-- ===================== PART VI — WORK FROM THE TERMINAL ===================== -->
+
+# 18. Run saved research commands yourself {#terminal-commands}
+
+The terminal is useful when you want to run a saved command yourself, work on a remote machine, or inspect a job log beside the agent. It is an optional interface to the same files and programs, not a prerequisite for the research workflow.
+
+For example, you can open the project folder in Terminal and run `just figures` to rebuild a plot from saved estimates. This chapter explains the folder, command, and output so you can recognize what ran. Appendix A covers optional terminal and editor conveniences.
+
+## The terminal and the shell
+
+A terminal is a window for typed commands and their output. A shell is the program inside it that interprets the commands. On a Mac, open Terminal through Spotlight (Command-Space, then type Terminal). For this guide's Windows route, open the Ubuntu environment installed through WSL2 (§3), either directly or through Windows Terminal. The examples below use a Unix shell, not PowerShell.
+
+A prompt marks where the shell is waiting for input. Type or paste a command after it and press Return. Do not copy a prompt character from a tutorial as part of the command. A command can read or change files immediately, so have the agent explain an unfamiliar one before you run it.
+
+Every shell has a *working directory*: the folder it uses when a command names a file without giving its full location. To see that folder and its contents, try:
+
+```
+pwd
+ls
+```
+
+`pwd` prints that folder's path; `ls` lists its contents. Use `cd` to move to the project. Replace the example path with your own, retaining quotes if it contains spaces:
+
+```
+cd "/Users/your-name/Research/heat-birthweight"
+pwd
+ls
+```
+
+A path beginning with `/` is *absolute*: it gives a location starting at the top of the filesystem. A *relative* path such as `code/model.R` starts from the working directory. `~` means your home directory, and `cd ..` moves up one level. Confirm the working directory before running a command that writes files.
+
+## Run a saved command
+
+If the project has a justfile (§5), `just --list` shows its named recipes. Run an inexpensive check first. A *command not found* message can mean the program is absent or that its directory is missing from `PATH`, the list of folders the shell searches for programs. Ask the agent to identify the cause before reinstalling anything.
+
+Programs normally print ordinary output and errors to the terminal. To save both, an example is:
+
+```
+just check > check.log 2>&1
+```
+
+This overwrites `check.log`; use a new name when an earlier log matters. Saving a log does not put the job in a queue; use §6 for long work. Control-C requests interruption of the program currently running in the terminal. It does not undo files already written or guarantee that other processes started by that program have stopped.
+
+An environment variable is a named value available to a running program and usually to programs it starts. Credentials are often supplied this way. Use the vault procedure in §12 rather than typing secret values into commands, shell history, or startup files. A program that receives the value can read it.
+
+## What a terminal does and does not keep alive
+
+A terminal window displays a process; a multiplexer can preserve its session when that window closes (Appendix A). A queue records and manages submitted jobs (§6). A pipeline runner determines which analysis steps need rerunning (§9). None makes computation continue while a laptop is asleep or after a process has been terminated.
+
+For a remote server, use the institution's approved access and scheduling procedures. Installing an agent on that server is a separate data-processing decision: being close to the files does not mean their contents stay away from the model provider.
+
+# 19. Use an agent from the terminal: Claude Code {#terminal-agents}
+
+An interactive terminal session gives you another way to work with an agent in a project folder. It can be useful when your commands and job logs are already open there. The project files and research decisions remain the same whichever interface you use.
+
+For example, open a project containing a small, nonconfidential `notes.md`, ask the agent to summarize it, then request one small edit and inspect the saved file. This chapter covers that interactive session; saved unattended runs and local models have separate chapters.
+
+## Install and start
+
+Follow the current [Claude Code quickstart](https://code.claude.com/docs/en/quickstart) for the supported installation route on your platform. Having the desktop app does not by itself establish that the `claude` command is installed. Ask the agent to check first. Complete account sign-in yourself and select the institutional subscription route you intend to use.
+
+Open the project folder containing your `notes.md` in a terminal (§18 explains navigating to a folder), then run:
+
+```
+claude
+```
+
+Read the folder-trust prompt before accepting it. Ask Claude to identify the project instructions it loaded and summarize `notes.md` without changing anything. Then request one small edit and inspect the saved file. The research guide explains project instructions and evidence for accepting a task.
+
+The project directory determines ordinary relative paths; it is not by itself a boundary on everything the process can read. The access configuration in §2 still matters.
+
+## Controls you will use
+
+[Research chapter 5](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give an agent. As of September 2026, the terminal documentation describes these controls; check their availability against the installed version's help and [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode):
+
+| Control | Purpose |
+|:--|:--|
+| `/model` | Choose an available model and inspect its options |
+| `/effort` | Set reasoning effort where supported |
+| `/permissions` | Inspect and change permission rules |
+| `/sandbox` | Inspect sandbox configuration |
+| `/context` | Inspect context use |
+| `/compact` | Summarize the current conversation to reduce context |
+| `/usage` | Inspect account usage information |
+| `/exit` | Leave the interactive session |
+
+Shift-Tab cycles the available permission modes. The cycle can depend on account and configuration; check the displayed mode rather than assuming a fixed sequence. Use Auto for ordinary work inside reviewed boundaries, Plan when you want to settle the approach first, and Manual when inspecting individual approvals is useful. Save important decisions and next steps to project files before compacting or ending a session.
 
 <!-- ===================== REFERENCE ===================== -->
 
@@ -966,7 +966,7 @@ If you want commands and job output visible side by side, a terminal with split 
 
 On a Mac, ask the agent to help install [iTerm2](https://iterm2.com/documentation.html) without replacing existing shell settings. Open the project in one pane and a read-only queue status command in another. Search the output for a task identifier, copy its result, and close the extra pane. If that improves your work, save the layout or profile.
 
-On Windows, use the Ubuntu profile in [Windows Terminal](https://learn.microsoft.com/windows/terminal/). Confirm the working directory and Linux environment with the commands from §17. A neighboring PowerShell tab is a different environment.
+On Windows, use the Ubuntu profile in [Windows Terminal](https://learn.microsoft.com/windows/terminal/). Confirm the working directory and Linux environment with the commands from §18. A neighboring PowerShell tab is a different environment.
 
 Use legible fonts and a restrained color scheme. Special fonts are only needed if your chosen prompt requires their symbols. No terminal replacement or theme is required to run Claude or any of the project's saved commands.
 
@@ -1011,7 +1011,7 @@ Check that both panes and their harmless contents remain. The [Zellij user guide
 
 Detaching leaves the session's processes running while the host and session remain available. It does not protect against shutdown, lost storage, or a program failure. Restoring a layout after a restart is different from resuming the processes that previously occupied it.
 
-Use pueue for a local job's submission record and result (§9), or the institutional scheduler on a cluster. Zellij provides a convenient place to inspect those jobs and their logs. On a remote machine, the session lives there; reconnecting your laptop does not revive a remote process that has died.
+Use pueue for a local job's submission record and result (§6), or the institutional scheduler on a cluster. Zellij provides a convenient place to inspect those jobs and their logs. On a remote machine, the session lives there; reconnecting your laptop does not revive a remote process that has died.
 
 Keep an established multiplexer if it already works for you. The useful check is being able to detach and recover a harmless session before relying on it during important work.
 
@@ -1021,7 +1021,7 @@ Positron is an optional editor for inspecting R or Python code, data, and plots 
 
 ### Open an existing project
 
-Install through [Positron's official site](https://positron.posit.co/) if you want to try it, then open a practice project folder. Select the R or Python interpreter that belongs to the recorded project environment (§5). Confirm the version and library path before executing code; an editor can discover several installations.
+Install through [Positron's official site](https://positron.posit.co/) if you want to try it, then open a practice project folder. Select the R or Python interpreter that belongs to the recorded project environment (§8). Confirm the version and library path before executing code; an editor can discover several installations.
 
 Run a small existing analysis, inspect a dataframe in the [Data Explorer](https://positron.posit.co/data-explorer), and view its saved plot. Filtering or sorting the displayed table is useful for inspection, but those temporary views do not replace reproducible cleaning code.
 
@@ -1031,7 +1031,61 @@ Have the agent make a small agreed change through your existing app or terminal 
 
 An AI extension or database connection is a separate addition with its own access and account requirements. You do not need one for this workflow. Keep the initial trial focused on whether the editor makes code, data, and results easier for you to inspect.
 
-## Troubleshooting R launched by an agent on macOS
+# Appendix B. Keep records of shared settings: chezmoi {#shared-settings}
+
+Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine.
+
+For example, a correction to your shared coding conventions should survive a new laptop and should not be overwritten by an older managed copy. Chezmoi records source files and applies them to their expected locations. Project-only configuration already tracked by git may need nothing more.
+
+## What it gives the agent
+
+Chezmoi keeps source versions of selected settings and writes them to the locations each program reads. A private git repository can record changes to that source. This makes it possible to inspect a proposed update and recover a previous configuration.
+
+![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi keeps source versions in a settings repository and applies them to the paths programs read. Both locations need review and protection." above="16pt" below="14pt"}
+
+There are two copies to consider: the source managed by chezmoi and the applied file used by the program. Protect both when a file defines the agent's permissions. If the source remains editable, the agent could change it and later have chezmoi overwrite the protected active setting (§2).
+
+## Start with a harmless setting
+
+> Inspect how my settings are already managed. If chezmoi would help, propose a small initial set and preserve backups before importing it. Exclude credentials and sensitive account details. Show the source and applied paths, the proposed diff, and a way to restore the previous version. Do not publish the settings repository.
+
+Use the [chezmoi quick start](https://www.chezmoi.io/quick-start/) for the current workflow. Start with a harmless setting, inspect `chezmoi diff`, and apply it after review. Confirm the program sees the change, then rehearse restoring the previous setting before managing permission files.
+
+## Keep the record and the active files aligned
+
+If the agent edits an applied file directly, it must capture that change back to chezmoi's source before a later apply overwrites it. Review the resulting source diff and commit the intended change. Do not broadly capture a directory that might contain tokens or account state.
+
+Templates can express differences between machines, but test them before applying to a working setup. A startup file that references a missing program can break the next shell session. On WSL2, manage the Linux home deliberately rather than assuming it is the same as the Windows user's settings.
+
+Keep an existing institutional configuration manager when it already does this job. Adding chezmoi should make settings easier to inspect and restore, not create a second authority that continually overwrites the first.
+
+# Appendix C. Account-usage tools {#usage-tools}
+
+Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill.
+
+## What to inspect first
+
+Check the app's usage controls or the terminal's `/usage` command. Limits depend on the account and can change; use the current [Claude usage guidance](https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits) and your institutional plan rather than a fixed number in this guide.
+
+Long conversations, large inputs and outputs, model choice, and reasoning effort can increase usage. A model fit computing on your laptop does not itself consume language-model tokens merely because time passes. Repeatedly asking the agent for progress updates or having it read large logs can create additional calls to the language model.
+
+## What ccusage adds
+
+[ccusage](https://ccusage.com/guide/) summarizes compatible local logs by periods and sessions. Its coverage depends on which sessions were logged, retained, and available on this machine. Deleted logs, work on other machines, and unsupported interfaces can leave gaps. Cost estimates depend on the tool's pricing assumptions and are not an invoice.
+
+> Check Claude's built-in usage information first. If the retained logs can answer my question, use a reviewed version of ccusage to summarize this week's largest sessions. Report the covered dates and missing sources. Separate measured token totals from hypotheses about why a session was expensive. Do not upload the logs or quote confidential contents.
+
+Review and record the package version before running it. A package executed through npx is still downloaded code, even if it is not installed permanently.
+
+## Use the result to change a habit
+
+Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§6).
+
+A missing session is a coverage problem to investigate, not evidence of zero use. Retained logs may themselves contain confidential material; apply the project's access and retention rules to them.
+
+# Appendix D. Troubleshooting {#troubleshooting}
+
+## R launched by an agent on macOS {#r-on-macos}
 
 On the author's Mac, R has sometimes stalled when an agent launches it with output sent to another program or discarded, rather than connected to a terminal. The process keeps using a processor core but produces no output. This is an observed local problem, not a general property of R or every agent. Giving the process a *pseudo-terminal*, a software-created terminal connection, has been the dependable workaround in this environment.
 
@@ -1057,27 +1111,3 @@ script -q /dev/null quarto render paper.qmd < /dev/null
 ```
 
 Check the process and artifact as well as the returned status. If a process appears stuck, establish its identity and progress before stopping it; do not launch several replacements. Linux has a different `script` interface, so the macOS wrapper should not be copied unchanged there.
-
-# Appendix B. Account-usage tools {#usage-tools}
-
-Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill.
-
-## What to inspect first
-
-Check the app's usage controls or the terminal's `/usage` command. Limits depend on the account and can change; use the current [Claude usage guidance](https://support.claude.com/en/articles/11647753-understanding-usage-and-length-limits) and your institutional plan rather than a fixed number in this guide.
-
-Long conversations, large inputs and outputs, model choice, and reasoning effort can increase usage. A model fit computing on your laptop does not itself consume language-model tokens merely because time passes. Repeatedly asking the agent for progress updates or having it read large logs can create additional calls to the language model.
-
-## What ccusage adds
-
-[ccusage](https://ccusage.com/guide/) summarizes compatible local logs by periods and sessions. Its coverage depends on which sessions were logged, retained, and available on this machine. Deleted logs, work on other machines, and unsupported interfaces can leave gaps. Cost estimates depend on the tool's pricing assumptions and are not an invoice.
-
-> Check Claude's built-in usage information first. If the retained logs can answer my question, use a reviewed version of ccusage to summarize this week's largest sessions. Report the covered dates and missing sources. Separate measured token totals from hypotheses about why a session was expensive. Do not upload the logs or quote confidential contents.
-
-Review and record the package version before running it. A package executed through npx is still downloaded code, even if it is not installed permanently.
-
-## Use the result to change a habit
-
-Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§9).
-
-A missing session is a coverage problem to investigate, not evidence of zero use. Retained logs may themselves contain confidential material; apply the project's access and retention rules to them.

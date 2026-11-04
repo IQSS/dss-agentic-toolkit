@@ -1,5 +1,5 @@
 ---
-title: "8. Rerun only affected steps: targets and Snakemake"
+title: "9. Rerun only affected steps: targets and Snakemake"
 ---
 
 When a workflow has expensive steps, tracking dependencies saves repeated computation and reduces the chance of reporting stale results. A pipeline runner decides which declared steps need updating after a change.
@@ -37,9 +37,9 @@ A first pipeline can call your existing scripts. It may then treat a whole scrip
 
 For targets, inspect `tar_outdated()` and the graph. For Snakemake, use `snakemake -n` for a dry run. Test the three changes in the table on a small invented dataset, compare the predicted and actual reruns, and confirm unchanged outputs are reused. Neither route has been tested as a complete new-installation walkthrough for this edition; verify it in the project's environment.
 
-For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§9). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix A gives the conservative troubleshooting baseline without separate workers.
+For parallel work, budget memory and threads as well as worker count. A model using several threads inside each of several workers can exhaust a laptop. Start with one representative job (§6). Targets can use crew for parallel workers, but the observed macOS R problem requires checking that execution route; Appendix D gives the conservative troubleshooting baseline without separate workers.
 
-These tools do different parts of the work. A just recipe (§6) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§9) manages submission and execution of the overall job.
+These tools do different parts of the work. A just recipe (§5) gives you a named command. The pipeline runner decides which analysis steps need rerunning. A queue (§6) manages submission and execution of the overall job.
 
 ![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="Analysis data feed fits A and B. Both feed a figure. A change to fit B reruns that branch and the figure while fit A is reused."}
 

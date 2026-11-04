@@ -1,5 +1,5 @@
 ---
-title: "12. Connect to research data and services: MCP"
+title: "13. Connect to research data and services: MCP"
 ---
 
 A direct connection can reduce repeated export and import work while preserving a traceable route to the source. Add one when it gives the agent access the research task actually needs, under an approved account and scope.
@@ -24,7 +24,7 @@ At Harvard, check the current [HUIT Claude guidance](https://www.huit.harvard.ed
 
 > Identify the approved connection for [service] and the operations this task needs. Show its source, data destinations, credentials, and requested access before configuring it. Use a test collection with no confidential material and read-only access first. Retrieve one record I can check independently. Do not send messages or change service records.
 
-You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§11).
+You complete authentication and approve the intended scope. Do not put a token in a shared configuration file; use the credential mechanism appropriate to the connection (§12).
 
 ## Check what it can reach
 

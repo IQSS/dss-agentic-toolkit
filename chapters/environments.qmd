@@ -1,5 +1,5 @@
 ---
-title: "5. Preserve a software environment: rig, renv, and uv"
+title: "8. Preserve a software environment: rig, renv, and uv"
 ---
 
 A working analysis depends on its software as well as its code. Recording the environment makes it possible to restore that combination after an update or on another machine, and to explain an unexpected change in results.
@@ -45,7 +45,7 @@ Common failures are unrecorded packages, missing system libraries, and a lockfil
 
 A restore may need system libraries such as a compiler or spatial-data library. Record their installation requirements in the README. If the project depends on a conda-based scientific stack, consider pixi or retain its existing conda environment rather than repeatedly forcing those dependencies through a different manager. A single failed installation is a diagnosis to investigate, not an automatic reason to migrate.
 
-On the author's affected Mac execution route, R environment commands use Appendix A's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§4).
+On the author's affected Mac execution route, R environment commands use Appendix D's wrapper. Keep generated libraries outside synchronized folders, or apply the documented exclusion before creating their contents (§4).
 
 ## Read the version change
 
@@ -55,7 +55,7 @@ An illustrative lockfile review might show one plotting package added with two d
 
 ## If the environment needs more
 
-Use a container (§15) when system dependencies also need to be packaged. Keep an existing conda or other managed environment when it is adequate. Platform-specific binaries can differ, so test restoration on the collaborator's target platform before promising portability.
+Use a container (§11) when system dependencies also need to be packaged. Keep an existing conda or other managed environment when it is adequate. Platform-specific binaries can differ, so test restoration on the collaborator's target platform before promising portability.
 
 ## On Windows (WSL2) and Linux
 

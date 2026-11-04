@@ -1,5 +1,5 @@
 ---
-title: "16. Keep records of shared settings: chezmoi"
+title: "Appendix B. Keep records of shared settings: chezmoi"
 ---
 
 Personal tool settings can become hard to recover once they are scattered across several folders. Keeping a maintained source makes changes inspectable and helps restore a working setup on another machine.

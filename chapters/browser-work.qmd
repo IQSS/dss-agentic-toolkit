@@ -1,5 +1,5 @@
 ---
-title: "13. Inspect and interact with a browser"
+title: "14. Inspect and interact with a browser"
 ---
 
 A successful document build does not establish that people can read the result. Browser access lets the agent inspect the rendered page, including layout faults that are absent from the source text.
@@ -14,7 +14,7 @@ The agent can inspect page structure, navigate, interact, and capture evidence o
 
 > Configure the official Playwright MCP server for this project using a reviewed version. Open the local test report in a separate browser profile with no signed-in accounts. Inspect the table, figure, and navigation. Report concrete problems with screenshots or page locations, and compare one displayed result with its source file.
 
-Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §12.
+Check current installation requirements in the server documentation. An MCP package and its browser dependencies are executable software, so review their access under §2 and configure them under §13.
 
 ## When the browser needs an account
 
@@ -26,4 +26,4 @@ Whatever the agent reads may become part of model processing. Do not expose part
 
 An agent can help discover a permitted route and prototype the interaction. Once the collection steps are stable, save a script, inputs, outputs, and failure handling. Test it on a small sample before increasing volume. Browser-driven collection can be reproducible, but a conversational record of clicks alone is a weak reproduction package.
 
-Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§15). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.
+Computer use reaches beyond browser pages to a desktop's visible applications. Reserve it for a task the narrower tools cannot perform, in an approved isolated environment with appropriate mounts, network access, and credentials (§11). A container label alone does not establish that the desktop is isolated. This guide does not require computer use to follow any of its core paths.

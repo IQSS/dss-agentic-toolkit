@@ -1,0 +1,30 @@
+---
+title: "Appendix D. Troubleshooting"
+---
+
+## R launched by an agent on macOS {#r-on-macos}
+
+On the author's Mac, R has sometimes stalled when an agent launches it with output sent to another program or discarded, rather than connected to a terminal. The process keeps using a processor core but produces no output. This is an observed local problem, not a general property of R or every agent. Giving the process a *pseudo-terminal*, a software-created terminal connection, has been the dependable workaround in this environment.
+
+The project should put the workaround in one executable file, `bin/rscript-pty`, rather than relying on the agent to remember it at each call:
+
+```
+#!/bin/sh
+command -v script >/dev/null 2>&1 || {
+  echo "No script command; cannot allocate a pseudo-terminal" >&2
+  exit 127
+}
+exec script -q /dev/null Rscript "$@" < /dev/null
+```
+
+Have the agent route every R recipe through this helper, including checks and environment commands. For targets, run the pipeline in that same process with `callr_function = NULL` and disable crew for the initial test. Separately launched workers may not inherit the terminal connection. Verify a small run and its output before scaling up.
+
+Earlier local tests succeeded with pueue's file-based logging and with crew. They do not establish that every queued or worker configuration is safe. The consistent baseline here retains the wrapper for queued R jobs too. Enable parallel workers only after testing the actual execution route and recording the evidence.
+
+If the agent sandbox blocks pseudo-terminal allocation, the strict settings in §2 will refuse the call. Use a separately reviewed execution route or run the saved script in your own application; do not silently disable the sandbox. For Quarto that executes R, the equivalent macOS wrapper surrounds the whole render:
+
+```
+script -q /dev/null quarto render paper.qmd < /dev/null
+```
+
+Check the process and artifact as well as the returned status. If a process appears stuck, establish its identity and progress before stopping it; do not launch several replacements. Linux has a different `script` interface, so the macOS wrapper should not be copied unchanged there.

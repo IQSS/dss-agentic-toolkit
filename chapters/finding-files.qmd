@@ -1,5 +1,5 @@
 ---
-title: "3. Find research files efficiently: rg, fd, jq, yq, bat"
+title: "7. Find research files efficiently: rg, fd, jq, yq, bat"
 ---
 
 Finding the right file quickly helps an agent use the project's actual evidence instead of guessing from an incomplete description. Search and structured-data tools also keep irrelevant output out of the conversation.

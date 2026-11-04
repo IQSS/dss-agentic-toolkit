@@ -32,6 +32,12 @@ For GitHub, start with a read-only operation such as inspecting the approved rep
 
 Standing instructions: inspect status before editing; preserve unrelated changes; stage intended files; review the outgoing diff before a push; obtain approval before publishing or rewriting shared history.
 
+## Inspect changes before accepting them
+
+Use the app's diff view to inspect changed specifications, exclusions, dependencies, and execution rules. Difftastic is an optional structural diff tool that can reduce formatting noise in supported languages; it still does not interpret the scientific meaning of a change. Keep the ordinary diff available.
+
+A formatter makes code layout consistent; a linter inspects code for specified style issues and some programming mistakes. Use them when they help the project, and review their adoption separately from an analysis correction. Reformatting a whole file during a small edit can make the substantive change harder to see.
+
 ## Keep repository internals out of cloud synchronization
 
 Git's internal `.git` directory changes frequently and should not be treated as a cloud-synced working document. For a new repository under Dropbox on macOS, the local procedure used here is to initialize it, exclude `.git` before the first commit, and verify the exclusion:

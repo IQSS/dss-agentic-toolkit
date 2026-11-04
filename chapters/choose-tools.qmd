@@ -1,48 +1,78 @@
 ---
-title: "Choose tools for a research need"
+title: "1. Choose tools for a research need"
 ---
 
 Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence.
 
 Suppose your heat-and-birthweight project now needs 100 simulation runs. You want a few running at once, the rest waiting, and a record of failures to inspect later. A queue addresses that need. It does not choose the simulation design, decide whether the estimates are valid, or make a sleeping laptop compute. Understanding that division of work is more useful than installing a large collection of tools.
 
-The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app; no terminal knowledge is required for chapters 1–16. Sign-ins, passwords, and decisions about access remain yours.
+The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app. Most chapters do not require you to use a terminal. Sign-ins, passwords, and decisions about access remain yours.
+
+Use this book as a reference. After this overview and the boundaries chapter, choose the capability your research needs. Each tool chapter can be used independently; follow its links when you need a supporting setup or explanation.
 
 ## Find the problem you need to solve
 
 | Research need | Start here |
 |:--|:--|
-| **Set up and protect the work** | |
-| Add one missing capability without upgrading everything | §1: Homebrew |
-| Check what a new tool can read, change, or send | §2: access controls |
-| Find a variable or inspect a saved service response | §3: rg, fd, jq, yq, bat |
-| Recover a working state after an unsuccessful change | §4: git and gh |
-| **Run and reproduce the work** | |
-| Restore the language and packages used for an analysis | §5: rig, renv, uv |
-| Repeat a research task with one saved command | §6: just |
-| Catch consequential mistakes before fitting | §7: runnable checks |
-| Rerun only steps affected by a change | §8: targets and Snakemake |
-| Keep a batch moving unattended | §9: pueue |
-| Rebuild a report from saved research outputs | §10: Quarto and pandoc |
-| **Extend access and coordinate work** | |
-| Supply a credential without storing it in research code | §11: 1Password and direnv |
-| Reach an approved reference library or service | §12: MCP |
-| Inspect a rendered page or interact with a website | §13: browser tools |
-| Give parallel agents separate working copies | §14: git worktrees |
-| Package or restrict a separate execution environment | §15: containers |
-| Keep a recoverable record of personal tool settings | §16: chezmoi |
-| **Work from a terminal, optionally** | |
-| Run a saved command yourself | §17: terminal commands |
-| Run an agent interactively or as a recorded batch step | §18: terminal agents |
+| **Foundations** | |
+| Check what a new tool can read, change, or send | §2: Control what added tools can access |
+| **Essential tools** | |
+| Install tools through a maintained package manager | §3: Add a tool without disrupting a project: Homebrew |
+| Record changes and recover a working state | §4: Recover earlier work: git and gh |
+| Repeat research tasks with saved commands | §5: Give research tasks reliable commands: just |
+| Keep a batch moving unattended | §6: Keep unattended jobs moving: pueue |
+| Find research files or inspect a saved service response | §7: Find research files efficiently: rg, fd, jq, yq, bat |
+| **Reproducible research workflows** | |
+| Restore the language and packages used for an analysis | §8: Preserve a software environment: rig, renv, and uv |
+| Rerun only steps affected by a change | §9: Rerun only affected steps: targets and Snakemake |
+| Rebuild documents from saved research outputs | §10: Generate documents from research outputs: Quarto and pandoc |
+| Run work in a separately configured environment | §11: Run work in a separate environment: containers |
+| **Connect to data and services** | |
+| Supply credentials without storing them in research code | §12: Keep credentials out of research files: 1Password and direnv |
+| Reach an approved library or service | §13: Connect to research data and services: MCP |
+| Inspect or interact with a website | §14: Inspect and interact with a browser |
+| **Run and coordinate agents** | |
+| Give parallel agents separate working copies | §15: Divide work between agents: git worktrees |
+| Run an agent from recorded requests with controlled inputs | §16: Run agents from saved requests |
+| Set up and check inference on your own computer | §17: Run a model on your own computer |
+| **Work from the terminal** | |
+| Run saved commands yourself | §18: Run saved research commands yourself |
+| Work interactively with an agent in a terminal | §19: Use an agent from the terminal: Claude Code |
 | **Reference** | |
-| Terminal, shell, editor, and R execution conveniences | Appendix A |
-| Inspect historical account usage with an extra tool | Appendix B |
+| Choose terminal, shell, session, or editor conveniences | Appendix A: Optional working environment |
+| Keep a recoverable record of personal tool settings | Appendix B: Keep records of shared settings: chezmoi |
+| Inspect account usage with an extra tool | Appendix C: Account-usage tools |
+| Diagnose the recorded R-on-macOS execution problem | Appendix D: Troubleshooting |
 
 ## Add only what the project needs
 
 Installed programs extend what the agent can do through its command tool. Connections expose functions supplied by another service. Instructions tell the agent when and how to use either. Installation alone does not teach a reliable procedure: a queue needs resource limits and an outcome check; an environment manager needs a maintained version record.
 
 Each chapter begins with the research problem and an example, then gives a setup request and evidence to inspect. Most examples are deliberately small and invented. Where a procedure comes from a recorded run or has not yet had a clean-installation trial, the text says so. We are Data Science Services at Harvard's Institute for Quantitative Social Science; the examples draw on our research-support work.
+
+## Tell the agent how to use installed tools
+
+A newly installed tool can go unused, or be used incorrectly, unless the agent has instructions for it. This chapter shows how to record when to use a tool, what limits apply, and which results to report. The research guide's *The files the agent reads* and *Repeatable workflows* chapters explain the instruction files and skills that hold those procedures.
+
+### Start with short, specific instructions
+
+A machine-wide convention can live in your personal `CLAUDE.md`. A project's commands, resource limits, and data-access rules belong with that project. Keep an established instruction layout rather than creating a second one for this guide.
+
+For example:
+
+- Submit long jobs through pueue, record the task identifier, and verify both completion status and expected outputs.
+- Fetch required credentials from the approved vault for the command that needs them. Never print or commit their values.
+- Use the project's recorded environment. Report proposed dependency changes before applying them.
+
+Each line names an action and a check. “Use pueue” alone leaves the agent to guess how to establish that a job succeeded. Keep a short inventory of installed tools and their purpose alongside these instructions.
+
+### Package procedures only when they recur
+
+A skill can hold a recurring procedure such as submitting a job, inspecting its status, and reporting failure. Start with a standing instruction; add the longer procedure if you repeatedly need the same correction. Hooks can run checks at specified events, but are executable configuration that needs review. Neither instructions nor hooks replace a data-access boundary (§2).
+
+### Check that the instruction is used
+
+In a fresh session, ask which project instructions apply and how the agent would run a long job. Have it identify the file it read, then demonstrate the procedure on a harmless task. A confident summary alone does not prove the file was loaded or the procedure works.
 
 ## Use the environment you have
 

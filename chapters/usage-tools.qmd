@@ -1,5 +1,5 @@
 ---
-title: "Appendix B. Account-usage tools"
+title: "Appendix C. Account-usage tools"
 ---
 
 Use Claude's own usage display to check the allowance for your account. This chapter also explains how ccusage can summarize past sessions from saved local logs, helping you identify where usage accumulated. Its token counts and monetary estimates may differ from your subscription balance or bill.
@@ -20,6 +20,6 @@ Review and record the package version before running it. A package executed thro
 
 ## Use the result to change a habit
 
-Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§9).
+Compare the report with sessions you remember, and look for an actionable pattern: whole data files read into context, repeated full builds, or a long conversation that should have ended after its task. Read selected log lines instead of streaming everything. Queue long computations and inspect their status and outputs (§6).
 
 A missing session is a coverage problem to investigate, not evidence of zero use. Retained logs may themselves contain confidential material; apply the project's access and retention rules to them.

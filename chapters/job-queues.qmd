@@ -1,5 +1,5 @@
 ---
-title: "9. Keep unattended jobs moving: pueue"
+title: "6. Keep unattended jobs moving: pueue"
 ---
 
 Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return.
@@ -35,7 +35,7 @@ Have the agent retain each task ID. Submission confirms that the service accepte
 | Succeeded | Successful stored result and the expected output artifact |
 | Failed | Failure status and log explaining what stopped; no silent resubmission |
 
-For a project with the `fit` recipe from §6, the agent can submit `just fit`:
+For a project with the `fit` recipe from §5, the agent can submit `just fit`:
 
 ```
 pueue add --print-task-id -- just fit
@@ -56,6 +56,6 @@ Common setup failures include an absent service, a blocked service socket, and t
 
 ## Combine a queue with a pipeline when useful
 
-Targets and Snakemake (§8) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§6), a dependency runner (§8), and a queue solve different problems; use the ones the project needs.
+Targets and Snakemake (§9) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§5), a dependency runner (§9), and a queue solve different problems; use the ones the project needs.
 
 On WSL2, run the service in the project's environment and test its lifetime. Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) says that systemd services do not keep a WSL instance alive. Do not assume work survives shutting down the distribution or Windows.

@@ -4,7 +4,7 @@ The website is generated from the canonical manuscript in `workspace/publishing/
 
 ## Local reading draft
 
-The November 2, 2026 revision has 21 chapter/reference pages, a landing page, and a 404 page. The complete local render and link/source checks pass. Author review and account/platform trials precede the planned November 19 public release. The source lock records the committed reading draft. The visual organization of the landing-page table of contents will be revisited after the author confirms the chapter structure.
+The November 3, 2026 structure review has 19 chapters in six parts and four reference appendices. The local render has 26 pages, including the landing page, 404 page, and a redirect from the former standalone checks chapter. Source and link checks pass. The source lock records the matching committed manuscript. The existing landing artwork has updated numbers, groups, and destinations; its visual redesign remains deferred until the chapter review is complete.
 
 ## Build and check
 
