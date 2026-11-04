@@ -30,7 +30,7 @@ check: render
 
 # Serve locally, rebuilding on save
 preview:
-    quarto preview
+    python3 scripts/render-site.py --preview
 
 # Live local preview while the author edits the guide: one sync, then quarto serves and reloads
 # the browser on save while watchexec re-runs the sync whenever the upstream source markdown or a
@@ -47,7 +47,7 @@ watch:
     watchexec --watch "$up/source" --watch "$up/figures" --exts md,svg -- $sync &
     watcher=$!
     trap 'kill "$watcher" 2>/dev/null || true' EXIT INT TERM
-    quarto preview
+    python3 scripts/render-site.py --preview
 
 # Publish to Cloudflare Pages -- project `dss-agentic-toolkit`, https://dss-agentic-toolkit.pages.dev
 # Direct upload, deliberately not a git integration: CI renders and checks but never publishes, so no
