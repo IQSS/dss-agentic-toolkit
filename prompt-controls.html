@@ -1,0 +1,29 @@
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".prompt").forEach((block) => {
+    const quote = block.querySelector("blockquote");
+    if (!quote) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "copy-prompt";
+    button.textContent = "Copy request";
+    const status = document.createElement("span");
+    status.className = "copy-status";
+    status.setAttribute("role", "status");
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(quote.innerText.trim());
+        status.textContent = "Copied";
+      } catch {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(quote);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        status.textContent = "Selected. Use your browser’s Copy command.";
+      }
+    });
+    block.append(button, status);
+  });
+});
+</script>

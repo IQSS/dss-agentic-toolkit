@@ -85,3 +85,17 @@ main:has(.chapter-agent) #title-block-header .quarto-title { display: none; }
 /* Transparent SVGs need a reading surface when enlarged over the lightbox overlay. */
 .glightbox-container .gslide-image img { background: #f7f4ec; }
 body.quarto-dark .glightbox-container .gslide-image img { background: #14181e; }
+
+/* Research requests and downloads retain ordinary links when scripting is absent. */
+.prompt { margin-block: 1.25rem; padding: 1rem; border: 1px solid var(--bs-border-color); border-radius: .45rem; }
+.prompt blockquote { margin: 0 0 .75rem; }
+.copy-prompt, a.download-button { display: inline-block; border: 1px solid currentColor; border-radius: .3rem; padding: .35rem .65rem; color: var(--bs-link-color); background: transparent; font-size: .9rem; }
+.copy-prompt:focus-visible, a.download-button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+.copy-status { margin-inline-start: .6rem; font-size: .85rem; }
+/* Wide result tables scroll within the reading column on narrow screens. */
+main { min-width: 0; }
+main table { display: block; max-width: 100%; overflow-x: auto; }
+.research-use { display: grid; grid-template-columns: 70px 1fr; gap: 1rem; align-items: start; margin-block: 1.25rem; }
+.research-use > p { margin: 0; }
+.research-use .use-icon { width: 64px; height: auto; border: 0 !important; box-shadow: none !important; }
+@media (max-width: 480px) { .research-use { grid-template-columns: 50px 1fr; gap: .6rem; } .research-use .use-icon { width: 48px; } }

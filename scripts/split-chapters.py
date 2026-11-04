@@ -62,8 +62,10 @@ FENCE = re.compile(r"^ {0,3}(?P<char>`{3,}|~{3,})(?P<info>.*)$")
 COPIED_TOOLING = (
     ("site-filter.lua", "filters/site-filter.lua"),
     ("site.css", "site.css"),
+    ("prompt-controls.html", "prompt-controls.html"),
     ("split-chapters.py", "scripts/split-chapters.py"),
     ("check-site.py", "scripts/check-site.py"),
+    ("render-site.py", "scripts/render-site.py"),
 )
 
 H1 = re.compile(r"^# (?P<text>.+?)\s*$")
@@ -378,8 +380,10 @@ def chapter_text(lines: list[str], chapter: dict, agent: str = "") -> str:
     sit beside the figure; site.css hides Quarto's own title block on the pages that carry one.
     """
     title = chapter["title"].replace('"', '\\"')
-    head = f'---\ntitle: "{title}"\n---\n\n'
     body = body_of(lines, chapter)
+    aliases = re.findall(r"^<!-- aliases: ([a-z0-9-]+) -->$", body, re.M)
+    extra = "aliases:\n" + "".join(f"  - /chapters/{name}.html\n" for name in aliases) if aliases else ""
+    head = f'---\ntitle: "{title}"\n{extra}---\n\n'
     if agent:
         return f'{head}{agent}\n\n# {chapter["title"]}\n\n{body}\n'
     return f"{head}{body}\n"
@@ -392,12 +396,12 @@ def content_commit(upstream: Path, rel: Path) -> str:
     a commit to any of those would otherwise mark every site stale -- noise that teaches you to ignore
     the check. This way "stale" means the content changed.
     """
-    return git(upstream, "log", "-1", "--format=%H", "--", str(rel), "figures")
+    return git(upstream, "log", "-1", "--format=%H", "--", str(rel), "figures", "resources")
 
 
 def synced_paths_dirty(upstream: Path, rel: Path) -> str:
     """Uncommitted changes to those same paths, for the same reason."""
-    return git(upstream, "status", "--porcelain", "--", str(rel), "figures")
+    return git(upstream, "status", "--porcelain", "--", str(rel), "figures", "resources")
 
 
 def git(repo: Path, *args: str) -> str:
@@ -503,8 +507,14 @@ def anchor_map(lines: list[str], chapters: list[dict]) -> dict[str, str]:
                     fence = None
                 continue
             if fence is None and re.match(r"^#{2,6} ", ln):
-                ident = heading_id(ln.lstrip("#").strip())
+                explicit = EXPLICIT_ID.search(ln)
+                ident = explicit["id"] if explicit else heading_id(ln.lstrip("#").strip())
                 owner.setdefault(ident, f"/chapters/{c['slug']}.qmd#{ident}")
+            if fence is None and re.match(r"^:::+\s+\{", ln):
+                match = re.search(r"\{#([a-z][a-z0-9-]*)\b", ln)
+                if match:
+                    ident = match[1]
+                    owner.setdefault(ident, f"/chapters/{c['slug']}.qmd#{ident}")
 
     wanted = set(re.findall(r"]\(#([^)]+)\)", "\n".join(lines)))
     missing = sorted(a for a in wanted if a not in owner)
@@ -597,6 +607,9 @@ def check(site: Path) -> int:
     if lock.get("source_sha256") != digest:
         problems.append(f"SOURCE.lock records source_sha256 {lock.get('source_sha256', '(none)')[:12]}… "
                         f"but {src.relative_to(site)} hashes to {digest[:12]}…; re-run `just sync`")
+    resource_record = site / "SOURCE.resources.json"
+    if not resource_record.exists() or json.loads(resource_record.read_text()) != resource_hashes(site / "resources"):
+        problems.append("Downloadable resources differ from SOURCE.resources.json; re-run just sync")
 
     if problems:
         print(f"{len(problems)} problem(s) -- the committed tree is not what the source produces:")
@@ -606,6 +619,27 @@ def check(site: Path) -> int:
     print(f"chapters match the source: {len(chapters)} pages, the sidebar and both maps, "
           f"and SOURCE.lock's hash")
     return 0
+
+
+def resource_hashes(directory: Path) -> dict[str, str]:
+    """Record nested downloadable resources by path and bytes."""
+    return {
+        str(path.relative_to(directory)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(directory.rglob("*")) if path.is_file()
+    }
+
+
+def sync_resources(upstream: Path, site: Path) -> None:
+    origin, destination = upstream / "resources", site / "resources"
+    expected = resource_hashes(origin)
+    for old in destination.rglob("*"):
+        if old.is_file() and str(old.relative_to(destination)) not in expected:
+            old.unlink()
+    for name in expected:
+        target = destination / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(origin / name, target)
+    (site / "SOURCE.resources.json").write_text(json.dumps(expected, indent=2) + "\n")
 
 
 def main() -> None:
@@ -645,6 +679,7 @@ def main() -> None:
     # 1. the copy that is the drift boundary
     (site / rel.parent).mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, site / rel)
+    sync_resources(upstream, site)
 
     # 2. the web-format figures, light and dark, plus the stylesheet that swaps between them
     svgs = sorted((upstream / "figures").glob("*.svg"))

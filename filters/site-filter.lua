@@ -139,6 +139,7 @@ return {
     -- 4a. figures live at the site root, not beside the chapter that shows them
     Image = function(img)
       img.src = img.src:gsub("^figures/", "/figures/")
+      img.src = img.src:gsub("^resources/", "/resources/")
       -- `above` and `below` are the print build's figure spacing; here they ride along into the page
       -- as data- attributes. Rebuild the attribute set rather than assigning nil into it: the table
       -- read off an element is a copy, so the deletion would apply to nothing.
@@ -156,6 +157,10 @@ return {
 
     -- 4b. an in-document anchor from when the document was one file
     Link = function(link)
+      if link.target:match("^resources/") then
+        link.target = "/" .. link.target
+        return link
+      end
       local anchor = link.target:match("^#(.+)$")
       local target = anchor and anchors[anchor]
       if not target then return nil end

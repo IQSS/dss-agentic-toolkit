@@ -1,7 +1,7 @@
 ---
 title: "Extending Your Agent's Toolkit"
 subtitle: "A Guide for Researchers"
-version: "2.1 draft"
+version: "2.2 draft"
 ---
 
 # Choose tools for a research need {#choose-tools}
@@ -838,13 +838,13 @@ In the practice folder from §17, run:
 claude
 ```
 
-Read the folder-trust prompt before accepting it. Ask Claude to identify the project instructions it loaded and summarize `notes.md` without changing anything. Then request one small edit and inspect the saved file, as in the research guide's first-session exercise.
+Read the folder-trust prompt before accepting it. Ask Claude to identify the project instructions it loaded and summarize `notes.md` without changing anything. Then request one small edit and inspect the saved file. The research guide explains project instructions and evidence for accepting a task.
 
 The project directory determines ordinary relative paths; it is not by itself a boundary on everything the process can read. The access configuration in §2 still matters.
 
 ## Controls you will use
 
-[Research chapter 4](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give an agent. As of September 2026, the terminal documentation describes these controls; check their availability against the installed version's help and [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode):
+[Research chapter 5](https://dss-agentic-research.pages.dev/chapters/directing-work.html) explains when to plan and how much autonomy to give an agent. As of September 2026, the terminal documentation describes these controls; check their availability against the installed version's help and [interactive-mode documentation](https://code.claude.com/docs/en/interactive-mode):
 
 | Control | Purpose |
 |:--|:--|
@@ -873,7 +873,7 @@ Most scheduled research computation should run the saved pipeline directly. Add 
 
 ## Configure a controlled research run
 
-For the reviewer/judge example in research chapter 12, define a run record before launching a batch. It should identify the case, role, exact prompt and assigned inputs, model and available settings, permitted tools, loaded configuration, output location, and retry policy. Save stdout, stderr, exit status, and the raw response separately from parsed measurements. A process exit alone does not establish that a usable judgment was produced.
+For the reviewer/judge example in research chapter 16, define a run record before launching a batch. It should identify the case, role, exact prompt and assigned inputs, model and available settings, permitted tools, loaded configuration, output location, and retry policy. Save stdout, stderr, exit status, and the raw response separately from parsed measurements. A process exit alone does not establish that a usable judgment was produced.
 
 Default print mode can discover instructions, memory, skills, plugins, and MCP connections just as an interactive session can. The [headless documentation](https://code.claude.com/docs/en/headless) describes `--bare` for skipping this discovery. It also states that bare mode does not use subscription OAuth credentials: it requires an API or provider authentication route. Do not add it to a subscription workflow assuming authentication and billing stay the same.
 
@@ -897,6 +897,60 @@ Put a unique invented marker in case A and a different one in case B. Give run B
 Save the configuration and the actual evidence, including refusals. A model saying it cannot remember the marker is weaker evidence than an observed access denial. A test covers the routes and version exercised; it does not certify future tools or all possible attacks. If a route cannot be tested, name it as unverified rather than calling the entire setup isolated.
 
 This is a teaching procedure, not a completed containment trial for the reader's installation. The historical peer-review wrappers motivated it; they are not a substitute for testing the current tool and account. After these checks, validate a small batch against the research rubric before scaling up. A queue (§9) can manage the outer jobs, but its execution permissions need their own check.
+
+## Run a model locally {#local-models}
+
+A local model can keep inference on approved hardware and preserve access to a chosen set of weights. It can also be substantially less capable than the hosted model you normally use. The [research guide’s LLM-analysis chapter](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#local-models) explains that choice and its connection to data governance. This section establishes a small trial before adding a model to a research pipeline.
+
+### Install and start a local runtime
+
+Use an existing approved model service if your institution supplies one. For a Mac trial, [Ollama](https://docs.ollama.com/quickstart) supplies a local model runtime. Check for an existing installation first. With Homebrew already configured (§1), the command-line installation is:
+
+```
+brew install ollama
+```
+
+For Linux or WSL2, follow Ollama’s platform instructions and check the actual GPU and memory available. Keep downloaded weights outside a cloud-synchronized research folder. The default Mac model directory is in your home folder under `.ollama/models`.
+
+Ollama also supports cloud models and web search. Its [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables those features. For a temporary foreground server, use a separate terminal window:
+
+```
+OLLAMA_NO_CLOUD=1 OLLAMA_HOST=127.0.0.1:11434 OLLAMA_CONTEXT_LENGTH=65536 ollama serve
+```
+
+Check for an existing server before starting another. Confirm the startup log says cloud features are disabled and the server is listening on localhost. This command does not set up a login service. Configuring a persistent service is a separate step; apply the same local-only setting to the process that actually serves requests. These settings govern Ollama, not every network-capable tool an agent might use.
+
+### Download a small model and test inference
+
+A modest trial model is [Qwen3 4B](https://ollama.com/library/qwen3:4b), distributed here as about 2.5 GB of quantized weights. This is a setup example, not a recommendation for a particular research measurement. In another terminal:
+
+```
+ollama pull qwen3:4b
+ollama list
+ollama run qwen3:4b
+```
+
+Ask a harmless question, then exit the interactive session with `/bye`. Record the runtime version and exact model digest, not just the tag: a tag can later refer to different bytes. The [local model-list API](https://docs.ollama.com/api/tags) exposes the digest and quantization. Memory needed during inference exceeds the download size and grows with context and concurrency; `ollama ps` shows the active allocation.
+
+For an extraction or classification step, require a structured response and validate it. A small trial on this Mac illustrates why: the unrestricted request for one category produced explanatory text and hit the output limit. Supplying a JSON schema produced the required category object. That establishes behavior on the invented test input, not accuracy on research data. Keep malformed responses and retries in the record.
+
+### Connect the model to an agent
+
+[Ollama’s Claude Code integration](https://docs.ollama.com/integrations/claude-code) connects compatible models through an Anthropic-compatible endpoint. Its launcher can configure the integration; inspect proposed configuration changes before replacing an existing hosted-model setup. A process-scoped trial can instead supply the local endpoint and model explicitly.
+
+> In a fresh folder containing only an invented marker file, configure one headless Claude Code run against the local Ollama endpoint. Use the downloaded model, explicit local authentication placeholder, bare mode, no saved session, no MCP servers, and only the Read tool. Permit that tool without enabling arbitrary command execution. Save the request, tool-call trace, raw result, and exit status. Confirm an actual read of the assigned file and the expected response. Do not modify my normal hosted-agent configuration or use research data.
+
+The tested configuration used `ANTHROPIC_BASE_URL=http://127.0.0.1:11434`, an `ANTHROPIC_API_KEY` placeholder of `ollama`, and `--model qwen3:4b`. The placeholder is not a provider credential. The run used `--bare`, `--no-session-persistence`, `--strict-mcp-config` with an empty server list, and explicit Read-tool permissions. Use the installed CLI help to construct the complete invocation; do not copy only the endpoint and assume the remaining context is controlled.
+
+The harmless local trial completed a two-turn file-reading task and returned the marker. It did not test all containment routes or establish that this model can perform research analysis reliably. CLI estimates of context limits or monetary cost for an unrecognized local model are not evidence of the actual runtime limits or a provider charge. Record the server configuration and observed run instead.
+
+For restricted work, enforce the required file and network boundaries (§2), review the full chain of custody, and evaluate task quality before scaling up. Small distilled DeepSeek releases, large Kimi models, and Apple’s built-in model have different deployment and access routes; do not assume that every local model is an interchangeable backend for this launcher.
+
+### Apple’s on-device model {#apple-on-device}
+
+Apple supplies an alternative that uses the system model. On macOS 27, the built-in [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) supports interactive use, saved scripting steps, and structured responses. Check `fm --help` and `fm respond --help` on the intended Mac before constructing a trial. The documented default is on-device inference; selecting Private Cloud Compute changes where the request is processed.
+
+For Python workflows, Apple’s [Foundation Models SDK](https://github.com/apple/python-apple-fm-sdk) requires macOS 26 or later, Xcode 26 or later, Python 3.10 or later, and Apple Intelligence enabled on a compatible Mac. Add the SDK to the project’s recorded environment (§5), check model availability, and start with an invented input and a fixed output schema. Keep the package version and system information with the results. These Apple routes were checked against documentation on November 3, 2026; they have not been run in this guide’s local trial.
 
 <!-- ===================== REFERENCE ===================== -->
 

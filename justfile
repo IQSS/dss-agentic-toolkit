@@ -21,7 +21,7 @@ check-upstream:
 
 # Build the site into _site
 render:
-    quarto render
+    python3 scripts/render-site.py
 
 # What CI runs: the committed tree is what the committed source produces, and the render is clean.
 check: render
