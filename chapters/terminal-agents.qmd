@@ -78,7 +78,7 @@ This is a teaching procedure, not a completed containment trial for the reader's
 
 ## Run a model locally {#local-models}
 
-A local model can keep inference on approved hardware and preserve access to a chosen set of weights. It can also be substantially less capable than the hosted model you normally use. The [research guide’s LLM-analysis chapter](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#local-models) explains that choice and its connection to data governance. This section establishes a small trial before adding a model to a research pipeline.
+A local model can keep inference on approved hardware and preserve access to a chosen set of weights. It can also be substantially less capable than the hosted model you normally use. The research guide's [Run and adapt models for your research](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) explains that choice, its connection to data governance, and when fine-tuning may help. This section establishes a small trial before adding a model to a research pipeline.
 
 ### Install and start a local runtime
 
