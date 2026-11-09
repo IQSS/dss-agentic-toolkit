@@ -2,21 +2,56 @@
 title: "2. Control what added tools can access"
 ---
 
-An agent may need your project's code and approved inputs without needing access to other studies, personal files, or every account you use. Adding a tool can give it another way to reach those resources. Decide what the work requires, then have the agent configure the corresponding file, command, and network controls. The research guide's [data-governance chapter](https://dss-agentic-research.pages.dev/chapters/research-limits.html) explains which data may be processed where.
+Adding tools lets an agent carry out more of a research task without stopping for help. Configure those tools to use the files and accounts the task needs while protecting original inputs and unrelated work. The agent can set up and test the controls from your instructions.
 
-For example, an agent developing analysis code could read simulated inputs and write figures, while the original participant records remain inaccessible. If it later submits a job through [pueue](https://github.com/Nukesor/pueue), that job runs under a separate queue service. The service's access must also fit the task; restrictions on the command that submits a job do not automatically restrict the job itself.
+For a batch of model fits, the queue needs to read the analysis code and approved inputs, then save results and logs. It does not need to change the original data or read another study's files. A queue such as [pueue](https://github.com/Nukesor/pueue) runs work through a separate background service, so its access needs checking even if you have already restricted the agent's own commands.[^tk-pueue-process]
 
-![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Ordinary commands and queued jobs can run under different processes and permissions. Check the files, network, and credentials available to each route."}
+## Check where the work runs
 
-## Decide which files and services the task needs
+In [Claude Code](https://code.claude.com/docs/en/overview), permission rules allow tool actions, require approval, or block them. A sandbox adds restrictions enforced by the operating system on programs running inside it. Written instructions explain how the agent should work, but do not enforce those restrictions.[^tk-access-controls]
 
-Give the agent concrete locations and allowed actions: read these inputs, write to these output folders, contact these services, and leave these other resources inaccessible. Include browser sessions and connected accounts as well as local files. A read-only connection can still send its contents to a hosted model.
+![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Direct commands run inside their sandbox; queued work runs through a separate service; connected operations use account access. Returned records can reach the agent. Built-in file tools have separate permission checks."}
 
-Written project instructions explain your intentions. In [Claude Code](https://code.claude.com/docs/en/overview), permission rules determine whether matching tool calls are allowed, refused, or require approval. A sandbox uses operating-system controls to restrict the programs running inside it. [Containers](#containers) can provide a separately configured environment. Each has a different job; an instruction to avoid a folder is not an operating-system restriction on reading it.
+The built-in sandbox covers commands run inside it and the programs they start. It does not enclose every tool available to the agent. Built-in file tools have their own permission checks; connected services and separately running queue services need their own access controls. Have the agent identify the programs and accounts involved in the actual task.[^tk-sandbox-scope]
 
-## Have the agent configure and check the controls
+A connection that only reads data can still return those data to the agent, which may send them to a hosted large language model (LLM). Decide which material may be sent before enabling the connection. The research guide explains [what reaches the LLM](https://dss-agentic-research.pages.dev/chapters/research-limits.html#what-reaches-the-llm) and [how to establish a chain of custody](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody).
 
-The following example belongs in a project's `.claude/settings.json`. It keeps approved raw inputs readable but blocks changes to them, denies access to a restricted-data folder, and protects the project settings. Adapt it to the actual paths and managed policy using the current [permissions](https://code.claude.com/docs/en/permissions) and [sandbox](https://code.claude.com/docs/en/sandboxing) documentation.
+## Apply settings at the right scope
+
+Use global settings for rules shared across your projects and project settings for the requirements of a particular study. Ask the agent to inspect the existing files and any institution-managed settings before proposing changes.
+
+| Scope | Settings file | Use |
+|:--|:--|:--|
+| Global | `~/.claude/settings.json`[^tk-home-folder] | Personal settings across projects on this computer. |
+| Project | `.claude/settings.json` inside the project | Settings that can be shared with project collaborators. |
+| Personal project | `.claude/settings.local.json` inside the project | Your own settings for this project; keep this file out of version control. |
+
+For many settings, the personal project file overrides the shared project file, which overrides global defaults. Permission rules combine across those files: a matching deny takes precedence over an allow. Your institution can also enforce managed settings. Ask the agent to report which settings actually apply, including any session-specific overrides.[^tk-settings-scope]
+
+Keep secret values out of these files and saved command approvals. The [credential chapter](#credentials) explains how to supply them to the program that needs them.
+
+## Ask the agent to configure and check access
+
+Describe the files and services the work needs. For the batch of fits, you could ask:
+
+> Set up access for these model fits. The approved inputs are in [folder]; results and logs belong in [folder]. Leave the inputs unchanged and block access to [excluded folder]. Check the current agent settings and the queue service's access. Explain where changes are needed before applying them. Test permitted and blocked actions with harmless substitute files, then report the settings changed, the outcomes, and anything you could not verify.
+
+The agent should test the paths the work will actually use. A direct command succeeding or failing does not establish how a queued job behaves. Its report might include the following checks; the entries describe expected outcomes, not results already obtained.
+
+| Check | Expected outcome |
+|:--|:--|
+| Run a representative queued fit on approved synthetic inputs | Saved result and log appear in the intended folders. |
+| Try to change a substitute for a protected input | The configured restriction blocks the change. |
+| Try to read an excluded substitute file through each relevant tool or process | Each attempted route is blocked; untested routes are identified. |
+
+Keep the settings and a short record of observed results with the project. If a required restriction fails, have the agent diagnose it before using protected inputs. These checks can expose configuration mistakes; they do not establish protection against every possible action.
+
+The downloadable example protects `data/raw` from changes and excludes `data/restricted`. Have the agent adapt it to the actual project and merge it with existing settings. File-tool paths beginning with `/` are project-relative here; sandbox paths beginning with `./` in project settings resolve from the project root. In global settings, relative sandbox paths resolve from that settings directory. These are different conventions, so the agent must resolve and check both before relying on them.
+
+[Download the settings example](resources/project-settings-example.json){.download-button download="project-settings-example.json"}
+
+<details class="guide-example">
+<summary>Read the example project settings</summary>
 
 ```json
 {
@@ -47,16 +82,24 @@ The following example belongs in a project's `.claude/settings.json`. It keeps a
 }
 ```
 
-The file-tool rules and sandbox paths use different path conventions. This example is project-scoped; it does not list every sensitive location on your computer. Settings from other scopes may also contribute permissions. Have the agent inspect the effective configuration rather than assuming this file replaces every existing setting.
+The sandbox must start successfully, and the example disables unsandboxed retries. Existing excluded commands or broader settings still require inspection. This file does not configure a separately running queue, browser account, or remote service, and it is not a complete restriction on every file on the computer. The keys follow the linked documentation; the agent must test the required behavior in the intended environment.
 
-> Configure access for this task: [approved inputs, writable outputs, permitted services, excluded resources]. Inspect the existing project and managed settings first. Explain which controls cover file tools, shell commands, queued jobs, and connected services. Propose the necessary changes, then test allowed and denied operations with harmless substitute files. Report actual outcomes and any routes that remain untested.
+</details>
 
-You decide permitted access and handle any personal or institutional authorization. The agent performs the configuration checks. Using harmless files here tests whether restrictions work before protected material is involved; it is not a separate practice exercise. These tests can reveal mistakes but cannot certify every possible execution route.
+## When a tool needs different access
 
-## Handle a blocked operation deliberately
+If an operation is blocked, ask the agent to identify what it needs: a particular folder, a network destination, or access to the queue service. It should explain a specific change and its consequences. A command that runs outside the sandbox needs another arrangement that meets the project's access requirements.
 
-A blocked command may need a queue socket, a system installation, an application connection, or a pseudo-terminal for the [observed R-on-macOS issue](#r-on-macos). Have the agent identify the required access and explain a specific solution. Avoid blanket exemptions for entire categories of commands.
+Where stronger separation is required, the agent can help configure an approved separate environment. The [container chapter](#containers) explains one option. Use the institution's support route when the necessary controls cannot be established in the current environment.
 
-If approved work runs outside the sandbox, record what protects that execution instead. A queued job uses the queue service's permissions. A browser may use a signed-in account. A command supplied with a credential can read that credential. For restricted analysis, use an environment that meets the data requirements rather than widening access until a command works.
+Repeat relevant checks when you add a tool or change how work is run. If settings are maintained through another program, protect its source copy as well as the file the agent reads; [Appendix B](#understand-the-two-copies) explains the two locations.
 
-Keep the resulting configuration with the project and repeat relevant checks when the execution route changes. Protect both active settings and any managed source copies that can overwrite them; [Appendix B](#shared-settings) explains that distinction. On Linux or [WSL2](https://learn.microsoft.com/windows/wsl/), ask the agent to check platform-specific sandbox requirements. Native Windows is outside this guide's setup route.
+[^tk-pueue-process]: [Pueue's documentation](https://github.com/Nukesor/pueue) describes its background service, working directories, and task environment. The conclusion about checking the service's access follows from that separate execution process; queue submission is not an access-control test.
+
+[^tk-access-controls]: Anthropic's [permission documentation](https://code.claude.com/docs/en/permissions) describes tool rules and their precedence. The research guide's [access chapter](https://dss-agentic-research.pages.dev/chapters/agent-access.html#enforce-those-limits) introduces the controls and defines the related terms.
+
+[^tk-sandbox-scope]: Anthropic lists [what runs outside the sandbox](https://code.claude.com/docs/en/sandboxing#what-runs-outside-the-sandbox). A command merely sending a request to an existing service does not move that service inside the command's sandbox.
+
+[^tk-home-folder]: The tilde (`~`) means your home folder. The other two paths start inside the project folder. See Anthropic's [settings-file reference](https://code.claude.com/docs/en/settings#settings-files-and-who-they-affect).
+
+[^tk-settings-scope]: See Anthropic's [settings precedence](https://code.claude.com/docs/en/settings#settings-precedence) and [permission-rule precedence](https://code.claude.com/docs/en/permissions#settings-precedence). These explain file merging; the agent must still inspect the configuration used by the actual session and its extensions.

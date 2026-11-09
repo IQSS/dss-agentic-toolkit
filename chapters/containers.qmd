@@ -2,30 +2,38 @@
 title: "10. Run work in a separate environment: containers"
 ---
 
-A container runs programs in a separately configured environment with its own packaged software and selected access to your machine. It can help reproduce system dependencies, restrict the files a task can reach, or give an agent a deliberately limited place to work. Which benefit you get depends on how the container is configured.
+A container runs software in a separately configured environment. It can include system libraries that a language lockfile does not capture, and its access can be limited to selected files and services. The configuration determines which of those benefits the project receives.
 
-For example, a spatial analysis may depend on a particular system library as well as [R](https://www.r-project.org/) packages. Packaging that software in a container gives collaborators a more complete environment to restore. A different container might run an agent and local model with access only to one approved document collection. These are distinct reasons to use the same technology.
+For example, a spatial analysis may depend on a particular geospatial library as well as R packages. Packaging those components helps a collaborator establish the same software. A different project may need an agent and local LLM to process only an approved document collection. Both can use containers, but they need different access and software arrangements.
 
-## Three research uses
+## Decide why the task needs a container
 
-*Work with restricted inputs.* A project may require processing on an approved machine with limited access and outputs. A container can expose only the required input folder and a writable output location, with network access configured for that work. It does not itself authorize processing under a DUA or IRB protocol. Start with the research guide's [data-governance decisions](https://dss-agentic-research.pages.dev/chapters/research-limits.html) and the institution's requirements.
+| Research need | What the agent configures |
+|---|---|
+| Reproduce system dependencies | Language/packages, system libraries, command-line programs, and the supported platform. |
+| Run approved work with restricted inputs | Required input access, separate output storage, permitted network connections, and credentials. |
+| Give a local agent a limited workspace | The LLM runtime and agent, their tools, and the files/accounts available to them. |
 
-*Preserve system software.* The language and package records in [chapter 8](#environments) do not capture every operating-system library or command-line program. A container can package these alongside the analysis environment, reducing differences between machines. Record the platform too; a container is not a promise of identical results across every processor or operating system.
+A container does not itself authorize processing under a data agreement. Establish the permitted environment through the research guide's [data-governance chapter](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody), then configure and check it for that purpose.
 
-*Give a local agent a limited workspace.* An open-weight model, its runtime, and an agent can be configured with a particular set of tools and inputs. This is useful for document analysis where you want deliberate control over what each run can access. Show where model computation actually happens: putting an agent's commands inside a container does not move a hosted model there. The [local-model chapter](#local-models) covers that setup choice.
+## Specify software and access
 
-## What the agent needs to configure
+With [Docker](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. A *mount* makes a folder on the host computer available inside the container, for example as read-only inputs or writable output storage. Docker's [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
 
-With [Docker](https://www.docker.com/), a `Dockerfile` describes how to build an *image*, the packaged software used to start a container. A *mount* makes a folder from the host computer available inside it. Read-only input mounts and separate writable outputs can express the intended access. Credentials, network connections, and runtime privileges also matter. Broad mounts or access to Docker's control socket can undermine the intended separation; see the [security](https://docs.docker.com/engine/security/) and [mount](https://docs.docker.com/engine/storage/bind-mounts/) documentation.
+![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and system software. It reads selected inputs, writes designated outputs, and uses explicitly configured network access. An optional local-agent setup also includes an LLM runtime and harness."}
 
-> Configure a container for [the research task and its purpose]. Preserve the project's language/package records and identify any system dependencies. List the model's execution location, permitted tools, mounted folders, read/write access, network destinations, and supplied credentials. Use that configuration to run a representative project case, check the expected outputs, and verify relevant access restrictions with harmless substitute files. Record the build and run commands for future agents.
+State where the LLM will run. Putting commands inside a container does not move a hosted LLM onto your computer. A local-agent arrangement must configure the LLM runtime too, as described in [chapter 17](#local-models).
 
-The agent performs setup and checks; you supply the research and access decisions and complete any required authorization. A successful analysis run and an access-control test answer different questions. Retain both when both claims matter.
+## Build and check the environment
 
-## Make the environment recoverable
+> Configure a container for [task and purpose]. Preserve the project's language/package records and include required system software. Give it only the approved input/output locations and connections. Record where the LLM runs if one is involved. Run a representative case, check the saved outputs, and test any required access restrictions with harmless substitute files.
 
-On a Mac, [Colima](https://github.com/abiosoft/colima) with the Docker CLI is the command-line route used here. Keep an existing approved [Docker Desktop](https://www.docker.com/products/docker-desktop/) setup when suitable. Use the supported Docker Engine route on Linux or [WSL2](https://learn.microsoft.com/windows/wsl/); on an institutional cluster, follow its supported runtime, often [Apptainer](https://apptainer.org/).
+The agent can use [Colima](https://github.com/abiosoft/colima) with Docker's command-line tools on a Mac, or retain an existing approved [Docker Desktop](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, follow the supported runtime, which may be [Apptainer](https://apptainer.org/). The researcher completes required authorization; the agent builds and checks the environment.
 
-For reproducible builds, have the agent record the base image's digest, restore pinned dependencies, and document the platform and required files. A digest identifies image content. A Dockerfile alone does not preserve external repositories or future downloads, so archive the built image through an approved route when long-term recovery matters.
+A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Broad home-directory mounts, unnecessary privileges, or access to Docker's control socket can defeat intended separation; configure only the access the task needs.
 
-Do not mount the whole home directory merely to fix a missing file. Have the agent identify the required input and add the specific access the task needs. Keep separate configurations for workloads with different data or tool permissions. The [access-control chapter](#tool-access) explains how this relates to the agent's other execution routes.
+## Preserve what is needed to run it again
+
+Save the build/run configuration and environment records with the project. A base-image digest identifies particular image content, while a moving tag can later identify a different image. Pin the relevant dependencies and record the platform. A Dockerfile that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
+
+Keep different access arrangements explicit rather than changing one container silently between tasks. [Chapter 2](#tool-access) explains how these controls relate to the agent's other tools.

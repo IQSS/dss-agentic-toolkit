@@ -2,60 +2,62 @@
 title: "6. Keep unattended jobs moving: pueue"
 ---
 
-Research computations often need less attention than they need time. A queue lets prepared jobs continue while you are away, automatically starting the next job when capacity becomes available. Its record of outcomes lets you identify what finished and what needs investigation when you return.
+A queue keeps prepared research jobs moving while you are away. It starts the next waiting job automatically when another finishes, so neither you nor an agent needs to supervise each launch. [Pueue](https://github.com/Nukesor/pueue) manages these jobs through a background service and keeps their status and logs.
 
-Suppose the [heat-and-birthweight sensitivity analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) needs 100 independent fits, but the computer can comfortably run four at once. You submit the batch before leaving. As each fit finishes, the queue starts another without waiting for you or an agent to intervene. The next morning, ask the agent to summarize completed results and diagnose failed jobs. This is an illustrative workload, not a promise that all 100 fits finish overnight.
+Suppose the [heat-and-birthweight sensitivity analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) needs 100 independent fits. If the computer can comfortably run four at once, the remaining fits wait their turn. You can return later and ask the agent which results are ready and which jobs need attention.
 
-![](figures/job-queues.svg){#fig-job-queues fig-alt="Many waiting jobs feed four available execution slots. Whenever a running job finishes, pueue automatically starts the next waiting job. Completed jobs retain outputs and success or failure status." above="8pt" below="8pt"}
+![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs feeds four simultaneous running slots. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
 
-## Separate submission from execution
+## Prepare the batch
 
-[Pueue](https://github.com/Nukesor/pueue) runs a background service that manages commands submitted to it. The service records the command, working directory, output, and status, and limits simultaneous jobs. Closing the conversation that submitted a job need not stop its computation.
+Ask the agent to run a representative fit through the queue before submitting the full batch. This [smoke test](#smoke-tests) checks the command, working directory, project environment, and saved output. It also helps establish a sensible concurrency limit.
 
-The computer must remain awake and the service available. A reboot can interrupt work. After an interruption, inspect the queue and outputs before restarting: the queue's record does not itself let a model fit resume halfway through. That requires checkpoints saved by the fitting program.
+Four simultaneous jobs do not necessarily use four processor cores. Each fit may use several threads, and memory can limit concurrency before processor capacity does. Have the agent inspect those requirements and leave capacity for the rest of the computer's work.
 
-Use a queue for recurring long fits, simulations, or batches of independent work. Run short commands directly when their outcome can be checked immediately. Keep an institutional scheduler for work already running on a cluster.
+> Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose a concurrency limit from its memory and thread use, then submit the batch. Record job identifiers, specifications, logs, and output locations so we can identify and rerun individual failures.
 
-## Choose a limit from the jobs' resource needs
+The queue service's access must suit the work, as explained in [chapter 2](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
 
-Have the agent run a representative job through the actual queue as a [smoke test](#smoke-tests), checking its outputs, memory use, and internal threads. Then choose a concurrency limit that leaves room for the rest of the machine's work. Four queued fits using four threads each can demand sixteen threads; four available slots do not mean the fits each use one core.
+## Let the queue manage execution
 
-Ask the agent to inspect the command and environment before submitting a large batch. A queued command runs with the queue service's access, which can differ from the agent command tool's sandbox (§2). Configure the intended route and test it with harmless inputs. The queue controls when a job runs; it does not automatically inherit the agent's access restrictions.
+The background service starts and records the jobs. Closing the submitting conversation need not stop them, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires checkpoints saved by the fitting program.
 
-> Set up pueue if needed and use it for this project's sensitivity fits. Run a representative fit through the queue first, confirm its saved output, and use its memory and thread requirements to choose a concurrency limit. Then submit the batch with task IDs, working directories, logs, and final results recorded. Preserve the project environment and report failed jobs without silently resubmitting them.
+For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [WSL2](https://learn.microsoft.com/windows/wsl/systemd), have the agent verify the service's lifetime before relying on unattended execution. A systemd service does not itself keep a WSL instance alive.
 
-## Check the outcome, including failures
+## Review results and recover failures
 
-Have the agent retain each task ID. Submission confirms that the service accepted the command; it does not establish that the command ran successfully.
+Ask for completed artifacts as well as process status. A command can exit successfully while writing its result to an unexpected location. Keep failed attempts and their logs so the agent can explain what happened.
 
-| State | Evidence to inspect |
-|---|---|
-| Waiting | The recorded command, inputs, working directory, and place in the queue |
-| Running | Actual process status plus an advancing log or expected intermediate output |
-| Succeeded | Successful stored result and the expected output artifact |
-| Failed | Failure status and log explaining what stopped; no silent resubmission |
+An illustrative report might say:
 
-For a project with the `fit` recipe from §5, the agent can submit `just fit`:
+> Of 100 jobs, 98 completed with the expected results files. Two failed before saving estimates because their requested memory exceeded the available allocation. Their specifications and logs are retained; the completed fits do not need rerunning.
 
-```
+You can then ask the agent to diagnose the failures, propose any change affecting the analysis or resource use, and rerun the affected jobs. Each retry should retain its relationship to the original attempt. Avoid duplicating completed fits or overwriting an earlier failed run's evidence.
+
+Pueue distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
+
+<details class="guide-example">
+<summary>Example: submit a saved command and inspect its outcome</summary>
+
+For a project with a `fit` recipe, the agent can submit `just fit`. The recipe must already exist.
+
+```text
 pueue add --print-task-id -- just fit
 pueue status
 ```
 
-Use the returned ID in subsequent commands. If the returned ID were 42, the checks would be:
+Use the returned task ID. If it were 42, the following query checks the stored result using [jq](https://jqlang.org/):
 
-```
+```text
 pueue log 42
 pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
-This JSON check follows pueue 4.0.4's stored-result shape. `pueue wait` returns after waiting even when the job failed; its own successful exit does not prove job success. Have the agent also check the fit artifact. A successful command that wrote to the wrong folder has not completed the research task.
+This result shape was checked with pueue 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [R](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
 
-Common setup failures include an absent service, a blocked service socket, and the wrong working directory or environment. Distinguish these from model errors. For the observed macOS [R](https://www.r-project.org/) problem, follow the [R troubleshooting procedure](#r-on-macos) for both direct and queued execution until the actual route is verified.
+</details>
 
-## Combine a queue with a pipeline when useful
+## Combine with a dependency pipeline
 
-[Targets](https://docs.ropensci.org/targets/) and [Snakemake](https://snakemake.readthedocs.io/) (§9) decide which dependent steps need to run. Pueue can submit the outer command and retain its outcome after the submitting session closes. A saved command (§5), a dependency runner (§9), and a queue solve different problems; use the ones the project needs.
-
-On [WSL2](https://learn.microsoft.com/windows/wsl/), run the service in the project's environment and test its lifetime. Microsoft's [systemd guidance](https://learn.microsoft.com/windows/wsl/systemd) says that systemd services do not keep a WSL instance alive. Do not assume work survives shutting down the distribution or Windows.
+A [just](https://just.systems/) recipe can invoke a complete analysis, and [targets](https://docs.ropensci.org/targets/) or [Snakemake](https://snakemake.readthedocs.io/) can decide which dependent steps need rebuilding. Pueue can queue that outer command. Choose resource limits for both levels so the pipeline's internal workers do not overwhelm the machine. [Chapter 9](#pipeline-dependencies) explains the dependency runner's role.

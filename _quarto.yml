@@ -104,20 +104,31 @@ chapter-map:
 
 anchor-map:
   "adding-tools": /chapters/adding-tools.qmd
+  "browser-work": /chapters/browser-work.qmd
+  "choose-tools": /chapters/choose-tools.qmd
+  "cloud-sync-storage": /chapters/troubleshooting.qmd#cloud-sync-storage
   "containers": /chapters/containers.qmd
   "credentials": /chapters/credentials.qmd
   "environments": /chapters/environments.qmd
+  "finding-files": /chapters/finding-files.qmd
   "headless-agents": /chapters/headless-agents.qmd
   "job-queues": /chapters/job-queues.qmd
   "local-models": /chapters/local-models.qmd
+  "parallel-work": /chapters/parallel-work.qmd
   "pipeline-dependencies": /chapters/pipeline-dependencies.qmd
   "project-commands": /chapters/project-commands.qmd
   "r-on-macos": /chapters/troubleshooting.qmd#r-on-macos
+  "research-documents": /chapters/research-documents.qmd
+  "service-connections": /chapters/service-connections.qmd
   "shared-settings": /chapters/shared-settings.qmd
   "smoke-tests": /chapters/project-commands.qmd#smoke-tests
   "terminal-agents": /chapters/terminal-agents.qmd
   "terminal-history": /chapters/terminal-history.qmd
+  "tex-table-counter": /chapters/troubleshooting.qmd#tex-table-counter
   "tool-access": /chapters/tool-access.qmd
+  "troubleshooting": /chapters/troubleshooting.qmd
+  "understand-the-two-copies": /chapters/shared-settings.qmd#understand-the-two-copies
+  "usage-tools": /chapters/usage-tools.qmd
   "version-control": /chapters/version-control.qmd
   "working-environment": /chapters/working-environment.qmd
 

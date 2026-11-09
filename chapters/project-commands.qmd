@@ -6,49 +6,46 @@ aliases:
 
 <!-- aliases: runnable-checks -->
 
-A *command runner* gives names to the operations your project needs: fit a model, rebuild figures, check inputs, or regenerate the paper. [Just](https://just.systems/) stores those commands in a small text file called a `justfile`. The agent can use the same commands repeatedly, and you or a collaborator can run them without another conversation with a model.
+A command runner gives names to tasks a project repeats. [Just](https://just.systems/) saves those commands in a small text file called a `justfile`. The agent can use them while developing the analysis, and you or a collaborator can run them later without asking an LLM to reconstruct the steps.
 
-In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), changing a figure label should not require refitting every model. A command such as `just figures` can redraw plots from saved estimates, while `just fit` runs the model. The benefit comes from both a modular analysis and dependable commands for selecting the work to run.
+In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), changing a figure label should not require fitting the statistical model again. A figure command can read the saved estimates and regenerate the plot. A separate command can refit a selected specification when the analysis changes.
 
-## Give the commands independently runnable work
+## Give the commands useful work
 
-Installing just does not make a monolithic analysis selective. Have the agent identify coherent steps with explicit inputs and saved outputs: prepare the analysis data, fit a specified model, generate a figure. Put shared functions in reusable code. A step may be a script or a function; there is no target number of files.
+The analysis needs independently runnable steps with explicit inputs and saved outputs. A step might fit one specification, produce a figure, or build the manuscript. Shared functions can support several steps. The research guide's [modular-workflow chapter](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) explains how to organize that work.
 
-The agent then records commands for those steps and useful combinations. The research guide's [modular-workflow chapter](https://dss-agentic-research.pages.dev/chapters/research-workflows.html) explains the research benefits. Here the task is to make that structure easy to execute consistently, preserving the analysis's intended behavior.
+Installing just does not create this structure. Have the agent inspect the current analysis and preserve its working results before reorganizing it. Each command should then select a coherent task without quietly repeating unrelated computation.
 
-> Inspect the current analysis and identify which steps can run independently. Preserve a working baseline, then organize the code so we can refit a selected model, regenerate figures from saved estimates, and rebuild the complete analysis. Reuse shared functions. Add just recipes with clear inputs and outputs, and record when future agents should use each one. Run a smoke test before a full batch and report any changed results.
+![](figures/project-commands.svg){#fig-project-commands fig-alt="Several modular analysis scripts and one small justfile provide commands for selected fits, figures, a manuscript, or a complete build."}
 
-Keep an existing master do-file, [Make](https://www.gnu.org/software/make/) setup, or other working command system when it already provides the needed execution. Avoid creating a second list of commands that drifts from the first.
+## Save the commands
 
-## How just fits with other runners
+> Preserve the current results, then give this project commands to fit a selected specification, rebuild figures from saved estimates, and run the complete workflow. Use just unless the existing command system already does this. Record each command's inputs and outputs, reuse shared code, and check that reorganizing execution has not changed the intended results.
 
-| Tool | What it does for the project |
-|:--|:--|
-| just | Saves named commands for individual tasks and useful combinations. |
-| Make | Uses declared file dependencies and timestamps to decide which outputs need rebuilding; also commonly exposes named project commands. |
-| [targets](https://docs.ropensci.org/targets/) | Tracks dependencies in an [R](https://www.r-project.org/) workflow and reuses results that remain current. |
-| [Snakemake](https://snakemake.readthedocs.io/) | Coordinates rules that produce files from inputs, often across languages and computing environments. |
+The agent installs just if needed and maintains the recipes. A small project might expose the following menu; these commands are examples to create for the project, not commands available simply because just is installed.
 
-Just and a dependency-aware runner work well together. A `just build` recipe can invoke targets or Snakemake; that runner decides which analysis steps need updating. Other just recipes can open a preview, check the project, or render a document. [Chapter 9](#pipeline-dependencies) develops this combination.
+| Example command | Project operation |
+|---|---|
+| `just fit age-spline` | Fit the named specification and save its results. |
+| `just figures` | Rebuild figures from saved results. |
+| `just paper` | Regenerate the manuscript from its source and outputs. |
+| `just smoke` | Exercise a small representative workload. |
+| `just build` | Run the project's complete documented workflow. |
 
-## Make the recipes part of normal agent work
+Ask the agent to use these recipes in normal work and keep their descriptions current. `just --list` shows the available recipes. A completed figure task should report the command used, the saved estimates it read, and the figure it produced.
 
-Ask the agent to install just through [Homebrew](https://brew.sh/) or the project's established tool manager, then create and maintain the recipes. Each recipe should name an outcome rather than a long implementation detail. `just --list` lists the available tasks.
+## Run a smoke test {#smoke-tests}
 
-A concise project instruction might read: “Use the justfile for analysis and document commands. After a figure-only change, rebuild the affected figure from saved results. After changing a model, rerun the affected fit and downstream outputs. Report the commands used and whether their expected outputs were produced.”
+A *smoke test* runs a small representative workload through the actual workflow before a large batch. Ask the agent to run one specification or a few simulation repetitions through the relevant stages, checking that the software runs and expected outputs are saved. Use the same code and environment as the full run, with a smaller workload selected by an option.
 
-The full reproduction command should still exist. Selective execution makes development efficient; the complete command gives collaborators a documented route through the project.
+> Add a smoke-test recipe using the actual workflow. Keep its outputs separate from the full analysis, run it after relevant changes, and confirm the expected files before starting an expensive batch.
 
-## Run a smoke test before the main batch {#smoke-tests}
+[]{#runnable-checks}
 
-A *smoke test* is a small, representative run through the actual workflow to catch execution problems before committing substantial time or computation. Have the agent run one model specification, a few simulation repetitions, or a small document batch through all the relevant stages. It should confirm that inputs are found, required software runs, and expected outputs are saved in the right form and location.
+Execution checks and scientific checks answer different questions. A working pipeline can still implement the wrong analysis. Keep checks derived from the research specification runnable too, such as a join that must preserve observation counts. The research guide covers [simulation against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
 
-Use the same code and environment as the main batch, with a smaller workload selected by a recorded option. Keep smoke-test outputs separate so they cannot be mistaken for final results. A pipeline that runs successfully may still implement the wrong method; scientific checks have a different purpose.
+## Combine command and dependency runners
 
-> Add a smoke-test command that runs a representative case through this workflow using its existing code. Keep its outputs separate from the full analysis. Run it, diagnose any failure, and confirm the expected artifacts before launching the batch. Save the command so future agents can repeat it after relevant changes.
+[Make](https://www.gnu.org/software/make/), [targets](https://docs.ropensci.org/targets/), and [Snakemake](https://snakemake.readthedocs.io/) can track dependencies and determine which work needs repeating. Just provides named commands; it does not perform that dependency analysis. A `just build` recipe can invoke targets or Snakemake, while other recipes open a preview or run quick checks.
 
-## Keep substantive checks runnable {#runnable-checks}
-
-Expose useful checks through the same command system. If a join must preserve the number of observations, have the agent add a check that fails when duplicate keys would expand the data. Checks should reflect the specification and use independently established expected behavior, rather than repeat the implementation's own calculation.
-
-Keep quick execution checks separate from expensive validation. The research guide explains [simulation against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html). The recipes make those procedures easy to run; they do not decide whether the methods or conclusions are appropriate. For the observed R-on-macOS execution problem, have the agent route relevant recipes through the [documented wrapper](#r-on-macos).
+[Chapter 9](#pipeline-dependencies) explains selective rebuilding. [Chapter 6](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing Make setup or master do-file if it already supplies the required behavior.

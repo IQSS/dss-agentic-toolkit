@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v script >/dev/null 2>&1 || {
+  echo "No script command; cannot allocate a pseudo-terminal" >&2
+  exit 127
+}
+exec script -q /dev/null Rscript "$@" < /dev/null

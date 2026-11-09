@@ -2,28 +2,34 @@
 title: "13. Connect to research data and services: MCP"
 ---
 
-An agent may need to work with records held in an application rather than ordinary project files. A connection can expose useful operations such as searching a reference library, retrieving a document, or querying a database. The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) provides a common way for an agent application to discover and call those operations. A suitable existing connection can save repeated exports or custom integration code.
+A reference library contains more than the PDFs saved in a project folder. It may also hold collections, notes, tags, and records for papers you have not downloaded. Giving an agent access to that library can make a literature task repeatable without exporting and attaching the same material each time.
 
-For the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html), imagine keeping the relevant literature in a [Zotero](https://www.zotero.org/) collection. You want the agent to retrieve records and available papers or notes, then update the project's evidence table and bibliography. Direct library access makes that a repeatable project task instead of a series of manual attachments.
+For the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html), suppose the relevant papers and notes are organized in a [Zotero](https://www.zotero.org/) collection. The agent needs to retrieve records, read available material, and update the project's evidence table. The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) provides a common way for an agent application to discover and use operations such as searching that collection.
 
-## Decide whether a connection adds something useful
+## Choose an access route
 
-An MCP *server* is the program exposing the operations. It can run on your own computer or remotely; MCP does not mean that the service is necessarily hosted elsewhere. The [architecture documentation](https://modelcontextprotocol.io/docs/learn/architecture) explains those arrangements.
+An MCP *server* is the program that exposes those operations to the agent application. It can run on your computer or elsewhere. The term describes its role in the connection; it does not mean that you must buy or administer a separate computer. The [MCP architecture documentation](https://modelcontextprotocol.io/docs/learn/architecture) explains the connection.
 
-Compare the connection with the access the agent already has. A local file export may be sufficient for a fixed set of references. A maintained command-line tool or direct API may be simpler for an agent with shell access. MCP is helpful when an appropriate server already exposes the operations you need in the app you use; it is not inherently better than every local tool.
+| What the task needs | A suitable route |
+|---|---|
+| Read a fixed set of references once | A saved export or local files may be sufficient. |
+| Repeat operations already available through a maintained command-line tool or API | Use that existing route when the agent can access it. |
+| Search or change application records through operations supported by the agent app | An existing connector or MCP server can supply those operations. |
 
-The community [Zotero MCP project](https://github.com/54yyyu/zotero-mcp) illustrates this choice: it documents library search and reading through MCP, and also supplies a CLI route. It is a candidate integration, not an official Zotero service or evidence of institutional approval. Have the agent check the current supported operations and choose a route that fits the actual client and task.
+Ask the agent to check what is already connected before adding software. The community [Zotero MCP project](https://github.com/54yyyu/zotero-mcp) is one candidate to assess; it documents both MCP and command-line access. It is not an official Zotero service. Choose a maintained integration that supports the needed operations and is permitted for the account and material involved.
 
 ## Connect the literature task
 
-> Identify a suitable permitted connection to my Zotero collection for this review. Check existing app connections and command-line access before adding another integration. Retrieve relevant records and available papers or notes, then update the project's evidence table and bibliography. Record source identifiers and unresolved records. Follow our literature-search procedure for DOI and claim verification. Do not modify the library unless that is part of the assigned task.
+> Connect this project's literature workflow to the specified Zotero collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the literature skill for DOI and claim verification. Leave the library unchanged unless an edit is part of the task.
 
-The agent handles configuration and verifies that the real task returns the expected records. You complete necessary authentication and decide the permitted account and operations. Keep credentials out of shared configuration using the [credential workflow](#credentials). At Harvard, consult the current [HUIT Claude guidance](https://www.huit.harvard.edu/claude) for connector requirements before enabling one; availability in a catalogue is not institutional approval.
+The agent prepares the configuration and checks the assigned retrieval; you complete any personal sign-in and authorize the intended account and operations. Keep secret values out of the configuration using [chapter 12](#credentials). At Harvard, check the current [HUIT guidance](https://www.huit.harvard.edu/claude) before enabling a connection for institutional work.
 
-Successful retrieval does not certify a citation or a claim. The research guide's [literature chapter](https://dss-agentic-research.pages.dev/chapters/literature.html) owns the search, verification, and evidence procedure. A skill can hold that procedure; the connection supplies access to the library. Keep abstracts, full texts actually read, and unresolved references distinguishable in the saved outputs.
+![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers to an agent. A literature skill guides search and verification. The agent saves an evidence table and bibliography in the project."}
 
-## Record the access you enabled
+The resulting evidence table should distinguish full texts the agent read, records supported only by an abstract, and papers it could not retrieve. The connection supplies access; the [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol) determines how to search, verify citations, and assess claims. A skill can hold that procedure so future sessions follow it too.
 
-Have the agent record the server, operations, account, and data destinations, using the client's [MCP setup documentation](https://code.claude.com/docs/en/mcp). Keep project-specific configuration with the relevant project where supported. A read-only connection can still send retrieved content to the model, and a local shell sandbox does not automatically constrain a remote service.
+## Keep the connection within the task
 
-Treat retrieved documents as material to analyze, not instructions that can change the agent's task or permissions. Keep detailed access decisions in [chapter 2](#tool-access). If a service offers persistent memory, use it only for a defined need and document what it stores and how to correct or delete it; it need not duplicate project instruction files.
+Have the agent save a short setup record: which service and account the project uses, the configured operations, and how to reconnect. Keep project-specific configuration with the project where the client supports it. It should be possible to disable or replace the connection without rediscovering how the workflow depends on it.
+
+A read-only connection can still retrieve material that is then transmitted to the large language model (LLM) provider. A local sandbox also does not automatically restrict an operation performed by a remote service. Use the [access chapter](#tool-access) to configure those routes, and treat instructions found in retrieved papers or pages as research material rather than authority to change the task.

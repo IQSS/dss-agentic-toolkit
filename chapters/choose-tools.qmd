@@ -2,88 +2,67 @@
 title: "1. Choose tools for a research need"
 ---
 
-This guide shows you how to get an AI agent to use tools that support your research. You choose what you want to accomplish and what access to allow; the agent installs, configures, and runs the tools. You do not need to learn to operate each tool yourself.
+Research involves tasks worth setting up once and repeating reliably: running a batch of analyses, rebuilding a manuscript, or restoring the software used in an analysis. This guide shows how to get an AI agent to set up and use tools for that work. You direct the research; the agent installs and configures the tools, runs them, and checks their output.
 
-Additional tools are useful when they remove a specific obstacle to research: a fit that stops when a session closes, a figure revision that reruns every model, or a collaborator who cannot restore your software. Begin with that problem. Keep an existing tool when it already provides the required behavior and evidence.
+Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return. You can arrange this from the app without learning the queue's commands.
 
-The companion research guide follows a [synthetic study of heat exposure and birthweight](https://dss-agentic-research.pages.dev/chapters/example-project.html). Suppose you need 100 simulation runs for that study. You want a few running at once, the rest waiting, and a record of failures to inspect later. A queue addresses that need. It does not choose the simulation design, decide whether the estimates are valid, or make a sleeping laptop compute. Understanding that division of work is more useful than installing a large collection of tools.
+Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) covers research workflows and judgment; if you are new to the app, start with its [introduction to Claude](https://dss-agentic-research.pages.dev/chapters/first-session.html).
 
-The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains delegation and research judgment. This book explains tools that help carry out those decisions. You can ask the agent to install and operate them from the app. Most chapters do not require you to use a terminal. Sign-ins, passwords, and decisions about access remain yours.
+## Find the tool for your task
 
-Use this book as a reference. After this overview and the boundaries chapter, choose the capability your research needs. Each tool chapter can be used independently; follow its links when you need a supporting setup or explanation.
+Start with the result you need. Keep tools that already serve the project, and add others when they supply a useful capability.
 
-## Find the problem you need to solve
 
 ::: {.toolkit-lookup}
 
 | Research need | Start here |
 |:--|:--|
 | **Foundations** | |
-| Check what a new tool can read, change, or send | §2: Control what added tools can access |
+| Control what a new tool can read, change, or send | [2. Tool access](#tool-access) |
 | **Essential tools** | |
-| Install tools through a maintained package manager | §3: Install and manage tools with [Homebrew](https://brew.sh/) |
-| Record changes and recover a working state | §4: Recover earlier work: [git](https://git-scm.com/) and [gh](https://cli.github.com/) |
-| Repeat research tasks with saved commands | §5: Give research tasks reliable commands: [just](https://just.systems/) |
-| Keep a batch moving unattended | §6: Keep unattended jobs moving: [pueue](https://github.com/Nukesor/pueue) |
-| Find research files or inspect a saved service response | §7: Find research files efficiently: [ripgrep](https://github.com/BurntSushi/ripgrep), [fd](https://github.com/sharkdp/fd), [jq](https://jqlang.org/), [yq](https://mikefarah.gitbook.io/yq/), [bat](https://github.com/sharkdp/bat) |
+| Install and maintain research tools | [3. Installation](#adding-tools): [Homebrew](https://brew.sh/) |
+| Record changes and recover earlier work | [4. Version control](#version-control): [git](https://git-scm.com/) and [gh](https://cli.github.com/) |
+| Repeat tasks using saved commands | [5. Project commands](#project-commands): [just](https://just.systems/) |
+| Keep a batch moving unattended | [6. Job queues](#job-queues): [pueue](https://github.com/Nukesor/pueue) |
+| Find files and inspect their contents | [7. Search and inspection](#finding-files): [ripgrep](https://github.com/BurntSushi/ripgrep), [fd](https://github.com/sharkdp/fd), [jq](https://jqlang.org/), [yq](https://mikefarah.gitbook.io/yq/), and [bat](https://github.com/sharkdp/bat) |
 | **Reproducible research workflows** | |
-| Restore the language and packages used for an analysis | §8: Preserve a software environment: [rig](https://rig.r-lib.org/), [renv](https://rstudio.github.io/renv/), and [uv](https://docs.astral.sh/uv/) |
-| Rerun only steps affected by a change | §9: Rerun only affected steps: [targets](https://docs.ropensci.org/targets/) and [Snakemake](https://snakemake.readthedocs.io/) |
-| Run work in a separately configured environment | §10: Run work in a separate environment: containers |
-| Rebuild documents from saved research outputs | §11: Generate documents from research outputs: [Quarto](https://quarto.org/) and [Pandoc](https://pandoc.org/) |
+| Restore the language and packages used for an analysis | [8. Software environments](#environments): [rig](https://rig.r-lib.org/), [renv](https://rstudio.github.io/renv/), and [uv](https://docs.astral.sh/uv/) |
+| Rerun only steps affected by a change | [9. Dependencies](#pipeline-dependencies): [targets](https://docs.ropensci.org/targets/) and [Snakemake](https://snakemake.readthedocs.io/) |
+| Package software and configure a separate place to run it | [10. Containers](#containers) |
+| Rebuild a document from saved research outputs | [11. Document production](#research-documents): [Quarto](https://quarto.org/) and [Pandoc](https://pandoc.org/) |
 | **Connect to data and services** | |
-| Supply credentials without storing them in research code | §12: Keep credentials out of research files: [1Password](https://1password.com/) and [direnv](https://direnv.net/) |
-| Reach an approved library or service | §13: Connect to research data and services: [MCP](https://modelcontextprotocol.io/) |
-| Inspect or interact with a website | §14: Inspect and interact with a browser |
+| Supply account credentials without putting them in research code | [12. Credentials](#credentials): [1Password](https://1password.com/) and [direnv](https://direnv.net/) |
+| Give the agent access to an application or service | [13. Connections](#service-connections): [MCP](https://modelcontextprotocol.io/) |
+| Build, inspect, or collect data from a website | [14. Browser access](#browser-work) |
 | **Run and coordinate agents** | |
-| Coordinate agents in one project or separate working copies | §15: Divide work between agents: shared projects and git worktrees |
-| Run an agent from recorded requests with controlled inputs | §16: Run agents from saved requests |
-| Run a model on your own computer | §17: Run a model on your own computer |
+| Divide a project between several agents | [15. Agent coordination](#parallel-work) |
+| Run a batch of agent tasks from saved requests | [16. Headless agents](#headless-agents) |
+| Run or adapt a large language model (LLM) on your own hardware | [17. Local LLMs and adaptation](#local-models) |
 | **Work from the terminal** | |
-| Work with an agent and run saved commands in a terminal | §18: Use an agent from the terminal: [Claude Code](https://code.claude.com/docs/en/overview) |
+| Use a terminal interface to the agent | [18. Terminal agents](#terminal-agents): [Claude Code](https://code.claude.com/docs/en/overview) |
 | **Reference** | |
-| Choose terminal, shell, session, or editor conveniences | Appendix A: Optional working environment |
-| Keep a recoverable record of personal tool settings | Appendix B: Keep records of shared settings: [chezmoi](https://www.chezmoi.io/) |
-| Check account usage and investigate past sessions | Appendix C: Account-usage tools |
-| Diagnose recorded execution and document-build problems | Appendix D: Troubleshooting |
-| Understand terminal history and terminology | Appendix E: Terminal vocabulary |
+| Choose optional terminal and editor conveniences | [A. Working environment](#working-environment) |
+| Restore personal settings across computers | [B. Shared settings](#shared-settings): [chezmoi](https://www.chezmoi.io/) |
+| Investigate account usage | [C. Usage tools](#usage-tools) |
+| Diagnose execution and document-build problems | [D. Troubleshooting](#troubleshooting) |
+| Understand terminal terminology | [E. Terminal vocabulary](#terminal-history) |
 
 :::
 
-## Add only what the project needs
+## Make the tool part of the workflow
 
-Installed programs extend what the agent can do through its command tool. Connections expose functions supplied by another service. Instructions tell the agent when and how to use either. Installation alone does not teach a reliable procedure: a queue needs resource limits and an outcome check; an environment manager needs a maintained version record.
+Some tools are programs the agent runs on the computer doing the work, such as a job queue. Others connect it to an application or service, such as a reference library. Once a tool is available, record when the agent should use it and what it should report.
 
-Each chapter begins with the research problem and an example, then explains what to ask the agent to set up, run, and check. Examples connect the tools to research tasks; smoke tests use a small portion of the actual workflow before a large batch. Where a procedure comes from a recorded run or has not yet had a clean-installation trial, the text says so. We are Data Science Services at Harvard's Institute for Quantitative Social Science; the examples draw on our research-support work.
+![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
 
-## Tell the agent how to use installed tools
+For the simulation batch, the project instructions should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
 
-A newly installed tool can go unused, or be used incorrectly, unless the agent has instructions for it. This chapter shows how to record when to use a tool, what limits apply, and which results to report. The research guide's [project-context](https://dss-agentic-research.pages.dev/chapters/project-context.html), [shared-conventions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html), and [reusable-procedures](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html) chapters explain the instruction files and skills that hold those procedures.
+> Record the queue command, the limit on simultaneous jobs, and where results and logs belong. Add instructions for future sessions to use this setup for the project's simulation runs and report which jobs succeeded or failed, checking their saved outputs.
 
-### Start with short, specific instructions
+Save project-specific commands and limits with the project. Put conventions that should apply across projects in your shared instructions. The research guide explains [project records](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [shared conventions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
 
-A machine-wide convention can live in your personal `CLAUDE.md`. A project's commands, resource limits, and data-access rules belong with that project. Keep an established instruction layout rather than creating a second one for this guide.
+## Use tools from the app
 
-For example:
+You can ask the agent to install and operate these tools from the app. You supply the research decisions and complete personal steps such as signing in or entering an administrator password. Give passwords to the sign-in or system dialog, rather than pasting them into the conversation.
 
-- Submit long jobs through pueue, record the task identifier, and verify both completion status and expected outputs.
-- Fetch required credentials from the approved vault for the command that needs them. Never print or commit their values.
-- Use the project's recorded environment. Report proposed dependency changes before applying them.
-
-Each line names an action and a check. “Use pueue” alone leaves the agent to guess how to establish that a job succeeded. Keep a short inventory of installed tools and their purpose alongside these instructions.
-
-### Package procedures only when they recur
-
-A skill can hold a recurring procedure such as submitting a job, inspecting its status, and reporting failure. Start with a standing instruction; add the longer procedure if you repeatedly need the same correction. Hooks can run checks at specified events, but are executable configuration that needs review. Neither instructions nor hooks replace a data-access boundary (§2).
-
-### Check that the instruction is used
-
-When the agent next performs the relevant project task, have it follow the recorded procedure and report the commands, outputs, and any failures. If it overlooks a tool or convention, correct the maintained instructions so the next session has the same guidance.
-
-## Use the environment you have
-
-The main routes are macOS and Ubuntu Linux; Windows readers can use Ubuntu through WSL2. [R](https://www.r-project.org/), [Python](https://www.python.org/), and [Stata](https://www.stata.com/) users can keep their research language. A master do-file may already provide the workflow you need, and Stata's language and community-command versions still need recording.
-
-An app, terminal, remote session, and [WSL](https://learn.microsoft.com/windows/wsl/) session may have different tools and credentials. Check the actual session in which research will run. For Windows, consult the [desktop WSL documentation](https://code.claude.com/docs/en/desktop-wsl) before assuming that a locally installed tool or connector is available there. Platform-specific clean-installation trials are recorded separately from tests on the author's configured Mac.
-
-Product interfaces and access controls change faster than the purposes of these tools. Consult the linked primary documentation for the installed version, and have the agent check the actual workflow before scaling it up. This November draft is prepared for author review; publication and remaining account-dependent trials follow that review.
+The setup examples cover macOS and Linux. The Windows route uses [Windows Subsystem for Linux (WSL2)](https://learn.microsoft.com/windows/wsl/), which provides a Linux environment on a Windows computer. Ask the agent to check the environment where the work will run before installing software there. You can keep using [R](https://www.r-project.org/), [Python](https://www.python.org/), or [Stata](https://www.stata.com/); adopting a queue or command runner does not require changing research language.

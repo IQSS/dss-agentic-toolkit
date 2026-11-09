@@ -2,32 +2,46 @@
 title: "16. Run agents from saved requests"
 ---
 
-Some research workflows need a language model to make a judgment for each item in a collection. A *headless* agent runs programmatically without an interactive conversation, so a saved workflow can supply each request, collect its response, and record failures. You can ask an agent in the app to prepare and launch that workflow; you do not have to operate a terminal yourself.
+Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another request.
 
-The research guide's [peer-review example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html) compares AI and human reviews. Each AI reviewer receives its assigned paper and instructions; a separate judge receives the material specified for judging. Fresh per-case runs make repeated work manageable. Deliberately controlling the inputs also helps prevent one case's content from influencing the next, provided the configuration actually enforces that separation.
+Consider the research guide's [reviewer-and-judge example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents). Each reviewer receives an assigned paper and instructions; each judge receives the material required by the judging protocol. Separate runs make this repeated work manageable. When the study also requires reviewers to know nothing about other cases, the workflow must control those inputs explicitly.
 
-## Separate the launcher from the run
+## Turn the task into a saved workflow
 
-[Claude Code](https://code.claude.com/docs/en/overview) supports noninteractive calls through `claude -p` and programmatic use through [Python](https://www.python.org/) or TypeScript SDKs. The [headless documentation](https://code.claude.com/docs/en/headless) describes these routes. An app with suitable command access can invoke the installed CLI or a script using the SDK. Authentication, permissions, and process support must be available in that execution environment.
+[Claude Code](https://code.claude.com/docs/en/headless) supports noninteractive calls through `claude -p`, as well as an Agent SDK for Python and TypeScript. An agent in the desktop app can prepare and launch a script using one of these routes if its tools have the required access. Headless describes how the run proceeds, not where you must sit or which window you must use.
 
-Have the agent check its installation and intended account route before configuring the workflow. You complete personal sign-in or API authorization. A headless run should not wait for a person to answer a prompt; the agent must configure the operations it may perform and record any refused action. The CLI's `dontAsk` mode denies operations that require approval rather than granting unlimited access.
+Ask the agent to turn the written protocol into a repeatable command. It should check the intended account, available tools, and output format, and handle failures without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
 
-Ordinary model fits and document builds should run their saved code directly. Add an LLM step when the task needs its interpretation or judgment, rather than using an agent to babysit computation.
+> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the requests, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
 
-## Save the request and the result for every case
+If the task only requires a judgment on supplied text, a direct LLM API call may be sufficient. Use an agent when the task needs tools or a sequence of actions. Ordinary model fitting and document production should use their saved research code directly.
 
-Ask the agent to build a run record containing the case identifier, role, prompt, assigned inputs, model/settings, available tools, loaded configuration, output location, and retry policy. Save the raw response separately from parsed measurements, together with process status and diagnostic output. A successful process exit is not enough if the returned judgment cannot be parsed.
+## Record each case
 
-> Build the reviewer/judge workflow from our specification. Give each case a fresh run with the assigned inputs and permitted tools. Save the exact requests, raw responses, parsed results, and run status. Run two representative documents through the complete workflow as a smoke test, diagnose failures, and confirm the expected artifacts before starting the main batch. Keep test outputs separate from the study results.
+![](figures/headless-research.svg){#fig-headless-research fig-alt="Saved instructions and assigned inputs feed fresh reviewer runs. Each retains its response and attempt status. A judge receives only the protocol-defined inputs. Parsing produces a measurement table while preserving failed attempts."}
 
-The [smoke test](#smoke-tests) checks execution and output handling. Assess the quality of the judgments against the research rubric separately. A [pueue](https://github.com/Nukesor/pueue) queue can manage the outer jobs and concurrency; have the agent verify the queue's execution environment as well.
+| Record | Why retain it |
+|---|---|
+| Case, role, exact request, and assigned inputs | Establish what the reviewer or judge was asked to assess |
+| Model version/settings, tools, and loaded configuration | Establish the execution conditions and sources of context |
+| Raw response and separately parsed result | Preserve what the LLM returned, including material discarded by parsing |
+| Run status, diagnostics, and attempt identifiers | Distinguish a valid result from a refused action, interruption, or failed parse |
 
-## Control what each run can receive
+A process can finish successfully while returning a response the analysis cannot use. The workflow should check the expected output structure and keep malformed responses. Specify retry rules before the batch so repeated attempts do not silently replace inconvenient results. The [smoke test](#smoke-tests) checks that this machinery works; the [LLM-evaluation procedure](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#evaluate-llm-labeling) checks the quality of the judgments.
 
-Starting a new process does not by itself exclude personal instructions, memory, plugins, connected services, or other files. Normal print mode can discover configuration just as an interactive session does. If the study depends on each reviewer seeing only assigned material, have the agent identify and configure every relevant source of context. Do not resume another case's conversation.
+For a long batch, [pueue](https://github.com/Nukesor/pueue) can manage outer jobs and concurrency. Configure the queue's authentication and environment as well as its commands, and use the [job report](#job-queues) to establish what completed.
 
-[Claude](https://claude.ai/)'s `--bare` option skips much of the normal configuration discovery, as described in the linked documentation. It also changes authentication: it does not use subscription OAuth credentials and needs an API or supported provider route. Have the agent check the installed version and intended billing before choosing it. Explicit inputs, tool lists, settings, and session-persistence controls still need attention. For a text-only judgment with no tools, a direct model API call may be simpler than an agent.
+## Control what each run receives
 
-When isolation is part of the research design, ask for targeted checks using harmless markers. One run should read its assigned marker while attempts to read another case's marker fail through the configured routes. Check unintended instruction or memory loading as well as direct file and service access. Record observed outcomes; a model claiming not to remember something is not equivalent to a denied read. These checks address context restrictions, not scientific validity, and cover only the routes actually exercised.
+A fresh conversation can still load project instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
 
-The historical peer-review project motivates this design. It does not establish that an arbitrary current app/account configuration is isolated. Keep the configuration, checks, and any unresolved access questions with the study, and link the scientific evaluation to the research guide's [LLM-analysis procedure](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html).
+Use a targeted check of the actual configuration. A run should read a harmless marker in its assigned input while an attempted read of another case's marker is denied through the configured routes. Check unexpected instruction and memory loading too. Save the observed outcomes; an LLM saying it remembers nothing is not evidence that it cannot retrieve another case.
+
+For stronger restrictions, use the [access controls](#tool-access) and, where appropriate, a [separate execution environment](#containers). The research guide explains [which information reviewers and judges should receive](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#control-what-each-reviewer-or-judge-receives). These are separate decisions from whether the resulting judgments are scientifically useful.
+
+<details class="guide-example">
+<summary>Claude Code configuration for controlled runs</summary>
+
+The [`--bare` option](https://code.claude.com/docs/en/cli-reference) skips much automatic discovery of instructions and extensions. It is not a sandbox and does not remove tool access by itself. It also uses a different authentication route from ordinary subscription sign-in; check the installed version and intended provider before selecting it. Explicit tool, input, session-persistence, and settings choices remain necessary. The `dontAsk` permission mode denies calls that would otherwise prompt, but currently documented extensions can affect approvals, and normally permitted actions still run. Configure and check the complete run rather than treating a flag as proof of isolation.
+
+</details>

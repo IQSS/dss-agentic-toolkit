@@ -1,59 +1,61 @@
 ---
-title: "17. Run a model on your own computer"
+title: "17. Run and adapt an LLM on your own hardware"
 ---
 
-A local model can run on approved hardware and preserve access to a chosen set of weights. Here, *inference* means running a trained model on an input to produce an output, such as a response to a prompt. It is distinct from statistical inference about a population or process. *Local inference* means that the model computation happens on the local machine. It can also be substantially less capable than the hosted model you normally use. The research guide's [Run and adapt models for your research](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) explains that choice, its connection to data governance, and when fine-tuning may help. This section establishes a small trial before adding a model to a research pipeline.
+Running a large language model (LLM) on hardware you control can keep its computation within an approved environment and let a project retain a chosen version of its weights. That hardware may be your main computer or a server provided by your institution. A separate server is not required when the model and task fit the computer's available memory and processing capacity.
 
-For example, first ask a small downloaded model to return a category for an invented input, then test whether an agent using that model can read an assigned harmless file. These trials check the setup before you consider a research task.
+Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the requests and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The researcher guide explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
 
-## Install and start a local runtime
+## Choose hardware and a runtime
 
-Use an existing approved model service if your institution supplies one. For a Mac trial, [Ollama](https://docs.ollama.com/quickstart) supplies a local model runtime. Check for an existing installation first. With [Homebrew](https://brew.sh/) already configured (§3), the command-line installation is:
+A *runtime* loads the model's weights and processes requests. [Ollama](https://docs.ollama.com/quickstart) is one option for compatible downloaded models; use an existing approved institutional service if it already meets the need. Ask the agent to check the operating system, available memory, accelerator support, and storage before choosing a model or installing software.
 
-```
-brew install ollama
-```
+The download size is not the memory needed during use. Longer inputs and more simultaneous requests can substantially increase that requirement. A quantized model stores its weights at reduced precision, often reducing memory use, but its behavior must still be assessed on the task. Record the exact release and quantization instead of treating models with the same family name as interchangeable.
 
-For Linux or [WSL2](https://learn.microsoft.com/windows/wsl/), follow Ollama’s platform instructions and check the actual GPU and memory available. Keep downloaded weights outside a cloud-synchronized research folder. The default Mac model directory is in your home folder under `.ollama/models`.
+![](figures/local-llm-execution.svg){#fig-local-llm-execution fig-alt="On approved hardware, a script can request inference from an LLM runtime with local weights. An optional agent harness connects the runtime to tools. Hardware can be the main computer or an institutional server."}
 
-Ollama also supports cloud models and web search. Its [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables those features. For a temporary foreground server, the agent can run:
+For Ollama, the agent should configure the process that actually serves requests. Its [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables Ollama's cloud features; the service can listen on the local loopback address, `127.0.0.1`, rather than accept network connections. Keep model files outside cloud-synchronized project folders. These settings govern the runtime, not other network-capable tools used by an agent.
 
-```
-OLLAMA_NO_CLOUD=1 OLLAMA_HOST=127.0.0.1:11434 OLLAMA_CONTEXT_LENGTH=65536 ollama serve
-```
+> Prepare this computer for the approved local-model task. Check its resources and existing installations, select a compatible runtime and model version, and configure local execution. Keep my usual hosted-agent settings intact. Record the model, runtime, storage, context limit, and concurrent-request limit, then run representative permitted inputs and report failures and resource use.
 
-Check for an existing server before starting another. Confirm the startup log says cloud features are disabled and the server is listening on localhost. This command does not set up a login service. Configuring a persistent service is a separate step; apply the same local-only setting to the process that actually serves requests. These settings govern Ollama, not every network-capable tool an agent might use.
+Have the agent report whether the requested configuration fits the available hardware. If it does not, choose a smaller candidate for evaluation or use an approved server. Do not quietly shorten study documents or change the model to make a run finish.
 
-## Download a small model and test inference
+## Run the research task
 
-A modest trial model is [Qwen3 4B](https://ollama.com/library/qwen3:4b), distributed here as about 2.5 GB of quantized weights. This is a setup example, not a recommendation for a particular research measurement. Once the server is available, the agent downloads and invokes the model with:
+Use a saved command with explicit inputs and outputs. For extraction or classification, request a defined response structure and validate each result before it enters the analysis table. Save raw responses, malformed outputs, and retries. A completed request establishes execution; comparison with the study's reference judgments establishes whether the output is useful.
 
-```
-ollama pull qwen3:4b
-ollama list
-ollama run qwen3:4b
-```
+Keep the runtime version, exact model identifier or digest, generation settings, request template, and input identifiers with the run. A model tag can point to different weights later. [Ollama's model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
 
-Have the agent check a representative request and retain its result; `/bye` exits the interactive model session. Have the agent record the runtime version and exact model digest, not just the tag: a tag can later refer to different bytes. The [local model-list API](https://docs.ollama.com/api/tags) exposes the digest and quantization. Memory needed during inference exceeds the download size and grows with context and concurrency; `ollama ps` shows the active allocation.
+A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use the [batch workflow](#headless-agents) when many requests must run consistently.
 
-For an extraction or classification step, require a structured response and validate it. A small trial on this Mac illustrates why: the unrestricted request for one category produced explanatory text and hit the output limit. Supplying a JSON schema produced the required category object. That establishes behavior on the invented test input, not accuracy on research data. Keep malformed responses and retries in the record.
+## Connect the LLM to an agent
 
-## Connect the model to an agent
+An LLM runtime does not itself provide the complete agent environment. A software harness gives the LLM tools and carries out its tool calls. [Ollama's Claude Code integration](https://docs.ollama.com/integrations/claude-code) offers an Anthropic-compatible endpoint for supported models. Have the agent configure a separate invocation and check an actual tool call before relying on it for project work.
 
-This trial also requires the [`claude`](https://claude.ai/) command. Ask the agent to check its installation before starting; §18 covers setup and interactive use, and §16 explains controlled headless runs.
+Record both sides: which runtime processes the LLM requests and which harness controls the tools. Retain the tool-call trace for the check. A model that returns fluent text may still fail to produce usable tool calls. Apply [file and network restrictions](#tool-access) independently of the choice to run the LLM locally; a local LLM can still ask a tool to contact a remote service.
 
-[Ollama’s Claude Code integration](https://docs.ollama.com/integrations/claude-code) connects compatible models through an Anthropic-compatible endpoint. Its launcher can configure the integration; inspect proposed configuration changes before replacing an existing hosted-model setup. A process-scoped trial can instead supply the local endpoint and model explicitly.
+## Adapt a model when the study calls for it
 
-> In a fresh folder containing only an invented marker file, configure one headless Claude Code run against the local Ollama endpoint. Use the downloaded model, explicit local authentication placeholder, bare mode, no saved session, no [MCP](https://modelcontextprotocol.io/) servers, and only the Read tool. Permit that tool without enabling arbitrary command execution. Save the request, tool-call trace, raw result, and exit status. Confirm an actual read of the assigned file and the expected response. Do not modify my normal hosted-agent configuration or use research data.
+Fine-tuning changes model parameters using training examples. LoRA is a method that trains a relatively small set of added parameters, often saved as an *adapter*, alongside a specified base model. The researcher guide explains [when training may help](https://dss-agentic-research.pages.dev/chapters/research-models.html#context-or-training), [LoRA](https://dss-agentic-research.pages.dev/chapters/research-models.html#lora), and the evidence needed to compare adaptation with a strong unadapted model.
 
-The tested configuration used `ANTHROPIC_BASE_URL=http://127.0.0.1:11434`, an `ANTHROPIC_API_KEY` placeholder of `ollama`, and `--model qwen3:4b`. The placeholder is not a provider credential. The run used `--bare`, `--no-session-persistence`, `--strict-mcp-config` with an empty server list, and explicit Read-tool permissions. Use the installed CLI help to construct the complete invocation; do not copy only the endpoint and assume the remaining context is controlled.
+| Environment | Candidate tool | What the agent should check |
+|---|---|---|
+| Apple silicon Mac | [MLX-LM](https://github.com/ml-explore/mlx-lm) | Supported model, available memory, data format, and training/inference compatibility |
+| A supported PyTorch environment, commonly with a suitable GPU | [Hugging Face PEFT](https://huggingface.co/docs/peft/main/en/quicktour) | Base-model support, accelerator configuration, adapter method, and required training libraries |
+| An established institutional training service | Its approved training tools | Data access, resource allocation, artifact retention, and how the resulting model is evaluated |
 
-The harmless local trial completed a two-turn file-reading task and returned the marker. It did not test all containment routes or establish that this model can perform research analysis reliably. CLI estimates of context limits or monetary cost for an unrecognized local model are not evidence of the actual runtime limits or a provider charge. Record the server configuration and observed run instead.
+The agent should install the selected tools in a [recorded project environment](#environments). Keep the training, development, and held-out evaluation data separate, following the study design. Use development data to make training choices; do not repeatedly tune against the held-out evaluation results.
 
-For restricted work, enforce the required file and network boundaries (§2), review the full chain of custody, and evaluate task quality before scaling up. Small distilled DeepSeek releases, large Kimi models, and Apple’s built-in model have different deployment and access routes; do not assume that every local model is an interchangeable backend for this launcher.
+> Set up the agreed adaptation study using the approved data splits and base model. Preserve the unadapted baseline, record the full configuration, and check that a short training run can save and reload an adapter before launching the planned run. Save checkpoints, logs, and evaluation outputs. Compare the baseline and adapted versions using the prespecified evaluation; do not change the data splits or success criteria to improve the result.
 
-## Apple’s on-device model {#apple-on-device}
+![](figures/llm-adaptation.svg){#fig-llm-adaptation fig-alt="The base LLM supplies a baseline and an adaptation run. Training and development inputs support adaptation; a held-out evaluation compares baseline and adapted versions. The adapter and run records are saved."}
 
-Apple supplies an alternative that uses the system model. On macOS 27, the built-in [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) supports interactive use, saved scripting steps, and structured responses. Check `fm --help` and `fm respond --help` on the intended Mac before constructing a trial. The documented default is on-device inference; selecting Private Cloud Compute changes where the request is processed.
+The retained artifacts should identify the base weights and tokenizer, training data version, adapter configuration, software environment, run settings, checkpoints, and evaluation results. An adapter must be loaded with a compatible base model. If it is converted or merged for another runtime, check that exported version on the task too; a successful file conversion does not establish unchanged behavior.
 
-For [Python](https://www.python.org/) workflows, Apple’s [Foundation Models SDK](https://github.com/apple/python-apple-fm-sdk) requires macOS 26 or later, Xcode 26 or later, Python 3.10 or later, and Apple Intelligence enabled on a compatible Mac. Add the SDK to the project’s recorded environment (§8), check model availability, and start with an invented input and a fixed output schema. Keep the package version and system information with the results. These Apple routes were checked against documentation on November 3, 2026; they have not been run in this guide’s local trial.
+Training may require different resources and software from inference. Use a short execution check before a long run, then arrange job management and checkpointing appropriate to the machine. Protect training data, logs, and resulting weights under the study's requirements; fine-tuning is not a way to anonymize sensitive examples. The [data chain-of-custody discussion](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) applies to these artifacts too.
+
+## Apple's on-device model {#apple-on-device}
+
+On a compatible Mac, Apple's system model provides another route for bounded tasks such as extracting structured information. Its [Foundation Models Python SDK](https://github.com/apple/python-apple-fm-sdk) and, on supported macOS versions, the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) provide programmatic access. Ask the agent to check system requirements, model availability, and the selected execution mode before using either.
+
+This route differs from downloading arbitrary open weights and running them through Ollama. Keep the system and SDK versions with the results, and evaluate the actual task. Selecting an offered cloud-processing mode changes where the request runs. These Apple routes have been checked against documentation for this guide, but have not been included in its local execution trial.

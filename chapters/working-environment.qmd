@@ -2,32 +2,33 @@
 title: "Appendix A. Optional working environment"
 ---
 
-Your existing terminal and editor may already be sufficient. Additional conveniences are useful when they solve an everyday problem: seeing job status beside an agent session, returning to a working layout, or inspecting code and plots in one place. None is a prerequisite for agent work.
+An agent conversation, a job log, and a figure can all belong to the same research task. Keeping them easy to find can make the work more comfortable. Your existing terminal and editor may already provide what you need; add a tool when it solves a recurring inconvenience.
 
-For example, you might keep an agent conversation in one pane and its project's job status in another. Ask the agent to configure that layout using your existing tools, then add a replacement only if it supplies something you need. [Appendix E](#terminal-history) explains where the terminal terminology comes from.
+For example, you might want the agent conversation beside a view of the project's queue, with the latest figure open in an editor. Ask the agent to arrange that using the tools already installed. The layout should help you follow the research, without requiring you to learn a collection of new applications.
 
-## Terminal applications
+| Need | Possible addition | What to ask the agent to configure |
+|---|---|---|
+| See a conversation and a log together | [iTerm2](https://iterm2.com/) on macOS; [Windows Terminal](https://learn.microsoft.com/windows/terminal/) with [WSL2](https://learn.microsoft.com/windows/wsl/) | Readable panes or tabs in the intended project environment |
+| Recognize the current project and branch | [Oh My Posh](https://ohmyposh.dev/) | A simple prompt in the existing shell |
+| Return to a named terminal workspace | [Zellij](https://zellij.dev/) | A session and layout for the project |
+| Inspect code, data, and plots together | [Positron](https://positron.posit.co/) or an existing research editor | The actual project and its recorded language environment |
 
-[iTerm2](https://iterm2.com/) on a Mac and [Windows Terminal](https://learn.microsoft.com/windows/terminal/) with Ubuntu [WSL2](https://learn.microsoft.com/windows/wsl/) provide panes, searchable output, and reusable profiles. Have the agent help configure a layout for the real project, such as a conversation beside a read-only queue view. Keep your current terminal if it already works well.
+![](figures/research-workspace.svg){#fig-research-workspace fig-alt="An illustrative workspace places an agent conversation, queue status, and a saved figure together. The queue service runs separately from the window displaying its status."}
 
-Use legible fonts and colors. Special fonts are only needed for prompt symbols you choose to use; a theme is not required to run an agent or a saved project command. In Windows Terminal, a PowerShell tab and an Ubuntu tab are different environments.
+## Make the current work visible
 
-## Shell and prompt
+Use legible text and a small number of panes. A prompt showing the project directory, git branch, and failed-command status can help distinguish projects without changing the shell itself. Decorative symbols and special fonts are optional. Have the agent preserve existing settings and check a new session after making changes.
 
-The shell interprets commands; its prompt shows where the next command will be entered. A prompt displaying the directory, [git](https://git-scm.com/) branch, and previous command's status can help you recognize the project and state you are working in. [Oh My Posh](https://ohmyposh.dev/) can add that information to an existing shell. There is no need to replace the shell or install a larger framework just to change the prompt.
+On Windows, an Ubuntu tab and a PowerShell tab use different environments. The agent should configure the intended one rather than assume that settings in one apply to the other. Shell startup files also run instructions, so a visual customization should not silently replace unrelated setup.
 
-> Preserve my existing shell settings. Configure a readable prompt showing the project directory, git branch, and failed-command status. Explain the changes, verify a fresh session, and record how to restore the old setup. Keep unrelated aliases, credentials, and research environments unchanged.
+## Return to a working session
 
-Shell startup files execute code. The agent should check both an interactive shell and its own execution environment, since they may load different settings. Personal authorization remains yours; routine configuration diagnosis belongs with the agent.
+Zellij can keep a named session available when you detach from it and later reattach, while the host and session continue running. That can preserve a useful layout or survive a dropped connection. Ask the agent to configure the layout and explain the relevant on-screen controls.
 
-## Persistent terminal sessions
+Session management does not replace [pueue](https://github.com/Nukesor/pueue), which manages submitted jobs and their records. Nor does a restored layout establish that computation continued through sleep or shutdown. Use the [queue chapter](#job-queues) for unattended work and the institution's scheduler on a cluster.
 
-[Zellij](https://zellij.dev/) groups panes into a named session that you can leave and rejoin from another terminal window. This helps preserve a working layout and processes when a window closes or a connection drops, while the host and session remain available. Have the agent set up the project's layout and explain the on-screen detach and reattach controls. Keep an existing multiplexer if it meets the need.
+## Inspect results in the editor you use
 
-A persistent session and a queue do different jobs. [Pueue](https://github.com/Nukesor/pueue) records and manages submitted jobs; Zellij gives you a place to view those jobs and their logs. Neither makes computation continue through a sleeping or shut-down host. Reopening a layout after a restart is not the same as resuming the programs that previously occupied it. Use the institutional scheduler for cluster work.
+Positron supports work with [R](https://www.r-project.org/) and [Python](https://www.python.org/); [RStudio](https://posit.co/products/open-source/rstudio/), [Stata](https://www.stata.com/), or another familiar editor may already serve the project well. Have the agent open the project in its [recorded environment](#environments) and identify the interpreter being used.
 
-## An editor beside the agent
-
-[Positron](https://positron.posit.co/) combines code, data, and plots for [R](https://www.r-project.org/) and Python. Keep [RStudio](https://posit.co/products/open-source/rstudio/), [Stata](https://www.stata.com/), or another editor when it already supports your work. Ask the agent to help open the actual project in its [recorded environment](#environments) and identify the interpreter it will use.
-
-You can inspect the substantive results in the editor while the agent works on the same files. Avoid conflicting simultaneous edits. Temporary sorting or filtering in a data viewer helps inspection but does not replace saved cleaning code. An AI extension or database connection is a separate addition with its own account and access requirements; neither is necessary just to read the agent's code and outputs.
+You can inspect substantive results while the agent works on the files. Coordinate any simultaneous edits, and keep transformations used in the analysis in saved code rather than only in a data viewer. An extra AI extension or database connection is a separate choice, not a prerequisite for inspecting the work.

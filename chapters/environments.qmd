@@ -2,39 +2,41 @@
 title: "8. Preserve a software environment: rig, renv, and uv"
 ---
 
-An analysis depends on both the research language and the packages loaded into it. Recording their versions helps a collaborator reproduce the work and lets you investigate a software update without losing the earlier environment. These are two separate jobs even when one tool handles both.
+An analysis can change when its software changes. Recording the language and package versions lets the agent restore the earlier environment before investigating a different result or handing the project to a collaborator.
 
-Suppose a collaborator reruns the [synthetic heat-and-birthweight analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) and obtains different intervals. The agent should be able to restore the recorded [R](https://www.r-project.org/) or [Python](https://www.python.org/) version and the recorded packages before investigating the discrepancy. “Install the latest version” cannot reconstruct the software used for the original result.
+Suppose a collaborator reruns the [synthetic heat-and-birthweight analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) and obtains different intervals. The agent needs the original software records to determine whether the discrepancy follows from an environment change. Installing the latest releases would give it a different comparison.
 
-## Record the language and the packages
+## Record the language and packages
 
-The *runtime* is the installed language interpreter, such as a particular R or Python release. Project packages are the additional libraries used by the code. A *lockfile* records resolved package versions and their dependencies so they can be restored together.
+The *runtime* is the installed language interpreter, such as a particular release of R or Python. Packages provide additional functions used by the analysis. A *lockfile* records resolved package versions and their dependencies so they can be restored together.
 
 | Responsibility | R | Python |
-|:--|:--|:--|
-| Install/select the language version | [rig](https://rig.r-lib.org/) manages R installations. | [uv](https://docs.astral.sh/uv/) can install and select Python; `.python-version` records the project's selection. |
-| Record/restore project packages | [renv](https://rstudio.github.io/renv/) uses `renv.lock`. | uv uses `pyproject.toml` and `uv.lock`. |
+|---|---|---|
+| Install and select the language | [rig](https://rig.r-lib.org/) manages [R](https://www.r-project.org/) installations. | [uv](https://docs.astral.sh/uv/) manages [Python](https://www.python.org/) installations; `.python-version` records a selection. |
+| Record and restore packages | [renv](https://rstudio.github.io/renv/) maintains `renv.lock`. | uv maintains `pyproject.toml` and `uv.lock`. |
 
-Renv records the R version but does not install or switch R itself. Rig supplies that separate capability. Uv covers both responsibilities, but selecting Python and locking packages still produce distinct records. Preserve an existing adequate environment manager. [Stata](https://www.stata.com/) users should record Stata and community-command versions and their sources; no second language is required.
+Renv records the R version but does not install or switch R itself. Rig supplies that capability. Uv handles both language and package management, but the records still serve different purposes.
 
-## Capture working versions before changing them
+![](figures/research-environments.svg){#fig-research-environments fig-alt="Language version and package dependencies have separate records. Rig and renv support R; uv supports Python. Restore both records and check a baseline output."}
 
-> Inventory this project's language, packages, system dependencies, and existing environment records. Preserve the versions and a baseline output before making changes. Use rig plus renv for the required R setup, or uv for Python, unless the existing manager already does the job. Capture the complete dependency record without upgrading the working environment. Restore it separately and run the project's relevant checks; report discrepancies.
+## Capture the working environment
 
-For a new project, give the agent the intended language and required packages. It should establish the version records as part of setup. For an existing project, avoid a migration that quietly upgrades software just to make installation easier.
+For a new project, have the agent establish version records alongside the analysis. For an existing project, preserve the working versions before adding packages or changing managers.
 
-A package addition may bring dependencies with it. Have the agent report actual additions, removals, and changed versions, and run the affected checks. You decide whether a change that could alter results is appropriate; the agent performs the environment comparison and restoration.
+> Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected baseline checks. Report missing software and any changed results.
 
-## Check restoration, not just the presence of a lockfile
+Keep a functioning environment manager. [Conda](https://docs.conda.io/) environments can include language packages and other compiled software. [Micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) is a small command-line manager for conda environments; the agent can use it when that matches the project's scientific software. A project already using [pixi](https://pixi.sh/) need not migrate to uv. Ask for exact package/build records appropriate to that manager and target platform; a loose list of package names does not reproduce an earlier resolution.
 
-Have the agent verify the selected runtime and restore packages into a separate environment. For R it can inspect `renv::status()` and restore the recorded library. For Python, a [locked sync](https://docs.astral.sh/uv/concepts/projects/sync/) such as `uv sync --locked` refuses to silently update a stale lockfile. Keep the working environment intact while checking restoration.
+[Stata](https://www.stata.com/) projects also need their Stata release and community-command versions recorded. These tools do not require researchers to change language.
 
-Ask it to execute the project's smoke test or selected baseline analysis and report whether the expected outputs agree. Missing system libraries, unavailable package versions, or platform differences may prevent restoration; those are findings to record and resolve. A lockfile does not preserve the operating system or guarantee identical numerical results across all hardware.
+## Restore and check it
 
-![](figures/research-environments.svg){#fig-research-environments fig-alt="The language and packages are recorded in a version record, then restored in a separate environment and checked against a baseline output."}
+Have the agent restore into a separate environment and run the project's [smoke test](#smoke-tests) or selected baseline analysis. For R, it can check the restored library against `renv.lock`; for uv, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
 
-## Include system requirements when needed
+The completion report should identify the runtime actually used, whether packages restored, and which baseline outputs were compared. Missing packages or platform-specific failures are findings to resolve, not reasons to replace versions without recording the change. When adding a package later, retain the updated dependency record and check the affected analysis.
 
-Compilers and spatial libraries may need separate installation. Have the agent document those requirements and use [containers](#containers) when packaging the system software would help. Keep a working [conda](https://docs.conda.io/) environment, or consider [pixi](https://pixi.sh/) for a conda-based scientific stack, rather than forcing an unnecessary migration.
+## Include system requirements
 
-Keep generated libraries out of [git](https://git-scm.com/) and cloud synchronization before populating them; [chapter 4](#version-control) explains the local Dropbox procedure. On the author's affected Mac, R environment commands use the [pseudo-terminal wrapper](#r-on-macos). In [WSL2](https://learn.microsoft.com/windows/wsl/), create the environment inside the Linux distribution where it will run. Ask the agent to check the target platform before promising a collaborator that the environment is portable.
+Some packages depend on system libraries, compilers, or external programs. Record those requirements too. [Containers](#containers) can help package system software when language/package records are insufficient. Neither approach promises identical numerical results on all hardware.
+
+Store environment records with the project, while keeping generated libraries out of git and unnecessary cloud synchronization. [Appendix D](#cloud-sync-storage) describes the Dropbox procedure and the separate [R/macOS execution issue](#r-on-macos).

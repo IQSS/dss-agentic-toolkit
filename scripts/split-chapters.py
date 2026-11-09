@@ -70,6 +70,7 @@ COPIED_TOOLING = (
 
 H1 = re.compile(r"^# (?P<text>.+?)\s*$")
 EXPLICIT_ID = re.compile(r"\s+\{#(?P<id>[a-z][a-z0-9]*(?:-[a-z0-9]+)*)\}\s*$")
+HEADING_ATTRIBUTES = re.compile(r"\s+\{(?P<attributes>[^{}]*)\}\s*$")
 NUMBERED = re.compile(r"^(?P<num>\d+)\.\s+(?P<rest>.+)$")
 APPENDIX = re.compile(r"^Appendix\s+(?P<letter>[A-Z])\.\s+(?P<rest>.+)$")
 PART_MARKER = re.compile(r"^<!--\s*=+\s*(?P<title>.+?)\s*=+\s*-->\s*$")
@@ -474,6 +475,7 @@ def dark_css(figures: list[str]) -> str:
 
 def heading_id(text: str) -> str:
     """Pandoc's auto-identifier, near enough to match by. Every use of it is validated below."""
+    text = HEADING_ATTRIBUTES.sub("", text)
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)   # link text, not the target
     text = re.sub(r"[`*_]", "", text)
     text = re.sub(r"[^\w\s.-]", "", text, flags=re.UNICODE)
@@ -507,8 +509,12 @@ def anchor_map(lines: list[str], chapters: list[dict]) -> dict[str, str]:
                     fence = None
                 continue
             if fence is None and re.match(r"^#{2,6} ", ln):
-                explicit = EXPLICIT_ID.search(ln)
-                ident = explicit["id"] if explicit else heading_id(ln.lstrip("#").strip())
+                attributes = HEADING_ATTRIBUTES.search(ln)
+                identifiers = [
+                    value[1:] for value in attributes["attributes"].split()
+                    if value.startswith("#")
+                ] if attributes else []
+                ident = identifiers[0] if identifiers else heading_id(ln.lstrip("#").strip())
                 owner.setdefault(ident, f"/chapters/{c['slug']}.qmd#{ident}")
             if fence is None and re.match(r"^:::+\s+\{", ln):
                 match = re.search(r"\{#([a-z][a-z0-9-]*)\b", ln)

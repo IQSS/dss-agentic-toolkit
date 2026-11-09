@@ -1,29 +1,33 @@
 ---
-title: "7. Find research files efficiently: ripgrep, fd, jq, yq, bat"
+title: "7. Find and inspect project files"
 ---
 
-Your computer already has ways to find files, search their contents, and read text. The tools here give an agent faster searches, convenient filters, or structured queries for those familiar tasks. They help it locate relevant evidence without loading whole directories or long service responses into the conversation.
+Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
 
-Suppose a reviewer questions how `hot_days` enters the analysis. The agent needs to find where that variable is created, used in a model, and labeled in figures. [Ripgrep (`rg`)](https://github.com/BurntSushi/ripgrep) searches the project text and reports matching files and line numbers. “Ripgrep” is the tool's name; `rg` is the command the agent runs.
+Suppose a reviewer asks how `hot_days` enters the analysis. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [Ripgrep (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. Ripgrep is the program's name; `rg` is its command.
 
-## What each tool improves
+## Choose the appropriate search
 
-| Familiar task | Tool | What it adds |
-|:--|:--|:--|
-| Search text across files | ripgrep (`rg`) | Fast recursive searches, file-type filters, and useful defaults for ignoring irrelevant files. |
-| Find files by name | [fd](https://github.com/sharkdp/fd) | Concise filtering by name, extension, or file type. |
-| Inspect a JSON response | [jq](https://jqlang.org/) | Queries fields and transforms structured data without fragile text matching. |
-| Inspect YAML configuration | [yq](https://mikefarah.gitbook.io/yq/) | Queries or edits the document's structure rather than treating it as unstructured lines. |
-| Read a source file | [bat](https://github.com/sharkdp/bat) | Readable output with syntax highlighting and line numbers. |
+| Task | Tool | Useful result |
+|---|---|---|
+| Search text within project files | ripgrep (`rg`) | Matching passages with file paths and line numbers. |
+| Locate files by name or type | [fd](https://github.com/sharkdp/fd) | A focused list of candidate files. |
+| Query JSON | [jq](https://jqlang.org/) | Selected fields from a structured response. |
+| Query or edit YAML | [yq](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
+| Inspect source text | [bat](https://github.com/sharkdp/bat) | Readable excerpts with line numbers and syntax highlighting. |
 
-Text search and file listing usually have preinstalled alternatives. JSON and YAML querying may require an additional tool. Keep adequate existing tools, especially on a managed server; the point is to improve the agent's work rather than standardize every machine unnecessarily.
+The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job. JSON and YAML queries use the document's structure, which is more dependable than searching for a word and assuming the adjacent text has the intended meaning.
 
-## Ask the agent to use them in the project
+## Ask for findings tied to files
 
-> Find where hot_days is constructed, used in model formulas, and labeled in figures. Use ripgrep for text search, report the relevant paths and lines, and explain the search scope. If a saved JSON or YAML response is relevant, query the required fields rather than printing the whole file. Install a missing tool through the established package manager only when needed. Record these tool choices in the project instructions.
+> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines and explain how the definitions relate. Use focused searches and excerpts. If a saved JSON or YAML response is involved, query the relevant fields rather than printing the entire response.
 
-Ripgrep normally respects ignore files and skips hidden files. That reduces noise, but a missing match can mean a file was excluded. Have the agent check its [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that a variable is unused. Ignore rules do not grant or restrict permission to read files.
+![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
 
-For structured data, the agent should distinguish an absent field from a field containing an explicit null. It should report relevant values and their source without filling missing values from its expectations. Unrelated tools share the name `yq`; the Mike Farah implementation linked above is the one used here. The agent should confirm the installed implementation before constructing a query.
+An illustrative answer could identify `code/exposure.R` as the construction step, `code/fit.R` as the model formula, and `code/figure.R` as the label source, with the actual line numbers attached. The agent should explain any disagreement between those locations. The filenames here illustrate the form of a report; the agent must use the files that exist in your project.
 
-On some Linux installations, the commands are named `fdfind` or `batcat`. Record the names available in the working environment rather than installing another copy merely to match an example. The agent should perform the lookup and check its interpretation; you should receive an answer tied to the project's actual files.
+## Investigate a missing match
+
+Ripgrep ordinarily skips ignored and hidden files. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. A name assembled by code or stored in a binary file may need a different investigation. Search exclusions reduce noise; they are not file-access restrictions.
+
+For a structured response, distinguish a missing field from an explicit null value. The linked yq is Mike Farah's implementation; other programs use that name. Some Linux distributions also name fd and bat differently. Have the agent identify the available program and its behavior, then record useful tool conventions for future sessions.
