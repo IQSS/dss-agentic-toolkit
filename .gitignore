@@ -20,7 +20,7 @@ STATUS.md
 TASKS.md
 
 # wrangler drops a cache dir wherever `just deploy` runs
-.wrangler/
+/.wrangler
 
 .quarto-before-author-revision/
 
