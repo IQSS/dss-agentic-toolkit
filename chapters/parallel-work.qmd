@@ -12,7 +12,7 @@ An agent application may be able to delegate work to subagents, or you can open 
 
 > Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
 
-Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in project files where later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
+Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in the project context files so later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
 
 ## Choose shared or separate working copies
 

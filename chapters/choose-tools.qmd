@@ -55,11 +55,11 @@ Some tools are programs the agent runs on the computer doing the work, such as a
 
 ![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
 
-For the simulation batch, the project instructions should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
+For the simulation batch, `CLAUDE.md` (or `AGENTS.md`) should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
 
 > Record the queue command, the limit on simultaneous jobs, and where results and logs belong. Add instructions for future sessions to use this setup for the project's simulation runs and report which jobs succeeded or failed, checking their saved outputs.
 
-Save project-specific commands and limits with the project. For a paper, maintain current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. Put conventions that should apply across projects in your global user instructions. The research guide explains [project records](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
+Save project-specific commands and limits in the project context files: the maintained files that describe this project and guide the agent’s work. For a paper, maintain current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. Put conventions that should apply across projects in your global user instructions. The research guide explains [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
 
 ## Use tools from the app
 

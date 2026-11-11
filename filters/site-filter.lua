@@ -118,6 +118,46 @@ local function link_sections(str)
   return out, false
 end
 
+local function html_escape(value)
+  return value:gsub("&", "&amp;"):gsub('"', "&quot;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+end
+
+-- Opt-in chapter maps keep their hit areas beside the drawing geometry in SVG metadata.
+-- Native HTML links work without JavaScript; the image retains normal theme switching.
+local function chapter_map(img)
+  if not img.classes:includes("chapter-map") then return nil end
+  local root = (quarto and quarto.project and quarto.project.directory) or "."
+  local file = assert(io.open(root .. img.src, "r"), "Cannot read chapter-map SVG: " .. img.src)
+  local svg = file:read("*a")
+  file:close()
+  local metadata = assert(svg:match('<metadata id="chapter%-links">(.-)</metadata>'),
+                          "Chapter-map SVG has no link coordinates: " .. img.src)
+  local map = pandoc.json.decode(metadata)
+  img.classes:insert("nolightbox")
+  if img.attributes["fig-alt"] then
+    img.caption = {pandoc.Str(img.attributes["fig-alt"])}
+  end
+  local image_html = pandoc.write(pandoc.Pandoc({pandoc.Plain({img})}), "html")
+  local out = {'<span class="chapter-map-frame" role="group" aria-label="Research chapters">', image_html}
+  for _, link in ipairs(map.links) do
+    local target = anchors[link.anchor]
+    -- The anchor map can omit a chapter id already represented by the chapter map.
+    for _, chapter_path in pairs(chapters) do
+      if chapter_path:match("/([^/]+)%.qmd$") == link.anchor then target = chapter_path end
+    end
+    assert(target, "Unknown chapter-map anchor: " .. link.anchor)
+    target = target:gsub("%.qmd", ".html")
+    local style = string.format("left:%.5f%%;top:%.5f%%;width:%.5f%%;height:%.5f%%;",
+      100 * link.x / map.width, 100 * link.y / map.height,
+      100 * link.w / map.width, 100 * link.h / map.height)
+    out[#out + 1] = '<a class="chapter-map-link no-external" href="' .. html_escape(target) ..
+      '" aria-label="' .. html_escape(link.label) .. '" title="' .. html_escape(link.label) ..
+      '" style="' .. style .. '"></a>'
+  end
+  out[#out + 1] = '</span>'
+  return pandoc.RawInline("html", table.concat(out))
+end
+
 return {
   { Meta = read_meta },
   {
@@ -152,7 +192,7 @@ return {
       -- float and prints a bare "Figure 1" under it. Neither document cross-references a figure.
       local id = img.identifier:match("^fig%-") and "" or img.identifier
       img.attr = pandoc.Attr(id, img.classes, keep)
-      return img
+      return chapter_map(img) or img
     end,
 
     -- 4b. an in-document anchor from when the document was one file

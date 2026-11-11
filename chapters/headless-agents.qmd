@@ -35,7 +35,7 @@ For a long batch, [`pueue`](https://github.com/Nukesor/pueue) can manage outer j
 
 ## Control what each run receives
 
-A fresh conversation can still load project instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
+A fresh conversation can still load project context files, global user instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
 
 Use a targeted check of the actual configuration. A run should read a harmless marker in its assigned input while an attempted read of another case's marker is denied through the configured routes. Check unexpected instruction and memory loading too. Save the observed outcomes; an LLM saying it remembers nothing is not evidence that it cannot retrieve another case.
 

@@ -61,11 +61,11 @@ Some tools are programs the agent runs on the computer doing the work, such as a
 
 ![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
 
-For the simulation batch, the project instructions should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
+For the simulation batch, `CLAUDE.md` (or `AGENTS.md`) should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
 
 > Record the queue command, the limit on simultaneous jobs, and where results and logs belong. Add instructions for future sessions to use this setup for the project's simulation runs and report which jobs succeeded or failed, checking their saved outputs.
 
-Save project-specific commands and limits with the project. For a paper, maintain current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. Put conventions that should apply across projects in your global user instructions. The research guide explains [project records](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
+Save project-specific commands and limits in the project context files: the maintained files that describe this project and guide the agent’s work. For a paper, maintain current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. Put conventions that should apply across projects in your global user instructions. The research guide explains [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
 
 ## Use tools from the app
 
@@ -649,7 +649,7 @@ An agent application may be able to delegate work to subagents, or you can open 
 
 > Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
 
-Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in project files where later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
+Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in the project context files so later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
 
 ## Choose shared or separate working copies
 
@@ -705,7 +705,7 @@ For a long batch, [`pueue`](https://github.com/Nukesor/pueue) can manage outer j
 
 ## Control what each run receives
 
-A fresh conversation can still load project instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
+A fresh conversation can still load project context files, global user instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
 
 Use a targeted check of the actual configuration. A run should read a harmless marker in its assigned input while an attempted read of another case's marker is denied through the configured routes. Check unexpected instruction and memory loading too. Save the observed outcomes; an LLM saying it remembers nothing is not evidence that it cannot retrieve another case.
 
@@ -810,7 +810,7 @@ At the shell prompt, enter:
 claude
 ```
 
-Once `Claude` is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project instructions and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Once `Claude` is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
 ![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language requests. Exit to return to the shell, where just figures runs saved code without an LLM."}
 
