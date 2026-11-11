@@ -2,7 +2,7 @@
 title: "Appendix E. Terminal vocabulary"
 ---
 
-Many terminal terms describe physical equipment that software has replaced. Knowing that history makes the names less arbitrary. This appendix explains the terms used in the [terminal chapter](#terminal-agents) and in tool diagnostics; you do not need to memorize them before working with an agent.
+Many terminal terms describe physical equipment that software has replaced. Knowing that history makes the names less arbitrary. This appendix explains the terms used in [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) and in tool diagnostics; you do not need to memorize them before working with an agent.
 
 ## From a device to a window
 
@@ -14,7 +14,7 @@ The abbreviation *TTY*, from teletype, remained in computing. A modern *terminal
 
 ## The program receiving your commands
 
-A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [Bash](https://www.gnu.org/software/bash/) and [zsh](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for input; another program started from the shell may display its own interface until you exit it.
+A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for input; another program started from the shell may display its own interface until you exit it.
 
 A [*pseudo-terminal*, or PTY](https://man7.org/linux/man-pages/man7/pty.7.html), is a software connection that behaves like a terminal for the program using it. Programs can behave differently when connected to a terminal than when reading from a file or another process. That distinction matters for the specifically observed [R-on-macOS problem](#r-on-macos), but does not mean every unattended command needs a PTY.
 

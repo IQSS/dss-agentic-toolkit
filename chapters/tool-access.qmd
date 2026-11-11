@@ -4,17 +4,17 @@ title: "2. Control what added tools can access"
 
 Adding tools lets an agent carry out more of a research task without stopping for help. Configure those tools to use the files and accounts the task needs while protecting original inputs and unrelated work. The agent can set up and test the controls from your instructions.
 
-For a batch of model fits, the queue needs to read the analysis code and approved inputs, then save results and logs. It does not need to change the original data or read another study's files. A queue such as [pueue](https://github.com/Nukesor/pueue) runs work through a separate background service, so its access needs checking even if you have already restricted the agent's own commands.[^tk-pueue-process]
+For a batch of model fits, the queue needs to read the analysis code and approved inputs, then save results and logs. It does not need to change the original data or read another study's files. A queue such as [`pueue`](https://github.com/Nukesor/pueue) runs work through a separate background service, so its access needs checking even if you have already restricted the agent's own commands.[^tk-pueue-process]
 
 ## Check where the work runs
 
-In [Claude Code](https://code.claude.com/docs/en/overview), permission rules allow tool actions, require approval, or block them. A sandbox adds restrictions enforced by the operating system on programs running inside it. Written instructions explain how the agent should work, but do not enforce those restrictions.[^tk-access-controls]
+In [`Claude Code`](https://code.claude.com/docs/en/overview), permission rules allow tool actions, require approval, or block them. A sandbox adds restrictions enforced by the operating system on programs running inside it. Written instructions explain how the agent should work, but do not enforce those restrictions.[^tk-access-controls]
 
 ![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Direct commands run inside their sandbox; queued work runs through a separate service; connected operations use account access. Returned records can reach the agent. Built-in file tools have separate permission checks."}
 
 The built-in sandbox covers commands run inside it and the programs they start. It does not enclose every tool available to the agent. Built-in file tools have their own permission checks; connected services and separately running queue services need their own access controls. Have the agent identify the programs and accounts involved in the actual task.[^tk-sandbox-scope]
 
-A connection that only reads data can still return those data to the agent, which may send them to a hosted large language model (LLM). Decide which material may be sent before enabling the connection. The research guide explains [what reaches the LLM](https://dss-agentic-research.pages.dev/chapters/research-limits.html#what-reaches-the-llm) and [how to establish a chain of custody](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody).
+A connection that only reads data can still return those data to the agent, which may send them to a hosted large language model (LLM). Decide which material may be sent before enabling the connection. The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [what reaches the LLM](https://dss-agentic-research.pages.dev/chapters/research-limits.html#what-reaches-the-llm) and [how to establish a chain of custody](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody).
 
 ## Apply settings at the right scope
 
@@ -28,7 +28,7 @@ Use global settings for rules shared across your projects and project settings f
 
 For many settings, the personal project file overrides the shared project file, which overrides global defaults. Permission rules combine across those files: a matching deny takes precedence over an allow. Your institution can also enforce managed settings. Ask the agent to report which settings actually apply, including any session-specific overrides.[^tk-settings-scope]
 
-Keep secret values out of these files and saved command approvals. The [credential chapter](#credentials) explains how to supply them to the program that needs them.
+Keep secret values out of these files and saved command approvals. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to supply them to the program that needs them.
 
 ## Ask the agent to configure and check access
 
@@ -90,13 +90,13 @@ The sandbox must start successfully, and the example disables unsandboxed retrie
 
 If an operation is blocked, ask the agent to identify what it needs: a particular folder, a network destination, or access to the queue service. It should explain a specific change and its consequences. A command that runs outside the sandbox needs another arrangement that meets the project's access requirements.
 
-Where stronger separation is required, the agent can help configure an approved separate environment. The [container chapter](#containers) explains one option. Use the institution's support route when the necessary controls cannot be established in the current environment.
+Where stronger separation is required, the agent can help configure an approved separate environment. [Chapter 10: Run work in a separate environment: containers](#containers) explains one option. Use the institution's support route when the necessary controls cannot be established in the current environment.
 
-Repeat relevant checks when you add a tool or change how work is run. If settings are maintained through another program, protect its source copy as well as the file the agent reads; [Appendix B](#understand-the-two-copies) explains the two locations.
+Repeat relevant checks when you add a tool or change how work is run. If settings are maintained through another program, protect its source copy as well as the file the agent reads; [Appendix B: Keep records of shared settings: chezmoi](#understand-the-two-copies) explains the two locations.
 
-[^tk-pueue-process]: [Pueue's documentation](https://github.com/Nukesor/pueue) describes its background service, working directories, and task environment. The conclusion about checking the service's access follows from that separate execution process; queue submission is not an access-control test.
+[^tk-pueue-process]: [`Pueue`'s documentation](https://github.com/Nukesor/pueue) describes its background service, working directories, and task environment. The conclusion about checking the service's access follows from that separate execution process; queue submission is not an access-control test.
 
-[^tk-access-controls]: Anthropic's [permission documentation](https://code.claude.com/docs/en/permissions) describes tool rules and their precedence. The research guide's [access chapter](https://dss-agentic-research.pages.dev/chapters/agent-access.html#enforce-those-limits) introduces the controls and defines the related terms.
+[^tk-access-controls]: Anthropic's [permission documentation](https://code.claude.com/docs/en/permissions) describes tool rules and their precedence. The research guide's [Chapter 4: Control what the agent can do](https://dss-agentic-research.pages.dev/chapters/agent-access.html#enforce-those-limits) introduces the controls and defines the related terms.
 
 [^tk-sandbox-scope]: Anthropic lists [what runs outside the sandbox](https://code.claude.com/docs/en/sandboxing#what-runs-outside-the-sandbox). A command merely sending a request to an existing service does not move that service inside the command's sandbox.
 

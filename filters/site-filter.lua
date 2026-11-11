@@ -159,11 +159,15 @@ return {
     Link = function(link)
       if link.target:match("^resources/") then
         link.target = "/" .. link.target
+        link.classes:insert("no-external")
         return link
       end
       local anchor = link.target:match("^#(.+)$")
       local target = anchor and anchors[anchor]
       if not target then return nil end
+      -- These destinations belong to this site. Quarto otherwise misclassifies
+      -- 127.0.0.1 preview URLs as external and opens them in new tabs.
+      link.classes:insert("no-external")
       -- Still on this page? Keep it a fragment so the browser scrolls instead of reloading.
       if this_page and target:match("/([^/]+)%.qmd") == this_page then
         link.target = "#" .. anchor

@@ -6,29 +6,29 @@ Give the agent the error message, the command that failed, and the expected outp
 
 | Symptom | Where to investigate |
 |---|---|
-| A command cannot be found | [Installation and command availability](#adding-tools) |
-| A queued job waits, fails, or leaves no expected output | [Queue status and outcomes](#job-queues) |
-| A restored environment differs from the original | [Language and package versions](#environments) |
-| A pipeline reruns too much or misses a changed input | [Declared dependencies](#pipeline-dependencies) |
-| Authentication fails | [Credential delivery in the actual execution environment](#credentials) |
-| A connection cannot retrieve the expected records | [MCP configuration and access](#service-connections) |
-| A browser task uses the wrong session or cannot see a page | [Browser profile and account](#browser-work) |
-| A programmatic agent run cannot authenticate or use a required tool | [Headless-run configuration](#headless-agents) |
-| A local LLM exhausts memory or returns unusable output | [Runtime resources and response checking](#local-models) |
-| R uses a core without producing output when launched by an agent on macOS | [The observed R issue](#r-on-macos) |
+| A command cannot be found | [Chapter 3: Install and manage tools with Homebrew](#adding-tools) |
+| A queued job waits, fails, or leaves no expected output | [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) |
+| A restored environment differs from the original | [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) |
+| A pipeline reruns too much or misses a changed input | [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) |
+| Authentication fails | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
+| A connection cannot retrieve the expected records | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
+| A browser task uses the wrong session or cannot see a page | [Chapter 14: Inspect and interact with a browser](#browser-work) |
+| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved requests](#headless-agents) |
+| A local LLM exhausts memory or returns unusable output | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
+| `R` uses a core without producing output when launched by an agent on macOS | [The observed `R` issue](#r-on-macos) |
 | A PDF build reports “No counter 'none' defined” | [The specific table fix](#tex-table-counter) |
 | A project stalls while cloud storage processes many generated files | [Cloud-synchronized storage](#cloud-sync-storage) |
 
 ## R launched by an agent on macOS {#r-on-macos}
 
-In the environment used to develop these guides, [R](https://www.r-project.org/) has sometimes stalled when an agent starts it without a terminal connection. The process uses a processor core but produces no output. This is an observed macOS issue, not a claim about every R installation or operating system. A *pseudo-terminal*, a software-created terminal connection, has provided a dependable workaround in that environment.
+In the environment used to develop these guides, [`R`](https://www.r-project.org/) has sometimes stalled when an agent starts it without a terminal connection. The process uses a processor core but produces no output. This is an observed macOS issue, not a claim about every `R` installation or operating system. A *pseudo-terminal*, a software-created terminal connection, has provided a dependable workaround in that environment.
 
-Have the agent put the workaround in one executable helper, `bin/rscript-pty`, and route the project's R commands through it. Keep the helper's standard-input handling intact. For [targets](https://docs.ropensci.org/targets/), use `callr_function = NULL` and disable [crew](https://wlandau.github.io/crew/) for the initial check so the work stays in the process with the terminal connection. Separately launched workers need their own verification.
+Have the agent put the workaround in one executable helper, `bin/rscript-pty`, and route the project's `R` commands through it. Keep the helper's standard-input handling intact. For [`targets`](https://docs.ropensci.org/targets/), use `callr_function = NULL` and disable [`crew`](https://wlandau.github.io/crew/) for the initial check so the work stays in the process with the terminal connection. Separately launched workers need their own verification.
 
-[Download the macOS R helper](resources/rscript-pty){.download-button download="rscript-pty"}
+[Download the macOS `R` helper](resources/rscript-pty){.download-button download="rscript-pty"}
 
 <details class="guide-example">
-<summary>Read the complete macOS R helper</summary>
+<summary>Read the complete macOS `R` helper</summary>
 
 ```sh
 #!/bin/sh
@@ -43,19 +43,19 @@ Have the agent save it as `bin/rscript-pty`, make it executable, and verify it t
 
 </details>
 
-Retain the helper for queued R jobs too. Earlier success with a particular queue or worker configuration does not establish that another configuration will behave the same way. Check the actual execution route, the expected artifact, and whether the process finishes before scaling up. If a process stalls, identify it and examine progress before stopping it; do not launch replacements that leave the old jobs consuming resources.
+Retain the helper for queued `R` jobs too. Earlier success with a particular queue or worker configuration does not establish that another configuration will behave the same way. Check the actual execution route, the expected artifact, and whether the process finishes before scaling up. If a process stalls, identify it and examine progress before stopping it; do not launch replacements that leave the old jobs consuming resources.
 
-If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly approved execution route or run the saved command from your own application. Do not silently turn off the restrictions. For [Quarto](https://quarto.org/) that executes R, the macOS workaround wraps the complete render:
+If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly approved execution route or run the saved command from your own application. Do not silently turn off the restrictions. For [`Quarto`](https://quarto.org/) that executes `R`, the macOS workaround wraps the complete render:
 
 ```text
 script -q /dev/null quarto render paper.qmd < /dev/null
 ```
 
-Linux uses a different `script` interface, so this command should not be copied unchanged there. [Terminal vocabulary](#terminal-history) explains the connection without requiring a shell-programming lesson.
+Linux uses a different `script` interface, so this command should not be copied unchanged there. [Appendix E: Terminal vocabulary](#terminal-history) explains the connection without requiring a shell-programming lesson.
 
 ## Captionless tables with TeX Live 2026 {#tex-table-counter}
 
-A PDF build in these guides encountered “No counter 'none' defined” for a captionless table. [Pandoc](https://pandoc.org/) emitted a table setting that the installed [LaTeX](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template preamble, before the document begins:
+A PDF build in these guides encountered “No counter 'none' defined” for a captionless table. [`Pandoc`](https://pandoc.org/) emitted a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template preamble, before the document begins:
 
 ```tex
 \makeatletter
@@ -67,10 +67,10 @@ The guard preserves a counter if it already exists. Have the agent rebuild and i
 
 ## Cloud-synchronized project storage {#cloud-sync-storage}
 
-Software environments, caches, logs, and repository internals can contain many rapidly changing files. Synchronizing them through a cloud folder can create substantial churn and, in the Dropbox/macOS environment used for these guides, has sometimes blocked file operations. A git ignore rule controls what git records; it does not control what Dropbox synchronizes.
+Software environments, caches, logs, and repository internals can contain many rapidly changing files. Synchronizing them through a cloud folder can create substantial churn and, in the Dropbox/macOS environment used for these guides, has sometimes blocked file operations. A `git` ignore rule controls what `git` records; it does not control what `Dropbox` synchronizes.
 
-Ask the agent to distinguish authored material from files that can be rebuilt. Keep dependency records and source files with the project, while placing large rebuildable environments and caches outside the synchronized tree where practical. If a provider-specific exclusion is used, configure and verify it on an empty directory before filling that directory. Check the provider and platform: [Dropbox documents different mechanisms](https://help.dropbox.com/sync/ignored-files), and these settings are not interchangeable across systems.
+Ask the agent to distinguish authored material from files that can be rebuilt. Keep dependency records and source files with the project, while placing large rebuildable environments and caches outside the synchronized tree where practical. If a provider-specific exclusion is used, configure and verify it on an empty directory before filling that directory. Check the provider and platform: [`Dropbox` documents different mechanisms](https://help.dropbox.com/sync/ignored-files), and these settings are not interchangeable across systems.
 
 For an already populated or stalled directory, preserve the work and diagnose its synchronization state before changing exclusions. Retrospectively applying an exclusion is not the recovery procedure used here. Rebuild a disposable environment outside the synchronized location from its recorded dependencies, then reconnect the project to it. Preserve source, uncommitted work, and repository history when planning any move; do not treat a repository as a disposable cache.
 
-The agent should verify the project's commands after changing locations and explain which material is still backed up. Excluding generated files from synchronization does not itself create a backup or a reproducible environment. [Chapter 8](#environments) covers the records needed to restore software.
+The agent should verify the project's commands after changing locations and explain which material is still backed up. Excluding generated files from synchronization does not itself create a backup or a reproducible environment. [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) covers the records needed to restore software.

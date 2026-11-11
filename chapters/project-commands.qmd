@@ -6,13 +6,13 @@ aliases:
 
 <!-- aliases: runnable-checks -->
 
-A command runner gives names to tasks a project repeats. [Just](https://just.systems/) saves those commands in a small text file called a `justfile`. The agent can use them while developing the analysis, and you or a collaborator can run them later without asking an LLM to reconstruct the steps.
+A command runner gives names to tasks a project repeats. [`Just`](https://just.systems/) saves those commands in a small text file called a `justfile`. The agent can use them while developing the analysis, and you or a collaborator can run them later without asking an LLM to reconstruct the steps.
 
-In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), changing a figure label should not require fitting the statistical model again. A figure command can read the saved estimates and regenerate the plot. A separate command can refit a selected specification when the analysis changes.
+In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), changing a figure label should not require fitting the statistical model again. A figure command can read the saved estimates and regenerate the plot. A separate command can refit a selected specification when the analysis changes.
 
 ## Give the commands useful work
 
-The analysis needs independently runnable steps with explicit inputs and saved outputs. A step might fit one specification, produce a figure, or build the manuscript. Shared functions can support several steps. The research guide's [modular-workflow chapter](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) explains how to organize that work.
+The analysis needs independently runnable steps with explicit inputs and saved outputs. A step might fit one specification, produce a figure, or build the manuscript. Shared functions can support several steps. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the research guide explains how to organize that work.
 
 Installing just does not create this structure. Have the agent inspect the current analysis and preserve its working results before reorganizing it. Each command should then select a coherent task without quietly repeating unrelated computation.
 
@@ -42,10 +42,10 @@ A *smoke test* runs a small representative workload through the actual workflow 
 
 []{#runnable-checks}
 
-Execution checks and scientific checks answer different questions. A working pipeline can still implement the wrong analysis. Keep checks derived from the research specification runnable too, such as a join that must preserve observation counts. The research guide covers [simulation against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
+Execution checks and scientific checks answer different questions. A working pipeline can still implement the wrong analysis. Keep checks derived from `SPECIFICATION.md` runnable too, such as a join that must preserve observation counts. The command runner executes those checks; the specification states the research requirements. For scientific checks, see the research guide’s [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
 
 ## Combine command and dependency runners
 
-[Make](https://www.gnu.org/software/make/), [targets](https://docs.ropensci.org/targets/), and [Snakemake](https://snakemake.readthedocs.io/) can track dependencies and determine which work needs repeating. Just provides named commands; it does not perform that dependency analysis. A `just build` recipe can invoke targets or Snakemake, while other recipes open a preview or run quick checks.
+[`Make`](https://www.gnu.org/software/make/), [`targets`](https://docs.ropensci.org/targets/), and [`Snakemake`](https://snakemake.readthedocs.io/) can track dependencies and determine which work needs repeating. `Just` provides named commands; it does not perform that dependency analysis. A `just build` recipe can invoke `targets` or `Snakemake`, while other recipes open a preview or run quick checks.
 
-[Chapter 9](#pipeline-dependencies) explains selective rebuilding. [Chapter 6](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing Make setup or master do-file if it already supplies the required behavior.
+[Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains selective rebuilding. [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing `Make` setup or master do-file if it already supplies the required behavior.

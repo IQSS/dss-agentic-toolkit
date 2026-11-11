@@ -8,11 +8,11 @@ aliases:
 
 A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language requests to the agent, then run the saved project commands directly when you want to repeat a task.
 
-For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a saved [just](https://just.systems/) recipe, `just figures`, regenerates the figure without asking the large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
+For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a saved [`just`](https://just.systems/) recipe, `just figures`, regenerates the figure without asking the large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
 
 ## Open the project in a terminal
 
-A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands entered there. On a Mac, open Terminal through Spotlight. For this guide's Windows route, open Ubuntu in [WSL2](https://learn.microsoft.com/windows/wsl/) through [Windows Terminal](https://learn.microsoft.com/windows/terminal/). An Ubuntu shell and a PowerShell tab are different environments; these examples use the former.
+A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands entered there. On a Mac, open `Terminal` through Spotlight. For this guide's Windows route, open Ubuntu in [`WSL2`](https://learn.microsoft.com/windows/wsl/) through [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/). An Ubuntu shell and a `PowerShell` tab are different environments; these examples use the former.
 
 The shell has a *working directory*: the folder used to resolve paths that do not start from the top of the filesystem. Type `cd`, followed by your project's path, to change to it. Replace the example path below with the actual location and keep the quotes if it contains spaces:
 
@@ -20,11 +20,11 @@ The shell has a *working directory*: the folder used to resolve paths that do no
 cd "/Users/your-name/Research/my-project"
 ```
 
-The command `pwd` displays the current directory. You can ask the agent in the app for the exact `cd` command if you do not know the path. [Terminal vocabulary](#terminal-history) explains these terms further; no additional terminal setup is needed to continue.
+The command `pwd` displays the current directory. You can ask the agent in the app for the exact `cd` command if you do not know the path. [Appendix E: Terminal vocabulary](#terminal-history) explains these terms further; no additional terminal setup is needed to continue.
 
 ## Start a conversation with the agent
 
-Have the agent check whether the [Claude Code](https://code.claude.com/docs/en/overview) command-line interface is installed. The desktop app and the `claude` command are separate entry points; installing one does not establish that the other is available. The agent can prepare the installation using the current [platform instructions](https://code.claude.com/docs/en/quickstart), with any personal sign-in or authorization completed by you.
+Have the agent check whether the [`Claude Code`](https://code.claude.com/docs/en/overview) command-line interface is installed. The desktop app and the `claude` command are separate entry points; installing one does not establish that the other is available. The agent can prepare the installation using the current [platform instructions](https://code.claude.com/docs/en/quickstart), with any personal sign-in or authorization completed by you.
 
 At the shell prompt, enter:
 
@@ -32,24 +32,24 @@ At the shell prompt, enter:
 claude
 ```
 
-Once Claude is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project instructions and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Once `Claude` is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project instructions and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
 ![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language requests. Exit to return to the shell, where just figures runs saved code without an LLM."}
 
-The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The [access settings](#tool-access) still apply. If the selected LLM is hosted, information supplied to it is still sent to the provider even though you are using a local terminal.
+The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the selected LLM is hosted, information supplied to it is still sent to the provider even though you are using a local terminal.
 
 ## Run a saved command
 
-If the project has a [just](https://just.systems/) command menu, these commands list its available recipes and run the figure recipe:
+If the project has a [`just`](https://just.systems/) command menu, these commands list its available recipes and run the figure recipe:
 
 ```text
 just --list
 just figures
 ```
 
-Enter these at the shell prompt, after leaving the agent. The figure recipe must already exist; ask the agent to create or explain it using [chapter 5](#project-commands). You do not need to remember the underlying analysis commands because the project has saved them.
+Enter these at the shell prompt, after leaving the agent. The figure recipe must already exist; ask the agent to create or explain it using [Chapter 5: Give research tasks reliable commands: just](#project-commands). You do not need to remember the underlying analysis commands because the project has saved them.
 
-You can also ask the agent to install a missing tool. With [Homebrew](https://brew.sh/) available, `brew install just` is the corresponding installation command. The [package-manager chapter](#adding-tools) explains setup. A “command not found” message can mean that the program is absent or that this shell cannot locate it; have the agent distinguish those causes before reinstalling anything.
+You can also ask the agent to install a missing tool. With [`Homebrew`](https://brew.sh/) available, `brew install just` is the corresponding installation command. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains setup. A “command not found” message can mean that the program is absent or that this shell cannot locate it; have the agent distinguish those causes before reinstalling anything.
 
 ## Find session controls
 
@@ -63,6 +63,6 @@ While the agent is running, slash commands control the session. The [interactive
 | `/usage` | Show account-usage information |
 | `/exit` | Return to the shell |
 
-The research guide explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with the [tool-access chapter](#tool-access), since they govern different mechanisms. Before ending a session, have the agent save important decisions and next steps in the project records.
+The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent update `STATUS.md` and `TASKS.md` from checked work. For an approved scientific change, it should also rewrite the affected `SPECIFICATION.md` requirements and add the decision and reason at the top of `METHODOLOGY.md`.
 
-Use the [queue workflow](#job-queues) for unattended computation and [saved agent requests](#headless-agents) for programmatic LLM work. An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A](#working-environment).
+For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved requests](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).

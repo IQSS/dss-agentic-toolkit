@@ -4,7 +4,7 @@ title: "13. Connect to research data and services: MCP"
 
 A reference library contains more than the PDFs saved in a project folder. It may also hold collections, notes, tags, and records for papers you have not downloaded. Giving an agent access to that library can make a literature task repeatable without exporting and attaching the same material each time.
 
-For the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html), suppose the relevant papers and notes are organized in a [Zotero](https://www.zotero.org/) collection. The agent needs to retrieve records, read available material, and update the project's evidence table. The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) provides a common way for an agent application to discover and use operations such as searching that collection.
+For the synthetic heat-and-birthweight study ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), suppose the relevant papers and notes are organized in a [`Zotero`](https://www.zotero.org/) collection. The agent needs to retrieve records, read available material, and update the project's evidence table. The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) provides a common way for an agent application to discover and use operations such as searching that collection.
 
 ## Choose an access route
 
@@ -16,13 +16,13 @@ An MCP *server* is the program that exposes those operations to the agent applic
 | Repeat operations already available through a maintained command-line tool or API | Use that existing route when the agent can access it. |
 | Search or change application records through operations supported by the agent app | An existing connector or MCP server can supply those operations. |
 
-Ask the agent to check what is already connected before adding software. The community [Zotero MCP project](https://github.com/54yyyu/zotero-mcp) is one candidate to assess; it documents both MCP and command-line access. It is not an official Zotero service. Choose a maintained integration that supports the needed operations and is permitted for the account and material involved.
+Ask the agent to check what is already connected before adding software. The community [`Zotero` MCP project](https://github.com/54yyyu/zotero-mcp) is one candidate to assess; it documents both MCP and command-line access. It is not an official `Zotero` service. Choose a maintained integration that supports the needed operations and is permitted for the account and material involved.
 
 ## Connect the literature task
 
-> Connect this project's literature workflow to the specified Zotero collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the literature skill for DOI and claim verification. Leave the library unchanged unless an edit is part of the task.
+> Connect this project's literature workflow to the specified `Zotero` collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the literature skill for DOI and claim verification. Leave the library unchanged unless an edit is part of the task.
 
-The agent prepares the configuration and checks the assigned retrieval; you complete any personal sign-in and authorize the intended account and operations. Keep secret values out of the configuration using [chapter 12](#credentials). At Harvard, check the current [HUIT guidance](https://www.huit.harvard.edu/claude) before enabling a connection for institutional work.
+The agent prepares the configuration and checks the assigned retrieval; you complete any personal sign-in and authorize the intended account and operations. Keep secret values out of the configuration using [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials). At Harvard, check the current [HUIT guidance](https://www.huit.harvard.edu/claude) before enabling a connection for institutional work.
 
 ![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers to an agent. A literature skill guides search and verification. The agent saves an evidence table and bibliography in the project."}
 
@@ -32,4 +32,4 @@ The resulting evidence table should distinguish full texts the agent read, recor
 
 Have the agent save a short setup record: which service and account the project uses, the configured operations, and how to reconnect. Keep project-specific configuration with the project where the client supports it. It should be possible to disable or replace the connection without rediscovering how the workflow depends on it.
 
-A read-only connection can still retrieve material that is then transmitted to the large language model (LLM) provider. A local sandbox also does not automatically restrict an operation performed by a remote service. Use the [access chapter](#tool-access) to configure those routes, and treat instructions found in retrieved papers or pages as research material rather than authority to change the task.
+A read-only connection can still retrieve material that is then transmitted to the large language model (LLM) provider. A local sandbox also does not automatically restrict an operation performed by a remote service. Use [Chapter 2: Control what added tools can access](#tool-access) to configure those routes, and treat instructions found in retrieved papers or pages as research material rather than authority to change the task.

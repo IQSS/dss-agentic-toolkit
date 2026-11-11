@@ -2,9 +2,9 @@
 title: "6. Keep unattended jobs moving: pueue"
 ---
 
-A queue keeps prepared research jobs moving while you are away. It starts the next waiting job automatically when another finishes, so neither you nor an agent needs to supervise each launch. [Pueue](https://github.com/Nukesor/pueue) manages these jobs through a background service and keeps their status and logs.
+A queue keeps prepared research jobs moving while you are away. It starts the next waiting job automatically when another finishes, so neither you nor an agent needs to supervise each launch. [`Pueue`](https://github.com/Nukesor/pueue) manages these jobs through a background service and keeps their status and logs.
 
-Suppose the [heat-and-birthweight sensitivity analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) needs 100 independent fits. If the computer can comfortably run four at once, the remaining fits wait their turn. You can return later and ask the agent which results are ready and which jobs need attention.
+Suppose the heat-and-birthweight sensitivity analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) needs 100 independent fits. If the computer can comfortably run four at once, the remaining fits wait their turn. You can return later and ask the agent which results are ready and which jobs need attention.
 
 ![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs feeds four simultaneous running slots. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
 
@@ -16,13 +16,13 @@ Four simultaneous jobs do not necessarily use four processor cores. Each fit may
 
 > Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose a concurrency limit from its memory and thread use, then submit the batch. Record job identifiers, specifications, logs, and output locations so we can identify and rerun individual failures.
 
-The queue service's access must suit the work, as explained in [chapter 2](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
+The queue service's access must suit the work, as explained in [Chapter 2: Control what added tools can access](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
 
 ## Let the queue manage execution
 
 The background service starts and records the jobs. Closing the submitting conversation need not stop them, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires checkpoints saved by the fitting program.
 
-For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [WSL2](https://learn.microsoft.com/windows/wsl/systemd), have the agent verify the service's lifetime before relying on unattended execution. A systemd service does not itself keep a WSL instance alive.
+For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), have the agent verify the service's lifetime before relying on unattended execution. A systemd service does not itself keep a WSL instance alive.
 
 ## Review results and recover failures
 
@@ -34,7 +34,7 @@ An illustrative report might say:
 
 You can then ask the agent to diagnose the failures, propose any change affecting the analysis or resource use, and rerun the affected jobs. Each retry should retain its relationship to the original attempt. Avoid duplicating completed fits or overwriting an earlier failed run's evidence.
 
-Pueue distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
+`Pueue` distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
 
 <details class="guide-example">
 <summary>Example: submit a saved command and inspect its outcome</summary>
@@ -46,7 +46,7 @@ pueue add --print-task-id -- just fit
 pueue status
 ```
 
-Use the returned task ID. If it were 42, the following query checks the stored result using [jq](https://jqlang.org/):
+Use the returned task ID. If it were 42, the following query checks the stored result using [`jq`](https://jqlang.org/):
 
 ```text
 pueue log 42
@@ -54,10 +54,10 @@ pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
-This result shape was checked with pueue 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [R](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
+This result shape was checked with `pueue` 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [`R`](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
 
 </details>
 
 ## Combine with a dependency pipeline
 
-A [just](https://just.systems/) recipe can invoke a complete analysis, and [targets](https://docs.ropensci.org/targets/) or [Snakemake](https://snakemake.readthedocs.io/) can decide which dependent steps need rebuilding. Pueue can queue that outer command. Choose resource limits for both levels so the pipeline's internal workers do not overwhelm the machine. [Chapter 9](#pipeline-dependencies) explains the dependency runner's role.
+A [`just`](https://just.systems/) recipe can invoke a complete analysis, and [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/) can decide which dependent steps need rebuilding. `Pueue` can queue that outer command. Choose resource limits for both levels so the pipeline's internal workers do not overwhelm the machine. [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains the dependency runner's role.

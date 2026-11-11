@@ -4,7 +4,7 @@ title: "Appendix C. Account-usage tools"
 
 Start with the usage display in the app you already use. It is usually the quickest way to see the account's reported limits and reset information. An additional tool becomes useful when you want a history the app does not show, such as which recorded sessions accounted for most of the week's usage.
 
-[Ccusage](https://ccusage.com/) summarizes compatible retained local logs. Its reports can help investigate patterns, but they do not replace the account's official usage display or bill. Ask the agent to identify what the available records can actually answer before installing another reporting tool.
+[`Ccusage`](https://ccusage.com/) summarizes compatible retained local logs. Its reports can help investigate patterns, but they do not replace the account's official usage display or bill. Ask the agent to identify what the available records can actually answer before installing another reporting tool.
 
 | Question | Appropriate source | Limitation |
 |---|---|---|
@@ -18,4 +18,4 @@ Start with the usage display in the app you already use. It is usually the quick
 
 The agent should check the [current tool documentation](https://ccusage.com/guide/) and available log formats. A session absent from the report may have been deleted, stored elsewhere, or recorded in an unsupported format. State those gaps rather than interpreting absence as zero use.
 
-A long statistical-model fit on your computer does not consume LLM tokens simply because time passes. Asking an agent for repeated updates or sending it large logs can generate additional LLM calls. If the report identifies that pattern, use saved job records and the [queue workflow](#job-queues) to retrieve useful summaries. The research guide explains [context and usage choices](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context).
+A long statistical-model fit on your computer does not consume LLM tokens simply because time passes. Asking an agent for repeated updates or sending it large logs can generate additional LLM calls. If the report identifies that pattern, use saved job records to retrieve useful summaries, following [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [context and usage choices](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context).

@@ -4,18 +4,18 @@ title: "8. Preserve a software environment: rig, renv, and uv"
 
 An analysis can change when its software changes. Recording the language and package versions lets the agent restore the earlier environment before investigating a different result or handing the project to a collaborator.
 
-Suppose a collaborator reruns the [synthetic heat-and-birthweight analysis](https://dss-agentic-research.pages.dev/chapters/example-project.html) and obtains different intervals. The agent needs the original software records to determine whether the discrepancy follows from an environment change. Installing the latest releases would give it a different comparison.
+Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs the original software records to determine whether the discrepancy follows from an environment change. Installing the latest releases would give it a different comparison.
 
 ## Record the language and packages
 
-The *runtime* is the installed language interpreter, such as a particular release of R or Python. Packages provide additional functions used by the analysis. A *lockfile* records resolved package versions and their dependencies so they can be restored together.
+The *runtime* is the installed language interpreter, such as a particular release of `R` or Python. Packages provide additional functions used by the analysis. A *lockfile* records resolved package versions and their dependencies so they can be restored together.
 
-| Responsibility | R | Python |
+| Responsibility | `R` | `Python` |
 |---|---|---|
-| Install and select the language | [rig](https://rig.r-lib.org/) manages [R](https://www.r-project.org/) installations. | [uv](https://docs.astral.sh/uv/) manages [Python](https://www.python.org/) installations; `.python-version` records a selection. |
-| Record and restore packages | [renv](https://rstudio.github.io/renv/) maintains `renv.lock`. | uv maintains `pyproject.toml` and `uv.lock`. |
+| Install and select the language | [`rig`](https://rig.r-lib.org/) manages [`R`](https://www.r-project.org/) installations. | [`uv`](https://docs.astral.sh/uv/) manages [`Python`](https://www.python.org/) installations; `.python-version` records a selection. |
+| Record and restore packages | [`renv`](https://rstudio.github.io/renv/) maintains `renv.lock`. | `uv` maintains `pyproject.toml` and `uv.lock`. |
 
-Renv records the R version but does not install or switch R itself. Rig supplies that capability. Uv handles both language and package management, but the records still serve different purposes.
+Renv records the `R` version but does not install or switch `R` itself. Rig supplies that capability. Uv handles both language and package management, but the records still serve different purposes.
 
 ![](figures/research-environments.svg){#fig-research-environments fig-alt="Language version and package dependencies have separate records. Rig and renv support R; uv supports Python. Restore both records and check a baseline output."}
 
@@ -25,18 +25,18 @@ For a new project, have the agent establish version records alongside the analys
 
 > Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected baseline checks. Report missing software and any changed results.
 
-Keep a functioning environment manager. [Conda](https://docs.conda.io/) environments can include language packages and other compiled software. [Micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) is a small command-line manager for conda environments; the agent can use it when that matches the project's scientific software. A project already using [pixi](https://pixi.sh/) need not migrate to uv. Ask for exact package/build records appropriate to that manager and target platform; a loose list of package names does not reproduce an earlier resolution.
+Keep a functioning environment manager. [`Conda`](https://docs.conda.io/) environments can include language packages and other compiled software. [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) is a small command-line manager for conda environments; the agent can use it when that matches the project's scientific software. A project already using [`pixi`](https://pixi.sh/) need not migrate to uv. Ask for exact package/build records appropriate to that manager and target platform; a loose list of package names does not reproduce an earlier resolution.
 
-[Stata](https://www.stata.com/) projects also need their Stata release and community-command versions recorded. These tools do not require researchers to change language.
+[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded. These tools do not require researchers to change language.
 
 ## Restore and check it
 
-Have the agent restore into a separate environment and run the project's [smoke test](#smoke-tests) or selected baseline analysis. For R, it can check the restored library against `renv.lock`; for uv, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
+Have the agent restore into a separate environment and run the project's [smoke test](#smoke-tests) or selected baseline analysis. For `R`, it can check the restored library against `renv.lock`; for `uv`, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
 
 The completion report should identify the runtime actually used, whether packages restored, and which baseline outputs were compared. Missing packages or platform-specific failures are findings to resolve, not reasons to replace versions without recording the change. When adding a package later, retain the updated dependency record and check the affected analysis.
 
 ## Include system requirements
 
-Some packages depend on system libraries, compilers, or external programs. Record those requirements too. [Containers](#containers) can help package system software when language/package records are insufficient. Neither approach promises identical numerical results on all hardware.
+Some packages depend on system libraries, compilers, or external programs. Record those requirements too. Containers can help package system software when language/package records are insufficient; see [Chapter 10: Run work in a separate environment: containers](#containers). Neither approach promises identical numerical results on all hardware.
 
-Store environment records with the project, while keeping generated libraries out of git and unnecessary cloud synchronization. [Appendix D](#cloud-sync-storage) describes the Dropbox procedure and the separate [R/macOS execution issue](#r-on-macos).
+Store environment records with the project, while keeping generated libraries out of `git` and unnecessary cloud synchronization. [Appendix D: Troubleshooting](#cloud-sync-storage) describes the `Dropbox` procedure and the separate [R/macOS execution issue](#r-on-macos).

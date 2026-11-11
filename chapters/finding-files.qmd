@@ -4,17 +4,17 @@ title: "7. Find and inspect project files"
 
 Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
 
-Suppose a reviewer asks how `hot_days` enters the analysis. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [Ripgrep (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. Ripgrep is the program's name; `rg` is its command.
+Suppose a reviewer asks how `hot_days` enters the analysis. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`Ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `Ripgrep` is the program's name; `rg` is its command.
 
 ## Choose the appropriate search
 
 | Task | Tool | Useful result |
 |---|---|---|
-| Search text within project files | ripgrep (`rg`) | Matching passages with file paths and line numbers. |
-| Locate files by name or type | [fd](https://github.com/sharkdp/fd) | A focused list of candidate files. |
-| Query JSON | [jq](https://jqlang.org/) | Selected fields from a structured response. |
-| Query or edit YAML | [yq](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
-| Inspect source text | [bat](https://github.com/sharkdp/bat) | Readable excerpts with line numbers and syntax highlighting. |
+| Search text within project files | `ripgrep` (`rg`) | Matching passages with file paths and line numbers. |
+| Locate files by name or type | [`fd`](https://github.com/sharkdp/fd) | A focused list of candidate files. |
+| Query JSON | [`jq`](https://jqlang.org/) | Selected fields from a structured response. |
+| Query or edit YAML | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
+| Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers and syntax highlighting. |
 
 The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job. JSON and YAML queries use the document's structure, which is more dependable than searching for a word and assuming the adjacent text has the intended meaning.
 
@@ -28,6 +28,6 @@ An illustrative answer could identify `code/exposure.R` as the construction step
 
 ## Investigate a missing match
 
-Ripgrep ordinarily skips ignored and hidden files. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. A name assembled by code or stored in a binary file may need a different investigation. Search exclusions reduce noise; they are not file-access restrictions.
+`Ripgrep` ordinarily skips ignored and hidden files. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. A name assembled by code or stored in a binary file may need a different investigation. Search exclusions reduce noise; they are not file-access restrictions.
 
-For a structured response, distinguish a missing field from an explicit null value. The linked yq is Mike Farah's implementation; other programs use that name. Some Linux distributions also name fd and bat differently. Have the agent identify the available program and its behavior, then record useful tool conventions for future sessions.
+For a structured response, distinguish a missing field from an explicit null value. The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions also name `fd` and `bat` differently. Have the agent identify the available program and its behavior, then record useful tool conventions for future sessions.

@@ -2,17 +2,17 @@
 title: "3. Install and manage tools with Homebrew"
 ---
 
-A package manager installs software and its supporting components, then provides a consistent way to update or remove it. [Homebrew](https://brew.sh/) supplies many tools in this guide. Once it is installed, an agent can add the program a research task needs without taking you through a different website and installer each time.
+A package manager installs software and its supporting components, then provides a consistent way to update or remove it. [`Homebrew`](https://brew.sh/) supplies many tools in this guide. Once it is installed, an agent can add the program a research task needs without taking you through a different website and installer each time.
 
-Suppose you want a batch of simulations to continue while you are away. The agent can install [pueue](https://github.com/Nukesor/pueue) with Homebrew, then configure the queue for the project. Installing the program makes it available; setting up the queue makes it useful for your work.
+Suppose you want a batch of simulations to continue while you are away. The agent can install [`pueue`](https://github.com/Nukesor/pueue) with `Homebrew`, then configure the queue for the project. Installing the program makes it available; setting up the queue makes it useful for your work.
 
 ## Ask the agent to install the tool
 
-Start from the app and describe the task. The agent should check whether the tool and Homebrew are already available in the environment where it will run. If Homebrew is missing, it can identify the supported installation route and explain any step you must complete personally.
+Start from the app and describe the task. The agent should check whether the tool and `Homebrew` are already available in the environment where it will run. If `Homebrew` is missing, it can identify the supported installation route and explain any step you must complete personally.
 
-> Check whether Homebrew and pueue are available where this project runs. Install what is missing through the appropriate route, keeping the existing installation where it works. Explain any password or sign-in step I must complete. Confirm that you can run pueue from this session, then configure it for the project's simulation jobs.
+> Check whether `Homebrew` and `pueue` are available where this project runs. Install what is missing through the appropriate route, keeping the existing installation where it works. Explain any password or sign-in step I must complete. Confirm that you can run `pueue` from this session, then configure it for the project's simulation jobs.
 
-The installation command for pueue is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. Homebrew's [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If a personal step requires Terminal, [chapter 18](#terminal-agents) explains how to open it.
+The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. `Homebrew`'s [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If a personal step requires `Terminal`, [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains how to open it.
 
 The useful completion report identifies the installed program, its version, and whether the agent can invoke it in the intended session. A program may already be installed but absent from that session's `PATH`, the directories searched for commands. Have the agent diagnose that before installing a second copy.
 
@@ -20,10 +20,10 @@ The useful completion report identifies the installed program, its version, and 
 
 ## Keep a record of installed tools
 
-A [Brewfile](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with Homebrew. Ask the agent to maintain it when a recoverable machine setup would help, and to record how the project uses its tools. A Brewfile does not pin the full software environment for an analysis; [chapter 8](#environments) covers language and package versions.
+A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with Homebrew. Ask the agent to maintain it when a recoverable machine setup would help, and to record how the project uses its tools. A Brewfile does not pin the full software environment for an analysis; [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) covers language and package versions.
 
 During ordinary work, have the agent check for an existing installation before adding software. When an update could affect a recorded analysis, it should preserve the working environment and explain the proposed change. Updates to a computer's tools and changes to a study's package versions serve different purposes.
 
 ## Use the installation route for your computer
 
-Keep an institutional package manager when it already supplies the required tools. Homebrew also supports Linux under its documented requirements. The Windows route in this guide uses Ubuntu through [Windows Subsystem for Linux (WSL2)](https://learn.microsoft.com/windows/wsl/install), so the agent must install and use the tools in the intended Linux environment. [Chapter 1](#choose-tools) explains the guide's platform scope.
+Keep an institutional package manager when it already supplies the required tools. `Homebrew` also supports Linux under its documented requirements. The Windows route in this guide uses Ubuntu through [`Windows Subsystem for Linux` (`WSL2`)](https://learn.microsoft.com/windows/wsl/install), so the agent must install and use the tools in the intended Linux environment. [Chapter 1: Choose tools for a research need](#choose-tools) explains the guide's platform scope.

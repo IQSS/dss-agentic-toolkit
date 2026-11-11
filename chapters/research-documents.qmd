@@ -2,15 +2,15 @@
 title: "11. Generate documents from research outputs: Quarto and Pandoc"
 ---
 
-A manuscript often reports the same result in a table, a figure, and a sentence. Building those locations from saved analysis outputs makes updates easier to carry through consistently. [Quarto](https://quarto.org/) and [Pandoc](https://pandoc.org/) let an agent maintain the source and regenerate the document in the required format.
+A manuscript often reports the same result in a table, a figure, and a sentence. Building those locations from saved analysis outputs makes updates easier to carry through consistently. [`Quarto`](https://quarto.org/) and [`Pandoc`](https://pandoc.org/) let an agent maintain the source and regenerate the document in the required format.
 
-In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), a revised estimate should reach both the results table and the text describing it. The agent can connect those locations to the saved result and rebuild the manuscript. Collaborators can still receive Word files or PDFs.
+In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), a revised estimate should reach both the results table and the text describing it. The agent can connect those locations to the saved result and rebuild the manuscript. Collaborators can still receive `Word` files or PDFs.
 
 ## Connect the document to saved results
 
 Keep the manuscript text, references, figures, and numerical results in known project locations. The document build should read the intended outputs and make clear whether it also runs analysis code. A figure or text revision need not trigger a new fit.
 
-Quarto combines authoring, code execution, and publishing configuration, using Pandoc for conversion. Pandoc can also convert maintained source directly. Ask the agent to use the route that fits the existing document and the required output, rather than replacing a working writing system solely to match this example.
+`Quarto` combines authoring, code execution, and publishing configuration, using `Pandoc` for conversion. `Pandoc` can also convert maintained source directly. Ask the agent to use the route that fits the existing document and the required output, rather than replacing a working writing system solely to match this example.
 
 ![](figures/document-production.svg){#fig-document-production fig-alt="Manuscript text, references, and saved results feed a Quarto or Pandoc build. Outputs include Word, HTML, and PDF through LaTeX. Accepted coauthor edits return to maintained source before another build."}
 
@@ -19,24 +19,27 @@ Quarto combines authoring, code execution, and publishing configuration, using P
 | Format | Typical purpose | Additional requirement |
 |---|---|---|
 | Markdown | Readable text source or a simple text deliverable. | Appropriate formatting and links. |
-| Word (`.docx`) | Editable drafts for coauthors. | Styles, optionally supplied by a reference document. |
-| PDF through LaTeX | Typeset manuscripts with equations and controlled layout. | A TeX distribution and required fonts. |
+| `Word` (`.docx`) | Editable drafts for coauthors. | Styles, optionally supplied by a reference document. |
+| PDF through `LaTeX` | Typeset manuscripts with equations and controlled layout. | A TeX distribution and required fonts. |
 | HTML | Reports, websites, and interactive material. | Web assets and inspection in a browser. |
 
-[LaTeX](https://www.latex-project.org/) is a typesetting system. A *TeX distribution* supplies the programs and packages needed to use it. For Quarto's PDF route, the agent can follow its [PDF setup](https://quarto.org/docs/output-formats/pdf-basics.html), which includes [TinyTeX](https://yihui.org/tinytex/). If no suitable distribution is installed, the agent can use `quarto install tinytex` and verify the chosen PDF engine. Keep a working [MacTeX](https://tug.org/mactex/) or [TeX Live](https://tug.org/texlive/) installation. Word and Markdown output do not require this PDF software.
+[`LaTeX`](https://www.latex-project.org/) is a typesetting system. A *TeX distribution* supplies the programs and packages needed to use it. For `Quarto`'s PDF route, the agent can follow its [PDF setup](https://quarto.org/docs/output-formats/pdf-basics.html), which includes [`TinyTeX`](https://yihui.org/tinytex/). If no suitable distribution is installed, the agent can use `quarto install tinytex` and verify the chosen PDF engine. Keep a working [`MacTeX`](https://tug.org/mactex/) or [`TeX Live`](https://tug.org/texlive/) installation. `Word` and Markdown output do not require this PDF software.
 
 ## Configure and inspect the build
 
-> Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and add a [just](https://just.systems/) command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
+> Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and add a [`just`](https://just.systems/) command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
 
-The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. The research guide's [manuscript chapter](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) explains the full check that the right numbers reach the paper.
+The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. [Chapter 18: Write and revise from the research record](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the research guide explains the full check that the right numbers reach the paper.
 
-Keep build settings and dependencies with the project. Quarto's [execution settings](https://quarto.org/docs/projects/code-execution.html) control reuse of previous outputs; the agent should document how the final analysis results are refreshed. Specific R and TeX failures belong in [Appendix D](#troubleshooting).
+Keep build settings and dependencies with the project. `Quarto`'s [execution settings](https://quarto.org/docs/projects/code-execution.html) control reuse of previous outputs; the agent should document how the final analysis results are refreshed. Specific `R` and TeX failures belong in [Appendix D: Troubleshooting](#troubleshooting).
 
 ## Bring coauthor edits back into the source
 
-If a collaborator edits the generated Word file, preserve that returned file before rebuilding. Ask the agent to compare it with the version sent, identify the edits, and incorporate accepted changes into the maintained source. Resolve conflicting scientific revisions before generating a replacement draft.
+If a collaborator edits the generated `Word` file, preserve that returned file before rebuilding. Ask the agent to compare it with the version sent, identify the edits, and incorporate accepted changes into the maintained source. Resolve conflicting scientific revisions before generating a replacement draft.
 
 > Preserve this coauthor's returned document. Compare it with the draft sent, transfer the accepted edits into the source, and flag unresolved changes to claims or results. Rebuild a new draft without overwriting the returned copy, then check that the accepted edits survived.
 
 Conversion cannot be assumed to preserve every comment or tracked change automatically. Establish which document is authoritative for the current editing stage and retain the source/reference files needed for the next build.
+
+
+If an accepted edit changes the analysis, have the agent update `SPECIFICATION.md` and add the decision and reason to `METHODOLOGY.md`. Rerun the affected analysis and checks before rebuilding the document; a successful document build alone does not establish that the reported results implement the revised requirements.

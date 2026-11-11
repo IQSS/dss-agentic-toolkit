@@ -2,9 +2,9 @@
 title: "9. Rerun only affected steps: targets and Snakemake"
 ---
 
-When an analysis changes, some results need rebuilding and others remain usable. A dependency-aware runner records those relationships and selects the work to repeat. [Targets](https://docs.ropensci.org/targets/) provides this for R workflows; [Snakemake](https://snakemake.readthedocs.io/) organizes file-producing steps that can use different languages. [Just](https://just.systems/) can remain the project's command interface: `just build` invokes the runner underneath.
+When an analysis changes, some results need rebuilding and others remain usable. A dependency-aware runner records those relationships and selects the work to repeat. [`Targets`](https://docs.ropensci.org/targets/) provides this for `R` workflows; [`Snakemake`](https://snakemake.readthedocs.io/) organizes file-producing steps that can use different languages. [`Just`](https://just.systems/) can remain the project's command interface: `just build` invokes the runner underneath.
 
-In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html), a figure-label change should reuse the saved fits. Changing specification B should rerun fit B and the combined figure, while reusing fit A. Changing the shared analysis data affects both fits. The runner needs those dependencies recorded to make the distinction.
+In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), a figure-label change should reuse the saved fits. Changing specification B should rerun fit B and the combined figure, while reusing fit A. Changing the shared analysis data affects both fits. The runner needs those dependencies recorded to make the distinction.
 
 ## Show the dependencies
 
@@ -12,17 +12,17 @@ In the [synthetic heat-and-birthweight project](https://dss-agentic-research.pag
 
 Have the agent identify each step's inputs, code, parameters, and outputs. External inputs count too: a script that reads an unrecorded file or an API response can produce a result the runner does not know is out of date. Save and declare those inputs according to the project's acquisition procedure.
 
-The [targets manual](https://books.ropensci.org/targets/) explains tracking objects, functions, and files. [Snakemake rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html) describe how inputs produce outputs. The agent writes and maintains the definitions; you check that the proposed relationships match the intended research workflow.
+The [targets manual](https://books.ropensci.org/targets/) explains tracking objects, functions, and files. [`Snakemake` rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html) describe how inputs produce outputs. The agent writes and maintains the definitions; you check that the proposed relationships match the intended research workflow.
 
 ## Connect the analysis
 
-> Preserve the current results and environment. Connect the analysis through targets for this R workflow, declaring its inputs, functions, files, and outputs. Keep just as the command interface. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the baseline.
+> Preserve the current results and environment. Connect the analysis through targets for this `R` workflow, declaring its inputs, functions, files, and outputs. Keep just as the command interface. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the baseline.
 
-For a workflow organized around files and multiple languages, request Snakemake instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
+For a workflow organized around files and multiple languages, request `Snakemake` instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
 
 ## Check what reruns
 
-The agent can inspect planned work with targets' `tar_outdated()` or a Snakemake dry run, then test the expected behavior on a representative workload. It should report which steps actually ran, which results were reused, and whether the outputs agree with the intended change.
+The agent can inspect planned work with targets' `tar_outdated()` or a `Snakemake` dry run, then test the expected behavior on a representative workload. It should report which steps actually ran, which results were reused, and whether the outputs agree with the intended change.
 
 A successful setup report might show that a label edit rebuilt only the figure and document, while changing specification B rebuilt that fit and its downstream outputs. Those are illustrative expectations, not findings from the example project. Full analysis runs and scientific checks remain separate from this execution check.
 
@@ -30,4 +30,4 @@ A successful setup report might show that a label edit rebuilt only the figure a
 
 The runner can reuse completed results after an interruption when they remain current. Restarting halfway through an unfinished fit requires checkpoints from that fitting program. Keep the definitions, environment records, and needed inputs with the project; large rebuildable caches need separate storage management.
 
-[Pueue](https://github.com/Nukesor/pueue) can queue the outer pipeline command, while the pipeline runner decides which steps need computation. Coordinate memory and threads across both. Targets can use [crew](https://wlandau.github.io/crew/) for parallel workers; the documented [R/macOS issue](#r-on-macos) requires checking the actual worker route before enabling it in an affected environment.
+[`Pueue`](https://github.com/Nukesor/pueue) can queue the outer pipeline command, while the pipeline runner decides which steps need computation. Coordinate memory and threads across both. `Targets` can use [`crew`](https://wlandau.github.io/crew/) for parallel workers; the documented [R/macOS issue](#r-on-macos) requires checking the actual worker route before enabling it in an affected environment.

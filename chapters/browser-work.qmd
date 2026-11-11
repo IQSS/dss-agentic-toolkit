@@ -8,7 +8,7 @@ The same access can help obtain data from a website. An agent might inspect a pu
 
 ## Inspect a research website
 
-An agent app may already include browser access. [Playwright MCP](https://github.com/microsoft/playwright-mcp) is another route, exposing browser operations through an [MCP connection](https://modelcontextprotocol.io/). Ask the agent to use an appropriate available integration and configure another only when the task requires it.
+An agent app may already include browser access. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is another route, exposing browser operations through an [MCP connection](https://modelcontextprotocol.io/). Ask the agent to use an appropriate available integration and configure another only when the task requires it.
 
 > Inspect this project's website as you build it. Open the local preview, use the main navigation and filters, and check the figures at desktop and phone widths. Fix the problems you find. Report which pages and actions you checked, and show any remaining issue that needs a design decision.
 
@@ -18,7 +18,7 @@ The preview can run on your computer; the website need not be public. The agent 
 
 ## Collect data through a website
 
-Interactive browsing is often useful for finding the right source, even when the eventual collection should use a simpler route. Follow the research guide's [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder): use a suitable API or structured download, then static page extraction, then scripted browser interaction, with interactive agent browsing where those routes do not meet the need.
+Interactive browsing is often useful for finding the right source, even when the eventual collection should use a simpler route. Follow the [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder) in the companion guide *Doing Research with AI Agents*: use a suitable API or structured download, then static page extraction, then scripted browser interaction, with interactive agent browsing where those routes do not meet the need.
 
 > Find a permitted way to obtain the specified records from this source. Prefer an API or export when available. Save the original responses or downloads and their provenance. If collection must recur, create a script with explicit inputs, saved outputs, request limits, and failure reporting. Check representative records before running the full collection.
 
@@ -28,6 +28,6 @@ The agent's first exploration may involve clicking through filters and download 
 
 A browser profile holds session information such as logins. A separate profile can avoid giving a task access to your everyday signed-in services. If the task needs an authenticated portal, use the intended account and complete personal sign-in yourself; let the agent explain which actions it needs to perform.
 
-Being able to open a page does not establish permission to transmit its contents to a hosted large language model (LLM). Apply the [data rules](https://dss-agentic-research.pages.dev/chapters/research-limits.html) and [tool-access settings](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
+Being able to open a page does not establish permission to transmit its contents to a hosted large language model (LLM). Apply the data-use decisions from [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html) in the research guide and the access settings from [Chapter 2: Control what added tools can access](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
 
 Some tools can also operate desktop applications through computer use. That broader access can help with a task a browser cannot perform, but it is optional here. Configure it for the specific application and work rather than making it a prerequisite for website inspection or collection.

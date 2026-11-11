@@ -2,30 +2,30 @@
 title: "4. Recover earlier work: git and gh"
 ---
 
-Research projects change as sample definitions, analyses, and manuscripts develop. [Git](https://git-scm.com/) records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after the conversation has ended.
+Research projects change as sample definitions, analyses, and manuscripts develop. [`Git`](https://git-scm.com/) records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after the conversation has ended.
 
-Suppose a revised exclusion rule removes far more observations than expected. Ask the agent to find that change and recover the earlier rule while keeping the manuscript edits made since then. You decide which sample definition is appropriate; the agent finds and restores the relevant code.
+Suppose a revised exclusion rule removes far more observations than expected. Ask the agent to find that change and recover the earlier rule while keeping the manuscript edits made since then. You decide which sample definition is appropriate; the agent finds and restores the relevant code. If you approve restoring the earlier rule, it should also make `SPECIFICATION.md` consistent with that decision and add the reason at the top of `METHODOLOGY.md`, preserving the earlier entries.
 
 ## Give the project a useful history
 
-A git *repository* stores the project's history. A *commit* records a set of changes with a description. The agent can create these checkpoints after meaningful pieces of work, such as a revised specification or a completed figure. The descriptions should explain the change well enough to find it later.
+A `git` *repository* stores the project's history. A *commit* records a set of changes with a description. The agent can create these checkpoints after meaningful pieces of work, such as a revised `SPECIFICATION.md` with its `METHODOLOGY.md` entry, or a completed figure. The descriptions should explain the change well enough to find it later.
 
 > Maintain version history for this project. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
 
-The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. Git records only the files and changes included in its history; keep appropriate backups for the rest of the project.
+The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. `Git` records only the files and changes included in its history; keep appropriate backups for the rest of the project.
 
-If the project lives in Dropbox, have the agent configure storage for git's internal files before creating a populated repository. [Appendix D](#cloud-sync-storage) explains the specific local procedure and how to handle an already populated directory.
+If the project lives in `Dropbox`, have the agent configure storage for `git`'s internal files before creating a populated repository. [Appendix D: Troubleshooting](#cloud-sync-storage) explains the specific local procedure and how to handle an already populated directory.
 
 ![](figures/version-recovery.svg){#fig-version-recovery fig-alt="Git checkpoints retain an earlier sample rule. The agent restores that rule into the current project while preserving later manuscript edits."}
 
 ## Recover the change you need
 
-State the desired outcome rather than a git operation: “Restore the sample definition from before yesterday's sensitivity analysis, keeping the new figures and manuscript edits.” The agent should locate the relevant version, preserve unrelated work, and check the affected analysis after recovery.
+State the desired outcome rather than a `git` operation: “Restore the sample definition from before yesterday's sensitivity analysis, keeping the new figures and manuscript edits.” The agent should locate the relevant version, preserve unrelated work, and check the affected analysis after recovery.
 
 A useful report names the recovered decision, identifies the changed files and source checkpoint, and explains which outputs were regenerated. If the earlier state was never recorded, the agent should say what it can recover and what must be reconstructed. It should not silently reset the entire project to an older version.
 
 ## Share work when intended
 
-[GitHub](https://github.com/) hosts repositories for collaboration. [GitHub CLI (`gh`)](https://cli.github.com/) lets the agent use GitHub from commands, including preparing a pull request: a proposed change collaborators can discuss before it is incorporated. Git can maintain local history without GitHub.
+[`GitHub`](https://github.com/) hosts repositories for collaboration. [`GitHub CLI` (`gh`)](https://cli.github.com/) lets the agent use `GitHub` from commands, including preparing a pull request: a proposed change collaborators can discuss before it is incorporated. `Git` can maintain local history without GitHub.
 
-Use the lab's existing host and account arrangements. You complete [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures the connection and checks it without displaying credentials. Once sharing is authorized, it can send the intended changes and summarize the project's checks. A private repository still sends its contents to the hosting service, so protected data and secrets must be excluded before sharing. The research guide's [handoff chapter](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) covers deciding what belongs in a research deposit.
+Use the research group's existing host and account arrangements. You complete [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures the connection and checks it without displaying credentials. Once sharing is authorized, it can send the intended changes and summarize the project's checks. A private repository still sends its contents to the hosting service, so protected data and secrets must be excluded before sharing. [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in the companion guide *Doing Research with AI Agents* covers deciding what belongs in a research deposit.

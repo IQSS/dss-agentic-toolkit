@@ -8,15 +8,15 @@ For example, one agent can develop modeling code while another develops figures.
 
 ## Assign tasks and interfaces
 
-An agent application may be able to delegate work to subagents, or you can open separate sessions with distinct assignments. [Claude Code's subagents](https://code.claude.com/docs/en/sub-agents) provide one documented delegation route. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
+An agent application may be able to delegate work to subagents, or you can open separate sessions with distinct assignments. [`Claude Code`'s subagents](https://code.claude.com/docs/en/sub-agents) provide one documented delegation route. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
 
 > Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
 
-Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in project files where later sessions can find them.
+Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in project files where later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
 
 ## Choose shared or separate working copies
 
-Agents editing different files can often share one project directory. [Git worktrees](https://git-scm.com/docs/git-worktree) provide separate working directories attached to the same repository, usually on different branches. They help when agents need overlapping files, alternative versions, or a stable copy for testing while other work continues.
+Agents editing different files can often share one project directory. [`Git` worktrees](https://git-scm.com/docs/git-worktree) provide separate working directories attached to the same repository, usually on different branches. They help when agents need overlapping files, alternative versions, or a stable copy for testing while other work continues.
 
 | Arrangement | Useful when | What still needs coordination |
 |---|---|---|
@@ -31,4 +31,4 @@ A new worktree may not contain ignored data, installed packages, or saved model 
 
 The coordinating agent should run a representative path through the combined workflow. Code that works separately can still disagree about a result column, a file location, or a modeling assumption. Resolve those mismatches before the full run. Preserve needed work before removing a worktree, and leave research choices that cannot be inferred from the specification for your decision.
 
-Parallel development is different from an [independent-implementation check](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html). For that check, fresh agents receive the same specification and permitted inputs without seeing the other implementation or results. A worktree alone does not achieve this separation, especially when the earlier code remains in shared history.
+Parallel development differs from the independent-implementation check described in [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) of the companion guide *Doing Research with AI Agents*. For that check, fresh agents receive the same fixed specification version and permitted inputs without seeing the other implementation or results. Do not supply a decision log that reveals those results. A worktree alone does not achieve this separation, especially when the earlier code remains in shared history.
