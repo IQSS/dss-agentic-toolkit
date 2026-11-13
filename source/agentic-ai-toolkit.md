@@ -521,7 +521,7 @@ Keep the manuscript text, references, figures, and numerical results in known pr
 
 > Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and add a [`just`](https://just.systems/) command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
 
-The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. [Chapter 18: Write and revise from the research record](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the research guide explains the full check that the right numbers reach the paper.
+The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. [Chapter 18: Write and revise the manuscript](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the research guide explains the full check that the right numbers reach the paper.
 
 Keep build settings and dependencies with the project. `Quarto`'s [execution settings](https://quarto.org/docs/projects/code-execution.html) control reuse of previous outputs; the agent should document how the final analysis results are refreshed. Specific `R` and TeX failures belong in [Appendix D: Troubleshooting](#troubleshooting).
 
