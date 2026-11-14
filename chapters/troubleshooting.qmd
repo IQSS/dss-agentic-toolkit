@@ -13,7 +13,7 @@ Give the agent the error message, the command that failed, and the expected outp
 | Authentication fails | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
 | A connection cannot retrieve the expected records | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
 | A browser task uses the wrong session or cannot see a page | [Chapter 14: Inspect and interact with a browser](#browser-work) |
-| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved requests](#headless-agents) |
+| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | A local LLM exhausts memory or returns unusable output | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | `R` uses a core without producing output when launched by an agent on macOS | [The observed `R` issue](#r-on-macos) |
 | A PDF build reports “No counter 'none' defined” | [The specific table fix](#tex-table-counter) |

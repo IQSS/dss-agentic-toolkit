@@ -4,7 +4,7 @@ title: "17. Run and adapt an LLM on your own hardware"
 
 Running a large language model (LLM) on hardware you control can keep its computation within an approved environment and let a project retain a chosen version of its weights. That hardware may be your main computer or a server provided by your institution. A separate server is not required when the model and task fit the computer's available memory and processing capacity.
 
-Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the requests and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
+Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the prompts and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
 
 ## Choose hardware and a runtime
 
@@ -24,9 +24,9 @@ Have the agent report whether the requested configuration fits the available har
 
 Use a saved command with explicit inputs and outputs. For extraction or classification, request a defined response structure and validate each result before it enters the analysis table. Save raw responses, malformed outputs, and retries. A completed request establishes execution; comparison with the study's reference judgments establishes whether the output is useful.
 
-Keep the runtime version, exact model identifier or digest, generation settings, request template, and input identifiers with the run. A model tag can point to different weights later. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
+Keep the runtime version, exact model identifier or digest, generation settings, prompt template, and input identifiers with the run. A model tag can point to different weights later. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
 
-A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use [Chapter 16: Run agents from saved requests](#headless-agents) when many requests must run consistently.
+A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use [Chapter 16: Run agents from saved prompts](#headless-agents) when many requests must run consistently.
 
 ## Connect the LLM to an agent
 

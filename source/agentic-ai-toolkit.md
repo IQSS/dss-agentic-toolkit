@@ -42,7 +42,7 @@ Start with the result you need. Keep tools that already serve the project, and a
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
-| Run a batch of agent tasks from saved requests | [Chapter 16: Run agents from saved requests](#headless-agents) |
+| Run a batch of agent tasks from saved prompts | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents): [`Claude Code`](https://code.claude.com/docs/en/overview) |
@@ -670,9 +670,9 @@ The coordinating agent should run a representative path through the combined wor
 
 Parallel development differs from the independent-implementation check described in [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) of the companion guide *Doing Research with AI Agents*. For that check, fresh agents receive the same fixed specification version and permitted inputs without seeing the other implementation or results. Do not supply a decision log that reveals those results. A worktree alone does not achieve this separation, especially when the earlier code remains in shared history.
 
-# 16. Run agents from saved requests {#headless-agents}
+# 16. Run agents from saved prompts {#headless-agents}
 
-Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another request.
+Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another prompt.
 
 Consider the [reviewer-and-judge example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents) in the companion guide *Doing Research with AI Agents*. Each reviewer receives an assigned paper and instructions; each judge receives the material required by the judging protocol. Separate runs make this repeated work manageable. When the study also requires reviewers to know nothing about other cases, the workflow must control those inputs explicitly.
 
@@ -682,7 +682,7 @@ Consider the [reviewer-and-judge example](https://dss-agentic-research.pages.dev
 
 Ask the agent to turn the written protocol into a repeatable command. It should check the intended account, available tools, and output format, and handle failures without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
 
-> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the requests, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
+> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the prompts, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
 
 If the task only requires a judgment on supplied text, a direct LLM API call may be sufficient. Use an agent when the task needs tools or a sequence of actions. Ordinary model fitting and document production should use their saved research code directly.
 
@@ -694,7 +694,7 @@ Link the research protocol and evaluation criteria from `SPECIFICATION.md`. Reta
 
 | Record | Why retain it |
 |---|---|
-| Case, role, exact request, and assigned inputs | Establish what the reviewer or judge was asked to assess |
+| Case, role, exact prompt, and assigned inputs | Establish what the reviewer or judge was asked to assess |
 | Model version/settings, tools, and loaded configuration | Establish the execution conditions and sources of context |
 | Raw response and separately parsed result | Preserve what the LLM returned, including material discarded by parsing |
 | Run status, diagnostics, and attempt identifiers | Distinguish a valid result from a refused action, interruption, or failed parse |
@@ -722,7 +722,7 @@ The [`--bare` option](https://code.claude.com/docs/en/cli-reference) skips much 
 
 Running a large language model (LLM) on hardware you control can keep its computation within an approved environment and let a project retain a chosen version of its weights. That hardware may be your main computer or a server provided by your institution. A separate server is not required when the model and task fit the computer's available memory and processing capacity.
 
-Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the requests and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
+Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the prompts and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
 
 ## Choose hardware and a runtime
 
@@ -742,9 +742,9 @@ Have the agent report whether the requested configuration fits the available har
 
 Use a saved command with explicit inputs and outputs. For extraction or classification, request a defined response structure and validate each result before it enters the analysis table. Save raw responses, malformed outputs, and retries. A completed request establishes execution; comparison with the study's reference judgments establishes whether the output is useful.
 
-Keep the runtime version, exact model identifier or digest, generation settings, request template, and input identifiers with the run. A model tag can point to different weights later. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
+Keep the runtime version, exact model identifier or digest, generation settings, prompt template, and input identifiers with the run. A model tag can point to different weights later. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
 
-A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use [Chapter 16: Run agents from saved requests](#headless-agents) when many requests must run consistently.
+A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use [Chapter 16: Run agents from saved prompts](#headless-agents) when many requests must run consistently.
 
 ## Connect the LLM to an agent
 
@@ -784,7 +784,7 @@ This route differs from downloading arbitrary open weights and running them thro
 
 <!-- aliases: terminal-commands -->
 
-A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language requests to the agent, then run the saved project commands directly when you want to repeat a task.
+A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language prompts to the agent, then run the saved project commands directly when you want to repeat a task.
 
 For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a saved [`just`](https://just.systems/) recipe, `just figures`, regenerates the figure without asking the large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
 
@@ -810,9 +810,9 @@ At the shell prompt, enter:
 claude
 ```
 
-Once `Claude` is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Once `Claude` is running, type a research prompt in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
-![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language requests. Exit to return to the shell, where just figures runs saved code without an LLM."}
+![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell, where just figures runs saved code without an LLM."}
 
 The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the selected LLM is hosted, information supplied to it is still sent to the provider even though you are using a local terminal.
 
@@ -843,7 +843,7 @@ While the agent is running, slash commands control the session. The [interactive
 
 The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent update `STATUS.md` and `TASKS.md` from checked work. For an approved scientific change, it should also rewrite the affected `SPECIFICATION.md` requirements and add the decision and reason at the top of `METHODOLOGY.md`.
 
-For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved requests](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
+For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved prompts](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
 
 <!-- ===================== REFERENCE ===================== -->
 
@@ -935,7 +935,7 @@ Give the agent the error message, the command that failed, and the expected outp
 | Authentication fails | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
 | A connection cannot retrieve the expected records | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
 | A browser task uses the wrong session or cannot see a page | [Chapter 14: Inspect and interact with a browser](#browser-work) |
-| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved requests](#headless-agents) |
+| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | A local LLM exhausts memory or returns unusable output | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | `R` uses a core without producing output when launched by an agent on macOS | [The observed `R` issue](#r-on-macos) |
 | A PDF build reports “No counter 'none' defined” | [The specific table fix](#tex-table-counter) |

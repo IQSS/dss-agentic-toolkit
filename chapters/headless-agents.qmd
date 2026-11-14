@@ -1,8 +1,8 @@
 ---
-title: "16. Run agents from saved requests"
+title: "16. Run agents from saved prompts"
 ---
 
-Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another request.
+Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another prompt.
 
 Consider the [reviewer-and-judge example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents) in the companion guide *Doing Research with AI Agents*. Each reviewer receives an assigned paper and instructions; each judge receives the material required by the judging protocol. Separate runs make this repeated work manageable. When the study also requires reviewers to know nothing about other cases, the workflow must control those inputs explicitly.
 
@@ -12,7 +12,7 @@ Consider the [reviewer-and-judge example](https://dss-agentic-research.pages.dev
 
 Ask the agent to turn the written protocol into a repeatable command. It should check the intended account, available tools, and output format, and handle failures without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
 
-> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the requests, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
+> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the prompts, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
 
 If the task only requires a judgment on supplied text, a direct LLM API call may be sufficient. Use an agent when the task needs tools or a sequence of actions. Ordinary model fitting and document production should use their saved research code directly.
 
@@ -24,7 +24,7 @@ Link the research protocol and evaluation criteria from `SPECIFICATION.md`. Reta
 
 | Record | Why retain it |
 |---|---|
-| Case, role, exact request, and assigned inputs | Establish what the reviewer or judge was asked to assess |
+| Case, role, exact prompt, and assigned inputs | Establish what the reviewer or judge was asked to assess |
 | Model version/settings, tools, and loaded configuration | Establish the execution conditions and sources of context |
 | Raw response and separately parsed result | Preserve what the LLM returned, including material discarded by parsing |
 | Run status, diagnostics, and attempt identifiers | Distinguish a valid result from a refused action, interruption, or failed parse |

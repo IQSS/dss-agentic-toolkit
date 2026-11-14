@@ -6,7 +6,7 @@ aliases:
 
 <!-- aliases: terminal-commands -->
 
-A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language requests to the agent, then run the saved project commands directly when you want to repeat a task.
+A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language prompts to the agent, then run the saved project commands directly when you want to repeat a task.
 
 For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a saved [`just`](https://just.systems/) recipe, `just figures`, regenerates the figure without asking the large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
 
@@ -32,9 +32,9 @@ At the shell prompt, enter:
 claude
 ```
 
-Once `Claude` is running, type a research request in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Once `Claude` is running, type a research prompt in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
-![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language requests. Exit to return to the shell, where just figures runs saved code without an LLM."}
+![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell, where just figures runs saved code without an LLM."}
 
 The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the selected LLM is hosted, information supplied to it is still sent to the provider even though you are using a local terminal.
 
@@ -65,4 +65,4 @@ While the agent is running, slash commands control the session. The [interactive
 
 The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent update `STATUS.md` and `TASKS.md` from checked work. For an approved scientific change, it should also rewrite the affected `SPECIFICATION.md` requirements and add the decision and reason at the top of `METHODOLOGY.md`.
 
-For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved requests](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
+For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved prompts](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).

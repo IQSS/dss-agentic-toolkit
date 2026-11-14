@@ -36,7 +36,7 @@ Start with the result you need. Keep tools that already serve the project, and a
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
-| Run a batch of agent tasks from saved requests | [Chapter 16: Run agents from saved requests](#headless-agents) |
+| Run a batch of agent tasks from saved prompts | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents): [`Claude Code`](https://code.claude.com/docs/en/overview) |
