@@ -14,22 +14,25 @@ The abbreviation *TTY*, from teletype, remained in computing. A modern *terminal
 
 ## The program receiving your commands
 
-A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for input; another program started from the shell may display its own interface until you exit it.
+A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for a command. This differs from a written prompt addressed to an agent; the agent or another program started from the shell receives input until you exit it.
 
 A [*pseudo-terminal*, or PTY](https://man7.org/linux/man-pages/man7/pty.7.html), is a software connection that behaves like a terminal for the program using it. Programs can behave differently when connected to a terminal than when reading from a file or another process. That distinction matters for the specifically observed [R-on-macOS problem](#r-on-macos), but does not mean every unattended command needs a PTY.
 
 | Term | Meaning in this guide |
 |---|---|
 | Command-line interface, CLI | A program interface controlled through commands and arguments |
-| Argument | A value or option supplied with a command |
-| Working directory | The folder used to resolve relative file paths |
-| Absolute / relative path | A location starting from the filesystem root / a location interpreted from a working directory |
+| Argument | A value or option supplied with a command, such as `figures` in `just figures` |
+| Working directory | The folder from which the shell starts its work |
+| Absolute path | A location starting from the filesystem's root, such as `/Users/your-name/Research/my-project` |
+| Relative path | A location interpreted from a starting folder; `data/analysis.csv` means the file inside that folder's `data` directory |
 | `PATH` | The list of directories searched to locate an executable command |
 | Environment variable | A named value supplied to a program, often inherited by programs it starts |
 | Standard input, `stdin` | The input channel a program can read |
 | Standard output, `stdout` | The channel for ordinary program output |
 | Standard error, `stderr` | A separate channel commonly used for diagnostics |
 | Pipe | A connection passing one program's output to another program's input |
-| Exit status | A code returned when a program finishes; its interpretation depends on the program |
+| Exit status | A code reporting how a program ended according to that program's rules; also check the expected output |
+
+An exit status of zero does not by itself establish that the intended research job succeeded. The [`pueue wait` example](#review-results-and-recover-failures) shows why the program's own meaning and the saved result both matter.
 
 Ask the agent to explain an unfamiliar term in the command or error where it occurs. The useful question is what the program will do and what result to expect. A vocabulary reference supports that understanding without requiring a course in shell programming.

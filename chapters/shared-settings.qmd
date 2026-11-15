@@ -2,22 +2,24 @@
 title: "Appendix B. Keep records of shared settings: chezmoi"
 ---
 
-Personal tool settings often live in several folders. A saved, maintained copy makes it easier to recover after a mistake or prepare another computer. [`Chezmoi`](https://www.chezmoi.io/) manages selected configuration files and places them where the relevant programs expect to read them.
+Personal tool settings often live in several folders. A saved, maintained copy makes it easier to recover after a mistake or prepare another computer. [`chezmoi`](https://www.chezmoi.io/) manages selected configuration files and places them where the relevant programs expect to read them.
 
-Suppose you revise the coding instructions shared by your research projects. The change should survive a later settings update and be available on another machine. That requires knowing which copy is maintained and which copy the agent reads. A [`git`](https://git-scm.com/) repository can record the maintained copy's history.
+Suppose you revise your global user instructions, which apply across your research projects. The change should survive a later settings update and be available on another computer. These are personal settings, distinct from a research group's shared files or one project's configuration. A [`Git`](https://git-scm.com/) repository can record the maintained copy's version history.
 
 ## Understand the two copies {#understand-the-two-copies}
 
-The *source* is the copy managed by chezmoi. The *applied file* is the copy installed where a program reads it. Applying the source updates the installed copy. If the agent edits the applied file directly, it must capture that change back into the source before a later apply restores the older version. `Chezmoi` documents [editing and applying changes](https://www.chezmoi.io/user-guide/daily-operations/) and [capturing changed files](https://www.chezmoi.io/reference/commands/re-add/).
+The *source* is the copy managed by `chezmoi`. The *applied file* is the copy installed where a program reads it. Applying the source updates the installed copy. If the agent edits the applied file directly, it must capture that change back into the source before a later apply restores the older version. `chezmoi` documents [editing and applying changes](https://www.chezmoi.io/user-guide/daily-operations/) and [capturing changed files](https://www.chezmoi.io/reference/commands/re-add/).
 
-![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi applies maintained source settings to files read on two computers. An edit to an applied file must be captured back into source before a later apply. Git can record source history."}
+![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="On each computer, chezmoi applies a local source copy to the settings a program reads and captures selected edits back into source. Source changes are transferred between computers separately, then applied locally."}
 
 Ask the agent to identify any existing settings manager before introducing another. Have it preserve current files, record the source and applied locations, and verify that the target program reads the intended settings. Choose which personal settings belong in this record. Project-only configuration already tracked with its project usually needs no additional manager.
 
 ## Preserve differences between machines
 
-Some settings can be identical across computers; others need different paths or installed programs. `Chezmoi` templates can express those differences. Have the agent check the resulting files in each intended environment instead of copying one machine's entire setup unchanged.
+On each computer, `chezmoi` applies that computer's maintained source copy to the files programs read. To use an update elsewhere, first transfer the source changes through the chosen synchronization route, such as `Git`, then apply them on that computer.
 
-Keep credentials and account state out of an ordinary settings repository. A private repository controls who can access it; it does not make a stored password harmless. Follow [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for secret values and the [shared-instructions guidance](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) for the content of reusable research instructions.
+Some settings can be identical across computers; others need different paths or installed programs. A `chezmoi` *template* is a settings file that can produce the appropriate values for each machine. Have the agent check the resulting files in each intended environment instead of copying one computer's entire setup unchanged.
+
+Keep credentials and account state out of an ordinary settings repository. A private repository controls who can access it; it does not make a stored password harmless. Follow [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for secret values. *Doing Research with AI Agents* explains the content of [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions).
 
 If a managed file controls agent permissions, protect both the source and applied locations. Changing the source can change the permissions on the next apply. [Chapter 2: Control what added tools can access](#tool-access) explains that relationship. The agent should check the resulting behavior as well as whether the files were copied successfully.

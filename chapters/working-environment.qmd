@@ -8,8 +8,8 @@ For example, you might want the agent conversation beside a view of the project'
 
 | Need | Possible addition | What to ask the agent to configure |
 |---|---|---|
-| See a conversation and a log together | [`iTerm2`](https://iterm2.com/) on macOS; [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/) with [`WSL2`](https://learn.microsoft.com/windows/wsl/) | Readable panes or tabs in the intended project environment |
-| Recognize the current project and branch | [`Oh My Posh`](https://ohmyposh.dev/) | A simple prompt in the existing shell |
+| See a conversation and a log together | [`iTerm2`](https://iterm2.com/) on macOS; [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/) with [`WSL2`](https://learn.microsoft.com/windows/wsl/) | Readable window areas or tabs in the intended project environment |
+| Recognize the current project | [`Oh My Posh`](https://ohmyposh.dev/) | A simple shell prompt showing the folder and useful status |
 | Return to a named terminal workspace | [`Zellij`](https://zellij.dev/) | A session and layout for the project |
 | Inspect code, data, and plots together | [`Positron`](https://positron.posit.co/) or an existing research editor | The actual project and its recorded language environment |
 
@@ -17,18 +17,18 @@ For example, you might want the agent conversation beside a view of the project'
 
 ## Make the current work visible
 
-Use legible text and a small number of panes. A prompt showing the project directory, `git` branch, and failed-command status can help distinguish projects without changing the shell itself. Decorative symbols and special fonts are optional. Have the agent preserve existing settings and check a new session after making changes.
+Use legible text and a small number of *panes*, separate areas of one window. The *shell prompt* is the line showing that the shell is ready for input, unlike a written prompt addressed to an agent. It can show the project directory and failed-command status. For a project using [`Git`](https://git-scm.com/), it can also show the branch, the named line of work in version history. Decorative symbols and special fonts are optional. Have the agent preserve existing settings and check a new session after making changes.
 
 On Windows, an Ubuntu tab and a `PowerShell` tab use different environments. The agent should configure the intended one rather than assume that settings in one apply to the other. Shell startup files also run instructions, so a visual customization should not silently replace unrelated setup.
 
 ## Return to a working session
 
-`Zellij` can keep a named session available when you detach from it and later reattach, while the host and session continue running. That can preserve a useful layout or survive a dropped connection. Ask the agent to configure the layout and explain the relevant on-screen controls.
+`Zellij` can keep a group of panes together as a named session. *Detaching* leaves that session running while you stop viewing it; *reattaching* opens it again. The computer and session must remain available. This can preserve a layout across a dropped connection. Ask the agent to configure it and explain the relevant on-screen controls.
 
-Session management does not replace [`pueue`](https://github.com/Nukesor/pueue), which manages submitted jobs and their records. Nor does a restored layout establish that computation continued through sleep or shutdown. Use [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) for unattended work and the institution's scheduler on a cluster.
+Session management does not replace [`pueue`](https://github.com/Nukesor/pueue), which manages submitted jobs and their records. Nor does a restored layout establish that computation continued through sleep or shutdown. Use [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) for unattended work and the institution's scheduler on a cluster.
 
 ## Inspect results in the editor you use
 
-`Positron` supports work with [`R`](https://www.r-project.org/) and [`Python`](https://www.python.org/); [`RStudio`](https://posit.co/products/open-source/rstudio/), [`Stata`](https://www.stata.com/), or another familiar editor may already serve the project well. Have the agent open the project in its recorded environment and identify the interpreter being used, following [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments).
+`Positron` supports work with [`R`](https://www.r-project.org/) and [`Python`](https://www.python.org/); [`RStudio`](https://posit.co/products/open-source/rstudio/), [`Stata`](https://www.stata.com/), or another familiar editor may already serve the project well. Have the agent open the project in its recorded environment and identify the interpreter being used, following [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments).
 
 You can inspect substantive results while the agent works on the files. Coordinate any simultaneous edits, and keep transformations used in the analysis in saved code rather than only in a data viewer. An extra AI extension or database connection is a separate choice, not a prerequisite for inspecting the work.

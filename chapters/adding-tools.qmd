@@ -2,9 +2,11 @@
 title: "3. Install and manage tools with Homebrew"
 ---
 
-A package manager installs software and its supporting components, then provides a consistent way to update or remove it. [`Homebrew`](https://brew.sh/) supplies many tools in this guide. Once it is installed, an agent can add the program a research task needs without taking you through a different website and installer each time.
+The agent may need a program that is not yet installed, such as a queue for a simulation batch. A package manager installs the program and its supporting software, and provides a consistent way to update or remove it. [`Homebrew`](https://brew.sh/) supplies many of the tools in this guide.
 
-Suppose you want a batch of simulations to continue while you are away. The agent can install [`pueue`](https://github.com/Nukesor/pueue) with `Homebrew`, then configure the queue for the project. Installing the program makes it available; setting up the queue makes it useful for your work.
+For example, the agent can install [`pueue`](https://github.com/Nukesor/pueue), then configure the queue for the project's simulations. It first checks the computer where the work will run and installs only what is missing.
+
+![](figures/tool-installation.svg){#fig-tool-installation fig-alt="The agent retains an available program or installs the missing program and its supporting software. Both routes end by running the program in the intended session and reporting its version."}
 
 ## Ask the agent to install the tool
 
@@ -12,15 +14,13 @@ Start from the app and describe the task. The agent should check whether the too
 
 > Check whether `Homebrew` and `pueue` are available where this project runs. Install what is missing through the appropriate route, keeping the existing installation where it works. Explain any password or sign-in step I must complete. Confirm that you can run `pueue` from this session, then configure it for the project's simulation jobs.
 
-The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. `Homebrew`'s [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If a personal step requires `Terminal`, [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains how to open it.
+The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. `Homebrew`'s [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If you must open an installer or paste a command into `Terminal`, the agent should supply that exact step and explain its purpose. [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains how to open the terminal.
 
 The useful completion report identifies the installed program, its version, and whether the agent can invoke it in the intended session. A program may already be installed but absent from that session's `PATH`, the directories searched for commands. Have the agent diagnose that before installing a second copy.
 
-![](figures/tool-installation.svg){#fig-tool-installation fig-alt="The agent checks for an existing program. Available software can be used immediately; missing software and its dependencies are installed through the package manager, then checked in the actual session."}
-
 ## Keep a record of installed tools
 
-A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with Homebrew. Ask the agent to maintain it when a recoverable machine setup would help, and to record how the project uses its tools. A Brewfile does not pin the full software environment for an analysis; [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) covers language and package versions.
+A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with `Homebrew`. It helps install the same set of tools on another computer. Ask the agent to maintain it when that would be useful, along with a record of how the project uses its tools. The exact language and package versions used by an analysis need their own records; [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains these.
 
 During ordinary work, have the agent check for an existing installation before adding software. When an update could affect a recorded analysis, it should preserve the working environment and explain the proposed change. Updates to a computer's tools and changes to a study's package versions serve different purposes.
 

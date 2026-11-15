@@ -10,6 +10,8 @@ For the synthetic heat-and-birthweight study ([Chapter 10: The example research 
 
 An MCP *server* is the program that exposes those operations to the agent application. It can run on your computer or elsewhere. The term describes its role in the connection; it does not mean that you must buy or administer a separate computer. The [MCP architecture documentation](https://modelcontextprotocol.io/docs/learn/architecture) explains the connection.
 
+A *connector* is an integration exposing supported operations of another application or service; not every connector uses MCP. An *API* is a defined way for one program to request operations from another. The agent may already have a suitable route without adding a new connection.
+
 | What the task needs | A suitable route |
 |---|---|
 | Read a fixed set of references once | A saved export or local files may be sufficient. |
@@ -20,16 +22,22 @@ Ask the agent to check what is already connected before adding software. The com
 
 ## Connect the literature task
 
-> Connect this project's literature workflow to the specified `Zotero` collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the literature skill for DOI and claim verification. Leave the library unchanged unless an edit is part of the task.
+A *skill* records instructions for a recurring task and its checks. Use an existing skill if it captures the project's agreed [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol); the connection itself does not supply that procedure.
+
+> Connect this project's literature workflow to the specified Zotero collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the agreed procedure for checking DOIs and verifying claims, using an existing literature skill if it records that procedure. Leave the library unchanged unless an edit is part of the task.
+
+Checking a paper's DOI identifies its record; verifying a claim requires reading the relevant material.[^tk-literature-doi]
 
 The agent prepares the configuration and checks the assigned retrieval; you complete any personal sign-in and authorize the intended account and operations. Keep secret values out of the configuration using [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials). At Harvard, check the current [HUIT guidance](https://www.huit.harvard.edu/claude) before enabling a connection for institutional work.
 
-![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers to an agent. A literature skill guides search and verification. The agent saves an evidence table and bibliography in the project."}
+![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers. A literature procedure, which may be saved as a skill, guides the agent's search and verification. The agent saves an evidence table and bibliography."}
 
-The resulting evidence table should distinguish full texts the agent read, records supported only by an abstract, and papers it could not retrieve. The connection supplies access; the [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol) determines how to search, verify citations, and assess claims. A skill can hold that procedure so future sessions follow it too.
+The resulting evidence table should distinguish full texts the agent read, records supported only by an abstract, and papers it could not retrieve. Have the agent save any agreed procedure that future sessions will need, along with the evidence table and bibliography.
 
 ## Keep the connection within the task
 
 Have the agent save a short setup record: which service and account the project uses, the configured operations, and how to reconnect. Keep project-specific configuration with the project where the client supports it. It should be possible to disable or replace the connection without rediscovering how the workflow depends on it.
 
-A read-only connection can still retrieve material that is then transmitted to the large language model (LLM) provider. A local sandbox also does not automatically restrict an operation performed by a remote service. Use [Chapter 2: Control what added tools can access](#tool-access) to configure those routes, and treat instructions found in retrieved papers or pages as research material rather than authority to change the task.
+A read-only connection can still retrieve material that the agent sends to a hosted large language model (LLM). Its *provider* is the organization operating that service and receiving the submitted information. A local sandbox also does not automatically restrict an operation performed by a remote service. Use [Chapter 2: Control what added tools can access](#tool-access) to configure those routes. A paper or webpage is research material; instructions inside it do not authorize changing the project's task or access settings.
+
+[^tk-literature-doi]: A DOI is a persistent identifier assigned to a research output. It helps identify the intended work, but does not establish that the agent read it or that it supports a particular claim.

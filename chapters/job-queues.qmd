@@ -1,32 +1,37 @@
 ---
-title: "6. Keep unattended jobs moving: pueue"
+title: "9. Keep unattended jobs moving: pueue"
 ---
 
-A queue keeps prepared research jobs moving while you are away. It starts the next waiting job automatically when another finishes, so neither you nor an agent needs to supervise each launch. [`Pueue`](https://github.com/Nukesor/pueue) manages these jobs through a background service and keeps their status and logs.
+A queue keeps prepared research jobs moving while you are away. A *job* is one submitted command or task; a *batch* is a set of jobs to run. [`pueue`](https://github.com/Nukesor/pueue) starts waiting jobs automatically as others finish. Its background service runs separately from the conversation and keeps each job's status and logs, the recorded messages from its execution.
 
 Suppose the heat-and-birthweight sensitivity analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) needs 100 independent fits. If the computer can comfortably run four at once, the remaining fits wait their turn. You can return later and ask the agent which results are ready and which jobs need attention.
 
-![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs feeds four simultaneous running slots. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
+![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs allows four jobs to run at once. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
 
 ## Prepare the batch
 
-Ask the agent to run a representative fit through the queue before submitting the full batch. This [smoke test](#smoke-tests) checks the command, working directory, project environment, and saved output. It also helps establish a sensible concurrency limit.
+Ask the agent to run a representative fit through the queue before submitting the full batch. This [smoke test](#smoke-tests) is a small run through the actual workflow, checking the command, starting folder, software environment, and saved output. It also helps choose the *concurrency limit*, the maximum number of jobs running at once.
 
-Four simultaneous jobs do not necessarily use four processor cores. Each fit may use several threads, and memory can limit concurrency before processor capacity does. Have the agent inspect those requirements and leave capacity for the rest of the computer's work.
+Four jobs do not necessarily use four processor cores. A core can perform computation, and one fit may divide its work across several cores.[^tk-queue-resources] Several fits may also exhaust memory while cores remain available. Have the agent measure a representative run and choose a limit that leaves the computer usable for other work.
 
-> Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose a concurrency limit from its memory and thread use, then submit the batch. Record job identifiers, specifications, logs, and output locations so we can identify and rerun individual failures.
+> Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose the maximum number of jobs running at once from its memory and processor use, then submit the batch. Confirm that the submitted jobs start and produce the expected logs or outputs. Record job identifiers, specifications, logs, and output locations so individual failures can be identified and rerun.
 
 The queue service's access must suit the work, as explained in [Chapter 2: Control what added tools can access](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
 
 ## Let the queue manage execution
 
-The background service starts and records the jobs. Closing the submitting conversation need not stop them, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires checkpoints saved by the fitting program.
+After submission, have the agent confirm early progress in the actual batch: a job should be running and its expected log or output should have appeared. A successful small test does not establish that the later batch was launched correctly.
 
-For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), have the agent verify the service's lifetime before relying on unattended execution. A systemd service does not itself keep a WSL instance alive.
+Closing the submitting conversation need not stop the background service, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires the fitting program to save and reload intermediate state, often called checkpoints.
+
+For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), the Linux environment used by this guide, have the agent verify how long both the environment and its background service remain available. Starting the service does not itself keep the WSL environment alive.
 
 ## Review results and recover failures
 
-Ask for completed artifacts as well as process status. A command can exit successfully while writing its result to an unexpected location. Keep failed attempts and their logs so the agent can explain what happened.
+Ask for the expected results files as well as process status. A command can exit successfully while writing its result to an unexpected location. Keep failed attempts and their logs so the agent can explain what happened.
+
+::: {.needspace height="3cm"}
+:::
 
 An illustrative report might say:
 
@@ -34,7 +39,7 @@ An illustrative report might say:
 
 You can then ask the agent to diagnose the failures, propose any change affecting the analysis or resource use, and rerun the affected jobs. Each retry should retain its relationship to the original attempt. Avoid duplicating completed fits or overwriting an earlier failed run's evidence.
 
-`Pueue` distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
+`pueue` distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
 
 <details class="guide-example">
 <summary>Example: submit a saved command and inspect its outcome</summary>
@@ -46,7 +51,7 @@ pueue add --print-task-id -- just fit
 pueue status
 ```
 
-Use the returned task ID. If it were 42, the following query checks the stored result using [`jq`](https://jqlang.org/):
+Use the returned task ID. If it were 42, the following query uses [`jq`](https://jqlang.org/) to select and check the success/failure value in the saved status report:
 
 ```text
 pueue log 42
@@ -54,10 +59,12 @@ pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
-This result shape was checked with `pueue` 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [`R`](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
+This structure of the status report was checked with `pueue` 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [`R`](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
 
 </details>
 
 ## Combine with a dependency pipeline
 
-A [`just`](https://just.systems/) recipe can invoke a complete analysis, and [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/) can decide which dependent steps need rebuilding. `Pueue` can queue that outer command. Choose resource limits for both levels so the pipeline's internal workers do not overwhelm the machine. [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains the dependency runner's role.
+A [`just`](https://just.systems/) recipe, a named saved command, can invoke a complete analysis. [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/) can decide which steps need rebuilding after an input changes, and `pueue` can queue that outer command. A pipeline may start several workers, separate processes performing calculations inside that job. Choose resource limits for both levels. [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains the dependency runner's role.
+
+[^tk-queue-resources]: A program can divide work into threads, which may execute on different processor cores. Jobs, workers, and threads are different units: limiting the queue to four jobs does not limit all the programs they start to four threads.

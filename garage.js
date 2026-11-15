@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const GROUPS = {
     I: { name: "Part I", long: "I · Foundations", dot: v("foundation") },
-    II: { name: "Part II", long: "II · Essential tools", dot: v("language") },
-    III: { name: "Part III", long: "III · Reproducible research workflows", dot: v("control") },
+    II: { name: "Part II", long: "II · Install tools and manage project files", dot: v("language") },
+    III: { name: "Part III", long: "III · Run and reproduce research", dot: v("control") },
     IV: { name: "Part IV", long: "IV · Connect to data and services", dot: v("surface") },
     V: { name: "Part V", long: "V · Run and coordinate agents", dot: v("agents") },
     VI: { name: "Part VI", long: "VI · Work from the terminal", dot: v("language") },
@@ -33,16 +33,16 @@ document.addEventListener("DOMContentLoaded", function () {
       body: "Homebrew installs and manages tools and their supporting software. Ask the agent to use the established package manager and record new tools." },
     { n: "4", group: "II", slug: "version-control", title: "Recover earlier work: git and gh", tool: "the tape measure",
       body: "Have the agent maintain meaningful checkpoints and recover earlier work without discarding unrelated changes. Add sharing when the project needs it." },
-    { n: "5", group: "II", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
-      body: "Give modular research steps dependable names. Just saves commands; a smoke test checks the actual workflow before a large batch." },
-    { n: "6", group: "II", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
-      body: "Submit prepared jobs and let pueue start the next one automatically when capacity is available. Have the agent report outputs and failures." },
-    { n: "7", group: "II", slug: "finding-files", title: "Find and inspect project files", tool: "the hammer",
+    { n: "5", group: "II", slug: "finding-files", title: "Find and inspect project files", tool: "the hammer",
       body: "Use modern search and structured-data tools to locate evidence efficiently. The agent reports relevant files and values without loading the whole project." },
-    { n: "8", group: "III", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
+    { n: "6", group: "III", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
       body: "Record the language version separately from project packages. Have the agent restore both and check the working analysis." },
-    { n: "9", group: "III", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
+    { n: "7", group: "III", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
+      body: "Give modular research steps dependable names. Just saves commands; a smoke test checks the actual workflow before a large batch." },
+    { n: "8", group: "III", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
       body: "Combine named just commands with targets or Snakemake. The pipeline tracks dependencies and reruns affected steps while reusing current results." },
+    { n: "9", group: "III", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
+      body: "Submit prepared jobs and let pueue start the next one automatically when capacity is available. Have the agent report outputs and failures." },
     { n: "11", group: "III", slug: "research-documents", title: "Generate documents from research outputs: Quarto and Pandoc", tool: "the pencil cup",
       body: "Build maintained text and saved results into Markdown, Word, PDF, or HTML. Have the agent set up the renderer and check the produced document." },
     { n: "10", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
@@ -484,13 +484,13 @@ document.addEventListener("DOMContentLoaded", function () {
   tool(wall, "15", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
   tool(wall, "A", DRAW.striplight, { heavy: true, tag: [704, 56] });
-  tool(wall, "8", DRAW.wrenches, { ghost: true, tag: [440, 252] });
+  tool(wall, "6", DRAW.wrenches, { ghost: true, tag: [440, 252] });
   tool(wall, "A", DRAW.screwdrivers, { ghost: true, tag: [312, 318] });
-  tool(wall, "7", DRAW.hammer, { ghost: true, tag: [512, 262] });
-  tool(wall, "5", DRAW.drill, { ghost: true, tag: [652, 232] });
+  tool(wall, "5", DRAW.hammer, { ghost: true, tag: [512, 262] });
+  tool(wall, "7", DRAW.drill, { ghost: true, tag: [652, 232] });
   tool(wall, "C", DRAW.meter, { ghost: true, tag: [722, 112] });
   tool(wall, "D", DRAW.level, { ghost: true, tag: [600, 340] });
-  tool(wall, "6", DRAW.clock, { ghost: true, tag: [806, 174] });
+  tool(wall, "9", DRAW.clock, { ghost: true, tag: [806, 174] });
   tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [806, 322] });
   cone(wall);
 
@@ -503,7 +503,7 @@ document.addEventListener("DOMContentLoaded", function () {
     tool(benchL, "3", DRAW.bench, { heavy: true, tag: [515, 480] });
     tool(benchL, "12", DRAW.drawers, { heavy: true, tag: [145, 493] });
     tool(benchL, "2", DRAW.cabinet, { heavy: true, tag: [825, 493] });
-    tool(benchL, "9", DRAW.gears, { tag: [492, 536] });
+    tool(benchL, "8", DRAW.gears, { tag: [492, 536] });
     tool(benchL, "B", DRAW.organizer, { heavy: true, tag: [408, 654] });
     // the stool is furniture
     const st = G(benchL, 560, 650, 1.1);

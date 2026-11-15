@@ -41,17 +41,17 @@ website:
         contents:
           - chapters/choose-tools.qmd
           - chapters/tool-access.qmd
-      - section: "Part II — Essential Tools"
+      - section: "Part II — Install Tools And Manage Project Files"
         contents:
           - chapters/adding-tools.qmd
           - chapters/version-control.qmd
-          - chapters/project-commands.qmd
-          - chapters/job-queues.qmd
           - chapters/finding-files.qmd
-      - section: "Part III — Reproducible Research Workflows"
+      - section: "Part III — Run And Reproduce Research"
         contents:
           - chapters/environments.qmd
+          - chapters/project-commands.qmd
           - chapters/pipeline-dependencies.qmd
+          - chapters/job-queues.qmd
           - chapters/containers.qmd
           - chapters/research-documents.qmd
       - section: "Part IV — Connect To Data And Services"
@@ -82,11 +82,11 @@ chapter-map:
   "2": /chapters/tool-access.qmd
   "3": /chapters/adding-tools.qmd
   "4": /chapters/version-control.qmd
-  "5": /chapters/project-commands.qmd
-  "6": /chapters/job-queues.qmd
-  "7": /chapters/finding-files.qmd
-  "8": /chapters/environments.qmd
-  "9": /chapters/pipeline-dependencies.qmd
+  "5": /chapters/finding-files.qmd
+  "6": /chapters/environments.qmd
+  "7": /chapters/project-commands.qmd
+  "8": /chapters/pipeline-dependencies.qmd
+  "9": /chapters/job-queues.qmd
   "10": /chapters/containers.qmd
   "11": /chapters/research-documents.qmd
   "12": /chapters/credentials.qmd
@@ -104,9 +104,14 @@ chapter-map:
 
 anchor-map:
   "adding-tools": /chapters/adding-tools.qmd
+  "ask-the-agent-to-install-the-tool": /chapters/adding-tools.qmd#ask-the-agent-to-install-the-tool
   "browser-work": /chapters/browser-work.qmd
+  "check-what-reruns": /chapters/pipeline-dependencies.qmd#check-what-reruns
+  "choose-hardware-and-a-runtime": /chapters/local-models.qmd#choose-hardware-and-a-runtime
+  "choose-the-browser-account": /chapters/browser-work.qmd#choose-the-browser-account
   "choose-tools": /chapters/choose-tools.qmd
   "cloud-sync-storage": /chapters/troubleshooting.qmd#cloud-sync-storage
+  "connect-the-literature-task": /chapters/service-connections.qmd#connect-the-literature-task
   "containers": /chapters/containers.qmd
   "credentials": /chapters/credentials.qmd
   "environments": /chapters/environments.qmd
@@ -119,14 +124,18 @@ anchor-map:
   "project-commands": /chapters/project-commands.qmd
   "r-on-macos": /chapters/troubleshooting.qmd#r-on-macos
   "research-documents": /chapters/research-documents.qmd
+  "restore-and-check-it": /chapters/environments.qmd#restore-and-check-it
+  "review-results-and-recover-failures": /chapters/job-queues.qmd#review-results-and-recover-failures
   "service-connections": /chapters/service-connections.qmd
   "shared-settings": /chapters/shared-settings.qmd
   "smoke-tests": /chapters/project-commands.qmd#smoke-tests
+  "supply-a-credential-to-a-command": /chapters/credentials.qmd#supply-a-credential-to-a-command
   "terminal-agents": /chapters/terminal-agents.qmd
   "terminal-history": /chapters/terminal-history.qmd
   "tex-table-counter": /chapters/troubleshooting.qmd#tex-table-counter
   "tool-access": /chapters/tool-access.qmd
   "troubleshooting": /chapters/troubleshooting.qmd
+  "turn-the-task-into-a-saved-workflow": /chapters/headless-agents.qmd#turn-the-task-into-a-saved-workflow
   "understand-the-two-copies": /chapters/shared-settings.qmd#understand-the-two-copies
   "usage-tools": /chapters/usage-tools.qmd
   "version-control": /chapters/version-control.qmd

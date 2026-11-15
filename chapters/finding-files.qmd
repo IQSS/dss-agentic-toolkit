@@ -1,33 +1,42 @@
 ---
-title: "7. Find and inspect project files"
+title: "5. Find and inspect project files"
 ---
 
 Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
 
-Suppose a reviewer asks how `hot_days` enters the analysis. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`Ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `Ripgrep` is the program's name; `rg` is its command.
+Suppose a reviewer asks how `hot_days`, a variable counting days of heat exposure, enters an analysis like the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `ripgrep` is the program's name; `rg` is its command.
+
+![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
+
+The diagram uses illustrative filenames. The agent must report your project's actual paths and lines, then explain any disagreement between the exposure construction, statistical-model use, and figure label.
 
 ## Choose the appropriate search
+
+Some files arrange information under named fields, such as a record identifier or an output folder. JSON and YAML are text formats for storing information this way, including fields grouped inside other fields. The agent can select the value it needs instead of printing the whole file or guessing which nearby words belong together.
 
 | Task | Tool | Useful result |
 |---|---|---|
 | Search text within project files | `ripgrep` (`rg`) | Matching passages with file paths and line numbers. |
 | Locate files by name or type | [`fd`](https://github.com/sharkdp/fd) | A focused list of candidate files. |
-| Query JSON | [`jq`](https://jqlang.org/) | Selected fields from a structured response. |
-| Query or edit YAML | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
-| Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers and syntax highlighting. |
+| Find values in a JSON response | [`jq`](https://jqlang.org/) | Selected fields from the response. |
+| Read or update YAML settings | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
+| Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers. |
 
-The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job. JSON and YAML queries use the document's structure, which is more dependable than searching for a word and assuming the adjacent text has the intended meaning.
+The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job.[^tk-search-programs]
+
+::: {.needspace height="7cm"}
+:::
 
 ## Ask for findings tied to files
 
-> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines and explain how the definitions relate. Use focused searches and excerpts. If a saved JSON or YAML response is involved, query the relevant fields rather than printing the entire response.
-
-![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
-
-An illustrative answer could identify `code/exposure.R` as the construction step, `code/fit.R` as the model formula, and `code/figure.R` as the label source, with the actual line numbers attached. The agent should explain any disagreement between those locations. The filenames here illustrate the form of a report; the agent must use the files that exist in your project.
+> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
 
 ## Investigate a missing match
 
-`Ripgrep` ordinarily skips ignored and hidden files. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. A name assembled by code or stored in a binary file may need a different investigation. Search exclusions reduce noise; they are not file-access restrictions.
+`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. Search exclusions reduce noise; they are not file-access restrictions.
 
-For a structured response, distinguish a missing field from an explicit null value. The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions also name `fd` and `bat` differently. Have the agent identify the available program and its behavior, then record useful tool conventions for future sessions.
+Text search does not read the contents of every PDF, image, or saved binary object. The agent should identify the format and use an appropriate reader. A name assembled by code may also require following the calculation rather than searching for the final name.
+
+For a structured response, distinguish an absent field from empty text or *null*, a marker for no value. Ask the agent to check the source's meaning of null before treating the record as missing data or replacing the value.
+
+[^tk-search-programs]: The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions name `fd` and `bat` differently. Ask the agent to identify the installed program and record any naming convention needed for later sessions.

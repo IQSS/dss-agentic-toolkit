@@ -2,27 +2,30 @@
 title: "10. Run work in a separate environment: containers"
 ---
 
-A container runs software in a separately configured environment. It can include system libraries that a language lockfile does not capture, and its access can be limited to selected files and services. The configuration determines which of those benefits the project receives.
+A spatial analysis may need a particular geospatial library as well as its [`R`](https://www.r-project.org/) packages. Recording the packages alone may leave a collaborator without the supporting software they require. A *container* packages the program and its supporting software in a separately configured environment. The agent can also limit which folders and connections it receives when the task requires those limits.
 
-For example, a spatial analysis may depend on a particular geospatial library as well as `R` packages. Packaging those components helps a collaborator establish the same software. A different project may need an agent and local LLM to process only an approved document collection. Both can use containers, but they need different access and software arrangements.
+A different project may need an agent and a local large language model (LLM) to process only an approved document collection. That arrangement needs its own software and access configuration. Choose the container's purpose before asking the agent to set it up.
 
 ## Decide why the task needs a container
 
 | Research need | What the agent configures |
 |---|---|
-| Reproduce system dependencies | Language/packages, system libraries, command-line programs, and the supported platform. |
+| Reproduce supporting software | Language/packages, supporting libraries and programs, and the supported platform. |
 | Run approved work with restricted inputs | Required input access, separate output storage, permitted network connections, and credentials. |
-| Give a local agent a limited workspace | The LLM runtime and agent, their tools, and the files/accounts available to them. |
+| Give a local agent a limited workspace | Software to run the LLM and agent, their tools, and the files/accounts available to them. |
 
 A container does not itself authorize processing under a data agreement. Establish the permitted environment through [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) in the companion guide *Doing Research with AI Agents*, then configure and check it for that purpose.
 
 ## Specify software and access
 
-With [`Docker`](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. A *mount* makes a folder on the host computer available inside the container, for example as read-only inputs or writable output storage. `Docker`'s [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
+With [`Docker`](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. The *host* is the computer running the container. A *mount* makes a selected host folder available inside it, for example as read-only inputs or writable output storage. `Docker`'s [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
 
-![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and system software. It reads selected inputs, writes designated outputs, and uses explicitly configured network access. An optional local-agent setup also includes an LLM runtime and harness."}
+![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and supporting software. It reads selected inputs, writes designated outputs, and can connect to an approved service. A separate note identifies the extra LLM and agent software needed for an optional local-agent setup."}
 
-State where the LLM will run. Putting commands inside a container does not move a hosted LLM onto your computer. A local-agent arrangement must configure the LLM runtime too, as described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+If the task uses an LLM, state where it will run. Putting commands inside a container does not move an LLM hosted on a provider's computers into it. A local-agent arrangement also needs an *LLM runtime*, software that loads the LLM and generates responses, as described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+
+::: {.needspace height="7cm"}
+:::
 
 ## Build and check the environment
 
@@ -30,10 +33,12 @@ State where the LLM will run. Putting commands inside a container does not move 
 
 The agent can use [`Colima`](https://github.com/abiosoft/colima) with `Docker`'s command-line tools on a Mac, or retain an existing approved [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, follow the supported runtime, which may be [`Apptainer`](https://apptainer.org/). The researcher completes required authorization; the agent builds and checks the environment.
 
-A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Broad home-directory mounts, unnecessary privileges, or access to `Docker`'s control socket can defeat intended separation; configure only the access the task needs.
+A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Sharing the whole home directory, granting powers the task does not need, or exposing `Docker`'s control socket can defeat the intended separation. The control socket is a connection through which programs can control `Docker`; it requires a separate access decision.
 
 ## Preserve what is needed to run it again
 
-Save the build/run configuration and environment records with the project. A base-image digest identifies particular image content, while a moving tag can later identify a different image. Pin the relevant dependencies and record the platform. A Dockerfile that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
+Save the build/run configuration and environment records with the project. Record and select the required software versions, the platform, and an identifier for the exact image used.[^tk-container-image-id] A `Dockerfile` that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
 
 Keep different access arrangements explicit rather than changing one container silently between tasks. [Chapter 2: Control what added tools can access](#tool-access) explains how these controls relate to the agent's other tools.
+
+[^tk-container-image-id]: A digest identifies particular image content. A tag is a convenient name that can later refer to a different image. The agent should record enough information to recover the version actually used.

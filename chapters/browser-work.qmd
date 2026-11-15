@@ -4,30 +4,34 @@ title: "14. Inspect and interact with a browser"
 
 When an agent builds a research website, it needs to inspect what a reader will see. A page can contain valid code and still have an unreadable figure, a broken filter, or navigation that disappears on a phone. Browser access lets the agent open the site, try its controls, and use the result to improve its work.
 
-The same access can help obtain data from a website. An agent might inspect a public portal, identify the appropriate release, and find an export or API. These are two useful tasks for browser tools: checking a site being built and understanding a site that supplies research material.
+The same access can help obtain data from a website. An agent might inspect a public portal, identify the appropriate release, and find a data export or an API, a way for a program to request records directly. Checking a site being built and understanding a site that supplies research material need different follow-up work.
 
 ## Inspect a research website
 
-An agent app may already include browser access. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is another route, exposing browser operations through an [MCP connection](https://modelcontextprotocol.io/). Ask the agent to use an appropriate available integration and configure another only when the task requires it.
+An agent app may already include browser access. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is another route. It uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to expose browser operations to the agent. Ask the agent to use an appropriate available integration and configure another only when the task requires it.
+
+A *local preview* is a version of the site served on your computer for inspection. The website need not be public for the agent to check it.
 
 > Inspect this project's website as you build it. Open the local preview, use the main navigation and filters, and check the figures at desktop and phone widths. Fix the problems you find. Report which pages and actions you checked, and show any remaining issue that needs a design decision.
 
-The preview can run on your computer; the website need not be public. The agent should check the rendered page after making changes, including whether an action produces the intended result. A screenshot shows appearance, while trying a filter or link checks behavior. Both can be useful evidence, and neither replaces checking the underlying research results.
+The agent should inspect the rendered page again after making changes, including whether an action produces the intended result. A screenshot shows appearance, while trying a filter or link checks behavior. Both can be useful evidence, and neither replaces checking the underlying research results.
 
-![](figures/browser-research.svg){#fig-browser-research fig-alt="One browser workflow inspects a local site, fixes its source, and checks again. Another finds a data release and export, then saves data, provenance, and repeatable collection code."}
+![](figures/browser-research.svg){#fig-browser-research fig-alt="One browser workflow inspects a local site, fixes its source, and checks again. Another finds a data release and export, then saves original data, a record of where they came from, and repeatable collection code."}
 
 ## Collect data through a website
 
-Interactive browsing is often useful for finding the right source, even when the eventual collection should use a simpler route. Follow the [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder) in the companion guide *Doing Research with AI Agents*: use a suitable API or structured download, then static page extraction, then scripted browser interaction, with interactive agent browsing where those routes do not meet the need.
+Use browsing first to understand the source and find the right release. A suitable API or structured download, such as a CSV table, lets a saved script obtain records directly. If the records are already present in a page, static-page extraction reads them without operating its controls. Use scripted browser interaction when filters or other controls are required, and interactive agent browsing where these routes do not meet the need. The [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder) in *Doing Research with AI Agents* develops this choice.
+
+Keep the original data and their *provenance*, the record of where they came from and how they were obtained. Include the source, release, date, query, and selections used.
 
 > Find a permitted way to obtain the specified records from this source. Prefer an API or export when available. Save the original responses or downloads and their provenance. If collection must recur, create a script with explicit inputs, saved outputs, request limits, and failure reporting. Check representative records before running the full collection.
 
-The agent's first exploration may involve clicking through filters and download options. Preserve what it learns in a repeatable collection procedure, with the release, date, query, and relevant selection settings. A transcript of clicks alone is a poor record of a large extraction. The [data-provenance section](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#data-provenance) explains what to retain for later research use.
+Preserve what the agent learns during its first exploration as saved collection code when the task will recur. A transcript of clicks alone cannot reliably repeat a large extraction. The [data-provenance section](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#data-provenance) explains what to retain for later research use.
 
 ## Choose the browser account
 
 A browser profile holds session information such as logins. A separate profile can avoid giving a task access to your everyday signed-in services. If the task needs an authenticated portal, use the intended account and complete personal sign-in yourself; let the agent explain which actions it needs to perform.
 
-Being able to open a page does not establish permission to transmit its contents to a hosted large language model (LLM). Apply the data-use decisions from [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html) in the research guide and the access settings from [Chapter 2: Control what added tools can access](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
+Being able to open a page does not establish permission to send its contents to a hosted large language model (LLM), which runs on the service provider's computers. Apply the data-use decisions from [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html) in the research guide and the access settings from [Chapter 2: Control what added tools can access](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
 
 Some tools can also operate desktop applications through computer use. That broader access can help with a task a browser cannot perform, but it is optional here. Configure it for the specific application and work rather than making it a prerequisite for website inspection or collection.

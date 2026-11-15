@@ -8,15 +8,15 @@ version: "2.3 draft"
 
 # 1. Choose tools for a research need {#choose-tools}
 
-Research involves tasks worth setting up once and repeating reliably: running a batch of analyses, rebuilding a manuscript, or restoring the software used in an analysis. This guide shows how to get an AI agent to set up and use tools for that work. You direct the research; the agent installs and configures the tools, runs them, and checks their output.
+Research involves tasks worth setting up once and repeating reliably: running a batch of analyses, rebuilding a manuscript, or restoring the software used in an analysis. This guide shows how to get an AI agent to set up and use tools for that work.[^tk-overview-agent] You direct the research; the agent installs and configures the tools, runs them, and checks their output.
 
-Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return. You can arrange this from the app without learning the queue's commands.
+Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return. Examples in this guide use [`Claude Code`](https://code.claude.com/docs/en/overview) in the `Claude` desktop app; you can arrange the work there without learning the queue's commands.
 
 Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://dss-agentic-research.pages.dev/chapters/first-session.html).
 
 ## Find the tool for your task
 
-Start with the result you need. Keep tools that already serve the project, and add others when they supply a useful capability.
+Start with the result you need. The table is a menu of capabilities, not a list to install in order. Keep tools that already serve the project, and add others when they supply a useful capability.
 
 
 ::: {.toolkit-lookup}
@@ -25,30 +25,30 @@ Start with the result you need. Keep tools that already serve the project, and a
 |:--|:--|
 | **Foundations** | |
 | Control what a new tool can read, change, or send | [Chapter 2: Control what added tools can access](#tool-access) |
-| **Essential tools** | |
-| Install and maintain research tools | [Chapter 3: Install and manage tools with Homebrew](#adding-tools): [`Homebrew`](https://brew.sh/) |
-| Record changes and recover earlier work | [Chapter 4: Recover earlier work: git and gh](#version-control): [`git`](https://git-scm.com/) and [`gh`](https://cli.github.com/) |
-| Repeat tasks using saved commands | [Chapter 5: Give research tasks reliable commands: just](#project-commands): [`just`](https://just.systems/) |
-| Keep a batch moving unattended | [Chapter 6: Keep unattended jobs moving: pueue](#job-queues): [`pueue`](https://github.com/Nukesor/pueue) |
-| Find files and inspect their contents | [Chapter 7: Find and inspect project files](#finding-files): [`ripgrep`](https://github.com/BurntSushi/ripgrep), [`fd`](https://github.com/sharkdp/fd), [`jq`](https://jqlang.org/), [`yq`](https://mikefarah.gitbook.io/yq/), and [`bat`](https://github.com/sharkdp/bat) |
-| **Reproducible research workflows** | |
-| Restore the language and packages used for an analysis | [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments): [`rig`](https://rig.r-lib.org/), [`renv`](https://rstudio.github.io/renv/), and [`uv`](https://docs.astral.sh/uv/) |
-| Rerun only steps affected by a change | [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies): [`targets`](https://docs.ropensci.org/targets/) and [`Snakemake`](https://snakemake.readthedocs.io/) |
+| **Install tools and manage project files** | |
+| Install and maintain research tools | [Chapter 3: Install and manage tools with Homebrew](#adding-tools) |
+| Record changes and recover earlier work | [Chapter 4: Recover earlier work: git and gh](#version-control) |
+| Find files and inspect their contents | [Chapter 5: Find and inspect project files](#finding-files) |
+| **Run and reproduce research** | |
+| Restore the language and packages used for an analysis | [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) |
+| Repeat tasks using saved commands | [Chapter 7: Give research tasks reliable commands: just](#project-commands) |
+| Rerun only steps affected by a change | [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) |
+| Keep a batch moving unattended | [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) |
 | Package software and configure a separate place to run it | [Chapter 10: Run work in a separate environment: containers](#containers) |
-| Rebuild a document from saved research outputs | [Chapter 11: Generate documents from research outputs: Quarto and Pandoc](#research-documents): [`Quarto`](https://quarto.org/) and [`Pandoc`](https://pandoc.org/) |
+| Rebuild a document from saved research outputs | [Chapter 11: Generate documents from research outputs: Quarto and Pandoc](#research-documents) |
 | **Connect to data and services** | |
-| Supply account credentials without putting them in research code | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials): [`1Password`](https://1password.com/) and [`direnv`](https://direnv.net/) |
-| Give the agent access to an application or service | [Chapter 13: Connect to research data and services: MCP](#service-connections): [MCP](https://modelcontextprotocol.io/) |
+| Supply account credentials without putting them in research code | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
+| Give the agent access to an application or service | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
 | Run a batch of agent tasks from saved prompts | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
-| Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents): [`Claude Code`](https://code.claude.com/docs/en/overview) |
+| Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) |
 | **Reference** | |
 | Choose optional terminal and editor conveniences | [Appendix A: Optional working environment](#working-environment) |
-| Restore personal settings across computers | [Appendix B: Keep records of shared settings: chezmoi](#shared-settings): [`chezmoi`](https://www.chezmoi.io/) |
+| Restore personal settings across computers | [Appendix B: Keep records of shared settings: chezmoi](#shared-settings) |
 | Investigate account usage | [Appendix C: Account-usage tools](#usage-tools) |
 | Diagnose execution and document-build problems | [Appendix D: Troubleshooting](#troubleshooting) |
 | Understand terminal terminology | [Appendix E: Terminal vocabulary](#terminal-history) |
@@ -61,11 +61,11 @@ Some tools are programs the agent runs on the computer doing the work, such as a
 
 ![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
 
-For the simulation batch, `CLAUDE.md` (or `AGENTS.md`) should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
+For the simulation batch, the project's instructions file, `CLAUDE.md` (or `AGENTS.md`), should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
 
 > Record the queue command, the limit on simultaneous jobs, and where results and logs belong. Add instructions for future sessions to use this setup for the project's simulation runs and report which jobs succeeded or failed, checking their saved outputs.
 
-Save project-specific commands and limits in the project context files: the maintained files that describe this project and guide the agent’s work. For a paper, maintain current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. Put conventions that should apply across projects in your global user instructions. The research guide explains [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) and [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions). A longer procedure that recurs can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add).
+Ask the agent to save these project-specific commands and limits in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records), the maintained files describing this project and guiding later sessions. Put a rule in your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) only if it should apply across projects. A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
 
 ## Use tools from the app
 
@@ -73,23 +73,25 @@ You can ask the agent to install and operate these tools from the app. You suppl
 
 The setup examples cover macOS and Linux. The Windows route uses [`Windows Subsystem for Linux` (`WSL2`)](https://learn.microsoft.com/windows/wsl/), which provides a Linux environment on a Windows computer. Ask the agent to check the environment where the work will run before installing software there. You can keep using [`R`](https://www.r-project.org/), [`Python`](https://www.python.org/), or [`Stata`](https://www.stata.com/); adopting a queue or command runner does not require changing research language.
 
+[^tk-overview-agent]: An agent combines a large language model (LLM), which processes supplied information and generates responses or tool requests, with tools and software that runs them and returns their results.
+
 # 2. Control what added tools can access {#tool-access}
 
 Adding tools lets an agent carry out more of a research task without stopping for help. Configure those tools to use the files and accounts the task needs while protecting original inputs and unrelated work. The agent can set up and test the controls from your instructions.
 
-For a batch of model fits, the queue needs to read the analysis code and approved inputs, then save results and logs. It does not need to change the original data or read another study's files. A queue such as [`pueue`](https://github.com/Nukesor/pueue) runs work through a separate background service, so its access needs checking even if you have already restricted the agent's own commands.[^tk-pueue-process]
+For a batch of statistical model fits, the queue needs to read the analysis code and approved inputs, then save results and logs. It does not need to change the original data or read another study's files. A queue such as [`pueue`](https://github.com/Nukesor/pueue) uses a background service: a program that runs separately from the conversation and starts submitted jobs. Restrictions on the command that submits a job do not establish which files that service can read. Check the queued fit itself using harmless test files.[^tk-pueue-process]
 
 ## Check where the work runs
 
-In [`Claude Code`](https://code.claude.com/docs/en/overview), permission rules allow tool actions, require approval, or block them. A sandbox adds restrictions enforced by the operating system on programs running inside it. Written instructions explain how the agent should work, but do not enforce those restrictions.[^tk-access-controls]
+In [`Claude Code`](https://code.claude.com/docs/en/overview), permission rules allow tool actions, require approval, or block them. A sandbox adds restrictions enforced by the operating system on programs running inside it.[^tk-access-os] Written instructions explain how the agent should work, but do not enforce those restrictions.[^tk-access-controls]
 
-![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="Direct commands run inside their sandbox; queued work runs through a separate service; connected operations use account access. Returned records can reach the agent. Built-in file tools have separate permission checks."}
+![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="The agent can run a command inside a configured sandbox, submit work to a separate queue service, or use a connected service. Each route needs its own access checks. Returned information reaches the agent; built-in file tools have separate permission checks."}
 
 The built-in sandbox covers commands run inside it and the programs they start. It does not enclose every tool available to the agent. Built-in file tools have their own permission checks; connected services and separately running queue services need their own access controls. Have the agent identify the programs and accounts involved in the actual task.[^tk-sandbox-scope]
 
-A connection that only reads data can still return those data to the agent, which may send them to a hosted large language model (LLM). Decide which material may be sent before enabling the connection. The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [what reaches the LLM](https://dss-agentic-research.pages.dev/chapters/research-limits.html#what-reaches-the-llm) and [how to establish a chain of custody](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody).
+A connection that only reads data can still return those data to the agent. The agent may send them to a hosted large language model (LLM), running on the computers of a provider such as Anthropic. The provider operates the service and receives the submitted information. Decide which material may be sent before enabling the connection. The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [what reaches the LLM](https://dss-agentic-research.pages.dev/chapters/research-limits.html#what-reaches-the-llm) and [how to establish a chain of custody](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody).
 
-## Apply settings at the right scope
+## Choose where the settings apply {#apply-settings-at-the-right-scope}
 
 Use global settings for rules shared across your projects and project settings for the requirements of a particular study. Ask the agent to inspect the existing files and any institution-managed settings before proposing changes.
 
@@ -99,7 +101,7 @@ Use global settings for rules shared across your projects and project settings f
 | Project | `.claude/settings.json` inside the project | Settings that can be shared with project collaborators. |
 | Personal project | `.claude/settings.local.json` inside the project | Your own settings for this project; keep this file out of version control. |
 
-For many settings, the personal project file overrides the shared project file, which overrides global defaults. Permission rules combine across those files: a matching deny takes precedence over an allow. Your institution can also enforce managed settings. Ask the agent to report which settings actually apply, including any session-specific overrides.[^tk-settings-scope]
+For many settings, the personal project file takes priority over the shared project file, which takes priority over global defaults. Permission rules combine across those files: a project allowance does not remove a matching global deny. Your institution can also enforce managed settings. Ask the agent to report which settings actually apply, including changes supplied when the session starts.[^tk-settings-scope]
 
 Keep secret values out of these files and saved command approvals. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to supply them to the program that needs them.
 
@@ -107,7 +109,7 @@ Keep secret values out of these files and saved command approvals. [Chapter 12: 
 
 Describe the files and services the work needs. For the batch of fits, you could ask:
 
-> Set up access for these model fits. The approved inputs are in [folder]; results and logs belong in [folder]. Leave the inputs unchanged and block access to [excluded folder]. Check the current agent settings and the queue service's access. Explain where changes are needed before applying them. Test permitted and blocked actions with harmless substitute files, then report the settings changed, the outcomes, and anything you could not verify.
+> Set up access for these statistical model fits. The approved inputs are in [folder]; results and logs belong in [folder]. Leave the inputs unchanged and block access to [excluded folder]. Check the current agent settings and the queue service's access. Explain where changes are needed before applying them. Test permitted and blocked actions with harmless substitute files, then report the settings changed, the outcomes, and anything you could not verify.
 
 The agent should test the paths the work will actually use. A direct command succeeding or failing does not establish how a queued job behaves. Its report might include the following checks; the entries describe expected outcomes, not results already obtained.
 
@@ -119,12 +121,14 @@ The agent should test the paths the work will actually use. A direct command suc
 
 Keep the settings and a short record of observed results with the project. If a required restriction fails, have the agent diagnose it before using protected inputs. These checks can expose configuration mistakes; they do not establish protection against every possible action.
 
-The downloadable example protects `data/raw` from changes and excludes `data/restricted`. Have the agent adapt it to the actual project and merge it with existing settings. File-tool paths beginning with `/` are project-relative here; sandbox paths beginning with `./` in project settings resolve from the project root. In global settings, relative sandbox paths resolve from that settings directory. These are different conventions, so the agent must resolve and check both before relying on them.
+The optional example below is intended to protect `data/raw` from changes and exclude `data/restricted`. Have the agent adapt it to the actual project, merge it with existing settings, and perform the relevant checks above. JSON is a text format that stores settings under named fields; you do not need to edit it yourself.
 
 [Download the settings example](resources/project-settings-example.json){.download-button download="project-settings-example.json"}
 
 <details class="guide-example">
 <summary>Read the example project settings</summary>
+
+File-tool paths beginning with `/` are project-relative here; sandbox paths beginning with `./` in project settings resolve from the project root. In global settings, relative sandbox paths resolve from that settings directory. These are different conventions, so the agent must resolve and check both before relying on them.
 
 ```json
 {
@@ -167,7 +171,9 @@ Where stronger separation is required, the agent can help configure an approved 
 
 Repeat relevant checks when you add a tool or change how work is run. If settings are maintained through another program, protect its source copy as well as the file the agent reads; [Appendix B: Keep records of shared settings: chezmoi](#understand-the-two-copies) explains the two locations.
 
-[^tk-pueue-process]: [`Pueue`'s documentation](https://github.com/Nukesor/pueue) describes its background service, working directories, and task environment. The conclusion about checking the service's access follows from that separate execution process; queue submission is not an access-control test.
+[^tk-access-os]: The operating system is the core software managing a computer's hardware, files, and running programs. macOS, Windows, and Linux are examples.
+
+[^tk-pueue-process]: [`pueue`'s documentation](https://github.com/Nukesor/pueue) describes its background service, working directories, and task environment. The conclusion about checking the service's access follows from that separate execution process; queue submission is not an access-control test.
 
 [^tk-access-controls]: Anthropic's [permission documentation](https://code.claude.com/docs/en/permissions) describes tool rules and their precedence. The research guide's [Chapter 4: Control what the agent can do](https://dss-agentic-research.pages.dev/chapters/agent-access.html#enforce-those-limits) introduces the controls and defines the related terms.
 
@@ -177,13 +183,15 @@ Repeat relevant checks when you add a tool or change how work is run. If setting
 
 [^tk-settings-scope]: See Anthropic's [settings precedence](https://code.claude.com/docs/en/settings#settings-precedence) and [permission-rule precedence](https://code.claude.com/docs/en/permissions#settings-precedence). These explain file merging; the agent must still inspect the configuration used by the actual session and its extensions.
 
-<!-- ===================== PART II — ESSENTIAL TOOLS ===================== -->
+<!-- ===================== PART II — INSTALL TOOLS AND MANAGE PROJECT FILES ===================== -->
 
 # 3. Install and manage tools with Homebrew {#adding-tools}
 
-A package manager installs software and its supporting components, then provides a consistent way to update or remove it. [`Homebrew`](https://brew.sh/) supplies many tools in this guide. Once it is installed, an agent can add the program a research task needs without taking you through a different website and installer each time.
+The agent may need a program that is not yet installed, such as a queue for a simulation batch. A package manager installs the program and its supporting software, and provides a consistent way to update or remove it. [`Homebrew`](https://brew.sh/) supplies many of the tools in this guide.
 
-Suppose you want a batch of simulations to continue while you are away. The agent can install [`pueue`](https://github.com/Nukesor/pueue) with `Homebrew`, then configure the queue for the project. Installing the program makes it available; setting up the queue makes it useful for your work.
+For example, the agent can install [`pueue`](https://github.com/Nukesor/pueue), then configure the queue for the project's simulations. It first checks the computer where the work will run and installs only what is missing.
+
+![](figures/tool-installation.svg){#fig-tool-installation fig-alt="The agent retains an available program or installs the missing program and its supporting software. Both routes end by running the program in the intended session and reporting its version."}
 
 ## Ask the agent to install the tool
 
@@ -191,15 +199,13 @@ Start from the app and describe the task. The agent should check whether the too
 
 > Check whether `Homebrew` and `pueue` are available where this project runs. Install what is missing through the appropriate route, keeping the existing installation where it works. Explain any password or sign-in step I must complete. Confirm that you can run `pueue` from this session, then configure it for the project's simulation jobs.
 
-The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. `Homebrew`'s [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If a personal step requires `Terminal`, [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains how to open it.
+The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords in the system dialog or sign-in interface, not in the conversation. `Homebrew`'s [installation documentation](https://docs.brew.sh/Installation) describes its supported routes, including a package installer for Apple Silicon Macs. If you must open an installer or paste a command into `Terminal`, the agent should supply that exact step and explain its purpose. [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains how to open the terminal.
 
 The useful completion report identifies the installed program, its version, and whether the agent can invoke it in the intended session. A program may already be installed but absent from that session's `PATH`, the directories searched for commands. Have the agent diagnose that before installing a second copy.
 
-![](figures/tool-installation.svg){#fig-tool-installation fig-alt="The agent checks for an existing program. Available software can be used immediately; missing software and its dependencies are installed through the package manager, then checked in the actual session."}
-
 ## Keep a record of installed tools
 
-A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with Homebrew. Ask the agent to maintain it when a recoverable machine setup would help, and to record how the project uses its tools. A Brewfile does not pin the full software environment for an analysis; [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) covers language and package versions.
+A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with `Homebrew`. It helps install the same set of tools on another computer. Ask the agent to maintain it when that would be useful, along with a record of how the project uses its tools. The exact language and package versions used by an analysis need their own records; [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains these.
 
 During ordinary work, have the agent check for an existing installation before adding software. When an update could affect a recorded analysis, it should preserve the working environment and explain the proposed change. Updates to a computer's tools and changes to a study's package versions serve different purposes.
 
@@ -211,53 +217,144 @@ Keep an institutional package manager when it already supplies the required tool
 
 Research projects change as sample definitions, analyses, and manuscripts develop. [`Git`](https://git-scm.com/) records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after the conversation has ended.
 
-Suppose a revised exclusion rule removes far more observations than expected. Ask the agent to find that change and recover the earlier rule while keeping the manuscript edits made since then. You decide which sample definition is appropriate; the agent finds and restores the relevant code. If you approve restoring the earlier rule, it should also make `SPECIFICATION.md` consistent with that decision and add the reason at the top of `METHODOLOGY.md`, preserving the earlier entries.
+Suppose a revised exclusion rule removes far more observations than expected. You decide which sample definition is appropriate; the agent finds the relevant change and can recover the earlier rule while preserving unrelated manuscript edits. A restored rule can change the results, so affected figures and manuscript values must be regenerated too.
+
+![](figures/version-recovery.svg){#fig-version-recovery fig-alt="Git retains an earlier sample rule. The agent restores that rule while keeping unrelated later text and styling edits, then regenerates affected results."}
 
 ## Give the project a useful history
 
-A `git` *repository* stores the project's history. A *commit* records a set of changes with a description. The agent can create these checkpoints after meaningful pieces of work, such as a revised `SPECIFICATION.md` with its `METHODOLOGY.md` entry, or a completed figure. The descriptions should explain the change well enough to find it later.
+A `Git` *repository* stores the project's history. A *commit* records a version of selected files with a message describing the change. The agent can create these checkpoints after meaningful pieces of work, such as an approved sample rule or a completed figure. The descriptions should explain the change well enough to find it later.
+
+For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. If you approve restoring the earlier rule, have the agent update the requirements and add the reason at the top of the decision record, preserving earlier entries.
 
 > Maintain version history for this project. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
 
-The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. `Git` records only the files and changes included in its history; keep appropriate backups for the rest of the project.
+The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. A `.gitignore` file tells `Git` which untracked files to leave out; it does not erase files already in history. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to keep secret values out of research files. Keep appropriate backups for material outside version history.
 
 If the project lives in `Dropbox`, have the agent configure storage for `git`'s internal files before creating a populated repository. [Appendix D: Troubleshooting](#cloud-sync-storage) explains the specific local procedure and how to handle an already populated directory.
 
-![](figures/version-recovery.svg){#fig-version-recovery fig-alt="Git checkpoints retain an earlier sample rule. The agent restores that rule into the current project while preserving later manuscript edits."}
-
 ## Recover the change you need
 
-State the desired outcome rather than a `git` operation: “Restore the sample definition from before yesterday's sensitivity analysis, keeping the new figures and manuscript edits.” The agent should locate the relevant version, preserve unrelated work, and check the affected analysis after recovery.
+State the desired outcome rather than a `Git` operation:
+
+> Restore the earlier sample-selection rule while preserving unrelated manuscript wording and figure-formatting edits. Update the approved analysis requirements and record why the rule changed. Rerun the affected analysis, regenerate its figures, and identify manuscript values that need updating.
 
 A useful report names the recovered decision, identifies the changed files and source checkpoint, and explains which outputs were regenerated. If the earlier state was never recorded, the agent should say what it can recover and what must be reconstructed. It should not silently reset the entire project to an older version.
 
 ## Share work when intended
 
-[`GitHub`](https://github.com/) hosts repositories for collaboration. [`GitHub CLI` (`gh`)](https://cli.github.com/) lets the agent use `GitHub` from commands, including preparing a pull request: a proposed change collaborators can discuss before it is incorporated. `Git` can maintain local history without GitHub.
+[`GitHub`](https://github.com/) hosts repositories for collaboration. [`GitHub CLI` (`gh`)](https://cli.github.com/) lets the agent use `GitHub` from commands, including preparing a pull request: a proposed change collaborators can discuss before it is incorporated. `Git` can maintain local history without `GitHub`.
 
-Use the research group's existing host and account arrangements. You complete [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures the connection and checks it without displaying credentials. Once sharing is authorized, it can send the intended changes and summarize the project's checks. A private repository still sends its contents to the hosting service, so protected data and secrets must be excluded before sharing. [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in the companion guide *Doing Research with AI Agents* covers deciding what belongs in a research deposit.
+Keep the research group's existing host and accounts. Complete [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures and checks the connection without displaying credentials. Once authorized, it can send the intended changes and report the project's checks. Exclude protected data and secrets before sharing: a private repository still sends its contents to the hosting service. For research deposits, see [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in *Doing Research with AI Agents*.
 
-# 5. Give research tasks reliable commands: just {#project-commands}
+# 5. Find and inspect project files {#finding-files}
+
+Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
+
+Suppose a reviewer asks how `hot_days`, a variable counting days of heat exposure, enters an analysis like the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `ripgrep` is the program's name; `rg` is its command.
+
+![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
+
+The diagram uses illustrative filenames. The agent must report your project's actual paths and lines, then explain any disagreement between the exposure construction, statistical-model use, and figure label.
+
+## Choose the appropriate search
+
+Some files arrange information under named fields, such as a record identifier or an output folder. JSON and YAML are text formats for storing information this way, including fields grouped inside other fields. The agent can select the value it needs instead of printing the whole file or guessing which nearby words belong together.
+
+| Task | Tool | Useful result |
+|---|---|---|
+| Search text within project files | `ripgrep` (`rg`) | Matching passages with file paths and line numbers. |
+| Locate files by name or type | [`fd`](https://github.com/sharkdp/fd) | A focused list of candidate files. |
+| Find values in a JSON response | [`jq`](https://jqlang.org/) | Selected fields from the response. |
+| Read or update YAML settings | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
+| Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers. |
+
+The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job.[^tk-search-programs]
+
+::: {.needspace height="7cm"}
+:::
+
+## Ask for findings tied to files
+
+> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
+
+## Investigate a missing match
+
+`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. Search exclusions reduce noise; they are not file-access restrictions.
+
+Text search does not read the contents of every PDF, image, or saved binary object. The agent should identify the format and use an appropriate reader. A name assembled by code may also require following the calculation rather than searching for the final name.
+
+For a structured response, distinguish an absent field from empty text or *null*, a marker for no value. Ask the agent to check the source's meaning of null before treating the record as missing data or replacing the value.
+
+[^tk-search-programs]: The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions name `fd` and `bat` differently. Ask the agent to identify the installed program and record any naming convention needed for later sessions.
+
+<!-- ===================== PART III — RUN AND REPRODUCE RESEARCH ===================== -->
+
+# 6. Preserve a software environment: rig, renv, and uv {#environments}
+
+Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs the original software records to investigate whether changed software explains the discrepancy. Installing the latest releases would give it a different comparison.
+
+Recording the software prepares the project for repeatable commands, selective reruns, and unattended jobs. It also lets the agent restore the earlier setup separately when investigating a result or preparing a handoff.
+
+## Record the language and packages
+
+A *software environment* includes the language, packages, and other programs used by the analysis. The language interpreter, also called its runtime, executes the code. A *package* adds functions and may require other packages or programs; those requirements are its *dependencies*. A *lockfile* records the particular package versions selected to work together, so the agent can restore that set rather than install whatever is newest.
+
+| Responsibility | `R` | `Python` |
+|---|---|---|
+| Install and select the language | [`rig`](https://rig.r-lib.org/) manages [`R`](https://www.r-project.org/) installations. | [`uv`](https://docs.astral.sh/uv/) manages [`Python`](https://www.python.org/) installations; `.python-version` records a selection. |
+| Record and restore packages | [`renv`](https://rstudio.github.io/renv/) maintains `renv.lock`. | `uv` maintains `pyproject.toml` and `uv.lock`. |
+
+`renv.lock` records the `R` version as well as packages, but `renv` does not install or switch `R` itself; `rig` supplies that capability. `uv` handles both language and package management. In either case, the agent must restore the intended language and packages.
+
+![](figures/research-environments.svg){#fig-research-environments fig-alt="The agent records a working R or Python environment, restores the recorded software separately, and compares a selected output with a saved reference result. Both language routes require the restore-and-check step."}
+
+## Capture the working environment
+
+For a new project, have the agent establish version records alongside the analysis. For an existing project, preserve the working versions before adding packages or changing managers. Choose a previously checked result as the reference for comparison after restoration.
+
+> Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected check. Compare its output with the saved reference result. Report missing software and any changed results.
+
+Keep a functioning environment manager. If the project already uses [`Conda`](https://docs.conda.io/), [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html), or [`pixi`](https://pixi.sh/), have the agent use its version records and restoration procedure. These can also manage software beyond language packages. Ask for exact versions appropriate to the intended operating system and hardware; a list of package names alone cannot restore the earlier setup.
+
+[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded. These tools do not require researchers to change language.
+
+## Restore and check it
+
+Have the agent restore into a separate environment and run a selected analysis or a [smoke test](#smoke-tests): a small representative run through the actual workflow. For `R`, it can compare the installed packages with `renv.lock`; for `uv`, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
+
+The completion report should identify the language version actually used, whether packages restored, and which saved reference results were compared. Missing packages or platform-specific failures need investigation before changing versions. When adding a package later, retain the updated dependency record and check the affected analysis.
+
+## Include system requirements
+
+Some packages depend on system libraries, compilers, or external programs.[^tk-environment-system-software] Record those requirements too. Containers can help package system software when language/package records are insufficient; see [Chapter 10: Run work in a separate environment: containers](#containers). Neither approach promises identical numerical results on all hardware.
+
+Store environment records with the project, while keeping installed package directories out of [`Git`](https://git-scm.com/) and unnecessary cloud synchronization. [Appendix D: Troubleshooting](#cloud-sync-storage) describes the `Dropbox` procedure and the separate [R/macOS execution issue](#r-on-macos).
+
+[^tk-environment-system-software]: A system library provides functions used by other software, such as reading a geospatial file. A compiler translates source code into a form the computer can run. The agent checks whether these supporting programs are required and records their versions.
+
+# 7. Give research tasks reliable commands: just {#project-commands}
 
 <!-- aliases: runnable-checks -->
 
-A command runner gives names to tasks a project repeats. [`Just`](https://just.systems/) saves those commands in a small text file called a `justfile`. The agent can use them while developing the analysis, and you or a collaborator can run them later without asking an LLM to reconstruct the steps.
-
 In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), changing a figure label should not require fitting the statistical model again. A figure command can read the saved estimates and regenerate the plot. A separate command can refit a selected specification when the analysis changes.
+
+A *command* tells the computer which program or saved task to run. [`just`](https://just.systems/) is a command runner that gives recurring tasks short names. Each definition, called a *recipe*, is saved in the project's `justfile` and can run one script or several commands. The agent can use these recipes during development, and you or a collaborator can run them later without reconstructing the steps.
 
 ## Give the commands useful work
 
-The analysis needs independently runnable steps with explicit inputs and saved outputs. A step might fit one specification, produce a figure, or build the manuscript. Shared functions can support several steps. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the research guide explains how to organize that work.
+Each selected step must run from its declared inputs and saved outputs, without relying on objects left in an interactive session. Installing `just` does not create that structure. Have the agent preserve the working results before reorganizing the code, reusing shared functions where appropriate. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the research guide explains the full process.
 
-Installing just does not create this structure. Have the agent inspect the current analysis and preserve its working results before reorganizing it. Each command should then select a coherent task without quietly repeating unrelated computation.
+![](figures/project-commands.svg){#fig-project-commands fig-alt="The agent runs a saved figure recipe that reads existing estimates and plotting code to produce a revised plot. The statistical fit is reused."}
 
-![](figures/project-commands.svg){#fig-project-commands fig-alt="Several modular analysis scripts and one small justfile provide commands for selected fits, figures, a manuscript, or a complete build."}
+::: {.needspace height="7cm"}
+:::
 
 ## Save the commands
 
 > Preserve the current results, then give this project commands to fit a selected specification, rebuild figures from saved estimates, and run the complete workflow. Use just unless the existing command system already does this. Record each command's inputs and outputs, reuse shared code, and check that reorganizing execution has not changed the intended results.
 
-The agent installs just if needed and maintains the recipes. A small project might expose the following menu; these commands are examples to create for the project, not commands available simply because just is installed.
+The agent installs `just` if needed and maintains the recipes. A small project might offer the following menu. These are examples to create for the project; installing `just` alone does not provide them.
 
 | Example command | Project operation |
 |---|---|
@@ -271,47 +368,87 @@ Ask the agent to use these recipes in normal work and keep their descriptions cu
 
 ## Run a smoke test {#smoke-tests}
 
-A *smoke test* runs a small representative workload through the actual workflow before a large batch. Ask the agent to run one specification or a few simulation repetitions through the relevant stages, checking that the software runs and expected outputs are saved. Use the same code and environment as the full run, with a smaller workload selected by an option.
+A *smoke test* runs a small representative workload through the actual workflow before a large batch. For example, one fit should also produce its required contrast table and figure, so the agent checks that the steps work together. Use the same code and environment as the full run, with a smaller workload selected by an option and outputs kept apart from the main study's results.
 
 > Add a smoke-test recipe using the actual workflow. Keep its outputs separate from the full analysis, run it after relevant changes, and confirm the expected files before starting an expensive batch.
 
 []{#runnable-checks}
 
-Execution checks and scientific checks answer different questions. A working pipeline can still implement the wrong analysis. Keep checks derived from `SPECIFICATION.md` runnable too, such as a join that must preserve observation counts. The command runner executes those checks; the specification states the research requirements. For scientific checks, see the research guide’s [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
+Successful execution does not establish that the analysis is appropriate. Save automatic checks of the project's requirements too, such as stopping when a join unexpectedly changes the observation count. These requirements come from `SPECIFICATION.md`, which holds the approved scientific specification. A simulation evaluating interval coverage asks a different question about statistical performance. Both checks can have saved commands; the command runner does not decide whether their research criteria are suitable. See the research guide’s [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
 
 ## Combine command and dependency runners
 
-[`Make`](https://www.gnu.org/software/make/), [`targets`](https://docs.ropensci.org/targets/), and [`Snakemake`](https://snakemake.readthedocs.io/) can track dependencies and determine which work needs repeating. `Just` provides named commands; it does not perform that dependency analysis. A `just build` recipe can invoke `targets` or `Snakemake`, while other recipes open a preview or run quick checks.
+A figure depends on the estimates it reads. [`Make`](https://www.gnu.org/software/make/), [`targets`](https://docs.ropensci.org/targets/), and [`Snakemake`](https://snakemake.readthedocs.io/) can track dependencies like this and determine which work needs repeating. `just` provides named commands; it does not perform that analysis. A `just build` recipe can invoke `targets` or `Snakemake`, while other recipes open a preview or run quick checks.
 
-[Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains selective rebuilding. [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing `Make` setup or master do-file if it already supplies the required behavior.
+[Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains selective rebuilding. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing `Make` setup or master do-file if it already supplies the required behavior.
 
-# 6. Keep unattended jobs moving: pueue {#job-queues}
+# 8. Rerun only affected steps: targets and Snakemake {#pipeline-dependencies}
 
-A queue keeps prepared research jobs moving while you are away. It starts the next waiting job automatically when another finishes, so neither you nor an agent needs to supervise each launch. [`Pueue`](https://github.com/Nukesor/pueue) manages these jobs through a background service and keeps their status and logs.
+A figure depends on the estimates it reads. If only its label changes, those estimates can be reused. A *dependency* is a step's reliance on a particular input or earlier result. A dependency runner records these relationships and selects the steps affected by a change.
+
+[`targets`](https://docs.ropensci.org/targets/) provides this for [`R`](https://www.r-project.org/) workflows; [`Snakemake`](https://snakemake.readthedocs.io/) organizes steps that produce files and can use different languages. [`just`](https://just.systems/), a command runner that gives project tasks familiar names, can call either tool. The agent can keep `just build` as the command while the dependency runner decides which calculations to repeat.
+
+## Show the dependencies
+
+The diagram illustrates a possible workflow with two fitted specifications, based on the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. Its reruns are expected behavior to check, not findings from a trial of the downloadable project.
+
+![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="The same dependency graph shows three changes: a figure edit reruns the figure and document, a specification-B edit also reruns fit B, and a shared-data change reruns both fits. Unaffected results are reused."}
+
+Have the agent identify each step's inputs, code, parameters, and outputs. External inputs count too: a script that reads an unrecorded file or a response from a data service can produce a result the runner does not know is out of date. Save and declare those inputs according to the project's acquisition procedure.
+
+The [targets manual](https://books.ropensci.org/targets/) explains tracking objects, functions, and files. [`Snakemake` rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html) describe how inputs produce outputs. The agent writes and maintains the definitions; you check that the proposed relationships match the intended research workflow.
+
+::: {.needspace height="7cm"}
+:::
+
+## Connect the analysis
+
+> Preserve the current results and environment. Connect the analysis through targets for this R workflow, declaring its inputs, functions, files, and outputs. Keep just as the command runner. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the previously checked results saved for this comparison.
+
+For a workflow organized around files and multiple languages, request `Snakemake` instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
+
+## Check what reruns
+
+Ask the agent to preview planned work without executing it, using `targets`' `tar_outdated()` or a `Snakemake` *dry run*. It should then run a small representative workload and compare the actual reruns with the expected graph. The report should identify steps performed, results reused, and any unexpected output changes. This checks execution; a full analysis and its scientific evaluation still have their own requirements.
+
+## Run the pipeline unattended when useful
+
+The runner can reuse completed results after an interruption when they remain current. Continuing an unfinished fit midway requires a *checkpoint*: saved intermediate state that the fitting program can reload. Keep the workflow definitions, environment records, and needed inputs with the project; large stores of reusable results, often called caches, need separate storage management.
+
+[`pueue`](https://github.com/Nukesor/pueue) can queue `just build`, which starts the dependency runner. The queue controls when that command starts; the runner selects the calculations. One queued job may start several *workers*, separate processes doing calculations concurrently, and each worker may itself use several processor cores. `targets` can use [`crew`](https://wlandau.github.io/crew/) for workers. Have the agent coordinate memory and processor use across both levels; [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains those limits. In an environment affected by the [R/macOS issue](#r-on-macos), check the actual worker route before enabling it.
+
+# 9. Keep unattended jobs moving: pueue {#job-queues}
+
+A queue keeps prepared research jobs moving while you are away. A *job* is one submitted command or task; a *batch* is a set of jobs to run. [`pueue`](https://github.com/Nukesor/pueue) starts waiting jobs automatically as others finish. Its background service runs separately from the conversation and keeps each job's status and logs, the recorded messages from its execution.
 
 Suppose the heat-and-birthweight sensitivity analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) needs 100 independent fits. If the computer can comfortably run four at once, the remaining fits wait their turn. You can return later and ask the agent which results are ready and which jobs need attention.
 
-![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs feeds four simultaneous running slots. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
+![](figures/job-queues.svg){#fig-job-queues fig-alt="An illustrative queue of 100 jobs allows four jobs to run at once. Whenever a job finishes, the queue automatically starts the next. Finished jobs retain results, logs, and success or failure status."}
 
 ## Prepare the batch
 
-Ask the agent to run a representative fit through the queue before submitting the full batch. This [smoke test](#smoke-tests) checks the command, working directory, project environment, and saved output. It also helps establish a sensible concurrency limit.
+Ask the agent to run a representative fit through the queue before submitting the full batch. This [smoke test](#smoke-tests) is a small run through the actual workflow, checking the command, starting folder, software environment, and saved output. It also helps choose the *concurrency limit*, the maximum number of jobs running at once.
 
-Four simultaneous jobs do not necessarily use four processor cores. Each fit may use several threads, and memory can limit concurrency before processor capacity does. Have the agent inspect those requirements and leave capacity for the rest of the computer's work.
+Four jobs do not necessarily use four processor cores. A core can perform computation, and one fit may divide its work across several cores.[^tk-queue-resources] Several fits may also exhaust memory while cores remain available. Have the agent measure a representative run and choose a limit that leaves the computer usable for other work.
 
-> Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose a concurrency limit from its memory and thread use, then submit the batch. Record job identifiers, specifications, logs, and output locations so we can identify and rerun individual failures.
+> Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose the maximum number of jobs running at once from its memory and processor use, then submit the batch. Confirm that the submitted jobs start and produce the expected logs or outputs. Record job identifiers, specifications, logs, and output locations so individual failures can be identified and rerun.
 
 The queue service's access must suit the work, as explained in [Chapter 2: Control what added tools can access](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
 
 ## Let the queue manage execution
 
-The background service starts and records the jobs. Closing the submitting conversation need not stop them, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires checkpoints saved by the fitting program.
+After submission, have the agent confirm early progress in the actual batch: a job should be running and its expected log or output should have appeared. A successful small test does not establish that the later batch was launched correctly.
 
-For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), have the agent verify the service's lifetime before relying on unattended execution. A systemd service does not itself keep a WSL instance alive.
+Closing the submitting conversation need not stop the background service, but the computer must remain awake and available. A reboot or shutdown can interrupt work. A queue's record does not let an interrupted fit resume midway; that requires the fitting program to save and reload intermediate state, often called checkpoints.
+
+For short tasks, direct execution may be sufficient. For work on a cluster, retain its institutional scheduler. On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), the Linux environment used by this guide, have the agent verify how long both the environment and its background service remain available. Starting the service does not itself keep the WSL environment alive.
 
 ## Review results and recover failures
 
-Ask for completed artifacts as well as process status. A command can exit successfully while writing its result to an unexpected location. Keep failed attempts and their logs so the agent can explain what happened.
+Ask for the expected results files as well as process status. A command can exit successfully while writing its result to an unexpected location. Keep failed attempts and their logs so the agent can explain what happened.
+
+::: {.needspace height="3cm"}
+:::
 
 An illustrative report might say:
 
@@ -319,7 +456,7 @@ An illustrative report might say:
 
 You can then ask the agent to diagnose the failures, propose any change affecting the analysis or resource use, and rerun the affected jobs. Each retry should retain its relationship to the original attempt. Avoid duplicating completed fits or overwriting an earlier failed run's evidence.
 
-`Pueue` distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
+`pueue` distinguishes waiting, running, and finished jobs. The agent should retain task IDs, inspect the stored success/failure result, and verify expected outputs. `pueue wait` indicates that waiting has ended; its own exit status is not the job's outcome.
 
 <details class="guide-example">
 <summary>Example: submit a saved command and inspect its outcome</summary>
@@ -331,7 +468,7 @@ pueue add --print-task-id -- just fit
 pueue status
 ```
 
-Use the returned task ID. If it were 42, the following query checks the stored result using [`jq`](https://jqlang.org/):
+Use the returned task ID. If it were 42, the following query uses [`jq`](https://jqlang.org/) to select and check the success/failure value in the saved status report:
 
 ```text
 pueue log 42
@@ -339,144 +476,42 @@ pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
-This result shape was checked with `pueue` 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [`R`](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
+This structure of the status report was checked with `pueue` 4.0.4. The agent must check the installed version and the expected result file as well as the stored status. For the observed macOS [`R`](https://www.r-project.org/) problem, retain the [pseudo-terminal helper](#r-on-macos) for queued execution too.
 
 </details>
 
 ## Combine with a dependency pipeline
 
-A [`just`](https://just.systems/) recipe can invoke a complete analysis, and [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/) can decide which dependent steps need rebuilding. `Pueue` can queue that outer command. Choose resource limits for both levels so the pipeline's internal workers do not overwhelm the machine. [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains the dependency runner's role.
+A [`just`](https://just.systems/) recipe, a named saved command, can invoke a complete analysis. [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/) can decide which steps need rebuilding after an input changes, and `pueue` can queue that outer command. A pipeline may start several workers, separate processes performing calculations inside that job. Choose resource limits for both levels. [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains the dependency runner's role.
 
-# 7. Find and inspect project files {#finding-files}
-
-Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
-
-Suppose a reviewer asks how `hot_days` enters the analysis. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`Ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `Ripgrep` is the program's name; `rg` is its command.
-
-## Choose the appropriate search
-
-| Task | Tool | Useful result |
-|---|---|---|
-| Search text within project files | `ripgrep` (`rg`) | Matching passages with file paths and line numbers. |
-| Locate files by name or type | [`fd`](https://github.com/sharkdp/fd) | A focused list of candidate files. |
-| Query JSON | [`jq`](https://jqlang.org/) | Selected fields from a structured response. |
-| Query or edit YAML | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
-| Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers and syntax highlighting. |
-
-The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job. JSON and YAML queries use the document's structure, which is more dependable than searching for a word and assuming the adjacent text has the intended meaning.
-
-## Ask for findings tied to files
-
-> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines and explain how the definitions relate. Use focused searches and excerpts. If a saved JSON or YAML response is involved, query the relevant fields rather than printing the entire response.
-
-![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
-
-An illustrative answer could identify `code/exposure.R` as the construction step, `code/fit.R` as the model formula, and `code/figure.R` as the label source, with the actual line numbers attached. The agent should explain any disagreement between those locations. The filenames here illustrate the form of a report; the agent must use the files that exist in your project.
-
-## Investigate a missing match
-
-`Ripgrep` ordinarily skips ignored and hidden files. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. A name assembled by code or stored in a binary file may need a different investigation. Search exclusions reduce noise; they are not file-access restrictions.
-
-For a structured response, distinguish a missing field from an explicit null value. The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions also name `fd` and `bat` differently. Have the agent identify the available program and its behavior, then record useful tool conventions for future sessions.
-
-<!-- ===================== PART III — REPRODUCIBLE RESEARCH WORKFLOWS ===================== -->
-
-# 8. Preserve a software environment: rig, renv, and uv {#environments}
-
-An analysis can change when its software changes. Recording the language and package versions lets the agent restore the earlier environment before investigating a different result or handing the project to a collaborator.
-
-Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs the original software records to determine whether the discrepancy follows from an environment change. Installing the latest releases would give it a different comparison.
-
-## Record the language and packages
-
-The *runtime* is the installed language interpreter, such as a particular release of `R` or Python. Packages provide additional functions used by the analysis. A *lockfile* records resolved package versions and their dependencies so they can be restored together.
-
-| Responsibility | `R` | `Python` |
-|---|---|---|
-| Install and select the language | [`rig`](https://rig.r-lib.org/) manages [`R`](https://www.r-project.org/) installations. | [`uv`](https://docs.astral.sh/uv/) manages [`Python`](https://www.python.org/) installations; `.python-version` records a selection. |
-| Record and restore packages | [`renv`](https://rstudio.github.io/renv/) maintains `renv.lock`. | `uv` maintains `pyproject.toml` and `uv.lock`. |
-
-Renv records the `R` version but does not install or switch `R` itself. Rig supplies that capability. Uv handles both language and package management, but the records still serve different purposes.
-
-![](figures/research-environments.svg){#fig-research-environments fig-alt="Language version and package dependencies have separate records. Rig and renv support R; uv supports Python. Restore both records and check a baseline output."}
-
-## Capture the working environment
-
-For a new project, have the agent establish version records alongside the analysis. For an existing project, preserve the working versions before adding packages or changing managers.
-
-> Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected baseline checks. Report missing software and any changed results.
-
-Keep a functioning environment manager. [`Conda`](https://docs.conda.io/) environments can include language packages and other compiled software. [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) is a small command-line manager for conda environments; the agent can use it when that matches the project's scientific software. A project already using [`pixi`](https://pixi.sh/) need not migrate to uv. Ask for exact package/build records appropriate to that manager and target platform; a loose list of package names does not reproduce an earlier resolution.
-
-[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded. These tools do not require researchers to change language.
-
-## Restore and check it
-
-Have the agent restore into a separate environment and run the project's [smoke test](#smoke-tests) or selected baseline analysis. For `R`, it can check the restored library against `renv.lock`; for `uv`, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
-
-The completion report should identify the runtime actually used, whether packages restored, and which baseline outputs were compared. Missing packages or platform-specific failures are findings to resolve, not reasons to replace versions without recording the change. When adding a package later, retain the updated dependency record and check the affected analysis.
-
-## Include system requirements
-
-Some packages depend on system libraries, compilers, or external programs. Record those requirements too. Containers can help package system software when language/package records are insufficient; see [Chapter 10: Run work in a separate environment: containers](#containers). Neither approach promises identical numerical results on all hardware.
-
-Store environment records with the project, while keeping generated libraries out of `git` and unnecessary cloud synchronization. [Appendix D: Troubleshooting](#cloud-sync-storage) describes the `Dropbox` procedure and the separate [R/macOS execution issue](#r-on-macos).
-
-# 9. Rerun only affected steps: targets and Snakemake {#pipeline-dependencies}
-
-When an analysis changes, some results need rebuilding and others remain usable. A dependency-aware runner records those relationships and selects the work to repeat. [`Targets`](https://docs.ropensci.org/targets/) provides this for `R` workflows; [`Snakemake`](https://snakemake.readthedocs.io/) organizes file-producing steps that can use different languages. [`Just`](https://just.systems/) can remain the project's command interface: `just build` invokes the runner underneath.
-
-In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), a figure-label change should reuse the saved fits. Changing specification B should rerun fit B and the combined figure, while reusing fit A. Changing the shared analysis data affects both fits. The runner needs those dependencies recorded to make the distinction.
-
-## Show the dependencies
-
-![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="The same dependency graph shows three changes: a figure edit reruns the figure and document, a specification-B edit also reruns fit B, and a shared-data change reruns both fits. Unaffected results are reused."}
-
-Have the agent identify each step's inputs, code, parameters, and outputs. External inputs count too: a script that reads an unrecorded file or an API response can produce a result the runner does not know is out of date. Save and declare those inputs according to the project's acquisition procedure.
-
-The [targets manual](https://books.ropensci.org/targets/) explains tracking objects, functions, and files. [`Snakemake` rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html) describe how inputs produce outputs. The agent writes and maintains the definitions; you check that the proposed relationships match the intended research workflow.
-
-## Connect the analysis
-
-> Preserve the current results and environment. Connect the analysis through targets for this `R` workflow, declaring its inputs, functions, files, and outputs. Keep just as the command interface. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the baseline.
-
-For a workflow organized around files and multiple languages, request `Snakemake` instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
-
-## Check what reruns
-
-The agent can inspect planned work with targets' `tar_outdated()` or a `Snakemake` dry run, then test the expected behavior on a representative workload. It should report which steps actually ran, which results were reused, and whether the outputs agree with the intended change.
-
-A successful setup report might show that a label edit rebuilt only the figure and document, while changing specification B rebuilt that fit and its downstream outputs. Those are illustrative expectations, not findings from the example project. Full analysis runs and scientific checks remain separate from this execution check.
-
-## Run the pipeline unattended when useful
-
-The runner can reuse completed results after an interruption when they remain current. Restarting halfway through an unfinished fit requires checkpoints from that fitting program. Keep the definitions, environment records, and needed inputs with the project; large rebuildable caches need separate storage management.
-
-[`Pueue`](https://github.com/Nukesor/pueue) can queue the outer pipeline command, while the pipeline runner decides which steps need computation. Coordinate memory and threads across both. `Targets` can use [`crew`](https://wlandau.github.io/crew/) for parallel workers; the documented [R/macOS issue](#r-on-macos) requires checking the actual worker route before enabling it in an affected environment.
+[^tk-queue-resources]: A program can divide work into threads, which may execute on different processor cores. Jobs, workers, and threads are different units: limiting the queue to four jobs does not limit all the programs they start to four threads.
 
 # 10. Run work in a separate environment: containers {#containers}
 
-A container runs software in a separately configured environment. It can include system libraries that a language lockfile does not capture, and its access can be limited to selected files and services. The configuration determines which of those benefits the project receives.
+A spatial analysis may need a particular geospatial library as well as its [`R`](https://www.r-project.org/) packages. Recording the packages alone may leave a collaborator without the supporting software they require. A *container* packages the program and its supporting software in a separately configured environment. The agent can also limit which folders and connections it receives when the task requires those limits.
 
-For example, a spatial analysis may depend on a particular geospatial library as well as `R` packages. Packaging those components helps a collaborator establish the same software. A different project may need an agent and local LLM to process only an approved document collection. Both can use containers, but they need different access and software arrangements.
+A different project may need an agent and a local large language model (LLM) to process only an approved document collection. That arrangement needs its own software and access configuration. Choose the container's purpose before asking the agent to set it up.
 
 ## Decide why the task needs a container
 
 | Research need | What the agent configures |
 |---|---|
-| Reproduce system dependencies | Language/packages, system libraries, command-line programs, and the supported platform. |
+| Reproduce supporting software | Language/packages, supporting libraries and programs, and the supported platform. |
 | Run approved work with restricted inputs | Required input access, separate output storage, permitted network connections, and credentials. |
-| Give a local agent a limited workspace | The LLM runtime and agent, their tools, and the files/accounts available to them. |
+| Give a local agent a limited workspace | Software to run the LLM and agent, their tools, and the files/accounts available to them. |
 
 A container does not itself authorize processing under a data agreement. Establish the permitted environment through [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) in the companion guide *Doing Research with AI Agents*, then configure and check it for that purpose.
 
 ## Specify software and access
 
-With [`Docker`](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. A *mount* makes a folder on the host computer available inside the container, for example as read-only inputs or writable output storage. `Docker`'s [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
+With [`Docker`](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. The *host* is the computer running the container. A *mount* makes a selected host folder available inside it, for example as read-only inputs or writable output storage. `Docker`'s [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
 
-![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and system software. It reads selected inputs, writes designated outputs, and uses explicitly configured network access. An optional local-agent setup also includes an LLM runtime and harness."}
+![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and supporting software. It reads selected inputs, writes designated outputs, and can connect to an approved service. A separate note identifies the extra LLM and agent software needed for an optional local-agent setup."}
 
-State where the LLM will run. Putting commands inside a container does not move a hosted LLM onto your computer. A local-agent arrangement must configure the LLM runtime too, as described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+If the task uses an LLM, state where it will run. Putting commands inside a container does not move an LLM hosted on a provider's computers into it. A local-agent arrangement also needs an *LLM runtime*, software that loads the LLM and generates responses, as described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+
+::: {.needspace height="7cm"}
+:::
 
 ## Build and check the environment
 
@@ -484,42 +519,48 @@ State where the LLM will run. Putting commands inside a container does not move 
 
 The agent can use [`Colima`](https://github.com/abiosoft/colima) with `Docker`'s command-line tools on a Mac, or retain an existing approved [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, follow the supported runtime, which may be [`Apptainer`](https://apptainer.org/). The researcher completes required authorization; the agent builds and checks the environment.
 
-A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Broad home-directory mounts, unnecessary privileges, or access to `Docker`'s control socket can defeat intended separation; configure only the access the task needs.
+A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Sharing the whole home directory, granting powers the task does not need, or exposing `Docker`'s control socket can defeat the intended separation. The control socket is a connection through which programs can control `Docker`; it requires a separate access decision.
 
 ## Preserve what is needed to run it again
 
-Save the build/run configuration and environment records with the project. A base-image digest identifies particular image content, while a moving tag can later identify a different image. Pin the relevant dependencies and record the platform. A Dockerfile that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
+Save the build/run configuration and environment records with the project. Record and select the required software versions, the platform, and an identifier for the exact image used.[^tk-container-image-id] A `Dockerfile` that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
 
 Keep different access arrangements explicit rather than changing one container silently between tasks. [Chapter 2: Control what added tools can access](#tool-access) explains how these controls relate to the agent's other tools.
 
+[^tk-container-image-id]: A digest identifies particular image content. A tag is a convenient name that can later refer to a different image. The agent should record enough information to recover the version actually used.
+
 # 11. Generate documents from research outputs: Quarto and Pandoc {#research-documents}
 
-A manuscript often reports the same result in a table, a figure, and a sentence. Building those locations from saved analysis outputs makes updates easier to carry through consistently. [`Quarto`](https://quarto.org/) and [`Pandoc`](https://pandoc.org/) let an agent maintain the source and regenerate the document in the required format.
+A manuscript often reports the same result in a table, a figure, and a sentence. Linking those locations to saved analysis outputs makes updates easier to carry through consistently. [`Quarto`](https://quarto.org/) and [`Pandoc`](https://pandoc.org/) let an agent maintain the document's *source*, its text and supporting inputs, and *build* or *render* a readable document from them.
 
-In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), a revised estimate should reach both the results table and the text describing it. The agent can connect those locations to the saved result and rebuild the manuscript. Collaborators can still receive `Word` files or PDFs.
+In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), a revised estimate should reach both the results table and the text describing it. The agent can connect those locations to the saved result and rebuild the manuscript. Collaborators can still receive [`Word`](https://www.microsoft.com/microsoft-365/word) files or PDFs.
 
 ## Connect the document to saved results
 
 Keep the manuscript text, references, figures, and numerical results in known project locations. The document build should read the intended outputs and make clear whether it also runs analysis code. A figure or text revision need not trigger a new fit.
 
-`Quarto` combines authoring, code execution, and publishing configuration, using `Pandoc` for conversion. `Pandoc` can also convert maintained source directly. Ask the agent to use the route that fits the existing document and the required output, rather than replacing a working writing system solely to match this example.
+The agent maintains the text and its links to saved results. `Quarto` combines those inputs and uses `Pandoc` to produce the requested format; it can also run analysis code when that is part of the document's instructions. `Pandoc` can convert text source directly. Keep a writing system that already works for the team, including an authoritative `Word` or [`Google Docs`](https://docs.google.com/) document. Conversion is not a prerequisite for agent assistance.
 
-![](figures/document-production.svg){#fig-document-production fig-alt="Manuscript text, references, and saved results feed a Quarto or Pandoc build. Outputs include Word, HTML, and PDF through LaTeX. Accepted coauthor edits return to maintained source before another build."}
+![](figures/document-production.svg){#fig-document-production fig-alt="Maintained text, references, and saved results feed a document build. It produces Word, web, or PDF outputs. In this source-generated workflow, accepted edits from a returned Word draft go back into the maintained text before rebuilding."}
 
 ## Choose the deliverable
+
+Markdown is plain text with simple formatting marks for headings, lists, and links. It can serve as the maintained text for a build; the agent handles the syntax and conversion settings.
 
 | Format | Typical purpose | Additional requirement |
 |---|---|---|
 | Markdown | Readable text source or a simple text deliverable. | Appropriate formatting and links. |
 | `Word` (`.docx`) | Editable drafts for coauthors. | Styles, optionally supplied by a reference document. |
 | PDF through `LaTeX` | Typeset manuscripts with equations and controlled layout. | A TeX distribution and required fonts. |
-| HTML | Reports, websites, and interactive material. | Web assets and inspection in a browser. |
+| Web document (HTML) | Reports, websites, and interactive material. | Supporting files and inspection in a browser. |
 
 [`LaTeX`](https://www.latex-project.org/) is a typesetting system. A *TeX distribution* supplies the programs and packages needed to use it. For `Quarto`'s PDF route, the agent can follow its [PDF setup](https://quarto.org/docs/output-formats/pdf-basics.html), which includes [`TinyTeX`](https://yihui.org/tinytex/). If no suitable distribution is installed, the agent can use `quarto install tinytex` and verify the chosen PDF engine. Keep a working [`MacTeX`](https://tug.org/mactex/) or [`TeX Live`](https://tug.org/texlive/) installation. `Word` and Markdown output do not require this PDF software.
 
 ## Configure and inspect the build
 
-> Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and add a [`just`](https://just.systems/) command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
+For a source-generated manuscript, ask the agent to save the build as a named command. [`just`](https://just.systems/) is a command runner for this purpose; retain existing build commands if they already work.
+
+> Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and save the build command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
 
 The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. [Chapter 18: Write and revise the manuscript](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the research guide explains the full check that the right numbers reach the paper.
 
@@ -527,31 +568,31 @@ Keep build settings and dependencies with the project. `Quarto`'s [execution set
 
 ## Bring coauthor edits back into the source
 
-If a collaborator edits the generated `Word` file, preserve that returned file before rebuilding. Ask the agent to compare it with the version sent, identify the edits, and incorporate accepted changes into the maintained source. Resolve conflicting scientific revisions before generating a replacement draft.
+Establish which document the team is maintaining. If it is Markdown or `Quarto` source, preserve the returned `Word` file, compare it with the version sent, and transfer accepted edits into that source before rebuilding. If the team edits `Word` or `Google Docs` directly, keep that document authoritative and have the agent check and revise it there.
 
-> Preserve this coauthor's returned document. Compare it with the draft sent, transfer the accepted edits into the source, and flag unresolved changes to claims or results. Rebuild a new draft without overwriting the returned copy, then check that the accepted edits survived.
+> Preserve this coauthor's returned document. Compare it with the draft sent, transfer the accepted edits into our maintained source, and flag unresolved changes to claims or results. Rebuild a new draft without overwriting the returned copy, then check that the accepted edits survived.
 
-Conversion cannot be assumed to preserve every comment or tracked change automatically. Establish which document is authoritative for the current editing stage and retain the source/reference files needed for the next build.
+Conversion cannot be assumed to preserve every comment or tracked change automatically. Resolve conflicting scientific revisions before generating a replacement draft, and retain the returned file and the inputs needed for the next build.
+
+If an accepted edit changes the analysis, have the agent update the current requirements in `SPECIFICATION.md` and add the dated decision and reason to `METHODOLOGY.md`. Rerun the affected analysis and checks before rebuilding the document; a successful document build alone does not establish that the reported results implement the revised requirements.
 
 <!-- ===================== PART IV — CONNECT TO DATA AND SERVICES ===================== -->
 
-If an accepted edit changes the analysis, have the agent update `SPECIFICATION.md` and add the decision and reason to `METHODOLOGY.md`. Rerun the affected analysis and checks before rebuilding the document; a successful document build alone does not establish that the reported results implement the revised requirements.
-
 # 12. Keep credentials out of research files: 1Password and direnv {#credentials}
 
-An API key can let a program spend money or access data under your account. If an agent saves that key in a script, anyone who receives the script may receive the same access. The project needs a reliable way to authenticate without putting credentials in its research files.
+Collecting records or sending documents to a service adds account access to the research workflow. An *API* lets a program request operations from a service. An API key is a *credential*, information the service uses to recognize authorized access under an account. If the key is saved in a script, someone receiving that script may receive the same access.
 
 Suppose an agent builds a workflow that sends approved documents to a paid large language model (LLM) service. Each run needs the key; the bibliography, analysis code, and shared repository do not. [`1Password`](https://1password.com/) can hold the credential and supply it when the command runs. If your institution already provides this function, use that service instead. The same separation applies to cloud storage and other authenticated research services.
 
 ## Supply a credential to a command
 
-An *environment variable* is a named value made available to a running program. The script can ask for a variable such as `MODEL_API_KEY` without containing the key itself. A *secret reference* identifies the vault item from which to obtain the value, keeping the credential in the vault until needed.
+The *vault* is the protected store holding the credential. The project keeps a *secret reference* identifying which vault item to use, rather than the secret value. An *environment variable* is a named value made available to a running program. The script can ask for a variable such as `MODEL_API_KEY` without containing the key itself.
 
 The `1Password` command-line tool, `op`, can resolve those references when it starts a command through `op run`. Ask the agent to configure the intended command and account using the [documented setup](https://developer.1password.com/docs/cli/secrets-scripts/). You complete personal sign-in or authorize access to the appropriate vault item. Use credentials limited to the operations the project needs.
 
-> Configure authentication for this project's document-analysis command using the approved vault item. Supply the key when the command runs, without saving its value in source files, logs, or conversation. Make an authorized request and report whether it succeeds. Record the account, variable name, and invocation for future runs; do not include the secret.
+> Configure this project's document-analysis command to use the intended account and approved vault item. Supply the key when the command runs, without saving its value in source files, logs, or conversation. Make an authorized request and report whether it succeeds. Record the account, variable name, and command for future runs; do not include the secret.
 
-![](figures/credential-delivery.svg){#fig-credential-delivery fig-alt="A script refers to an environment variable. The vault supplies its secret value to the running command, which authenticates to a service and saves research results without saving the credential in source."}
+![](figures/credential-delivery.svg){#fig-credential-delivery fig-alt="A script refers to an environment variable. When the command starts, the vault supplies the secret value so the command can use the intended service account. Research results are saved without writing the credential into source files."}
 
 The agent should check the actual execution environment. A command launched by a queue or on another computer may not have the authentication available in an interactive session. Keep the necessary setup with the project's run instructions, including whether an API key selects separate usage billing. The researcher chooses that account and spending arrangement.
 
@@ -559,11 +600,11 @@ A vault prevents unnecessary copies in project files; the process receiving a cr
 
 ## Reuse project settings
 
-[`Direnv`](https://direnv.net/) loads environment settings associated with a project directory. It is useful when several project commands need the same configuration, such as a service address, a project identifier, or a reference to a credential. It does not replace the vault.
+For a single command, `op run` may be enough. When several project commands need the same configuration, [`direnv`](https://direnv.net/) can load settings associated with their project directory, such as a service address, project identifier, or reference to a credential. It does not replace the vault.
 
-The settings live in `.envrc`, which contains executable instructions. Ask the agent to explain those instructions before authorizing the file with `direnv allow`. Keep secret values out of it. If an agent or queue does not load your usual terminal settings, `direnv exec .` can apply the approved environment to a particular command. The [`direnv` manual](https://direnv.net/man/direnv.1.html) documents both routes.
+The settings live in `.envrc`, which contains executable instructions. Ask the agent to explain its contents. You approve the intended configuration; the agent then runs `direnv allow`. Keep secret values out of the file. If an agent or queue does not load your usual terminal settings, `direnv exec .` can apply the approved environment to a particular command. The [`direnv` manual](https://direnv.net/man/direnv.1.html) documents both routes.
 
-Choose the narrower arrangement that meets the need: one command can receive a credential through `op run`; several commands can share nonsecret project settings through direnv. Have the agent record which arrangement the workflow uses so later sessions invoke it consistently.
+Have the agent record which arrangement the workflow uses so later sessions invoke it consistently. Check it through the actual queue or other execution route, using an authorized operation without displaying the credential.
 
 ## Respond to an exposed credential
 
@@ -579,6 +620,8 @@ For the synthetic heat-and-birthweight study ([Chapter 10: The example research 
 
 An MCP *server* is the program that exposes those operations to the agent application. It can run on your computer or elsewhere. The term describes its role in the connection; it does not mean that you must buy or administer a separate computer. The [MCP architecture documentation](https://modelcontextprotocol.io/docs/learn/architecture) explains the connection.
 
+A *connector* is an integration exposing supported operations of another application or service; not every connector uses MCP. An *API* is a defined way for one program to request operations from another. The agent may already have a suitable route without adding a new connection.
+
 | What the task needs | A suitable route |
 |---|---|
 | Read a fixed set of references once | A saved export or local files may be sufficient. |
@@ -589,49 +632,59 @@ Ask the agent to check what is already connected before adding software. The com
 
 ## Connect the literature task
 
-> Connect this project's literature workflow to the specified `Zotero` collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the literature skill for DOI and claim verification. Leave the library unchanged unless an edit is part of the task.
+A *skill* records instructions for a recurring task and its checks. Use an existing skill if it captures the project's agreed [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol); the connection itself does not supply that procedure.
+
+> Connect this project's literature workflow to the specified Zotero collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the agreed procedure for checking DOIs and verifying claims, using an existing literature skill if it records that procedure. Leave the library unchanged unless an edit is part of the task.
+
+Checking a paper's DOI identifies its record; verifying a claim requires reading the relevant material.[^tk-literature-doi]
 
 The agent prepares the configuration and checks the assigned retrieval; you complete any personal sign-in and authorize the intended account and operations. Keep secret values out of the configuration using [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials). At Harvard, check the current [HUIT guidance](https://www.huit.harvard.edu/claude) before enabling a connection for institutional work.
 
-![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers to an agent. A literature skill guides search and verification. The agent saves an evidence table and bibliography in the project."}
+![](figures/literature-connection.svg){#fig-literature-connection fig-alt="An MCP connection supplies Zotero records and available papers. A literature procedure, which may be saved as a skill, guides the agent's search and verification. The agent saves an evidence table and bibliography."}
 
-The resulting evidence table should distinguish full texts the agent read, records supported only by an abstract, and papers it could not retrieve. The connection supplies access; the [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol) determines how to search, verify citations, and assess claims. A skill can hold that procedure so future sessions follow it too.
+The resulting evidence table should distinguish full texts the agent read, records supported only by an abstract, and papers it could not retrieve. Have the agent save any agreed procedure that future sessions will need, along with the evidence table and bibliography.
 
 ## Keep the connection within the task
 
 Have the agent save a short setup record: which service and account the project uses, the configured operations, and how to reconnect. Keep project-specific configuration with the project where the client supports it. It should be possible to disable or replace the connection without rediscovering how the workflow depends on it.
 
-A read-only connection can still retrieve material that is then transmitted to the large language model (LLM) provider. A local sandbox also does not automatically restrict an operation performed by a remote service. Use [Chapter 2: Control what added tools can access](#tool-access) to configure those routes, and treat instructions found in retrieved papers or pages as research material rather than authority to change the task.
+A read-only connection can still retrieve material that the agent sends to a hosted large language model (LLM). Its *provider* is the organization operating that service and receiving the submitted information. A local sandbox also does not automatically restrict an operation performed by a remote service. Use [Chapter 2: Control what added tools can access](#tool-access) to configure those routes. A paper or webpage is research material; instructions inside it do not authorize changing the project's task or access settings.
+
+[^tk-literature-doi]: A DOI is a persistent identifier assigned to a research output. It helps identify the intended work, but does not establish that the agent read it or that it supports a particular claim.
 
 # 14. Inspect and interact with a browser {#browser-work}
 
 When an agent builds a research website, it needs to inspect what a reader will see. A page can contain valid code and still have an unreadable figure, a broken filter, or navigation that disappears on a phone. Browser access lets the agent open the site, try its controls, and use the result to improve its work.
 
-The same access can help obtain data from a website. An agent might inspect a public portal, identify the appropriate release, and find an export or API. These are two useful tasks for browser tools: checking a site being built and understanding a site that supplies research material.
+The same access can help obtain data from a website. An agent might inspect a public portal, identify the appropriate release, and find a data export or an API, a way for a program to request records directly. Checking a site being built and understanding a site that supplies research material need different follow-up work.
 
 ## Inspect a research website
 
-An agent app may already include browser access. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is another route, exposing browser operations through an [MCP connection](https://modelcontextprotocol.io/). Ask the agent to use an appropriate available integration and configure another only when the task requires it.
+An agent app may already include browser access. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is another route. It uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to expose browser operations to the agent. Ask the agent to use an appropriate available integration and configure another only when the task requires it.
+
+A *local preview* is a version of the site served on your computer for inspection. The website need not be public for the agent to check it.
 
 > Inspect this project's website as you build it. Open the local preview, use the main navigation and filters, and check the figures at desktop and phone widths. Fix the problems you find. Report which pages and actions you checked, and show any remaining issue that needs a design decision.
 
-The preview can run on your computer; the website need not be public. The agent should check the rendered page after making changes, including whether an action produces the intended result. A screenshot shows appearance, while trying a filter or link checks behavior. Both can be useful evidence, and neither replaces checking the underlying research results.
+The agent should inspect the rendered page again after making changes, including whether an action produces the intended result. A screenshot shows appearance, while trying a filter or link checks behavior. Both can be useful evidence, and neither replaces checking the underlying research results.
 
-![](figures/browser-research.svg){#fig-browser-research fig-alt="One browser workflow inspects a local site, fixes its source, and checks again. Another finds a data release and export, then saves data, provenance, and repeatable collection code."}
+![](figures/browser-research.svg){#fig-browser-research fig-alt="One browser workflow inspects a local site, fixes its source, and checks again. Another finds a data release and export, then saves original data, a record of where they came from, and repeatable collection code."}
 
 ## Collect data through a website
 
-Interactive browsing is often useful for finding the right source, even when the eventual collection should use a simpler route. Follow the [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder) in the companion guide *Doing Research with AI Agents*: use a suitable API or structured download, then static page extraction, then scripted browser interaction, with interactive agent browsing where those routes do not meet the need.
+Use browsing first to understand the source and find the right release. A suitable API or structured download, such as a CSV table, lets a saved script obtain records directly. If the records are already present in a page, static-page extraction reads them without operating its controls. Use scripted browser interaction when filters or other controls are required, and interactive agent browsing where these routes do not meet the need. The [acquisition ladder](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#acquisition-ladder) in *Doing Research with AI Agents* develops this choice.
+
+Keep the original data and their *provenance*, the record of where they came from and how they were obtained. Include the source, release, date, query, and selections used.
 
 > Find a permitted way to obtain the specified records from this source. Prefer an API or export when available. Save the original responses or downloads and their provenance. If collection must recur, create a script with explicit inputs, saved outputs, request limits, and failure reporting. Check representative records before running the full collection.
 
-The agent's first exploration may involve clicking through filters and download options. Preserve what it learns in a repeatable collection procedure, with the release, date, query, and relevant selection settings. A transcript of clicks alone is a poor record of a large extraction. The [data-provenance section](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#data-provenance) explains what to retain for later research use.
+Preserve what the agent learns during its first exploration as saved collection code when the task will recur. A transcript of clicks alone cannot reliably repeat a large extraction. The [data-provenance section](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#data-provenance) explains what to retain for later research use.
 
 ## Choose the browser account
 
 A browser profile holds session information such as logins. A separate profile can avoid giving a task access to your everyday signed-in services. If the task needs an authenticated portal, use the intended account and complete personal sign-in yourself; let the agent explain which actions it needs to perform.
 
-Being able to open a page does not establish permission to transmit its contents to a hosted large language model (LLM). Apply the data-use decisions from [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html) in the research guide and the access settings from [Chapter 2: Control what added tools can access](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
+Being able to open a page does not establish permission to send its contents to a hosted large language model (LLM), which runs on the service provider's computers. Apply the data-use decisions from [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html) in the research guide and the access settings from [Chapter 2: Control what added tools can access](#tool-access) to the actual account and content. Submitting a form or changing a record should follow the authorization for that task.
 
 Some tools can also operate desktop applications through computer use. That broader access can help with a task a browser cannot perform, but it is optional here. Configure it for the specific application and work rather than making it a prerequisite for website inspection or collection.
 
@@ -639,28 +692,30 @@ Some tools can also operate desktop applications through computer use. That broa
 
 # 15. Divide work between agents: shared projects and git worktrees {#parallel-work}
 
-Several agents can develop different parts of a research project at the same time. The benefit depends on whether those tasks can proceed independently. Clear responsibilities and an agreed format for exchanged results prevent parallel work from becoming repeated repair.
+Several agents can develop different parts of a research project at the same time. The benefit depends on whether those tasks can proceed independently and how their results will be combined. Decide which files each agent may change, what information it receives, and what it must supply to the other tasks.
 
 For example, one agent can develop modeling code while another develops figures. Before they start, agree on the saved estimates the plotting code will read, including column names, units, and uncertainty intervals. The agents can then work on their own files and check the complete model-to-figure workflow when the pieces are ready.
 
-## Assign tasks and interfaces
+## Agree on tasks and exchanged results {#assign-tasks-and-interfaces}
 
-An agent application may be able to delegate work to subagents, or you can open separate sessions with distinct assignments. [`Claude Code`'s subagents](https://code.claude.com/docs/en/sub-agents) provide one documented delegation route. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
+A *subagent* is another agent given a separate assignment by a coordinating agent. Availability depends on the application; [`Claude Code`'s subagents](https://code.claude.com/docs/en/sub-agents) provide one documented route. Separate sessions with distinct assignments are another option. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
 
 > Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
 
-Each assignment should name its inputs, expected outputs, and files it may change. A shared helper, dependency file, or pipeline definition needs an assigned editor. The lead agent also coordinates repository operations so that one agent does not reset or remove work another is using. Record agreed interfaces in the project context files so later sessions can find them. Assign one agent to maintain `SPECIFICATION.md` and `METHODOLOGY.md` after you approve scientific changes, so parallel tasks do not create conflicting requirements.
+Each assignment should name its inputs, expected outputs, and files it may change. Give one agent responsibility for shared files, such as functions used by both tasks, records of required software, or definitions connecting analysis steps. The lead agent also coordinates changes to version history so one agent does not remove work another is using.
+
+Record the agreed results format in the project context files, the maintained files that guide later sessions. Assign one agent to update `SPECIFICATION.md`, the current scientific requirements, and `METHODOLOGY.md`, the dated decisions and reasons, after you approve a scientific change.
 
 ## Choose shared or separate working copies
 
-Agents editing different files can often share one project directory. [`Git` worktrees](https://git-scm.com/docs/git-worktree) provide separate working directories attached to the same repository, usually on different branches. They help when agents need overlapping files, alternative versions, or a stable copy for testing while other work continues.
+Agents editing different files can often share one project directory. [`Git` worktrees](https://git-scm.com/docs/git-worktree) provide separate working copies attached to the same repository, the stored version history, usually on different branches.[^tk-parallel-branch] They help when agents need overlapping files, alternative versions, or a stable copy for testing while other work continues.
 
 | Arrangement | Useful when | What still needs coordination |
 |---|---|---|
-| One project directory | Tasks own different files and can share current results | Shared files, output names, repository operations, and interfaces |
+| One project directory | Tasks own different files and can share current results | Shared files, output names, version-history operations, and results format |
 | Separate worktrees | Tasks need different versions or overlapping edits | Inputs and environments in each copy, shared resources, and integration of changes |
 
-![](figures/agent-coordination.svg){#fig-agent-coordination fig-alt="Modeling and visualization agents can own different files in one project or use separate git worktrees. Both arrangements require an agreed results format and a combined workflow check."}
+![](figures/agent-coordination.svg){#fig-agent-coordination fig-alt="Agents can work on different files in one project or in separate working copies. Both arrangements use an agreed results format and end with a combined workflow check."}
 
 A new worktree may not contain ignored data, installed packages, or saved model fits. Have the agent supply the approved inputs and restore the recorded environment before starting work. Separate output locations prevent one run from replacing another's results. Worktrees share repository history and can still reach other files and services; they are not security sandboxes.
 
@@ -670,113 +725,135 @@ The coordinating agent should run a representative path through the combined wor
 
 Parallel development differs from the independent-implementation check described in [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) of the companion guide *Doing Research with AI Agents*. For that check, fresh agents receive the same fixed specification version and permitted inputs without seeing the other implementation or results. Do not supply a decision log that reveals those results. A worktree alone does not achieve this separation, especially when the earlier code remains in shared history.
 
+[^tk-parallel-branch]: A branch names a line of work within the repository's version history. Separate branches let the agent develop alternative changes and combine the chosen work later.
+
 # 16. Run agents from saved prompts {#headless-agents}
 
-Some studies need a large language model (LLM) to perform the same specified task on many items: classify a passage, extract a reported outcome, or assess a review against a rubric. A *headless* agent runs from a program without an interactive conversation. A saved workflow can give it the next case, collect its response, and record a failure without waiting for a person to type another prompt.
+A prepared research archive may need checking again after missing files or instructions are repaired. A saved prompt can ask an agent to inspect a test copy, follow its documented reproduction command, and report what passed, failed, or could not be tested. A *headless* agent runs noninteractively from a program, so the same assignment can be launched without opening another conversation and typing it again.
 
-Consider the [reviewer-and-judge example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents) in the companion guide *Doing Research with AI Agents*. Each reviewer receives an assigned paper and instructions; each judge receives the material required by the judging protocol. Separate runs make this repeated work manageable. When the study also requires reviewers to know nothing about other cases, the workflow must control those inputs explicitly.
+This task needs an agent because it involves reading instructions, operating tools, and investigating failures. Ordinary analysis code can run directly. A task that only asks a large language model (LLM) to label supplied text may need a direct API call instead; an API is a defined way for one program to request operations from another. The [interview-labeling example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents) in *Doing Research with AI Agents* explains that simpler route and the responses it must retain.
+
+![](figures/headless-research.svg){#fig-headless-research fig-alt="A fixed prompt and prepared project copy pass through a small checked run before the full headless check. Reports retain responses, tool records, and status, including failed and untested checks. The same assignment can run again on a corrected copy."}
 
 ## Turn the task into a saved workflow
 
-[`Claude Code`](https://code.claude.com/docs/en/headless) supports noninteractive calls through `claude -p`, as well as an Agent SDK for `Python` and TypeScript. An agent in the desktop app can prepare and launch a script using one of these routes if its tools have the required access. Headless describes how the run proceeds, not where you must sit or which window you must use.
+For the archive check, use the prepared inputs, documented commands, and comparison criteria described in [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html#test-and-name-the-reproduction-route) of the research guide. Give the checking agent a separate test copy and configure its access to exclude the working project. Missing inputs should be reported rather than silently recovered from that project.
 
-Ask the agent to turn the written protocol into a repeatable command. It should check the intended account, available tools, and output format, and handle failures without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
+[`Claude Code`](https://code.claude.com/docs/en/headless) documents noninteractive calls through `claude -p`; software libraries also support controlling the agent from a program.[^tk-headless-sdk] An agent in the desktop app can prepare and launch this workflow if its tools have the required access. You can direct it from the app even though the checking run itself has no interactive conversation.
 
-> Build the reviewer-and-judge workflow from this specification. Give each case its assigned inputs and permitted tools. Save the prompts, raw responses, parsed results, and run status. Run two representative cases through the full workflow, diagnose failures, and confirm the expected artifacts before the main batch. Keep the preliminary outputs separate from study results.
+Ask the agent to turn the approved check into a repeatable command. It should verify the intended account, required tools, and output format, and record blocked operations without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
 
-If the task only requires a judgment on supplied text, a direct LLM API call may be sufficient. Use an agent when the task needs tools or a sequence of actions. Ordinary model fitting and document production should use their saved research code directly.
+> Turn this approved handoff check into a saved command. Start a fresh agent with the fixed prompt and permitted test copy. Have it follow the documented reproduction steps without access to the working project, then save its report, exact response, tool record, and completion status. Test the complete route on a small prepared copy before using it for the full check. Preserve failed attempts and report any input or access requirement the workflow cannot satisfy.
+
+This preliminary [smoke test](#smoke-tests) runs a small representative task through the actual workflow. Once it passes, the same saved check can run on the intended archive and again on a corrected copy when needed. Keep the version of each copy and its report together.
 
 ## Record each case
 
-Link the research protocol and evaluation criteria from `SPECIFICATION.md`. Retain the exact prompts, rubrics, and run specifications used for completed batches; approved changes update the current specification and receive a dated explanation in `METHODOLOGY.md` without replacing those frozen inputs.
+A *raw response* is the exact text returned. A *parsed result* contains the fields the workflow extracts from it, such as a check identifier and its outcome. Preserve both, along with the tools used and their results. A response with the required fields is readable by the workflow; that alone does not establish that the assessment is correct.
 
-![](figures/headless-research.svg){#fig-headless-research fig-alt="Saved instructions and assigned inputs feed fresh reviewer runs. Each retains its response and attempt status. A judge receives only the protocol-defined inputs. Parsing produces a measurement table while preserving failed attempts."}
+::: {.needspace height="5cm"}
+:::
 
 | Record | Why retain it |
 |---|---|
-| Case, role, exact prompt, and assigned inputs | Establish what the reviewer or judge was asked to assess |
-| Model version/settings, tools, and loaded configuration | Establish the execution conditions and sources of context |
-| Raw response and separately parsed result | Preserve what the LLM returned, including material discarded by parsing |
-| Run status, diagnostics, and attempt identifiers | Distinguish a valid result from a refused action, interruption, or failed parse |
+| Check identifier, exact prompt, and version of assigned inputs | Establish what the agent was asked to reproduce and compare |
+| LLM version and settings, tools, and loaded configuration | Identify the software and information available during the run |
+| Raw response, tool record, and separately parsed result | Preserve the report and actions, including material omitted from extracted fields |
+| Run status, diagnostics, and attempt identifiers | Distinguish completed checks from refused actions, interruptions, and unreadable responses |
 
-A process can finish successfully while returning a response the analysis cannot use. The workflow should check the expected output structure and keep malformed responses. Specify retry rules before the batch so repeated attempts do not silently replace inconvenient results. The [smoke test](#smoke-tests) checks that this machinery works; the [LLM-evaluation procedure](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#evaluate-llm-labeling) checks the quality of the judgments.
+Keep copies of `SPECIFICATION.md`, the current scientific requirements, and `METHODOLOGY.md`, the dated decisions and reasons, as used in each check. Later revisions should not replace those records.
 
-For a long batch, [`pueue`](https://github.com/Nukesor/pueue) can manage outer jobs and concurrency. Configure the queue's authentication and environment as well as its commands, and use the job report described in [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) to establish what completed.
+A process can finish successfully while returning an unusable report. Keep malformed responses and identify which required fields or files are missing. Specify when retries are allowed and retain each attempt, so rerunning a check does not erase its earlier failure. For LLM-derived research measurements, the same recordkeeping preserves labels and failed attempts; the [LLM-evaluation procedure](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#evaluate-llm-labeling) addresses their scientific quality.
+
+For many checks, [`pueue`](https://github.com/Nukesor/pueue) can queue each command as a job and limit how many run at once. Configure the queue's account access and software environment as well as its commands. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains how to confirm progress and report which outputs were saved.
 
 ## Control what each run receives
 
-A fresh conversation can still load project context files, global user instructions, memory, plugins, or connections. It may also have tools capable of reading other cases. If cross-case separation matters to the study, have the agent identify these routes and configure the inputs and access for each run. Do not resume another case's conversation.
+*Context* is the information supplied to the LLM for generating its next response. A fresh conversation can still load project context files, global user instructions, saved memory, or extensions. Its tools may also read the working project or another case. Have the agent identify those routes and configure the inputs and access required for this check. Do not resume an earlier conversation whose information should be excluded.
 
-Use a targeted check of the actual configuration. A run should read a harmless marker in its assigned input while an attempted read of another case's marker is denied through the configured routes. Check unexpected instruction and memory loading too. Save the observed outcomes; an LLM saying it remembers nothing is not evidence that it cannot retrieve another case.
+Use a targeted check of the actual configuration. The agent should be able to read a harmless marker in its assigned test copy while attempted reads of an excluded marker in the working project are denied through the relevant routes. Check unexpected instruction and memory loading too. Save the observed outcomes and identify untested routes; the agent saying it remembers nothing does not establish that it cannot retrieve excluded material.
 
-For stronger restrictions, use the controls described in [Chapter 2: Control what added tools can access](#tool-access). Where appropriate, configure a separate execution environment as described in [Chapter 10: Run work in a separate environment: containers](#containers). The research guide explains [which information reviewers and judges should receive](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#control-what-each-reviewer-or-judge-receives). These are separate decisions from whether the resulting judgments are scientifically useful.
+Use the controls described in [Chapter 2: Control what added tools can access](#tool-access), with a separate execution environment where appropriate as described in [Chapter 10: Run work in a separate environment: containers](#containers). The research guide also explains [controlling the information supplied for interview labeling](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#control-what-each-reviewer-or-judge-receives). A fresh session, checked access restrictions, and statistical independence are different properties. Launching separate sessions does not by itself establish either of the latter two.
 
 <details class="guide-example">
 <summary>`Claude Code` configuration for controlled runs</summary>
 
-The [`--bare` option](https://code.claude.com/docs/en/cli-reference) skips much automatic discovery of instructions and extensions. It is not a sandbox and does not remove tool access by itself. It also uses a different authentication route from ordinary subscription sign-in; check the installed version and intended provider before selecting it. Explicit tool, input, session-persistence, and settings choices remain necessary. The `dontAsk` permission mode denies calls that would otherwise prompt, but currently documented extensions can affect approvals, and normally permitted actions still run. Configure and check the complete run rather than treating a flag as proof of isolation.
+The documented [`--bare` option](https://code.claude.com/docs/en/cli-reference) skips much automatic discovery of instructions and extensions. It is not a sandbox and does not remove tool access by itself. It also uses a different authentication route from ordinary subscription sign-in; check the installed version and intended provider, the organization operating the LLM service, before selecting it. Explicit tool, input, session-persistence, and settings choices remain necessary.
+
+The documented [`dontAsk` permission mode](https://code.claude.com/docs/en/permissions) denies calls that would otherwise prompt, but installed extensions can affect approvals, and normally permitted actions still run. Configure and check the complete run rather than treating a flag as proof of isolation. The handoff procedure above is a setup to request and test, not an observed containment result from this guide.
 
 </details>
 
+[^tk-headless-sdk]: An SDK, or software development kit, provides libraries for controlling the agent from a program. The `Claude Code` documentation describes Agent SDK packages for `Python` and `TypeScript`. The agent should choose the supported route that fits the existing workflow and verify its account requirements.
+
 # 17. Run and adapt an LLM on your own hardware {#local-models}
 
-Running a large language model (LLM) on hardware you control can keep its computation within an approved environment and let a project retain a chosen version of its weights. That hardware may be your main computer or a server provided by your institution. A separate server is not required when the model and task fit the computer's available memory and processing capacity.
+Suppose a study uses a large language model (LLM) to extract outcomes from documents that must remain in an approved environment. The LLM can run on your main computer or an institutional server. Its *weights* are numerical values learned during training; an *LLM runtime* loads them and uses them to generate responses.
 
-Suppose a study uses an LLM to extract outcomes from documents that must remain in an approved environment. The workflow needs a suitable model, software to run it, and a record of the prompts and outputs. Here, *inference* means running a trained LLM to generate a response; it does not mean statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local models are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for the study.
+Running an existing LLM and training it further are separate choices. Begin by checking whether an existing LLM can perform the research task on the approved hardware. Here, *inference* means running the trained LLM to generate a response, rather than statistical inference about a population. The companion guide *Doing Research with AI Agents* explains [when local LLMs are useful](https://dss-agentic-research.pages.dev/chapters/research-models.html#local-models) and how to evaluate them for a study.
 
 ## Choose hardware and a runtime
 
-A *runtime* loads the model's weights and processes requests. [`Ollama`](https://docs.ollama.com/quickstart) is one option for compatible downloaded models; use an existing approved institutional service if it already meets the need. Ask the agent to check the operating system, available memory, accelerator support, and storage before choosing a model or installing software.
+*Open weights* are available to download under specified terms; availability alone does not mean unrestricted use or a fully open-source system. [`Ollama`](https://docs.ollama.com/quickstart) is one runtime for compatible downloaded LLMs. Keep an approved institutional service if it already meets the need. Ask the agent to check the operating system, memory, supported processing hardware, and storage before choosing an LLM or installing software.[^tk-local-hardware]
 
-The download size is not the memory needed during use. Longer inputs and more simultaneous requests can substantially increase that requirement. A quantized model stores its weights at reduced precision, often reducing memory use, but its behavior must still be assessed on the task. Record the exact release and quantization instead of treating models with the same family name as interchangeable.
+The download size is not the memory needed during use. Longer inputs and more simultaneous requests increase that requirement. *Quantization* stores weights at lower numerical precision, often reducing memory use, but it can change the responses. Record and evaluate the exact release and quantization intended for the study.
 
-![](figures/local-llm-execution.svg){#fig-local-llm-execution fig-alt="On approved hardware, a script can request inference from an LLM runtime with local weights. An optional agent harness connects the runtime to tools. Hardware can be the main computer or an institutional server."}
+![](figures/local-llm-execution.svg){#fig-local-llm-execution fig-alt="A script can use an LLM runtime on approved hardware directly. An optional agent harness adds tools and carries out the LLM's tool requests. Running the LLM locally does not itself restrict those tools."}
 
-For `Ollama`, the agent should configure the process that actually serves requests. Its [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables `Ollama`'s cloud features; the service can listen on the local loopback address, `127.0.0.1`, rather than accept network connections. Keep model files outside cloud-synchronized project folders. These settings govern the runtime, not other network-capable tools used by an agent.
+For `Ollama`, configure the process that actually serves requests. Its documented [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables its cloud features. It can listen on the *loopback address*, `127.0.0.1`, reachable from that same computer, instead of accepting connections from other computers. Keep LLM files outside cloud-synchronized project folders. These settings govern the runtime; an agent's other tools need their own network restrictions.
 
-> Prepare this computer for the approved local-model task. Check its resources and existing installations, select a compatible runtime and model version, and configure local execution. Keep my usual hosted-agent settings intact. Record the model, runtime, storage, context limit, and concurrent-request limit, then run representative permitted inputs and report failures and resource use.
+> Prepare this computer for the approved local-LLM task. Check its resources and existing installations, select a compatible LLM runtime and version, and configure local execution. Keep my usual hosted-agent settings intact. Record the LLM, runtime, storage, maximum supported input and response length, and limit on simultaneous requests. Run representative permitted inputs and report failures and resource use.
 
-Have the agent report whether the requested configuration fits the available hardware. If it does not, choose a smaller candidate for evaluation or use an approved server. Do not quietly shorten study documents or change the model to make a run finish.
+Have the agent check whether the requested input length fits the LLM's context capacity as well as the computer's memory.[^tk-local-context] If the setup cannot handle the task, choose a smaller candidate for evaluation or an approved server. Do not quietly shorten study documents or substitute another LLM to make a run finish.
 
 ## Run the research task
 
-Use a saved command with explicit inputs and outputs. For extraction or classification, request a defined response structure and validate each result before it enters the analysis table. Save raw responses, malformed outputs, and retries. A completed request establishes execution; comparison with the study's reference judgments establishes whether the output is useful.
+Use a saved command with explicit inputs and outputs. For extraction or classification, define the response fields, such as document identifier and extracted outcome. Keep the *raw response*, the exact returned text, separately from the fields extracted for the analysis table. Save malformed responses and retries too. A usable structure establishes that the workflow can read the response; comparison with the study's reference judgments assesses its research value.
 
-Keep the runtime version, exact model identifier or digest, generation settings, prompt template, and input identifiers with the run. A model tag can point to different weights later. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) exposes identifying information; preserve the relevant record rather than relying on a remembered download name.
+Keep the runtime version, exact LLM identifier or digest, generation settings, prompt template, and input identifiers with the run. A *digest* identifies particular content; a *tag* is a convenient name that may later refer to different weights. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags), an interface through which programs request that information, supplies identifying records. Preserve the record for the version actually used.
 
-A small setup trial for this guide used Qwen3 4B and demonstrated structured output and a file-reading tool call. It did not establish research accuracy or comprehensive containment. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research model using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model), then use [Chapter 16: Run agents from saved prompts](#headless-agents) when many requests must run consistently.
+A small setup trial for this guide used Qwen3 4B and demonstrated a response with required fields and a file-reading tool call. It did not establish research accuracy, comprehensive containment, or installation on a clean computer. The [setup-trial record](resources/local-model-setup-trial.md) gives the configuration and observed limitations. Choose and evaluate the research LLM using the [study's evaluation procedure](https://dss-agentic-research.pages.dev/chapters/research-models.html#evaluate-adapted-model). [Chapter 16: Run agents from saved prompts](#headless-agents) distinguishes direct LLM calls from repeated tasks that need an agent.
 
 ## Connect the LLM to an agent
 
-An LLM runtime does not itself provide the complete agent environment. A software harness gives the LLM tools and carries out its tool calls. [`Ollama`'s `Claude Code` integration](https://docs.ollama.com/integrations/claude-code) offers an Anthropic-compatible endpoint for supported models. Have the agent configure a separate invocation and check an actual tool call before relying on it for project work.
+An LLM runtime does not itself provide the complete agent environment. A *harness* is the software that supplies information to the LLM, carries out its tool requests, and returns results for the next response. [`Ollama`'s `Claude Code` integration](https://docs.ollama.com/integrations/claude-code) documents a compatible endpoint, the address to which the agent sends requests, for supported LLMs. Have the agent configure a separate invocation and check an actual tool call before relying on it for project work.
 
-Record both sides: which runtime processes the LLM requests and which harness controls the tools. Retain the tool-call trace for the check. A model that returns fluent text may still fail to produce usable tool calls. Apply file and network restrictions as described in [Chapter 2: Control what added tools can access](#tool-access), independently of the choice to run the LLM locally; a local LLM can still ask a tool to contact a remote service.
+Record which runtime processes the LLM requests and which harness controls the tools, retaining a record of the tool calls and results. An LLM that returns fluent text may still fail to produce usable tool requests. Apply file and network restrictions as described in [Chapter 2: Control what added tools can access](#tool-access); a local LLM can still ask a tool to contact a remote service.
 
-## Adapt a model when the study calls for it
+## Adapt an LLM when the study calls for it {#adapt-a-model-when-the-study-calls-for-it}
 
-Fine-tuning changes model parameters using training examples. LoRA is a method that trains a relatively small set of added parameters, often saved as an *adapter*, alongside a specified base model. The research guide explains [when training may help](https://dss-agentic-research.pages.dev/chapters/research-models.html#context-or-training), [LoRA](https://dss-agentic-research.pages.dev/chapters/research-models.html#lora), and the evidence needed to compare adaptation with a strong unadapted model.
+*Fine-tuning* trains an existing LLM on additional examples. *LoRA*, or low-rank adaptation, keeps the original, or *base*, weights fixed and trains a relatively small set of additional values. Those values can be saved as an *adapter*. To use it later, the agent loads the adapter with the compatible base LLM; the adapter alone is not a complete LLM.
+
+The research guide explains [when training may help](https://dss-agentic-research.pages.dev/chapters/research-models.html#context-or-training), [LoRA](https://dss-agentic-research.pages.dev/chapters/research-models.html#lora), and the comparison with a strong unadapted LLM. The tools below support the chosen study; local execution does not require an adaptation project.
 
 | Environment | Candidate tool | What the agent should check |
 |---|---|---|
-| Apple silicon Mac | [`MLX-LM`](https://github.com/ml-explore/mlx-lm) | Supported model, available memory, data format, and training/inference compatibility |
-| A supported `PyTorch` environment, commonly with a suitable GPU | [`Hugging Face PEFT`](https://huggingface.co/docs/peft/main/en/quicktour) | Base-model support, accelerator configuration, adapter method, and required training libraries |
-| An established institutional training service | Its approved training tools | Data access, resource allocation, artifact retention, and how the resulting model is evaluated |
+| Apple silicon Mac | [`MLX LM`](https://github.com/ml-explore/mlx-lm) | Supported LLM, available memory, data format, and compatibility between training and later use |
+| A supported [`PyTorch`](https://pytorch.org/) environment, commonly with a suitable GPU | [`Hugging Face PEFT`](https://huggingface.co/docs/peft/main/en/quicktour) | Base-LLM support, processing hardware, adapter method, and required software |
+| An established institutional training service | Its approved training tools | Data access, computing allocation, saved files, and evaluation of the adapted LLM |
 
-The agent should install the selected tools in a recorded project environment, as described in [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments). Keep the training, development, and held-out evaluation data separate, following the study design. Use development data to make training choices; do not repeatedly tune against the held-out evaluation results.
+Have the agent install the selected tools in a recorded project environment, as described in [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments). Keep the study's data roles separate: training examples support learning, development examples support choosing the setup, and held-out test cases support the final comparison after those choices are fixed. The baseline is the unadapted LLM with the selected prompt, not an unspecified default invocation.
 
-> Set up the agreed adaptation study using the approved data splits and base model. Preserve the unadapted baseline, record the full configuration, and check that a short training run can save and reload an adapter before launching the planned run. Save checkpoints, logs, and evaluation outputs. Compare the baseline and adapted versions using the prespecified evaluation; do not change the data splits or success criteria to improve the result.
+> Set up the agreed adaptation study using the approved training, development, and held-out test assignments and base LLM. Preserve the unadapted LLM and its selected prompt. Record the configuration, and check that a short training run can save an adapter and reload it with the base LLM before launching the planned run. Save training state, logs, and evaluation outputs. Compare both versions on the same held-out test inputs using the prespecified evaluation. Do not change the data assignments or success criteria to improve the result.
 
-![](figures/llm-adaptation.svg){#fig-llm-adaptation fig-alt="The base LLM supplies a baseline and an adaptation run. Training and development inputs support adaptation; a held-out evaluation compares baseline and adapted versions. The adapter and run records are saved."}
+![](figures/llm-adaptation.svg){#fig-llm-adaptation fig-alt="LoRA learns an adapter using training data and development choices. The saved adapter is reloaded with its base LLM. The adapted and unadapted versions are compared on the same held-out test inputs."}
 
-The retained artifacts should identify the base weights and tokenizer, training data version, adapter configuration, software environment, run settings, checkpoints, and evaluation results. An adapter must be loaded with a compatible base model. If it is converted or merged for another runtime, check that exported version on the task too; a successful file conversion does not establish unchanged behavior.
+Save the base weights and tokenizer, training-data version and assignments, adapter configuration, software environment, run settings, and evaluation results.[^tk-local-tokenizer] Training *checkpoints* preserve state from which training can continue; they differ from [`Git`](https://git-scm.com/) commits that record file versions. If the adapter is converted or merged into the base weights for another runtime, evaluate that exported version on the task too. Successful conversion does not establish unchanged behavior.
 
-Training may require different resources and software from inference. Use a short execution check before a long run, then arrange job management and checkpointing appropriate to the machine. Protect training data, logs, and resulting weights under the study's requirements; fine-tuning is not a way to anonymize sensitive examples. The [data chain-of-custody discussion](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) applies to these artifacts too.
+::: {.needspace height="4cm"}
+:::
 
-## Apple's on-device model {#apple-on-device}
+Training may require different resources and software from generating responses. Use a short execution check before a long run, then arrange job management and saved training state appropriate to the machine. Protect training data, logs, weights, and adapters under the study's requirements; training can retain sensitive information. The research guide's [data chain-of-custody discussion](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) applies to these files too.
 
-On a compatible Mac, Apple's system model provides another route for bounded tasks such as extracting structured information. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk) and, on supported macOS versions, the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) provide programmatic access. Ask the agent to check system requirements, model availability, and the selected execution mode before using either.
+## Apple's on-device LLM {#apple-on-device}
 
-This route differs from downloading arbitrary open weights and running them through Ollama. Keep the system and SDK versions with the results, and evaluate the actual task. Selecting an offered cloud-processing mode changes where the request runs. These Apple routes have been checked against documentation for this guide, but have not been included in its local execution trial.
+On a compatible Mac, Apple's system LLM offers another documented route for bounded tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for programmatic access, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; selecting an offered cloud-processing mode changes where the request runs. Retain the system and SDK versions and evaluate the actual task. These routes were reviewed through documentation, not included in this guide's local execution trial.
+
+[^tk-local-hardware]: An accelerator performs particular calculations faster than a general-purpose processor. A GPU, or graphics processing unit, is commonly used for LLM calculations. The agent should check the runtime's actual hardware support rather than infer it from the computer's name.
+
+[^tk-local-context]: Context is information supplied to the LLM for a response. Capacity is measured in tokens, units of text often smaller than words. The agent should check the runtime's input/output limits and actual token count instead of estimating capacity from document pages.
+
+[^tk-local-tokenizer]: The tokenizer divides text into the units the LLM processes. Keeping its matching version helps reconstruct how the saved prompts and data were presented.
 
 <!-- ===================== PART VI — WORK FROM THE TERMINAL ===================== -->
 
@@ -786,23 +863,23 @@ This route differs from downloading arbitrary open weights and running them thro
 
 A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language prompts to the agent, then run the saved project commands directly when you want to repeat a task.
 
-For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a saved [`just`](https://just.systems/) recipe, `just figures`, regenerates the figure without asking the large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
+For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a [`just`](https://just.systems/) *recipe*, a named saved command, can regenerate it. In this example, `just figures` runs the plotting code without asking a large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
 
 ## Open the project in a terminal
 
 A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands entered there. On a Mac, open `Terminal` through Spotlight. For this guide's Windows route, open Ubuntu in [`WSL2`](https://learn.microsoft.com/windows/wsl/) through [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/). An Ubuntu shell and a `PowerShell` tab are different environments; these examples use the former.
 
-The shell has a *working directory*: the folder used to resolve paths that do not start from the top of the filesystem. Type `cd`, followed by your project's path, to change to it. Replace the example path below with the actual location and keep the quotes if it contains spaces:
+The shell has a *working directory*: the folder from which it starts its work. Use `cd` followed by the project's path to select that folder. The agent in the app can give you the exact command. Replace the example path below with the actual location and keep the quotes if it contains spaces:
 
 ```text
 cd "/Users/your-name/Research/my-project"
 ```
 
-The command `pwd` displays the current directory. You can ask the agent in the app for the exact `cd` command if you do not know the path. [Appendix E: Terminal vocabulary](#terminal-history) explains these terms further; no additional terminal setup is needed to continue.
+The command `pwd` displays the current directory. [Appendix E: Terminal vocabulary](#terminal-history) explains paths and related terms further; no additional terminal setup is needed to continue.
 
 ## Start a conversation with the agent
 
-Have the agent check whether the [`Claude Code`](https://code.claude.com/docs/en/overview) command-line interface is installed. The desktop app and the `claude` command are separate entry points; installing one does not establish that the other is available. The agent can prepare the installation using the current [platform instructions](https://code.claude.com/docs/en/quickstart), with any personal sign-in or authorization completed by you.
+Have the agent check whether the [`Claude Code`](https://code.claude.com/docs/en/overview) command-line interface is installed: this is the version started through a typed command. The desktop app and the `claude` command are separate entry points; installing one does not establish that the other is available. The agent can prepare the installation using the current [platform instructions](https://code.claude.com/docs/en/quickstart), with any personal sign-in or authorization completed by you.
 
 At the shell prompt, enter:
 
@@ -812,9 +889,9 @@ claude
 
 Once `Claude` is running, type a research prompt in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
-![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell, where just figures runs saved code without an LLM."}
+![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell. In the illustrated recipe, just figures runs plotting code using saved estimates without an LLM call."}
 
-The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the selected LLM is hosted, information supplied to it is still sent to the provider even though you are using a local terminal.
+The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the LLM runs on a provider's computers, information supplied to it is sent to that organization even though you use a local terminal.
 
 ## Run a saved command
 
@@ -825,13 +902,15 @@ just --list
 just figures
 ```
 
-Enter these at the shell prompt, after leaving the agent. The figure recipe must already exist; ask the agent to create or explain it using [Chapter 5: Give research tasks reliable commands: just](#project-commands). You do not need to remember the underlying analysis commands because the project has saved them.
+Enter these at the shell prompt, after leaving the agent. The figure recipe must already exist; ask the agent to create or explain it using [Chapter 7: Give research tasks reliable commands: just](#project-commands). You do not need to remember the underlying analysis commands because the project has saved them.
 
 You can also ask the agent to install a missing tool. With [`Homebrew`](https://brew.sh/) available, `brew install just` is the corresponding installation command. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains setup. A “command not found” message can mean that the program is absent or that this shell cannot locate it; have the agent distinguish those causes before reinstalling anything.
 
 ## Find session controls
 
 While the agent is running, slash commands control the session. The [interactive reference](https://code.claude.com/docs/en/interactive-mode) and installed help show the controls available in your version and account.
+
+*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary so it occupies less context; details can be omitted. Keep decisions needed later in the project's maintained files.
 
 | Control | What it does |
 |---|---|
@@ -841,9 +920,9 @@ While the agent is running, slash commands control the session. The [interactive
 | `/usage` | Show account-usage information |
 | `/exit` | Return to the shell |
 
-The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent update `STATUS.md` and `TASKS.md` from checked work. For an approved scientific change, it should also rewrite the affected `SPECIFICATION.md` requirements and add the decision and reason at the top of `METHODOLOGY.md`.
+The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent record checked project state, remaining tasks, and approved scientific changes in the appropriate [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records).
 
-For unattended computation, follow [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved prompts](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
+For unattended computation, follow [Chapter 9: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved prompts](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
 
 <!-- ===================== REFERENCE ===================== -->
 
@@ -855,8 +934,8 @@ For example, you might want the agent conversation beside a view of the project'
 
 | Need | Possible addition | What to ask the agent to configure |
 |---|---|---|
-| See a conversation and a log together | [`iTerm2`](https://iterm2.com/) on macOS; [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/) with [`WSL2`](https://learn.microsoft.com/windows/wsl/) | Readable panes or tabs in the intended project environment |
-| Recognize the current project and branch | [`Oh My Posh`](https://ohmyposh.dev/) | A simple prompt in the existing shell |
+| See a conversation and a log together | [`iTerm2`](https://iterm2.com/) on macOS; [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/) with [`WSL2`](https://learn.microsoft.com/windows/wsl/) | Readable window areas or tabs in the intended project environment |
+| Recognize the current project | [`Oh My Posh`](https://ohmyposh.dev/) | A simple shell prompt showing the folder and useful status |
 | Return to a named terminal workspace | [`Zellij`](https://zellij.dev/) | A session and layout for the project |
 | Inspect code, data, and plots together | [`Positron`](https://positron.posit.co/) or an existing research editor | The actual project and its recorded language environment |
 
@@ -864,41 +943,43 @@ For example, you might want the agent conversation beside a view of the project'
 
 ## Make the current work visible
 
-Use legible text and a small number of panes. A prompt showing the project directory, `git` branch, and failed-command status can help distinguish projects without changing the shell itself. Decorative symbols and special fonts are optional. Have the agent preserve existing settings and check a new session after making changes.
+Use legible text and a small number of *panes*, separate areas of one window. The *shell prompt* is the line showing that the shell is ready for input, unlike a written prompt addressed to an agent. It can show the project directory and failed-command status. For a project using [`Git`](https://git-scm.com/), it can also show the branch, the named line of work in version history. Decorative symbols and special fonts are optional. Have the agent preserve existing settings and check a new session after making changes.
 
 On Windows, an Ubuntu tab and a `PowerShell` tab use different environments. The agent should configure the intended one rather than assume that settings in one apply to the other. Shell startup files also run instructions, so a visual customization should not silently replace unrelated setup.
 
 ## Return to a working session
 
-`Zellij` can keep a named session available when you detach from it and later reattach, while the host and session continue running. That can preserve a useful layout or survive a dropped connection. Ask the agent to configure the layout and explain the relevant on-screen controls.
+`Zellij` can keep a group of panes together as a named session. *Detaching* leaves that session running while you stop viewing it; *reattaching* opens it again. The computer and session must remain available. This can preserve a layout across a dropped connection. Ask the agent to configure it and explain the relevant on-screen controls.
 
-Session management does not replace [`pueue`](https://github.com/Nukesor/pueue), which manages submitted jobs and their records. Nor does a restored layout establish that computation continued through sleep or shutdown. Use [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) for unattended work and the institution's scheduler on a cluster.
+Session management does not replace [`pueue`](https://github.com/Nukesor/pueue), which manages submitted jobs and their records. Nor does a restored layout establish that computation continued through sleep or shutdown. Use [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) for unattended work and the institution's scheduler on a cluster.
 
 ## Inspect results in the editor you use
 
-`Positron` supports work with [`R`](https://www.r-project.org/) and [`Python`](https://www.python.org/); [`RStudio`](https://posit.co/products/open-source/rstudio/), [`Stata`](https://www.stata.com/), or another familiar editor may already serve the project well. Have the agent open the project in its recorded environment and identify the interpreter being used, following [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments).
+`Positron` supports work with [`R`](https://www.r-project.org/) and [`Python`](https://www.python.org/); [`RStudio`](https://posit.co/products/open-source/rstudio/), [`Stata`](https://www.stata.com/), or another familiar editor may already serve the project well. Have the agent open the project in its recorded environment and identify the interpreter being used, following [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments).
 
 You can inspect substantive results while the agent works on the files. Coordinate any simultaneous edits, and keep transformations used in the analysis in saved code rather than only in a data viewer. An extra AI extension or database connection is a separate choice, not a prerequisite for inspecting the work.
 
 # Appendix B. Keep records of shared settings: chezmoi {#shared-settings}
 
-Personal tool settings often live in several folders. A saved, maintained copy makes it easier to recover after a mistake or prepare another computer. [`Chezmoi`](https://www.chezmoi.io/) manages selected configuration files and places them where the relevant programs expect to read them.
+Personal tool settings often live in several folders. A saved, maintained copy makes it easier to recover after a mistake or prepare another computer. [`chezmoi`](https://www.chezmoi.io/) manages selected configuration files and places them where the relevant programs expect to read them.
 
-Suppose you revise the coding instructions shared by your research projects. The change should survive a later settings update and be available on another machine. That requires knowing which copy is maintained and which copy the agent reads. A [`git`](https://git-scm.com/) repository can record the maintained copy's history.
+Suppose you revise your global user instructions, which apply across your research projects. The change should survive a later settings update and be available on another computer. These are personal settings, distinct from a research group's shared files or one project's configuration. A [`Git`](https://git-scm.com/) repository can record the maintained copy's version history.
 
 ## Understand the two copies {#understand-the-two-copies}
 
-The *source* is the copy managed by chezmoi. The *applied file* is the copy installed where a program reads it. Applying the source updates the installed copy. If the agent edits the applied file directly, it must capture that change back into the source before a later apply restores the older version. `Chezmoi` documents [editing and applying changes](https://www.chezmoi.io/user-guide/daily-operations/) and [capturing changed files](https://www.chezmoi.io/reference/commands/re-add/).
+The *source* is the copy managed by `chezmoi`. The *applied file* is the copy installed where a program reads it. Applying the source updates the installed copy. If the agent edits the applied file directly, it must capture that change back into the source before a later apply restores the older version. `chezmoi` documents [editing and applying changes](https://www.chezmoi.io/user-guide/daily-operations/) and [capturing changed files](https://www.chezmoi.io/reference/commands/re-add/).
 
-![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Chezmoi applies maintained source settings to files read on two computers. An edit to an applied file must be captured back into source before a later apply. Git can record source history."}
+![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="On each computer, chezmoi applies a local source copy to the settings a program reads and captures selected edits back into source. Source changes are transferred between computers separately, then applied locally."}
 
 Ask the agent to identify any existing settings manager before introducing another. Have it preserve current files, record the source and applied locations, and verify that the target program reads the intended settings. Choose which personal settings belong in this record. Project-only configuration already tracked with its project usually needs no additional manager.
 
 ## Preserve differences between machines
 
-Some settings can be identical across computers; others need different paths or installed programs. `Chezmoi` templates can express those differences. Have the agent check the resulting files in each intended environment instead of copying one machine's entire setup unchanged.
+On each computer, `chezmoi` applies that computer's maintained source copy to the files programs read. To use an update elsewhere, first transfer the source changes through the chosen synchronization route, such as `Git`, then apply them on that computer.
 
-Keep credentials and account state out of an ordinary settings repository. A private repository controls who can access it; it does not make a stored password harmless. Follow [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for secret values and the [shared-instructions guidance](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) for the content of reusable research instructions.
+Some settings can be identical across computers; others need different paths or installed programs. A `chezmoi` *template* is a settings file that can produce the appropriate values for each machine. Have the agent check the resulting files in each intended environment instead of copying one computer's entire setup unchanged.
+
+Keep credentials and account state out of an ordinary settings repository. A private repository controls who can access it; it does not make a stored password harmless. Follow [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for secret values. *Doing Research with AI Agents* explains the content of [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions).
 
 If a managed file controls agent permissions, protect both the source and applied locations. Changing the source can change the permissions on the next apply. [Chapter 2: Control what added tools can access](#tool-access) explains that relationship. The agent should check the resulting behavior as well as whether the files were copied successfully.
 
@@ -906,46 +987,53 @@ If a managed file controls agent permissions, protect both the source and applie
 
 Start with the usage display in the app you already use. It is usually the quickest way to see the account's reported limits and reset information. An additional tool becomes useful when you want a history the app does not show, such as which recorded sessions accounted for most of the week's usage.
 
-[`Ccusage`](https://ccusage.com/) summarizes compatible retained local logs. Its reports can help investigate patterns, but they do not replace the account's official usage display or bill. Ask the agent to identify what the available records can actually answer before installing another reporting tool.
+[`ccusage`](https://ccusage.com/) summarizes compatible retained local logs, the saved records of session activity. Its reports can help investigate patterns, but they do not replace the account's official usage display or bill. Ask the agent to identify what the available records can answer before installing another reporting tool.
+
+*Tokens* are units of text processed by a large language model (LLM), often word fragments. The *provider* operates the LLM service and reports account use. Charges for API access, where a program calls the service directly, may differ from a subscription's allowance.
 
 | Question | Appropriate source | Limitation |
 |---|---|---|
 | How much of the account allowance remains, and when does it reset? | The app or provider's account display | Depends on the plan and what the provider reports |
-| Which recorded sessions used the most tokens? | Compatible local logs and a tool such as ccusage | Missing or unsupported logs leave gaps |
+| Which recorded sessions used the most tokens? | Compatible local logs and a tool such as `ccusage` | Missing or unsupported logs leave gaps |
 | What was charged, or what would token use cost at specified prices? | Provider billing for actual charges; a log-based calculation for an estimate | Estimated API cost is not a subscription balance or an invoice |
 
 ## Ask for a report that answers a question
+
+A usage report counts activity over a period. A context display concerns the information available to the LLM within a session; it does not show the account's remaining allowance. *Doing Research with AI Agents* explains [context and usage choices](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context).
 
 > Use the available records to identify the largest sessions this week. State which dates, machines, and interfaces the report covers. Distinguish recorded token totals from explanations inferred about their causes. Keep confidential transcript content out of the report.
 
 The agent should check the [current tool documentation](https://ccusage.com/guide/) and available log formats. A session absent from the report may have been deleted, stored elsewhere, or recorded in an unsupported format. State those gaps rather than interpreting absence as zero use.
 
-A long statistical-model fit on your computer does not consume LLM tokens simply because time passes. Asking an agent for repeated updates or sending it large logs can generate additional LLM calls. If the report identifies that pattern, use saved job records to retrieve useful summaries, following [Chapter 6: Keep unattended jobs moving: pueue](#job-queues). The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [context and usage choices](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context).
+A long statistical-model fit on your computer does not consume LLM tokens simply because time passes. Asking an agent for repeated updates or sending it large logs can generate additional LLM calls. If the report identifies that pattern, use saved job records to retrieve useful summaries, following [Chapter 9: Keep unattended jobs moving: pueue](#job-queues).
 
 # Appendix D. Troubleshooting {#troubleshooting}
 
-Give the agent the error message, the command that failed, and the expected output. Ask it to identify the cause before changing the environment or starting another copy of the job. The entries below distinguish common routing problems from the specific failures observed while developing these guides.
+Tell the agent what you expected and what happened instead. Provide any error message it cannot already see. Ask it to inspect the command, logs (recorded execution messages), and saved outputs before changing software or starting another copy of the job.
 
-| Symptom | Where to investigate |
+| Symptom (links to help) | First check for the agent |
 |---|---|
-| A command cannot be found | [Chapter 3: Install and manage tools with Homebrew](#adding-tools) |
-| A queued job waits, fails, or leaves no expected output | [Chapter 6: Keep unattended jobs moving: pueue](#job-queues) |
-| A restored environment differs from the original | [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) |
-| A pipeline reruns too much or misses a changed input | [Chapter 9: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) |
-| Authentication fails | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
-| A connection cannot retrieve the expected records | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
-| A browser task uses the wrong session or cannot see a page | [Chapter 14: Inspect and interact with a browser](#browser-work) |
-| A programmatic agent run cannot authenticate or use a required tool | [Chapter 16: Run agents from saved prompts](#headless-agents) |
-| A local LLM exhausts memory or returns unusable output | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
-| `R` uses a core without producing output when launched by an agent on macOS | [The observed `R` issue](#r-on-macos) |
-| A PDF build reports “No counter 'none' defined” | [The specific table fix](#tex-table-counter) |
-| A project stalls while cloud storage processes many generated files | [Cloud-synchronized storage](#cloud-sync-storage) |
+| [Command missing](#ask-the-agent-to-install-the-tool) | Installed program and the session's `PATH` |
+| [Queued job stalled or failed](#review-results-and-recover-failures) | Recorded status, active process, and output location |
+| [Restored environment differs](#restore-and-check-it) | Actual software versions against recorded versions |
+| [Unexpected pipeline reruns](#check-what-reruns) | Declared inputs and changed files |
+| [Account access fails](#supply-a-credential-to-a-command) | Intended account and execution route, without printing secrets |
+| [Connected records missing](#connect-the-literature-task) | Configured operations and actual retrieval result |
+| [Wrong browser session](#choose-the-browser-account) | Profile and signed-in account |
+| [Headless agent fails](#turn-the-task-into-a-saved-workflow) | Account access, permissions, and required tools |
+| [Local LLM fails](#choose-hardware-and-a-runtime) | Memory use, input length, and raw output |
+| [Agent-launched `R` stalls on macOS](#r-on-macos) | Active process and the actual launch route |
+| [PDF reports “No counter 'none' defined”](#tex-table-counter) | Exact error and document template |
+| [Cloud-synchronized files stall](#cloud-sync-storage) | Synchronization activity and generated-file locations |
 
 ## R launched by an agent on macOS {#r-on-macos}
 
 In the environment used to develop these guides, [`R`](https://www.r-project.org/) has sometimes stalled when an agent starts it without a terminal connection. The process uses a processor core but produces no output. This is an observed macOS issue, not a claim about every `R` installation or operating system. A *pseudo-terminal*, a software-created terminal connection, has provided a dependable workaround in that environment.
 
-Have the agent put the workaround in one executable helper, `bin/rscript-pty`, and route the project's `R` commands through it. Keep the helper's standard-input handling intact. For [`targets`](https://docs.ropensci.org/targets/), use `callr_function = NULL` and disable [`crew`](https://wlandau.github.io/crew/) for the initial check so the work stays in the process with the terminal connection. Separately launched workers need their own verification.
+Have the agent put the workaround in one executable helper, `bin/rscript-pty`, a small program that launches the project's `R` commands in the required way. Keep its standard-input handling intact.[^tk-troubleshooting-stdin] For [`targets`](https://docs.ropensci.org/targets/), use `callr_function = NULL` and disable [`crew`](https://wlandau.github.io/crew/) for the initial check so the work stays in the process with the terminal connection. Separately launched workers need their own verification.
+
+::: {.needspace height="6cm"}
+:::
 
 [Download the macOS `R` helper](resources/rscript-pty){.download-button download="rscript-pty"}
 
@@ -965,7 +1053,7 @@ Have the agent save it as `bin/rscript-pty`, make it executable, and verify it t
 
 </details>
 
-Retain the helper for queued `R` jobs too. Earlier success with a particular queue or worker configuration does not establish that another configuration will behave the same way. Check the actual execution route, the expected artifact, and whether the process finishes before scaling up. If a process stalls, identify it and examine progress before stopping it; do not launch replacements that leave the old jobs consuming resources.
+Retain the helper for queued `R` jobs too. Earlier success with a particular queue or worker configuration does not establish that another configuration will behave the same way. Check the actual execution route, the expected output file, and whether the process finishes before scaling up. If a process stalls, identify it and examine progress before stopping it; do not launch replacements that leave the old jobs consuming resources.
 
 If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly approved execution route or run the saved command from your own application. Do not silently turn off the restrictions. For [`Quarto`](https://quarto.org/) that executes `R`, the macOS workaround wraps the complete render:
 
@@ -977,7 +1065,7 @@ Linux uses a different `script` interface, so this command should not be copied 
 
 ## Captionless tables with TeX Live 2026 {#tex-table-counter}
 
-A PDF build in these guides encountered “No counter 'none' defined” for a captionless table. [`Pandoc`](https://pandoc.org/) emitted a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template preamble, before the document begins:
+A PDF build in these guides encountered “No counter 'none' defined” for a captionless table. [`Pandoc`](https://pandoc.org/) emitted a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template's *preamble*, the setup section before the document content begins:
 
 ```tex
 \makeatletter
@@ -989,13 +1077,15 @@ The guard preserves a counter if it already exists. Have the agent rebuild and i
 
 ## Cloud-synchronized project storage {#cloud-sync-storage}
 
-Software environments, caches, logs, and repository internals can contain many rapidly changing files. Synchronizing them through a cloud folder can create substantial churn and, in the Dropbox/macOS environment used for these guides, has sometimes blocked file operations. A `git` ignore rule controls what `git` records; it does not control what `Dropbox` synchronizes.
+Installed software, caches of reusable results, logs, and version-history files can contain many rapidly changing files. Rewriting and synchronizing thousands of these files repeatedly has sometimes blocked file operations in the `Dropbox`/macOS environment used for these guides. A [`Git`](https://git-scm.com/) ignore rule controls what `Git` records; it does not control what `Dropbox` synchronizes.
 
 Ask the agent to distinguish authored material from files that can be rebuilt. Keep dependency records and source files with the project, while placing large rebuildable environments and caches outside the synchronized tree where practical. If a provider-specific exclusion is used, configure and verify it on an empty directory before filling that directory. Check the provider and platform: [`Dropbox` documents different mechanisms](https://help.dropbox.com/sync/ignored-files), and these settings are not interchangeable across systems.
 
 For an already populated or stalled directory, preserve the work and diagnose its synchronization state before changing exclusions. Retrospectively applying an exclusion is not the recovery procedure used here. Rebuild a disposable environment outside the synchronized location from its recorded dependencies, then reconnect the project to it. Preserve source, uncommitted work, and repository history when planning any move; do not treat a repository as a disposable cache.
 
-The agent should verify the project's commands after changing locations and explain which material is still backed up. Excluding generated files from synchronization does not itself create a backup or a reproducible environment. [Chapter 8: Preserve a software environment: rig, renv, and uv](#environments) covers the records needed to restore software.
+The agent should verify the project's commands after changing locations and explain which material is still backed up. Excluding generated files from synchronization does not itself create a backup or a reproducible environment. [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) covers the records needed to restore software.
+
+[^tk-troubleshooting-stdin]: Standard input is the input channel a program reads. The helper redirects it from `/dev/null`, which supplies no input. Retain that redirection as part of this observed workaround.
 
 # Appendix E. Terminal vocabulary {#terminal-history}
 
@@ -1011,22 +1101,25 @@ The abbreviation *TTY*, from teletype, remained in computing. A modern *terminal
 
 ## The program receiving your commands
 
-A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for input; another program started from the shell may display its own interface until you exit it.
+A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for a command. This differs from a written prompt addressed to an agent; the agent or another program started from the shell receives input until you exit it.
 
 A [*pseudo-terminal*, or PTY](https://man7.org/linux/man-pages/man7/pty.7.html), is a software connection that behaves like a terminal for the program using it. Programs can behave differently when connected to a terminal than when reading from a file or another process. That distinction matters for the specifically observed [R-on-macOS problem](#r-on-macos), but does not mean every unattended command needs a PTY.
 
 | Term | Meaning in this guide |
 |---|---|
 | Command-line interface, CLI | A program interface controlled through commands and arguments |
-| Argument | A value or option supplied with a command |
-| Working directory | The folder used to resolve relative file paths |
-| Absolute / relative path | A location starting from the filesystem root / a location interpreted from a working directory |
+| Argument | A value or option supplied with a command, such as `figures` in `just figures` |
+| Working directory | The folder from which the shell starts its work |
+| Absolute path | A location starting from the filesystem's root, such as `/Users/your-name/Research/my-project` |
+| Relative path | A location interpreted from a starting folder; `data/analysis.csv` means the file inside that folder's `data` directory |
 | `PATH` | The list of directories searched to locate an executable command |
 | Environment variable | A named value supplied to a program, often inherited by programs it starts |
 | Standard input, `stdin` | The input channel a program can read |
 | Standard output, `stdout` | The channel for ordinary program output |
 | Standard error, `stderr` | A separate channel commonly used for diagnostics |
 | Pipe | A connection passing one program's output to another program's input |
-| Exit status | A code returned when a program finishes; its interpretation depends on the program |
+| Exit status | A code reporting how a program ended according to that program's rules; also check the expected output |
+
+An exit status of zero does not by itself establish that the intended research job succeeded. The [`pueue wait` example](#review-results-and-recover-failures) shows why the program's own meaning and the saved result both matter.
 
 Ask the agent to explain an unfamiliar term in the command or error where it occurs. The useful question is what the program will do and what result to expect. A vocabulary reference supports that understanding without requiring a course in shell programming.
