@@ -240,7 +240,7 @@ Suppose a revised exclusion rule removes far more observations than expected. Yo
 
 A `Git` *repository* (often shortened to “repo”) stores the project's history. A *commit* records a version of selected files with a message describing the change. The agent can create these checkpoints after meaningful pieces of work, such as an approved sample rule or a completed figure. The descriptions should explain the change well enough to find it later.
 
-`Git` preserves versions of the project's files, but the study's requirements and the reasons for research decisions still need to be written down. For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`.[^tk-git-project-context] If you approve restoring the earlier exclusion rule from the opening example, have the agent update `SPECIFICATION.md` and add the reason at the top of `METHODOLOGY.md`, preserving earlier entries.
+`Git` preserves versions of the project's files, but the study's requirements and the reasons for research decisions still need to be written down. For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`.[^tk-git-project-context] When you make or revise a research decision, have the agent keep `SPECIFICATION.md` current and record the decision and its reason at the top of `METHODOLOGY.md`, preserving earlier entries.
 
 ::: {.prompt}
 > Maintain version history for this project using `Git`. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
@@ -274,19 +274,21 @@ For guidance on sharing a completed study so others can reproduce it, see [Chapt
 
 # 5. Find and inspect project files {#finding-files}
 
-Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what a saved service response contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
+Agents often need to locate a small piece of information in a large project: where an exposure is defined, which script writes a table, or what information a downloaded data file contains. Computers already provide search and file-reading tools. The programs here give the agent faster searches, useful filters, and ways to query structured data without reading everything into the conversation.
 
-Suppose a reviewer asks how `hot_days`, a variable counting days of heat exposure, enters an analysis like the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. The agent needs its construction, the statistical model that uses it, and the figure label describing it. [`ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `ripgrep` is the program's name; `rg` is its command.
+Suppose a journal reviewer asks how `hot_days`, a variable counting days of heat exposure, enters an analysis like the [synthetic heat-and-birthweight study](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. To answer that question, the agent needs to find the code that calculates `hot_days`, see how the statistical model uses it, and check how it is labeled in figures. The tool [`ripgrep` (`rg`)](https://github.com/BurntSushi/ripgrep) searches text across files and reports matching paths and lines. `ripgrep` is the program's name; `rg` is its command.
+
+The agent must report the file paths and line numbers of matching text, then explain any inconsistencies in how `hot_days` is calculated, used in the statistical model, and labeled in figures.
 
 ![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
 
-The diagram uses illustrative filenames. The agent must report your project's actual paths and lines, then explain any disagreement between the exposure construction, statistical-model use, and figure label.
+## Choose the right type of search {#choose-the-appropriate-search}
 
-## Choose the appropriate search
+Some files arrange information under named fields, such as a record identifier or an output folder. JSON and YAML[^tk-search-formats] are text formats for storing information this way, including fields grouped inside other fields. The agent can select the value it needs instead of printing the whole file or guessing which nearby words belong together.
 
-Some files arrange information under named fields, such as a record identifier or an output folder. JSON and YAML are text formats for storing information this way, including fields grouped inside other fields. The agent can select the value it needs instead of printing the whole file or guessing which nearby words belong together.
+The agent can install any missing programs through [`Homebrew`](https://brew.sh/) or your preferred package manager.
 
-| Task | Tool | Useful result |
+| Task | Tool[^tk-search-programs] | Useful result |
 |---|---|---|
 | Search text within project files | `ripgrep` (`rg`) | Matching passages with file paths and line numbers. |
 | Locate files by name or type | [`fd`](https://github.com/sharkdp/fd) | A focused list of candidate files. |
@@ -294,73 +296,91 @@ Some files arrange information under named fields, such as a record identifier o
 | Read or update YAML settings | [`yq`](https://mikefarah.gitbook.io/yq/) | Relevant configuration values, preserving their structure. |
 | Inspect source text | [`bat`](https://github.com/sharkdp/bat) | Readable excerpts with line numbers. |
 
-The agent can install a missing program through the established package manager. Keep an available alternative when it already does the job.[^tk-search-programs]
-
 ::: {.needspace height="7cm"}
 :::
 
 ## Ask for findings tied to files
 
 ::: {.prompt}
-> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
+> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant file paths and line numbers. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
 :::
 
 ## Investigate a missing match
 
-`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check the [search scope](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) before concluding that the definition is absent. Search exclusions reduce noise; they are not file-access restrictions.
+`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check [which files were searched](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) and whether any relevant files were excluded.
 
-Text search does not read the contents of every PDF, image, or saved binary object. The agent should identify the format and use an appropriate reader. A name assembled by code may also require following the calculation rather than searching for the final name.
+A text search can miss information even when it includes the right files. The agent may need a suitable tool to read a PDF, image, or saved dataset. If code builds a variable name or filename from several pieces of text, the agent should follow the code to identify it.
 
-For a structured response, distinguish an absent field from empty text or *null*, a marker for no value. Ask the agent to check the source's meaning of null before treating the record as missing data or replacing the value.
+When inspecting a JSON or YAML file, the agent should distinguish between an absent field, empty text, and `null`, a marker for no value. These can mean different things. The agent should check their meaning in the source data before treating a value as missing data or replacing it.
 
-[^tk-search-programs]: The linked `yq` is Mike Farah's implementation; other programs use that name. Some Linux distributions name `fd` and `bat` differently. Ask the agent to identify the installed program and record any naming convention needed for later sessions.
+[^tk-search-formats]: JSON stands for *JavaScript Object Notation*; YAML stands for *YAML Ain’t Markup Language*. See these examples of [JSON](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON#json_structure) and [YAML](https://yaml.org/spec/1.2.2/#chapter-2-language-overview) to see how information is arranged in each format.
+
+[^tk-search-programs]: The linked `yq` is [Mike Farah's implementation](https://github.com/mikefarah/yq); other programs use that name. Some Linux distributions name `fd` and `bat` differently. Ask the agent to identify the installed program and record any naming convention needed for later sessions.
 
 <!-- ===================== PART III — RUN AND REPRODUCE RESEARCH ===================== -->
 
 # 6. Preserve a software environment: rig, renv, and uv {#environments}
 
-Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs the original software records to investigate whether changed software explains the discrepancy. Installing the latest releases would give it a different comparison.
+Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs to know which software versions were used for the original analysis to check whether a software change explains the discrepancy. Installing the latest releases would give it a different comparison.
 
-Recording the software prepares the project for repeatable commands, selective reruns, and unattended jobs. It also lets the agent restore the earlier setup separately when investigating a result or preparing a handoff.
+Recording the software versions prepares the project for repeatable commands, selective reruns, and unattended jobs. It also lets the agent recreate the earlier software setup without changing the current one, for example when investigating a result or preparing to share the project.
 
-## Record the language and packages
+## Record the language and package versions {#record-the-language-and-packages}
 
-A *software environment* includes the language, packages, and other programs used by the analysis. The language interpreter, also called its runtime, executes the code. A *package* adds functions and may require other packages or programs; those requirements are its *dependencies*. A *lockfile* records the particular package versions selected to work together, so the agent can restore that set rather than install whatever is newest.
+A *software environment* includes the language, packages, and other programs used by the analysis. The language interpreter, also called its *runtime*, executes the code. A *package* adds functions and may require other packages or programs; those requirements are its *dependencies*. A *lockfile* records the particular package versions selected to work together, so the agent can restore that set rather than install whatever is newest.
 
 | Responsibility | `R` | `Python` |
 |---|---|---|
 | Install and select the language | [`rig`](https://rig.r-lib.org/) manages [`R`](https://www.r-project.org/) installations. | [`uv`](https://docs.astral.sh/uv/) manages [`Python`](https://www.python.org/) installations; `.python-version` records a selection. |
 | Record and restore packages | [`renv`](https://rstudio.github.io/renv/) maintains `renv.lock`. | `uv` maintains `pyproject.toml` and `uv.lock`. |
 
-`renv.lock` records the `R` version as well as packages, but `renv` does not install or switch `R` itself; `rig` supplies that capability. `uv` handles both language and package management. In either case, the agent must restore the intended language and packages.
+The `R` package `renv` records the `R` version and package versions in `renv.lock`, but does not install or switch `R` itself. The standalone tool `rig` supplies that capability. For `Python`, the standalone tool `uv` handles both language and package management. The agent can install [`rig`](https://formulae.brew.sh/formula/r-rig) and [`uv`](https://docs.astral.sh/uv/getting-started/installation/#homebrew) through [`Homebrew`](https://brew.sh/); it installs `renv` from within `R`.
+
+[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded.
 
 ![](figures/research-environments.svg){#fig-research-environments fig-alt="The agent records a working R or Python environment, restores the recorded software separately, and compares a selected output with a saved reference result. Both language routes require the restore-and-check step."}
 
+## When other environment tools are useful
+
+An *environment manager* creates and maintains a separate software setup for a project. `renv` manages `R` packages this way; `uv` manages `Python` and its packages.
+
+[`Conda`](https://docs.conda.io/projects/conda/en/stable/user-guide/concepts/environments.html), [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html), and [`pixi`](https://pixi.prefix.dev/latest/) can also manage other languages and supporting programs. They can be useful when an analysis combines several kinds of software, such as `Python` packages and separate programs for processing genetic data. They may also be the practical choice when collaborators already provide a working setup. Otherwise, `rig` with `renv` for `R`, or `uv` for `Python`, remain the recommended starting points.
+
+These tools can coexist on the same computer, with different projects using different setups. If the agent combines tools within one project, it should explain what each manages and record how to restore the complete setup. It should avoid having two tools independently update the same packages, which can [leave their records inconsistent](https://docs.conda.io/projects/conda/en/stable/user-guide/tasks/manage-environments.html#using-pip-in-an-environment).
+
 ## Capture the working environment
 
-For a new project, have the agent establish version records alongside the analysis. For an existing project, preserve the working versions before adding packages or changing managers. Choose a previously checked result as the reference for comparison after restoration.
+Have the agent use the appropriate tools to record the project's language and package versions. For an existing project, it should capture the versions already in use without upgrading them. To check that the setup can be recreated, the agent should save the output from a small part of the analysis, restore the recorded software versions, and rerun that part to compare the results.
 
 ::: {.prompt}
-> Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected check. Compare its output with the saved reference result. Report missing software and any changed results.
+> Inspect this project's software and record the language version and all required package versions without upgrading them. Choose a small, representative part of the analysis, run it with the current setup, and save the output. Recreate the recorded software setup in a separate environment, leaving the current one unchanged. Rerun the same part of the analysis and compare the outputs. Report anything that could not be restored and any differences in the results. Keep the setup files with the project and update README.md with any additional software requirements, restoration instructions, and the outcome of the check.
 :::
 
-Keep a functioning environment manager. If the project already uses [`Conda`](https://docs.conda.io/), [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html), or [`pixi`](https://pixi.sh/), have the agent use its version records and restoration procedure. These can also manage software beyond language packages. Ask for exact versions appropriate to the intended operating system and hardware; a list of package names alone cannot restore the earlier setup.
+When adding or updating a package later, have the agent update the lockfile and rerun the affected part of the analysis.
 
-[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded. These tools do not require researchers to change language.
+## Check the restored environment {#restore-and-check-it}
 
-## Restore and check it
+The agent should confirm that the analysis runs with the recorded language and package versions.[^tk-environment-restore] This matters when the computer has several versions installed: installing the intended version does not ensure that the analysis uses it.
 
-Have the agent restore into a separate environment and run a selected analysis or a [smoke test](#smoke-tests): a small representative run through the actual workflow. For `R`, it can compare the installed packages with `renv.lock`; for `uv`, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) can refuse an inconsistent lockfile instead of updating it silently.
+It should then rerun the small part of the analysis chosen before restoration, using the same code, data, and analysis settings. The agent should report whether the software versions match, whether the analysis completed, and whether its output differs from the saved result.
 
-The completion report should identify the language version actually used, whether packages restored, and which saved reference results were compared. Missing packages or platform-specific failures need investigation before changing versions. When adding a package later, retain the updated dependency record and check the affected analysis.
+The agent should diagnose and fix installation problems, and investigate any differences in results. It should explain any need to change the recorded software versions before making that change.
 
-## Include system requirements
+## Save the setup files and instructions {#include-system-requirements}
 
-Some packages depend on system libraries, compilers, or external programs.[^tk-environment-system-software] Record those requirements too. Containers can help package system software when language/package records are insufficient; see [Chapter 10: Run work in a separate environment: containers](#containers). Neither approach promises identical numerical results on all hardware.
+Some packages depend on system libraries, compilers, or external programs.[^tk-environment-system-software] For example, a Bayesian analysis may require a working C++ compiler and supporting build tools. Have the agent identify the required software and record its versions and installation instructions. Where compilation is required, it should check that it can compile and run a small representative model.
 
-Store environment records with the project, while keeping installed package directories out of [`Git`](https://git-scm.com/) and unnecessary cloud synchronization. [Appendix D: Troubleshooting](#cloud-sync-storage) describes the `Dropbox` procedure and the separate [R/macOS execution issue](#r-on-macos).
+Ask the agent to keep the setup files with the project, in the locations expected by the tools. These include `renv.lock` and its supporting files for `R`, or `pyproject.toml`, `uv.lock`, and `.python-version` for `Python`.[^tk-environment-setup-files] The agent should maintain these through the relevant tools.
 
-[^tk-environment-system-software]: A system library provides functions used by other software, such as reading a geospatial file. A compiler translates source code into a form the computer can run. The agent checks whether these supporting programs are required and records their versions.
+Have it add a “Software setup” section to `README.md`, the project's Markdown overview. This should explain any additional software requirements, including the versions used and how to install them. It should also identify the operating system and processor type used for the restoration check, give the commands for restoring the environment and rerunning the check, and summarize the outcome. Where requirements are already recorded in a setup file, the instructions should point to that file.
+
+If supporting software remains difficult to reproduce, ask the agent whether a container would help; see [Chapter 10: Run work in a separate environment: containers](#containers).
+
+[^tk-environment-restore]: For `R`, the agent can compare installed package versions with `renv.lock`. With `uv`, [locked synchronization](https://docs.astral.sh/uv/concepts/projects/sync/) stops if the lockfile needs updating, rather than changing it during restoration. A list of package names alone cannot restore the earlier setup; the agent also needs exact versions available for the intended operating system and hardware.
+
+[^tk-environment-system-software]: A system library provides functions used by other software, such as reading map files. A compiler translates source code into a form the computer can run.
+
+[^tk-environment-setup-files]: The lockfiles belong in the project's top-level folder. For `R`, also retain `.Rprofile`, `renv/activate.R`, and `renv/settings.json`; see the [`renv` collaboration guidance](https://rstudio.github.io/renv/articles/renv.html#collaboration). For `Python`, keep `pyproject.toml` and `.python-version` alongside `uv.lock`; see the [`uv` project files](https://docs.astral.sh/uv/concepts/projects/layout/).
 
 # 7. Give research tasks reliable commands: just {#project-commands}
 
