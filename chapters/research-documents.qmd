@@ -31,7 +31,9 @@ Markdown is plain text with simple formatting marks for headings, lists, and lin
 
 For a source-generated manuscript, ask the agent to save the build as a named command. [`just`](https://just.systems/) is a command runner for this purpose; retain existing build commands if they already work.
 
+::: {.prompt}
 > Configure this manuscript to build from its maintained text, references, and saved results. Produce [required formats] and save the build command. Explain which analysis outputs it reads and what it recomputes. Render the document, inspect its pages, and check representative numbers against their source files.
+:::
 
 The agent should check the actual document for missing citations, misplaced tables, clipped figures, and broken equations. You review interpretation and prose. A successful conversion alone does not show that a reader can use the result. [Chapter 18: Write and revise the manuscript](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the research guide explains the full check that the right numbers reach the paper.
 
@@ -41,7 +43,9 @@ Keep build settings and dependencies with the project. `Quarto`'s [execution set
 
 Establish which document the team is maintaining. If it is Markdown or `Quarto` source, preserve the returned `Word` file, compare it with the version sent, and transfer accepted edits into that source before rebuilding. If the team edits `Word` or `Google Docs` directly, keep that document authoritative and have the agent check and revise it there.
 
+::: {.prompt}
 > Preserve this coauthor's returned document. Compare it with the draft sent, transfer the accepted edits into our maintained source, and flag unresolved changes to claims or results. Rebuild a new draft without overwriting the returned copy, then check that the accepted edits survived.
+:::
 
 Conversion cannot be assumed to preserve every comment or tracked change automatically. Resolve conflicting scientific revisions before generating a replacement draft, and retain the returned file and the inputs needed for the next build.
 

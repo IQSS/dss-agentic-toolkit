@@ -10,7 +10,9 @@ For example, one agent can develop modeling code while another develops figures.
 
 A *subagent* is another agent given a separate assignment by a coordinating agent. Availability depends on the application; [`Claude Code`'s subagents](https://code.claude.com/docs/en/sub-agents) provide one documented route. Separate sessions with distinct assignments are another option. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
 
+::: {.prompt}
 > Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
+:::
 
 Each assignment should name its inputs, expected outputs, and files it may change. Give one agent responsibility for shared files, such as functions used by both tasks, records of required software, or definitions connecting analysis steps. The lead agent also coordinates changes to version history so one agent does not remove work another is using.
 

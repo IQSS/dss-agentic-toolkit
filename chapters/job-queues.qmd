@@ -14,7 +14,9 @@ Ask the agent to run a representative fit through the queue before submitting th
 
 Four jobs do not necessarily use four processor cores. A core can perform computation, and one fit may divide its work across several cores.[^tk-queue-resources] Several fits may also exhaust memory while cores remain available. Have the agent measure a representative run and choose a limit that leaves the computer usable for other work.
 
+::: {.prompt}
 > Prepare these sensitivity fits as queued jobs. Run a representative case first and check its saved result. Choose the maximum number of jobs running at once from its memory and processor use, then submit the batch. Confirm that the submitted jobs start and produce the expected logs or outputs. Record job identifiers, specifications, logs, and output locations so individual failures can be identified and rerun.
+:::
 
 The queue service's access must suit the work, as explained in [Chapter 2: Control what added tools can access](#tool-access). Use the project's recorded environment in the submitted commands rather than relying on whichever software the service happens to find.
 
@@ -35,7 +37,9 @@ Ask for the expected results files as well as process status. A command can exit
 
 An illustrative report might say:
 
-> Of 100 jobs, 98 completed with the expected results files. Two failed before saving estimates because their requested memory exceeded the available allocation. Their specifications and logs are retained; the completed fits do not need rerunning.
+::: {.example-output}
+Of 100 jobs, 98 completed with the expected results files. Two failed before saving estimates because their requested memory exceeded the available allocation. Their specifications and logs are retained; the completed fits do not need rerunning.
+:::
 
 You can then ask the agent to diagnose the failures, propose any change affecting the analysis or resource use, and rerun the affected jobs. Each retry should retain its relationship to the original attempt. Avoid duplicating completed fits or overwriting an earlier failed run's evidence.
 

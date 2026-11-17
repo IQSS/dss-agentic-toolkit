@@ -21,7 +21,9 @@ The [targets manual](https://books.ropensci.org/targets/) explains tracking obje
 
 ## Connect the analysis
 
+::: {.prompt}
 > Preserve the current results and environment. Connect the analysis through targets for this R workflow, declaring its inputs, functions, files, and outputs. Keep just as the command runner. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the previously checked results saved for this comparison.
+:::
 
 For a workflow organized around files and multiple languages, request `Snakemake` instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
 

@@ -21,7 +21,9 @@ Each selected step must run from its declared inputs and saved outputs, without 
 
 ## Save the commands
 
+::: {.prompt}
 > Preserve the current results, then give this project commands to fit a selected specification, rebuild figures from saved estimates, and run the complete workflow. Use just unless the existing command system already does this. Record each command's inputs and outputs, reuse shared code, and check that reorganizing execution has not changed the intended results.
+:::
 
 The agent installs `just` if needed and maintains the recipes. A small project might offer the following menu. These are examples to create for the project; installing `just` alone does not provide them.
 
@@ -39,7 +41,9 @@ Ask the agent to use these recipes in normal work and keep their descriptions cu
 
 A *smoke test* runs a small representative workload through the actual workflow before a large batch. For example, one fit should also produce its required contrast table and figure, so the agent checks that the steps work together. Use the same code and environment as the full run, with a smaller workload selected by an option and outputs kept apart from the main study's results.
 
+::: {.prompt}
 > Add a smoke-test recipe using the actual workflow. Keep its outputs separate from the full analysis, run it after relevant changes, and confirm the expected files before starting an expensive batch.
+:::
 
 []{#runnable-checks}
 

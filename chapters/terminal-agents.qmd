@@ -32,7 +32,13 @@ At the shell prompt, enter:
 claude
 ```
 
-Once `Claude` is running, type a research prompt in ordinary language: “Regenerate the main figure from the saved estimates and explain which files you used.” You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Once `Claude` is running, type a research prompt in ordinary language:
+
+::: {.prompt}
+> Regenerate the main figure from the saved estimates and explain which files you used.
+:::
+
+You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
 
 ![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell. In the illustrated recipe, just figures runs plotting code using saved estimates without an LLM call."}
 

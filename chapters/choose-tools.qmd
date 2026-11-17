@@ -2,15 +2,17 @@
 title: "1. Choose tools for a research need"
 ---
 
-Research involves tasks worth setting up once and repeating reliably: running a batch of analyses, rebuilding a manuscript, or restoring the software used in an analysis. This guide shows how to get an AI agent to set up and use tools for that work.[^tk-overview-agent] You direct the research; the agent installs and configures the tools, runs them, and checks their output.
+Research involves tasks worth setting up once and repeating reliably: running a batch of analyses, rebuilding a manuscript, or restoring the software used in an analysis. This guide shows how to get an AI agent to set up and use tools for that work.[^tk-overview-agent] A tool is software the agent can use to perform an action, such as searching files, running an analysis, or retrieving records from a database. Examples in this guide use [`Claude Code`](https://code.claude.com/docs/en/overview) in the `Claude` desktop app. You direct the research through conversation; the agent sets up and operates the tools and checks their output, so you do not need to learn their commands.
 
-Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return. Examples in this guide use [`Claude Code`](https://code.claude.com/docs/en/overview) in the `Claude` desktop app; you can arrange the work there without learning the queue's commands.
+Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return.
 
 Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://dss-agentic-research.pages.dev/chapters/first-session.html).
 
+![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
+
 ## Find the tool for your task
 
-Start with the result you need. The table is a menu of capabilities, not a list to install in order. Keep tools that already serve the project, and add others when they supply a useful capability.
+The table below is a menu of capabilities, not a list to install in order. Keep tools that already serve the project, and add others when they supply a useful capability.
 
 
 ::: {.toolkit-lookup}
@@ -24,19 +26,19 @@ Start with the result you need. The table is a menu of capabilities, not a list 
 | Record changes and recover earlier work | [Chapter 4: Recover earlier work: git and gh](#version-control) |
 | Find files and inspect their contents | [Chapter 5: Find and inspect project files](#finding-files) |
 | **Run and reproduce research** | |
-| Restore the language and packages used for an analysis | [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) |
-| Repeat tasks using saved commands | [Chapter 7: Give research tasks reliable commands: just](#project-commands) |
+| Restore the language and package versions used for an analysis | [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) |
+| Rerun analyses or rebuild figures with saved commands | [Chapter 7: Give research tasks reliable commands: just](#project-commands) |
 | Rerun only steps affected by a change | [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) |
-| Keep a batch moving unattended | [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) |
+| Keep a batch of analyses running unattended | [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) |
 | Package software and configure a separate place to run it | [Chapter 10: Run work in a separate environment: containers](#containers) |
-| Rebuild a document from saved research outputs | [Chapter 11: Generate documents from research outputs: Quarto and Pandoc](#research-documents) |
+| Build a document from saved research outputs | [Chapter 11: Generate documents from research outputs: Quarto and Pandoc](#research-documents) |
 | **Connect to data and services** | |
 | Supply account credentials without putting them in research code | [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) |
 | Give the agent access to an application or service | [Chapter 13: Connect to research data and services: MCP](#service-connections) |
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
-| Run a batch of agent tasks from saved prompts | [Chapter 16: Run agents from saved prompts](#headless-agents) |
+| Automate repeated agent tasks, such as checking whether an analysis can be reproduced | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) |
@@ -49,22 +51,16 @@ Start with the result you need. The table is a menu of capabilities, not a list 
 
 :::
 
-## Make the tool part of the workflow
+## Tell the agent when to use each tool {#make-the-tool-part-of-the-workflow}
 
-Some tools are programs the agent runs on the computer doing the work, such as a job queue. Others connect it to an application or service, such as a reference library. Once a tool is available, record when the agent should use it and what it should report.
-
-![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
-
-For the simulation batch, the project's instructions file, `CLAUDE.md` (or `AGENTS.md`), should tell future agents to use the queue for long runs, retain the job identifiers, and check the saved results. Once the queue is configured, ask the agent:
-
-> Record the queue command, the limit on simultaneous jobs, and where results and logs belong. Add instructions for future sessions to use this setup for the project's simulation runs and report which jobs succeeded or failed, checking their saved outputs.
-
-Ask the agent to save these project-specific commands and limits in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records), the maintained files describing this project and guiding later sessions. Put a rule in your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) only if it should apply across projects. A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
+Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save that guidance in `TOOLCHAIN.md`.[^tk-toolchain] Your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) should tell the agent when to consult that file. Keep requirements specific to one study in its [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
 
 ## Use tools from the app
 
-You can ask the agent to install and operate these tools from the app. You supply the research decisions and complete personal steps such as signing in or entering an administrator password. Give passwords to the sign-in or system dialog, rather than pasting them into the conversation.
+You can ask the agent to install and operate these tools from the app. You supply the research decisions and complete personal steps such as signing in or entering an administrator password.
 
-The setup examples cover macOS and Linux. The Windows route uses [`Windows Subsystem for Linux` (`WSL2`)](https://learn.microsoft.com/windows/wsl/), which provides a Linux environment on a Windows computer. Ask the agent to check the environment where the work will run before installing software there. You can keep using [`R`](https://www.r-project.org/), [`Python`](https://www.python.org/), or [`Stata`](https://www.stata.com/); adopting a queue or command runner does not require changing research language.
+The setup examples cover macOS and Linux. On Windows, the examples assume the tools run in [`Windows Subsystem for Linux` (`WSL2`)](https://learn.microsoft.com/windows/wsl/), which provides a Linux environment on a Windows computer. Ask the agent to check the environment where the work will run before installing software there. You can keep using [`R`](https://www.r-project.org/), [`Python`](https://www.python.org/), [`Stata`](https://www.stata.com/), or other analysis software; adopting new tools does not require changing research language.
 
 [^tk-overview-agent]: An agent combines a large language model (LLM), which processes supplied information and generates responses or tool requests, with tools and software that runs them and returns their results.
+
+[^tk-toolchain]: See [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.

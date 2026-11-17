@@ -2,7 +2,7 @@
 title: "4. Recover earlier work: git and gh"
 ---
 
-Research projects change as sample definitions, analyses, and manuscripts develop. [`Git`](https://git-scm.com/) records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after the conversation has ended.
+Research projects change as sample definitions, analyses, and manuscripts develop. [`Git`](https://git-scm.com/)[^tk-git-command] records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after your conversation with the agent has ended.
 
 Suppose a revised exclusion rule removes far more observations than expected. You decide which sample definition is appropriate; the agent finds the relevant change and can recover the earlier rule while preserving unrelated manuscript edits. A restored rule can change the results, so affected figures and manuscript values must be regenerated too.
 
@@ -10,26 +10,36 @@ Suppose a revised exclusion rule removes far more observations than expected. Yo
 
 ## Give the project a useful history
 
-A `Git` *repository* stores the project's history. A *commit* records a version of selected files with a message describing the change. The agent can create these checkpoints after meaningful pieces of work, such as an approved sample rule or a completed figure. The descriptions should explain the change well enough to find it later.
+A `Git` *repository* (often shortened to “repo”) stores the project's history. A *commit* records a version of selected files with a message describing the change. The agent can create these checkpoints after meaningful pieces of work, such as an approved sample rule or a completed figure. The descriptions should explain the change well enough to find it later.
 
-For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`. If you approve restoring the earlier rule, have the agent update the requirements and add the reason at the top of the decision record, preserving earlier entries.
+`Git` preserves versions of the project's files, but the study's requirements and the reasons for research decisions still need to be written down. For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`.[^tk-git-project-context] If you approve restoring the earlier exclusion rule from the opening example, have the agent update `SPECIFICATION.md` and add the reason at the top of `METHODOLOGY.md`, preserving earlier entries.
 
-> Maintain version history for this project. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
+::: {.prompt}
+> Maintain version history for this project using `Git`. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
+:::
 
-The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. A `.gitignore` file tells `Git` which untracked files to leave out; it does not erase files already in history. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to keep secret values out of research files. Keep appropriate backups for material outside version history.
+The agent handles file selection and commits. You do not need to inspect every code difference to benefit from the history. A *diff*, which shows changed lines, remains useful when investigating a particular decision or unexpected result. A `.gitignore` file tells `Git` which untracked files to leave out; it does not erase files already in history. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to keep secret values out of research files. Keep appropriate backups for files that `Git` does not track.
 
-If the project lives in `Dropbox`, have the agent configure storage for `git`'s internal files before creating a populated repository. [Appendix D: Troubleshooting](#cloud-sync-storage) explains the specific local procedure and how to handle an already populated directory.
+A `Git` repository can contain thousands of small internal files that record changes. Cloud storage services such as `Dropbox`, `Google Drive`, and `OneDrive` may try to sync these files as they change, creating heavy sync activity that can slow the computer or temporarily block access to files. Have the agent check the storage setup before creating a repository in a synced folder. [Appendix D: Troubleshooting](#cloud-sync-storage) explains the precautions and how to handle an existing repository.
 
 ## Recover the change you need
 
 State the desired outcome rather than a `Git` operation:
 
+::: {.prompt}
 > Restore the earlier sample-selection rule while preserving unrelated manuscript wording and figure-formatting edits. Update the approved analysis requirements and record why the rule changed. Rerun the affected analysis, regenerate its figures, and identify manuscript values that need updating.
+:::
 
-A useful report names the recovered decision, identifies the changed files and source checkpoint, and explains which outputs were regenerated. If the earlier state was never recorded, the agent should say what it can recover and what must be reconstructed. It should not silently reset the entire project to an older version.
+After restoring earlier work, the agent should explain what it restored, which saved version it used, which files it changed, and which outputs it regenerated. If the earlier state was never recorded, the agent should say what it can recover and what must be reconstructed. It should not silently reset the entire project to an older version.
 
-## Share work when intended
+## Share your project online {#share-work-when-intended}
 
-[`GitHub`](https://github.com/) hosts repositories for collaboration. [`GitHub CLI` (`gh`)](https://cli.github.com/) lets the agent use `GitHub` from commands, including preparing a pull request: a proposed change collaborators can discuss before it is incorporated. `Git` can maintain local history without `GitHub`.
+[`GitHub`](https://github.com/) hosts `Git` repositories for collaboration. `GitHub`'s command line interface tool (called [`gh`](https://cli.github.com/)) lets the agent use `GitHub` directly from the [`Claude`](https://claude.com/download) app, including preparing a *pull request*: a proposed change collaborators can discuss before it is incorporated. `Git` can maintain local history without `GitHub`.
 
-Keep the research group's existing host and accounts. Complete [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures and checks the connection without displaying credentials. Once authorized, it can send the intended changes and report the project's checks. Exclude protected data and secrets before sharing: a private repository still sends its contents to the hosting service. For research deposits, see [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in *Doing Research with AI Agents*.
+If you want to share your project online, ask the agent to use `GitHub` or a repository service you already use. You handle any [personal sign-in](https://cli.github.com/manual/gh_auth_login); the agent configures the connection and uploads the changes you authorize. Before uploading, have it check that protected data and credentials are excluded from both current files and their recorded history. A repository can be public, so anyone can view it, or private, with access limited to you and authorized collaborators. A private repository still stores its contents on the service's computers.
+
+For guidance on sharing a completed study so others can reproduce it, see [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in *Doing Research with AI Agents*.
+
+[^tk-git-command]: `Git` is the software's name; `git` is the command the agent uses to operate it.
+
+[^tk-git-project-context]: These are project context files: saved instructions and records that the agent can consult in later sessions. See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.

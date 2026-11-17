@@ -16,7 +16,9 @@ The download size is not the memory needed during use. Longer inputs and more si
 
 For `Ollama`, configure the process that actually serves requests. Its documented [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables its cloud features. It can listen on the *loopback address*, `127.0.0.1`, reachable from that same computer, instead of accepting connections from other computers. Keep LLM files outside cloud-synchronized project folders. These settings govern the runtime; an agent's other tools need their own network restrictions.
 
+::: {.prompt}
 > Prepare this computer for the approved local-LLM task. Check its resources and existing installations, select a compatible LLM runtime and version, and configure local execution. Keep my usual hosted-agent settings intact. Record the LLM, runtime, storage, maximum supported input and response length, and limit on simultaneous requests. Run representative permitted inputs and report failures and resource use.
+:::
 
 Have the agent check whether the requested input length fits the LLM's context capacity as well as the computer's memory.[^tk-local-context] If the setup cannot handle the task, choose a smaller candidate for evaluation or an approved server. Do not quietly shorten study documents or substitute another LLM to make a run finish.
 
@@ -48,7 +50,9 @@ The research guide explains [when training may help](https://dss-agentic-researc
 
 Have the agent install the selected tools in a recorded project environment, as described in [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments). Keep the study's data roles separate: training examples support learning, development examples support choosing the setup, and held-out test cases support the final comparison after those choices are fixed. The baseline is the unadapted LLM with the selected prompt, not an unspecified default invocation.
 
+::: {.prompt}
 > Set up the agreed adaptation study using the approved training, development, and held-out test assignments and base LLM. Preserve the unadapted LLM and its selected prompt. Record the configuration, and check that a short training run can save an adapter and reload it with the base LLM before launching the planned run. Save training state, logs, and evaluation outputs. Compare both versions on the same held-out test inputs using the prespecified evaluation. Do not change the data assignments or success criteria to improve the result.
+:::
 
 ![](figures/llm-adaptation.svg){#fig-llm-adaptation fig-alt="LoRA learns an adapter using training data and development choices. The saved adapter is reloaded with its base LLM. The adapted and unadapted versions are compared on the same held-out test inputs."}
 

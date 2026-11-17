@@ -29,7 +29,9 @@ The agent can install a missing program through the established package manager.
 
 ## Ask for findings tied to files
 
+::: {.prompt}
 > Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant paths and lines. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
+:::
 
 ## Investigate a missing match
 

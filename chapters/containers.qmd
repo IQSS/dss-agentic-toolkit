@@ -29,7 +29,9 @@ If the task uses an LLM, state where it will run. Putting commands inside a cont
 
 ## Build and check the environment
 
+::: {.prompt}
 > Configure a container for [task and purpose]. Preserve the project's language/package records and include required system software. Give it only the approved input/output locations and connections. Record where the LLM runs if one is involved. Run a representative case, check the saved outputs, and test any required access restrictions with harmless substitute files.
+:::
 
 The agent can use [`Colima`](https://github.com/abiosoft/colima) with `Docker`'s command-line tools on a Mac, or retain an existing approved [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, follow the supported runtime, which may be [`Apptainer`](https://apptainer.org/). The researcher completes required authorization; the agent builds and checks the environment.
 

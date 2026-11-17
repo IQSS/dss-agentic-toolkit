@@ -18,7 +18,9 @@ Start with the usage display in the app you already use. It is usually the quick
 
 A usage report counts activity over a period. A context display concerns the information available to the LLM within a session; it does not show the account's remaining allowance. *Doing Research with AI Agents* explains [context and usage choices](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context).
 
+::: {.prompt}
 > Use the available records to identify the largest sessions this week. State which dates, machines, and interfaces the report covers. Distinguish recorded token totals from explanations inferred about their causes. Keep confidential transcript content out of the report.
+:::
 
 The agent should check the [current tool documentation](https://ccusage.com/guide/) and available log formats. A session absent from the report may have been deleted, stored elsewhere, or recorded in an unsupported format. State those gaps rather than interpreting absence as zero use.
 

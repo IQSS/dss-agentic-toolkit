@@ -24,7 +24,9 @@ Ask the agent to check what is already connected before adding software. The com
 
 A *skill* records instructions for a recurring task and its checks. Use an existing skill if it captures the project's agreed [literature procedure](https://dss-agentic-research.pages.dev/chapters/literature.html#literature-protocol); the connection itself does not supply that procedure.
 
+::: {.prompt}
 > Connect this project's literature workflow to the specified Zotero collection using a permitted route. Retrieve relevant records and available papers or notes, then update the evidence table and bibliography. Keep source identifiers and flag missing material. Follow the agreed procedure for checking DOIs and verifying claims, using an existing literature skill if it records that procedure. Leave the library unchanged unless an edit is part of the task.
+:::
 
 Checking a paper's DOI identifies its record; verifying a claim requires reading the relevant material.[^tk-literature-doi]
 

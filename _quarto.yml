@@ -136,7 +136,6 @@ anchor-map:
   "tool-access": /chapters/tool-access.qmd
   "troubleshooting": /chapters/troubleshooting.qmd
   "turn-the-task-into-a-saved-workflow": /chapters/headless-agents.qmd#turn-the-task-into-a-saved-workflow
-  "understand-the-two-copies": /chapters/shared-settings.qmd#understand-the-two-copies
   "usage-tools": /chapters/usage-tools.qmd
   "version-control": /chapters/version-control.qmd
   "working-environment": /chapters/working-environment.qmd

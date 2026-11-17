@@ -16,7 +16,9 @@ For the archive check, use the prepared inputs, documented commands, and compari
 
 Ask the agent to turn the approved check into a repeatable command. It should verify the intended account, required tools, and output format, and record blocked operations without waiting indefinitely for an approval prompt. Personal sign-in and any decision to use separately billed API access remain yours.
 
+::: {.prompt}
 > Turn this approved handoff check into a saved command. Start a fresh agent with the fixed prompt and permitted test copy. Have it follow the documented reproduction steps without access to the working project, then save its report, exact response, tool record, and completion status. Test the complete route on a small prepared copy before using it for the full check. Preserve failed attempts and report any input or access requirement the workflow cannot satisfy.
+:::
 
 This preliminary [smoke test](#smoke-tests) runs a small representative task through the actual workflow. Once it passes, the same saved check can run on the intended archive and again on a corrected copy when needed. Keep the version of each copy and its report together.
 

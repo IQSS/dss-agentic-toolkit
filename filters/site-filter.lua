@@ -24,12 +24,8 @@ What it does, and why each one is a silent failure without it:
   6. Marks up the tool-chain's function matrix so CSS can shade it, replacing what the LaTeX-only
      matrix-shade.lua does for print.
 
-Section references get the one rule that is easy to get backwards: a reference inside a footnote is
-SKIPPED. In both documents a footnote's section reference cites the *other* document -- the guide
-footnotes the tool-chain map, never itself -- so linking it would send the reader to the wrong chapter
-of the wrong book. Verified on the current sources: with comments stripped, every body reference in
-the guide is unlettered and internal (§1–§18), while its footnotes are the only place lettered
-references appear (§15a, §17b), and those are the map's.
+Automatic § references inside footnotes are left alone because they may cite the companion guide.
+Explicit Markdown links still resolve through this site's anchor map, including in footnotes.
 ]]
 
 local chapters = {}   -- "13"       -> /chapters/13-permissions-and-sandboxing.qmd
@@ -158,13 +154,33 @@ local function chapter_map(img)
   return pandoc.RawInline("html", table.concat(out))
 end
 
+local function rewrite_link(link)
+  if link.target:match("^resources/") then
+    link.target = "/" .. link.target
+    link.classes:insert("no-external")
+    return link
+  end
+  local anchor = link.target:match("^#(.+)$")
+  local target = anchor and anchors[anchor]
+  if not target then return nil end
+  -- Quarto otherwise misclassifies local preview links as external.
+  link.classes:insert("no-external")
+  if this_page and target:match("/([^/]+)%.qmd") == this_page then
+    link.target = "#" .. anchor
+  else
+    link.target = target
+  end
+  return link
+end
+
 return {
   { Meta = read_meta },
   {
-    -- Top-down, so a footnote can be handed back whole and never descended into. Bottom-up would
-    -- rewrite the section references inside it before this filter ever saw the footnote.
+    -- Resolve explicit footnote links without guessing which guide a bare § reference cites.
     traverse = "topdown",
-    Note = function(note) return note, false end,
+    Note = function(note)
+      return pandoc.walk_inline(note, {Link = rewrite_link}), false
+    end,
 
     RawBlock = function(el) return drop_comment(el) or check_raw(el) end,
     RawInline = function(el) return drop_comment(el) or check_raw(el) end,
@@ -196,26 +212,7 @@ return {
     end,
 
     -- 4b. an in-document anchor from when the document was one file
-    Link = function(link)
-      if link.target:match("^resources/") then
-        link.target = "/" .. link.target
-        link.classes:insert("no-external")
-        return link
-      end
-      local anchor = link.target:match("^#(.+)$")
-      local target = anchor and anchors[anchor]
-      if not target then return nil end
-      -- These destinations belong to this site. Quarto otherwise misclassifies
-      -- 127.0.0.1 preview URLs as external and opens them in new tabs.
-      link.classes:insert("no-external")
-      -- Still on this page? Keep it a fragment so the browser scrolls instead of reloading.
-      if this_page and target:match("/([^/]+)%.qmd") == this_page then
-        link.target = "#" .. anchor
-      else
-        link.target = target
-      end
-      return link
-    end,
+    Link = rewrite_link,
 
     -- 5 + the anchors it points at: name each H2 of a numbered chapter `sec-13c`, by its position,
     -- which is how both documents letter their subsections. Generated here rather than upstream so

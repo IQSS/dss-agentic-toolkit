@@ -12,7 +12,9 @@ An agent app may already include browser access. [`Playwright MCP`](https://gith
 
 A *local preview* is a version of the site served on your computer for inspection. The website need not be public for the agent to check it.
 
+::: {.prompt}
 > Inspect this project's website as you build it. Open the local preview, use the main navigation and filters, and check the figures at desktop and phone widths. Fix the problems you find. Report which pages and actions you checked, and show any remaining issue that needs a design decision.
+:::
 
 The agent should inspect the rendered page again after making changes, including whether an action produces the intended result. A screenshot shows appearance, while trying a filter or link checks behavior. Both can be useful evidence, and neither replaces checking the underlying research results.
 
@@ -24,7 +26,9 @@ Use browsing first to understand the source and find the right release. A suitab
 
 Keep the original data and their *provenance*, the record of where they came from and how they were obtained. Include the source, release, date, query, and selections used.
 
+::: {.prompt}
 > Find a permitted way to obtain the specified records from this source. Prefer an API or export when available. Save the original responses or downloads and their provenance. If collection must recur, create a script with explicit inputs, saved outputs, request limits, and failure reporting. Check representative records before running the full collection.
+:::
 
 Preserve what the agent learns during its first exploration as saved collection code when the task will recur. A transcript of clicks alone cannot reliably repeat a large extraction. The [data-provenance section](https://dss-agentic-research.pages.dev/chapters/data-acquisition.html#data-provenance) explains what to retain for later research use.
 

@@ -23,7 +23,9 @@ A *software environment* includes the language, packages, and other programs use
 
 For a new project, have the agent establish version records alongside the analysis. For an existing project, preserve the working versions before adding packages or changing managers. Choose a previously checked result as the reference for comparison after restoration.
 
+::: {.prompt}
 > Inspect this project's software and existing environment records. Capture the language version and complete package dependencies without upgrading them. Keep the current environment intact, restore the recorded versions separately, and rerun the selected check. Compare its output with the saved reference result. Report missing software and any changed results.
+:::
 
 Keep a functioning environment manager. If the project already uses [`Conda`](https://docs.conda.io/), [`Micromamba`](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html), or [`pixi`](https://pixi.sh/), have the agent use its version records and restoration procedure. These can also manage software beyond language packages. Ask for exact versions appropriate to the intended operating system and hardware; a list of package names alone cannot restore the earlier setup.
 
