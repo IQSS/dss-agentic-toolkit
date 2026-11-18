@@ -38,7 +38,7 @@ Once `Claude Code` is running, type an instruction such as:
 > Regenerate the main figure from the saved estimates and explain which files you used.
 :::
 
-Your input now goes to the agent. It can read the project context files and use its permitted tools to carry out the task. When you have finished the conversation, enter `/exit` to return to the shell prompt.
+Your input now goes to the agent. It can read the project context files[^tk-terminal-project-context] and use its permitted tools to carry out the task. When you have finished the conversation, enter `/exit` to return to the shell prompt.
 
 ![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Three states of the same terminal keep the project path visible. At the shell prompt, claude starts the agent. Inside Claude Code, the researcher supplies an ordinary-language prompt and uses /exit to return. At the shell prompt again, just figures runs the saved plotting script without an LLM call."}
 
@@ -69,10 +69,12 @@ While `Claude Code` is running, type `/` to see its available controls. These *s
 
 Use `/usage` or the app or account display to check the usage and reset information available for your plan. This concerns account consumption; `/context` concerns the information held within the current session.
 
-*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary, which can omit details. Before ending a session, have the agent record the current work and decisions in the maintained project context files. [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html) in the companion guide *Doing Research with AI Agents* explains their purposes.[^tk-terminal-controls]
+*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary, which can omit details.[^tk-terminal-controls] Before ending a session, have the agent record the current work and decisions in the maintained [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records).
 
 [Appendix A: Tools for customizing your terminal](#working-environment) explains additional software for the terminal's appearance, shell, prompts and panes. For unattended computation, use [Chapter 9: Keep unattended jobs moving: pueue](#job-queues); for agent runs started from saved prompts, use [Chapter 16: Run agents from saved prompts](#headless-agents).
 
 [^tk-terminal-missing-command]: If the shell reports “command not found,” have the agent check whether the program is installed and available in that shell. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation.
+
+[^tk-terminal-project-context]: See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.
 
 [^tk-terminal-controls]: [Chapter 5: Choose settings for the task](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context) explains account-usage limits, the context window and compaction.

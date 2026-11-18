@@ -55,12 +55,14 @@ The example below places projects in separate terminal tabs. Within the selected
 Start with the setup already in use. Ask the agent to identify what is installed and preserve the existing configuration before changing it. The example prompt below requests the primary macOS choices; adapt the applications and layout to your computer and preferences.
 
 ::: {#prompt-terminal-setup .prompt}
-> Inspect my current terminal setup and configure `iTerm2`, `zsh`, `Oh My Zsh`, `Powerlevel10k` and `Zellij`, installing only what is missing. Preserve my existing settings and project software setup. Use readable text and a prompt showing the project folder and useful status. Prepare a named session with an agent pane, a view of my project's job queue and `btop` resource monitoring. Save the layout. Check that a new terminal starts the intended shell, displays the prompt correctly and can launch `Claude Code` in the project. Show me how to move between panes and detach from and return to the session. Record the configuration locations and how to reopen the setup.
+> Inspect my current terminal setup and configure `iTerm2`, `zsh`, `Oh My Zsh`, `Powerlevel10k` and `Zellij`, installing only what is missing. Preserve my existing settings and project software setup. Use readable text and a prompt showing the project folder and useful status. Prepare a named session with an agent pane, a view of my project's job queue and `btop` resource monitoring. Save the layout. Check that a new terminal starts the intended shell, displays the prompt correctly and can launch `Claude Code` in the project. Show me how to move between panes and detach from and return to the session. Record the configuration locations and how to reopen the setup in global [`TOOLCHAIN.md`](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions).
 :::
 
-After configuration, the agent should check the actual terminal you will use, including whether its shortcuts reach `Zellij`. It should report what changed and where the settings and reopening instructions are saved. [Appendix B: Maintain personal settings: chezmoi](#shared-settings) explains maintaining those settings for recovery or use on another computer.
+After configuration, the agent should check the actual terminal you will use, including whether its shortcuts reach `Zellij`. It should report what changed and record the configuration locations and reopening instructions in global `TOOLCHAIN.md`.[^tk-terminal-setup-records] [Appendix B: Maintain personal settings: chezmoi](#shared-settings) explains maintaining those settings for recovery or use on another computer.
 
 []{#inspect-results-in-the-editor-you-use}
+
+[^tk-terminal-setup-records]: For global `TOOLCHAIN.md`, see [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
 
 [^tk-terminal-config-files]: Configuration filenames beginning with a dot are often called *dotfiles*. `~/.zshrc` means the `.zshrc` file in your home folder. The agent should maintain it; you do not need to edit it yourself. See the [`zsh` startup-file documentation](https://zsh.sourceforge.io/Doc/Release/Files.html).
 

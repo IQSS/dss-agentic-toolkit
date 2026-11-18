@@ -104,6 +104,7 @@ chapter-map:
 
 anchor-map:
   "adding-tools": /chapters/adding-tools.qmd
+  "agent-execution-terms": /chapters/parallel-work.qmd#agent-execution-terms
   "ask-the-agent-to-install-the-tool": /chapters/adding-tools.qmd#ask-the-agent-to-install-the-tool
   "browser-work": /chapters/browser-work.qmd
   "check-what-reruns": /chapters/pipeline-dependencies.qmd#check-what-reruns

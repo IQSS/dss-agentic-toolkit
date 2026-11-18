@@ -10,6 +10,33 @@ figure.quarto-float-fig > figcaption {
   display: none;
 }
 
+/* TeX-family logos retain plain names for copying and accessible labels.
+   The letter offsets affect neither surrounding line spacing nor code blocks. */
+.tex-logo {
+  font-family: "Times New Roman", Times, serif;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.tex-logo-a,
+.tex-logo-e {
+  display: inline-block;
+  position: relative;
+  text-transform: uppercase;
+}
+.tex-logo-a {
+  font-size: 0.75em;
+  top: -0.45em;
+  margin-left: -0.36em;
+  margin-right: -0.15em;
+}
+.tex-logo-e {
+  top: 0.22em;
+  margin-left: -0.1667em;
+  margin-right: -0.125em;
+}
+
 /* The same identifier makes Quarto mark the float `anchored`, and the theme's AnchorJS then hangs a
    link icon off it on hover, as it does on headings. A figure nobody cross-references has no use for
    a permalink, so the icon is hidden on figures alone; heading anchors are left as they are. AnchorJS

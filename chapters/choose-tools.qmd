@@ -53,7 +53,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 
 ## Tell the agent when to use each tool {#make-the-tool-part-of-the-workflow}
 
-Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save that guidance in `TOOLCHAIN.md`.[^tk-toolchain] Your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) should tell the agent when to consult that file. Keep requirements specific to one study in its [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
+Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
 
 ## Use tools from the app
 

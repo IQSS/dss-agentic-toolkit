@@ -173,6 +173,37 @@ local function rewrite_link(link)
   return link
 end
 
+-- Keep the familiar TeX/LaTeX lettering in prose while preserving searchable,
+-- copyable names. Commands and filenames are not whole-name matches.
+local function tex_logo(name)
+  if name ~= "TeX" and name ~= "LaTeX" then return nil end
+  local letters = {}
+  if name == "LaTeX" then
+    letters[#letters + 1] = pandoc.Str("L")
+    letters[#letters + 1] = pandoc.Span("a", pandoc.Attr("", {"tex-logo-a"}))
+  end
+  letters[#letters + 1] = pandoc.Str("T")
+  letters[#letters + 1] = pandoc.Span("e", pandoc.Attr("", {"tex-logo-e"}))
+  letters[#letters + 1] = pandoc.Str("X")
+  local visible = pandoc.Span(letters, pandoc.Attr("", {}, {["aria-hidden"] = "true"}))
+  return pandoc.Span({visible}, pandoc.Attr("", {"tex-logo"}, {role = "img", ["aria-label"] = name}))
+end
+
+local function prose_tex_logos(el)
+  local result, cursor = {}, 1
+  for first, word, after in el.text:gmatch("()(%w+)()") do
+    local logo = tex_logo(word)
+    if logo then
+      if first > cursor then result[#result + 1] = pandoc.Str(el.text:sub(cursor, first - 1)) end
+      result[#result + 1] = logo
+      cursor = after
+    end
+  end
+  if cursor == 1 then return nil end
+  if cursor <= #el.text then result[#result + 1] = pandoc.Str(el.text:sub(cursor)) end
+  return result
+end
+
 return {
   { Meta = read_meta },
   {
@@ -273,5 +304,9 @@ return {
       end
       return tbl
     end,
+  },
+  {
+    Str = prose_tex_logos,
+    Code = function(el) return tex_logo(el.text) end,
   },
 }
