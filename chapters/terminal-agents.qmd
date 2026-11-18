@@ -6,71 +6,73 @@ aliases:
 
 <!-- aliases: terminal-commands -->
 
-A terminal is another place to work with an agent. It can be convenient when a project's commands and job logs are already open there, or when the work runs on a remote computer. You can give ordinary-language prompts to the agent, then run the saved project commands directly when you want to repeat a task.
+A terminal provides another way to work with an agent: you type a research prompt and read its response in the same window where you can run project commands. This can be useful when you already work with scripts and job logs there, or connect to another computer to run an analysis. You can continue to give the agent instructions in ordinary language.
 
-For example, ask the agent to revise a figure using saved estimates. Once it has made the change, a [`just`](https://just.systems/) *recipe*, a named saved command, can regenerate it. In this example, `just figures` runs the plotting code without asking a large language model (LLM) to reconstruct the steps. The code and results remain in the project whichever interface you use.
+Suppose you need to regenerate a figure from saved statistical estimates. You can ask the agent to do this, have it identify the files it used, and then repeat the task through a saved command. This chapter follows that sequence using [`Claude Code`](https://code.claude.com/docs/en/overview). The project keeps its code and results whichever interface you use.
 
 ## Open the project in a terminal
 
-A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands entered there. On a Mac, open `Terminal` through Spotlight. For this guide's Windows route, open Ubuntu in [`WSL2`](https://learn.microsoft.com/windows/wsl/) through [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/). An Ubuntu shell and a `PowerShell` tab are different environments; these examples use the former.
+A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands and starts other programs. Its *prompt* is the text indicating that it is ready for a command; this differs from a research prompt addressed to an agent. On a Mac, open `Terminal` through Spotlight. For this guide's Windows route, open Ubuntu in [`WSL2`](https://learn.microsoft.com/windows/wsl/) through [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/). The examples use that Ubuntu shell, not a `PowerShell` tab.
 
-The shell has a *working directory*: the folder from which it starts its work. Use `cd` followed by the project's path to select that folder. The agent in the app can give you the exact command. Replace the example path below with the actual location and keep the quotes if it contains spaces:
+The shell has a *working directory*: the folder from which it starts its work. Use `cd` followed by the project's path to select that folder. The agent in the desktop app can supply the exact command. Replace the example path below with your project's location, keeping the quotes if the path contains spaces:
 
 ```text
 cd "/Users/your-name/Research/my-project"
 ```
 
-The command `pwd` displays the current directory. [Appendix E: Terminal vocabulary](#terminal-history) explains paths and related terms further; no additional terminal setup is needed to continue.
+Enter `pwd` to display the current directory and confirm that it is the intended project. [Appendix E: Terminal vocabulary](#terminal-history) explains paths and related terms further.
 
 ## Start a conversation with the agent
 
-Have the agent check whether the [`Claude Code`](https://code.claude.com/docs/en/overview) command-line interface is installed: this is the version started through a typed command. The desktop app and the `claude` command are separate entry points; installing one does not establish that the other is available. The agent can prepare the installation using the current [platform instructions](https://code.claude.com/docs/en/quickstart), with any personal sign-in or authorization completed by you.
+First, ask the agent in the app to check whether the `claude` command is available in the terminal you will use. This command starts the *command-line interface*, the version of `Claude Code` launched by typing a command. If it is missing, have the agent install it using the [platform instructions](https://code.claude.com/docs/en/quickstart) and guide any sign-in you need to complete. Having the desktop app installed does not establish that this command is available.
 
-At the shell prompt, enter:
+At the shell prompt in your project folder, enter:
 
 ```text
 claude
 ```
 
-Once `Claude` is running, type a research prompt in ordinary language:
+Once `Claude Code` is running, type an instruction such as:
 
-::: {.prompt}
+::: {#prompt-terminal-figure .prompt}
 > Regenerate the main figure from the saved estimates and explain which files you used.
 :::
 
-You are now speaking to the agent. It can read project context files and use its permitted tools, just as it can through another interface. Use `/exit` to end that conversation and return to the shell prompt.
+Your input now goes to the agent. It can read the project context files and use its permitted tools to carry out the task. When you have finished the conversation, enter `/exit` to return to the shell prompt.
 
-![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Start Claude from the shell to enter ordinary-language prompts. Exit to return to the shell. In the illustrated recipe, just figures runs plotting code using saved estimates without an LLM call."}
+![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Three states of the same terminal keep the project path visible. At the shell prompt, claude starts the agent. Inside Claude Code, the researcher supplies an ordinary-language prompt and uses /exit to return. At the shell prompt again, just figures runs the saved plotting script without an LLM call."}
 
-The project directory tells the agent where the work starts; it does not itself restrict every file the agent can reach. The access settings described in [Chapter 2: Control what added tools can access](#tool-access) still apply. If the LLM runs on a provider's computers, information supplied to it is sent to that organization even though you use a local terminal.
+Starting in a project folder does not restrict every file the agent can reach; the access controls in [Chapter 2: Control what added tools can access](#tool-access) still apply. A hosted large language model (LLM) runs on the provider's computers, so information supplied to it is sent there even when you use a local terminal.
 
 ## Run a saved command
 
-If the project has a [`just`](https://just.systems/) command menu, these commands list its available recipes and run the figure recipe:
+[`just`](https://just.systems/) gives project tasks short names. Each *recipe* contains the instructions for one task, saved in the project's `justfile`. If the project has a figure recipe, enter these commands at the shell prompt to list the available recipes and regenerate the figure:
 
 ```text
 just --list
 just figures
 ```
 
-Enter these at the shell prompt, after leaving the agent. The figure recipe must already exist; ask the agent to create or explain it using [Chapter 7: Give research tasks reliable commands: just](#project-commands). You do not need to remember the underlying analysis commands because the project has saved them.
-
-You can also ask the agent to install a missing tool. With [`Homebrew`](https://brew.sh/) available, `brew install just` is the corresponding installation command. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains setup. A “command not found” message can mean that the program is absent or that this shell cannot locate it; have the agent distinguish those causes before reinstalling anything.
+In this example, `just figures` runs the plotting code using saved estimates. It does not ask an LLM to recreate the analysis. Installing `just` does not create that recipe: ask the agent to prepare and check it if it is missing, following [Chapter 7: Give research tasks reliable commands: just](#project-commands).[^tk-terminal-missing-command]
 
 ## Find session controls
 
-While the agent is running, slash commands control the session. The [interactive reference](https://code.claude.com/docs/en/interactive-mode) and installed help show the controls available in your version and account.
-
-*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary so it occupies less context; details can be omitted. Keep decisions needed later in the project's maintained files.
+While `Claude Code` is running, type `/` to see its available controls. These *slash commands* are instructions to the agent application, rather than commands for the shell. The [command reference](https://code.claude.com/docs/en/commands) explains the controls supported by each version and account.
 
 | Control | What it does |
-|---|---|
-| `/model`, `/effort` | Select an available LLM and supported reasoning effort |
-| `/context` | Show context use for the session |
-| `/compact` | Summarize the conversation to reduce the context it occupies |
-| `/usage` | Show account-usage information |
-| `/exit` | Return to the shell |
+|------------------------------|----------------------------------------------------------------------|
+| `/model`, `/effort` | Select an available LLM and its reasoning effort. |
+| `/context` | Show how much of the session's context capacity is in use. |
+| `/compact` | Summarize conversation history to reduce the space it occupies. |
+| `/usage` | Show account-usage information. |
+| `/exit` | End the conversation and return to the shell. |
 
-The companion guide [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) explains [usage and context](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context). For access configuration, `/permissions` and `/sandbox` expose relevant controls; use them with [Chapter 2: Control what added tools can access](#tool-access), since they govern different mechanisms. Before ending a session, have the agent record checked project state, remaining tasks, and approved scientific changes in the appropriate [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records).
+Use `/usage` or the app or account display to check the usage and reset information available for your plan. This concerns account consumption; `/context` concerns the information held within the current session.
 
-For unattended computation, follow [Chapter 9: Keep unattended jobs moving: pueue](#job-queues). For programmatic LLM work, follow [Chapter 16: Run agents from saved prompts](#headless-agents). An open terminal is an interface to those tasks, not a record of whether they completed. Optional layouts for watching them appear in [Appendix A: Optional working environment](#working-environment).
+*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary, which can omit details. Before ending a session, have the agent record the current work and decisions in the maintained project context files. [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html) in the companion guide *Doing Research with AI Agents* explains their purposes.[^tk-terminal-controls]
+
+[Appendix A: Tools for customizing your terminal](#working-environment) explains additional software for the terminal's appearance, shell, prompts and panes. For unattended computation, use [Chapter 9: Keep unattended jobs moving: pueue](#job-queues); for agent runs started from saved prompts, use [Chapter 16: Run agents from saved prompts](#headless-agents).
+
+[^tk-terminal-missing-command]: If the shell reports “command not found,” have the agent check whether the program is installed and available in that shell. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation.
+
+[^tk-terminal-controls]: [Chapter 5: Choose settings for the task](https://dss-agentic-research.pages.dev/chapters/directing-work.html#usage-and-context) explains account-usage limits, the context window and compaction.

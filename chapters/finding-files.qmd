@@ -8,7 +8,7 @@ Suppose a journal reviewer asks how `hot_days`, a variable counting days of heat
 
 The agent must report the file paths and line numbers of matching text, then explain any inconsistencies in how `hot_days` is calculated, used in the statistical model, and labeled in figures.
 
-![](figures/project-search.svg){#fig-project-search fig-alt="Focused searches connect the exposure definition, statistical model formula, and figure label through file paths and line references."}
+![](figures/project-search.svg){#fig-project-search fig-alt="A project search returns file paths, line numbers and code excerpts for an exposure definition, a statistical model and a figure label. The agent interprets the matches and checks consistency. Code excerpts illustrate the search, rather than reproduce a particular project's files."}
 
 ## Choose the right type of search {#choose-the-appropriate-search}
 
@@ -29,8 +29,8 @@ The agent can install any missing programs through [`Homebrew`](https://brew.sh/
 
 ## Ask for findings tied to files
 
-::: {.prompt}
-> Find where hot_days is constructed, used in statistical models, and labeled in figures. Report the relevant file paths and line numbers. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
+::: {#prompt-search-project .prompt}
+> Find where `hot_days` is constructed, used in statistical models, and labeled in figures. Report the relevant file paths and line numbers. Use focused searches and excerpts. If a saved JSON or YAML response is involved, select the relevant fields rather than printing the entire response. Explain whether the construction, statistical-model use, and figure label describe the same exposure and units.
 :::
 
 ## Investigate a missing match

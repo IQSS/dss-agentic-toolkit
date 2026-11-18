@@ -2,37 +2,60 @@
 title: "Appendix E. Terminal vocabulary"
 ---
 
-Many terminal terms describe physical equipment that software has replaced. Knowing that history makes the names less arbitrary. This appendix explains the terms used in [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) and in tool diagnostics; you do not need to memorize them before working with an agent.
+This appendix explains terms encountered in terminal windows, commands, and tool diagnostics. Use it to look up an unfamiliar word or ask the agent to explain that word in the command or error you are reading. [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains using the terminal agent, and [Appendix A: Tools for customizing your terminal](#working-environment) explains the software choices for its appearance and layout.
 
 ## From a device to a window
 
-A terminal was a device through which a person communicated with a computer. A teletype combined a keyboard and printer: typed characters went to the connected machine, and responses appeared on paper. [Museum collections preserve examples](https://collections.museumsvictoria.com.au/items/407696) used for computer access. Later terminals displayed text on a screen.
+Many terminal terms describe physical equipment that software has replaced. A terminal was a device through which a person communicated with a computer. A teletype combined a keyboard and printer: typed characters went to the connected machine, and responses appeared on paper. [Museum collections preserve examples](https://collections.museumsvictoria.com.au/items/407696) used for computer access. Later terminals displayed text on a screen.
 
 The abbreviation *TTY*, from teletype, remained in computing. A modern *terminal emulator* provides a similar text interface in a software window. The program inside that interface may be a shell, an editor, or an agent. Its appearance alone does not tell you which program is receiving your input.
 
-![](figures/terminal-vocabulary.svg){#fig-terminal-vocabulary fig-alt="A keyboard and printer terminal, a screen terminal, and a modern terminal window illustrate the history of TTY. A shell or an agent is the program inside the modern interface."}
+![](figures/terminal-vocabulary.svg){#fig-terminal-vocabulary fig-alt="A teletype-style keyboard and printer leads to a physical screen terminal and then a terminal-emulator window. TTY preserves the older name. The lower cutaway shows three alternative programs inside the interface: a shell receiving commands, an editor receiving document text, or an agent receiving a research prompt. The hardware drawings are original schematic illustrations, not particular models."}
 
 ## The program receiving your commands
 
-A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. The shell can interpret a saved script as well as something you type. Its *prompt* indicates that it is ready for a command. This differs from a written prompt addressed to an agent; the agent or another program started from the shell receives input until you exit it.
-
-A [*pseudo-terminal*, or PTY](https://man7.org/linux/man-pages/man7/pty.7.html), is a software connection that behaves like a terminal for the program using it. Programs can behave differently when connected to a terminal than when reading from a file or another process. That distinction matters for the specifically observed [R-on-macOS problem](#r-on-macos), but does not mean every unattended command needs a PTY.
+A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. A shell can interpret a saved script as well as something you type. When it starts an interactive program such as an agent, your input goes to that program until it finishes or you exit it; the shell then becomes ready for another command.
 
 | Term | Meaning in this guide |
-|---|---|
-| Command-line interface, CLI | A program interface controlled through commands and arguments |
-| Argument | A value or option supplied with a command, such as `figures` in `just figures` |
-| Working directory | The folder from which the shell starts its work |
-| Absolute path | A location starting from the filesystem's root, such as `/Users/your-name/Research/my-project` |
-| Relative path | A location interpreted from a starting folder; `data/analysis.csv` means the file inside that folder's `data` directory |
-| `PATH` | The list of directories searched to locate an executable command |
-| Environment variable | A named value supplied to a program, often inherited by programs it starts |
-| Standard input, `stdin` | The input channel a program can read |
-| Standard output, `stdout` | The channel for ordinary program output |
-| Standard error, `stderr` | A separate channel commonly used for diagnostics |
-| Pipe | A connection passing one program's output to another program's input |
-| Exit status | A code reporting how a program ended according to that program's rules; also check the expected output |
+|--------------------------------|--------------------------------------------------------------------------|
+| Terminal / terminal emulator | The text interface, now usually a software window, in which programs receive typed input and display output |
+| Shell | The program interpreting commands and starting other programs; for example, `zsh` starts the agent when you enter `claude` |
+| Shell prompt | The text indicating that the shell is ready for a command; distinct from a written prompt addressed to an agent |
+| TTY | A name for a terminal connection, inherited from *teletype* |
+| Pseudo-terminal, PTY | A software-created connection that behaves like a terminal for the program using it |
 
-An exit status of zero does not by itself establish that the intended research job succeeded. The [`pueue wait` example](#review-results-and-recover-failures) shows why the program's own meaning and the saved result both matter.
+Programs can behave differently when connected to a terminal than when reading from a file or another process. A [pseudo-terminal](https://man7.org/linux/man-pages/man7/pty.7.html) supplies a terminal connection when needed, as in the observed [R-on-macOS problem](#r-on-macos). This does not mean every unattended command requires one.
 
-Ask the agent to explain an unfamiliar term in the command or error where it occurs. The useful question is what the program will do and what result to expect. A vocabulary reference supports that understanding without requiring a course in shell programming.
+## Commands and file locations {#commands-and-file-locations}
+
+In `just figures`, [`just`](https://just.systems/) names the program and `figures` tells it which recipe to run. Programs also need to locate their files. A path such as `data/analysis.csv` is interpreted from the program's *working directory*, its current folder, so the same command can find different files when started elsewhere.
+
+| Term | Meaning in this guide |
+|--------------------------------|--------------------------------------------------------------------------|
+| Command-line interface, CLI | An interface in which you control a program by typing commands and supplying arguments |
+| Argument | Information supplied after the program name; `figures` is an argument in `just figures` |
+| Option / flag | An argument that selects a program's behavior, such as `--list` in `just --list`; some options also take a value |
+| Working directory | A program's current folder, used as the starting point for relative file paths |
+| Absolute path | A location starting at the filesystem's root, such as `/Users/your-name/Research/my-project` |
+| Relative path | A location interpreted from a starting folder; `data/analysis.csv` identifies a file in that folder's `data/` directory |
+| Home folder, `~` | Your personal folder on the computer; in shell paths, `~/Research/` refers to its `Research/` subfolder |
+| `PATH` | The list of directories searched for a program when its command is given without a file path |
+| Dotfile | A file whose name begins with a dot, such as `.zshrc`; these files are usually hidden in normal file listings and often contain configuration |
+
+The home folder and working directory are different concepts. For example, the working directory may be a research project while `~/.zshrc` still points to the shell settings in your home folder. The examples follow this guide's macOS and Linux conventions, including the Linux shell supplied by [`WSL2`](https://learn.microsoft.com/windows/wsl/) on Windows.
+
+## Programs, input, and output {#program-input-and-output}
+
+A running program can receive information from the terminal, files, or another program. It can also send results and diagnostic messages through separate output channels. These terms help explain what the agent is inspecting when a command fails.
+
+| Term | Meaning in this guide |
+|--------------------------------|--------------------------------------------------------------------------|
+| Process | A running instance of a program; two simultaneous analysis runs are separate processes |
+| Environment variable | A named value supplied to a program, such as a setting that identifies a project folder; programs can pass these values to programs they start |
+| Standard input, `stdin` | The input channel a program can read, supplied through typing, a file, or another program |
+| Standard output, `stdout` | The channel a program uses for ordinary output, which can be displayed or saved |
+| Standard error, `stderr` | A separate output channel commonly used for errors and other diagnostic messages |
+| Pipe | A connection passing one program's output to another program's input; for example, passing a status report to a tool that selects the failed jobs |
+| Exit status | A code reporting how a program ended according to that program's rules |
+
+An exit status of zero usually indicates success for the command that returned it, but does not by itself establish that the intended research job succeeded. The [`pueue wait` example](#review-results-and-recover-failures) shows why the program's own meaning and the saved result both matter.

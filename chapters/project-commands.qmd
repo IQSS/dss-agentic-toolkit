@@ -6,51 +6,54 @@ aliases:
 
 <!-- aliases: runnable-checks -->
 
-In the synthetic heat-and-birthweight project ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*), changing a figure label should not require fitting the statistical model again. A figure command can read the saved estimates and regenerate the plot. A separate command can refit a selected specification when the analysis changes.
+Repeating a research task means knowing which scripts to run, in what order, and with which settings. A *command* tells the computer which program or saved task to run. Saving the instructions for a task under one command lets the agent or a collaborator repeat it without reconstructing those details.
 
-A *command* tells the computer which program or saved task to run. [`just`](https://just.systems/) is a command runner that gives recurring tasks short names. Each definition, called a *recipe*, is saved in the project's `justfile` and can run one script or several commands. The agent can use these recipes during development, and you or a collaborator can run them later without reconstructing the steps.
+Suppose a figure shows estimates from a statistical model. If model fitting and plotting are separate steps, the agent can regenerate the figure from saved estimates without fitting the model again. [`just`](https://just.systems/) is a command runner that gives these tasks short names. The agent saves each task's instructions as a *recipe* in the project's `justfile`.
 
-## Give the commands useful work
+## Make each task runnable on its own {#give-the-commands-useful-work}
 
-Each selected step must run from its declared inputs and saved outputs, without relying on objects left in an interactive session. Installing `just` does not create that structure. Have the agent preserve the working results before reorganizing the code, reusing shared functions where appropriate. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the research guide explains the full process.
+Have the agent check that each task can run separately. For example, the plotting code should read the statistical model's estimates from a saved file, so it can regenerate the figure even after the original analysis session has ended. If the code needs reorganizing, the agent should first save the current results, then check that the revised code reproduces them. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the companion guide *Doing Research with AI Agents* explains how to structure the code this way.
 
-![](figures/project-commands.svg){#fig-project-commands fig-alt="The agent runs a saved figure recipe that reads existing estimates and plotting code to produce a revised plot. The statistical fit is reused."}
-
-::: {.needspace height="7cm"}
-:::
+![](figures/project-commands.svg){#fig-project-commands fig-alt="The agent calls just figures. The project's justfile maps that name to Rscript code/figures.R. The plotting script reads saved estimates and produces a revised figure without refitting the statistical model."}
 
 ## Save the commands
 
-::: {.prompt}
-> Preserve the current results, then give this project commands to fit a selected specification, rebuild figures from saved estimates, and run the complete workflow. Use just unless the existing command system already does this. Record each command's inputs and outputs, reuse shared code, and check that reorganizing execution has not changed the intended results.
-:::
-
-The agent installs `just` if needed and maintains the recipes. A small project might offer the following menu. These are examples to create for the project; installing `just` alone does not provide them.
+The agent installs `just` if needed, using [`Homebrew`](https://brew.sh/) or your preferred package manager. It then creates and maintains the project's recipes. A small project might offer the following menu. These are examples to create for the project; installing `just` alone does not provide them.
 
 | Example command | Project operation |
-|---|---|
-| `just fit age-spline` | Fit the named specification and save its results. |
-| `just figures` | Rebuild figures from saved results. |
-| `just paper` | Regenerate the manuscript from its source and outputs. |
-| `just smoke` | Exercise a small representative workload. |
-| `just build` | Run the project's complete documented workflow. |
+|------------------------------|----------------------------------------------------------------------|
+| `just all` | Run the project's complete documented workflow. |
+| `just fit age-spline`[^tk-command-model] | Fit the named statistical model and save its results. |
+| `just contrasts` | Calculate comparisons of interest, such as differences between groups, from saved model results. |
+| `just figures` | Generate figures from saved results. |
+| `just power` | Run simulations to estimate statistical power for a proposed study. |
+| `just paper` | Build the manuscript with its tables, figures, and reported results. |
+| `just smoke` | Run a small version of the workflow to check that its steps work together. |
 
-Ask the agent to use these recipes in normal work and keep their descriptions current. `just --list` shows the available recipes. A completed figure task should report the command used, the saved estimates it read, and the figure it produced.
+::: {#prompt-saved-commands .prompt}
+> Inspect this project's analysis and set up named commands for fitting the statistical model, regenerating figures from saved estimates, and running the complete workflow. Use `just` unless existing project commands already cover these tasks. Check that the individual tasks can run separately. If the code needs reorganizing, save the current results first and confirm that the revised code reproduces them. Explain what each command does and use these commands whenever you carry out the corresponding tasks.
+:::
+
+Ask the agent to use these recipes in normal work and keep their descriptions current. You can ask the agent to list the project's commands and explain what each does. A completed figure task should report the command used, the saved estimates it read, and the figure it produced.
 
 ## Run a smoke test {#smoke-tests}
 
-A *smoke test* runs a small representative workload through the actual workflow before a large batch. For example, one fit should also produce its required contrast table and figure, so the agent checks that the steps work together. Use the same code and environment as the full run, with a smaller workload selected by an option and outputs kept apart from the main study's results.
+A *smoke test* runs a small, representative workload through the actual workflow before a long run. For a simulation study, the agent might run a few repetitions instead of thousands, then produce the expected tables and figures from those results. Ask the agent to propose a small workload for your project, explain which steps it will check, and configure `just smoke` to run it. It should use the same analysis code and software environment as the full run and save the test outputs separately from the main study's results.
 
-::: {.prompt}
-> Add a smoke-test recipe using the actual workflow. Keep its outputs separate from the full analysis, run it after relevant changes, and confirm the expected files before starting an expensive batch.
+::: {#prompt-smoke-test .prompt}
+> Add a `just smoke` recipe for this simulation study. Run five repetitions, fitting the planned statistical model in each and then generating the summary tables and figures. Use the same simulation and analysis code, sample size, and software environment as the full run. Save the test outputs separately from the main results. Check that each step completes and produces the expected files, and report any problems. Run this check after relevant code changes and before starting the full simulation.
 :::
 
 []{#runnable-checks}
 
-Successful execution does not establish that the analysis is appropriate. Save automatic checks of the project's requirements too, such as stopping when a join unexpectedly changes the observation count. These requirements come from `SPECIFICATION.md`, which holds the approved scientific specification. A simulation evaluating interval coverage asks a different question about statistical performance. Both checks can have saved commands; the command runner does not decide whether their research criteria are suitable. See the research guide’s [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html).
+Ask the agent to check the contents of the outputs as well as whether the files exist. In the simulation example, it should confirm that all five repetitions produced results and that those results were used in the summary tables and figures. A successful smoke test shows that these steps work together on the small run; it does not establish that the statistical method is suitable for the research question.[^tk-smoke-scientific-checks]
 
-## Combine command and dependency runners
+[]{#combine-command-and-dependency-runners}
 
-A figure depends on the estimates it reads. [`Make`](https://www.gnu.org/software/make/), [`targets`](https://docs.ropensci.org/targets/), and [`Snakemake`](https://snakemake.readthedocs.io/) can track dependencies like this and determine which work needs repeating. `just` provides named commands; it does not perform that analysis. A `just build` recipe can invoke `targets` or `Snakemake`, while other recipes open a preview or run quick checks.
+[]{#sec-7d}
 
-[Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies) explains selective rebuilding. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) adds a queue when the saved command needs to run unattended. Keep an existing `Make` setup or master do-file if it already supplies the required behavior.
+To have the workflow determine which steps need rerunning after a change, see [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies).
+
+[^tk-command-model]: Here, `age-spline` is an example name for a statistical model allowing a curved relationship between age and the outcome. The name after `fit` identifies which model the agent should fit.
+
+[^tk-smoke-scientific-checks]: For checks of statistical performance and independent implementations, see [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) in *Doing Research with AI Agents*.

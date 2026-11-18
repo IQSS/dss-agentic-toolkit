@@ -1,5 +1,9 @@
 {
+  "artwork-licenses/README.md": "e99f5ffb3898727f606441eb618e1e1e20d34ed3df306861e06e18e0ea9ec407",
+  "artwork-licenses/homebrew.txt": "f80329e58613ad669c0e73cb132d8060b9b2c55e339c73848068e4d1567f4627",
   "local-model-setup-trial.md": "e4ac201568b7a63796f5b5172459e44235c93bdb8360b4b535b37897eb834688",
   "project-settings-example.json": "90fee5ae00868799a6eead7f12743310238e3ce61362a0daf4760130f67ae070",
+  "prompt-bank.md": "5b3d70b33aa1f30d3fce643f678d329578f11da689051571e4051517e4a6ff11",
+  "prompt-manifest.json": "49d9beb6e65f2f734c58098d00fb6081908dc1939587a8faaf18c82e380f50c5",
   "rscript-pty": "1233e77c413078fd499e76ad01cf88441bdf303054114c303c204553165ddd32"
 }

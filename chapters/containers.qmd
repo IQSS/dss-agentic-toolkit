@@ -2,45 +2,70 @@
 title: "10. Run work in a separate environment: containers"
 ---
 
-A spatial analysis may need a particular geospatial library as well as its [`R`](https://www.r-project.org/) packages. Recording the packages alone may leave a collaborator without the supporting software they require. A *container* packages the program and its supporting software in a separately configured environment. The agent can also limit which folders and connections it receives when the task requires those limits.
+An analysis may depend on software beyond its language and packages, making it difficult to recreate the setup on another computer. A *container* provides a separate environment containing the programs and supporting software needed for a task. The agent can also configure which folders and network connections are available inside it.
 
-A different project may need an agent and a local large language model (LLM) to process only an approved document collection. That arrangement needs its own software and access configuration. Choose the container's purpose before asking the agent to set it up.
+Suppose a collaborator needs to rerun your Bayesian analysis. They have the required [`R`](https://www.r-project.org/) packages, but the analysis also needs a compiler[^tk-container-compiler] and supporting software that are missing from their computer. The agent can use [`Docker`](https://www.docker.com/), software for building and running containers,[^tk-container-docker] to package these requirements into a prepared environment, check it with a small model fit, and provide instructions for running the analysis on the collaborator's computer.[^tk-container-platform]
 
-## Decide why the task needs a container
+## When a container is useful {#decide-why-the-task-needs-a-container}
+
+A container is useful when collaborators need a prepared software setup that would otherwise be difficult to recreate on each computer. The agent can package the required language, packages, and supporting programs using [the project's recorded versions](#record-the-language-and-packages). It can also configure which files and network connections the analysis can access.
 
 | Research need | What the agent configures |
-|---|---|
-| Reproduce supporting software | Language/packages, supporting libraries and programs, and the supported platform. |
-| Run approved work with restricted inputs | Required input access, separate output storage, permitted network connections, and credentials. |
-| Give a local agent a limited workspace | Software to run the LLM and agent, their tools, and the files/accounts available to them. |
+|----------------------------------------|------------------------------------------------------------|
+| Run the analysis on another computer | The required language, packages, and supporting programs, prepared for the intended computer. |
+| Run a task with selected files and network access | Read-only input folders, a writable results folder, and the connections the task needs. |
 
-A container does not itself authorize processing under a data agreement. Establish the permitted environment through [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) in the companion guide *Doing Research with AI Agents*, then configure and check it for that purpose.
+## Prepare the software and file access {#specify-software-and-access}
 
-## Specify software and access
+Have the agent check what container software is already available on the computer that will run the analysis. On a Mac, [`Colima`](https://github.com/abiosoft/colima) provides the Linux environment needed to run the containers, while `Docker`'s command-line tools let the agent build and operate them. The agent can install missing components through [`Homebrew`](https://brew.sh/), or retain an existing suitable [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, it should use the supported container software, which may be [`Apptainer`](https://apptainer.org/), and check that software's file and network access settings.
 
-With [`Docker`](https://www.docker.com/), an *image* is the packaged software from which a container starts. A `Dockerfile` records how to build the image. The *host* is the computer running the container. A *mount* makes a selected host folder available inside it, for example as read-only inputs or writable output storage. `Docker`'s [container introduction](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/) and [mount documentation](https://docs.docker.com/engine/storage/bind-mounts/) explain those distinctions.
+For `Docker`, the agent writes a `Dockerfile`: instructions for assembling the required software. Building those instructions produces an *image*, a saved package from which containers can be created. The agent then starts a container and makes selected project folders available inside it. These folder connections are called *mounts*.[^tk-container-mounts] Keeping the study data outside the image lets a collaborator receive the prepared software without receiving those data.
 
-![](figures/research-containers.svg){#fig-research-containers fig-alt="A configured container includes language, packages, and supporting software. It reads selected inputs, writes designated outputs, and can connect to an approved service. A separate note identifies the extra LLM and agent software needed for an optional local-agent setup."}
+![](figures/research-containers.svg){#fig-research-containers fig-alt="On a host computer, a Dockerfile builds a software image. A running container contains a language, packages, system tools and the analysis command. A read-only mount supplies original inputs, a writable mount saves results, and a separately permitted network connection reaches an approved service."}
 
-If the task uses an LLM, state where it will run. Putting commands inside a container does not move an LLM hosted on a provider's computers into it. A local-agent arrangement also needs an *LLM runtime*, software that loads the LLM and generates responses, as described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+For the Bayesian analysis example, have the agent make the required input files available without permission to change them, and save the fitted results to a designated project folder outside the container. Those results remain available when the container is removed. If the fit needs no external service, have the agent disable network access during the analysis. It should share only the folders and connections needed for the task.[^tk-container-control-socket]
+
+These restrictions apply to programs running inside the container. The agent's other tools still need their own access controls; see [Chapter 2: Control what added tools can access](#tool-access). For protected data, establish where processing is permitted before configuring the container. [Chapter 3: Know where your data goes](https://dss-agentic-research.pages.dev/chapters/research-limits.html#data-chain-of-custody) in the companion guide *Doing Research with AI Agents* explains that decision.
+
+::: {.guide-note}
+The agent can operate the analysis inside the container while its large language model (LLM) runs elsewhere. Even an agent running inside a container can use a hosted LLM, which runs on the service provider's computers; information sent to that service leaves the computer. Running the LLM locally requires additional software, described in [Chapter 17: Run and adapt an LLM on your own hardware](#local-models).
+:::
 
 ::: {.needspace height="7cm"}
 :::
 
-## Build and check the environment
+## Build and check the environment {#build-and-check-the-environment}
 
-::: {.prompt}
-> Configure a container for [task and purpose]. Preserve the project's language/package records and include required system software. Give it only the approved input/output locations and connections. Record where the LLM runs if one is involved. Run a representative case, check the saved outputs, and test any required access restrictions with harmless substitute files.
+Ask the agent to save results from a small representative fit using the working setup, then run the same fit inside the container with the same data, code, and analysis settings. This is a [smoke test](#smoke-tests): a small run through the actual workflow before the full analysis. It should check that the model compiles and runs, compare the saved estimates, and investigate unexpected differences.[^tk-container-fit-comparison]
+
+Have the agent confirm that results are saved in the intended project folder and remain available after the test container is removed. It should separately test any required file and network restrictions with harmless substitute inputs. A successful fit does not establish that those restrictions work.
+
+::: {#prompt-container-analysis .prompt}
+> Prepare a container so a collaborator can rerun this Bayesian analysis. Preserve the recorded `R` and package versions, and include the compiler and other supporting software the analysis needs. Check the intended computer and any existing container setup, then install or configure what is missing through the appropriate route. Make the required inputs read-only and save fitted results to a designated project folder outside the container. Run a small representative fit in the working setup and in the container with the same data, code, and settings. Compare the estimates and investigate unexpected differences. Check that results remain available after the test container is removed, and test required access restrictions with harmless substitute inputs. Save the configuration with the project and document how to build, run, and check it in `README.md`. Use this setup for future runs of the analysis.
 :::
 
-The agent can use [`Colima`](https://github.com/abiosoft/colima) with `Docker`'s command-line tools on a Mac, or retain an existing approved [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) setup. On institutional infrastructure, follow the supported runtime, which may be [`Apptainer`](https://apptainer.org/). The researcher completes required authorization; the agent builds and checks the environment.
+After the test, have the agent report which software versions were used, which outputs it compared, any differences it found, and where the results are saved. It should identify the access restrictions actually tested and diagnose and fix setup problems before the full run. Changes to the statistical model or research inputs remain your decision.
 
-A useful report identifies the software, exposed folders, network access, and tested outputs. It distinguishes an analysis that ran from access restrictions that were tested. Sharing the whole home directory, granting powers the task does not need, or exposing `Docker`'s control socket can defeat the intended separation. The control socket is a connection through which programs can control `Docker`; it requires a separate access decision.
+## Save the setup for future runs {#preserve-what-is-needed-to-run-it-again}
 
-## Preserve what is needed to run it again
+Have the agent keep the `Dockerfile` and existing records of language and package versions with the project. It should also save the command or configuration that starts the container with the intended folders and network access. When tasks need different access, have it maintain separately named commands or configurations so the differences remain explicit.
 
-Save the build/run configuration and environment records with the project. Record and select the required software versions, the platform, and an identifier for the exact image used.[^tk-container-image-id] A `Dockerfile` that downloads software from changing repositories is not a permanent copy of that software; when long-term recovery matters, arrange approved storage for the built image too.
+Ask it to add a "Container setup" section to `README.md`, the project's Markdown overview. This should identify the tested operating system and processor type, the exact image used,[^tk-container-image-id] and the input and output locations. It should give the commands for building the image, running the analysis, and repeating the check, with a short record of the outcome. The collaborator can give these instructions to their agent to check compatibility and run the analysis.
 
-Keep different access arrangements explicit rather than changing one container silently between tasks. [Chapter 2: Control what added tools can access](#tool-access) explains how these controls relate to the agent's other tools.
+A `Dockerfile` that downloads software from changing repositories is not a permanent copy of that software. When long-term recovery matters, have the agent save the built image in an agreed storage location and record how to retrieve it. The image identifier establishes which version was used; retaining the image makes that version available later.
 
-[^tk-container-image-id]: A digest identifies particular image content. A tag is a convenient name that can later refer to a different image. The agent should record enough information to recover the version actually used.
+The agent can keep the project's saved commands while arranging for them to run the analysis inside the container. If the project uses a job queue, it can submit those commands as before. [Chapter 7: Give research tasks reliable commands: just](#project-commands) and [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explain how the agent sets up those parts of the workflow.
+
+[^tk-container-compiler]: A compiler translates source code into a form the computer can run. Some Bayesian fitting software compiles code for a statistical model before fitting; the example assumes such a setup.
+
+[^tk-container-docker]: The command-line tool is called `docker`; it sends instructions to the background service that builds images and runs containers. [`Docker Desktop`](https://www.docker.com/products/docker-desktop/) is an application that bundles those components with a graphical interface. See [Docker's explanation of its components](https://docs.docker.com/get-started/docker-overview/#docker-architecture).
+
+[^tk-container-platform]: Containers still have operating-system and processor requirements. Have the agent check the intended computer and prepare a compatible image; [Docker's platform documentation](https://docs.docker.com/build/building/multi-platform/) explains the available approaches.
+
+[^tk-container-mounts]: The computer running the container is called the *host*. A bind mount makes one of its files or folders available inside the container. `Docker` bind mounts allow writing by default, so the agent must explicitly configure read-only inputs. See [Docker's mount documentation](https://docs.docker.com/engine/storage/bind-mounts/).
+
+[^tk-container-control-socket]: Have the agent avoid sharing the entire home folder or granting powers the analysis does not need. `Docker`'s *control socket* is a connection through which software can control `Docker` and its containers; making it available inside a container requires a separate access decision.
+
+[^tk-container-fit-comparison]: Bayesian estimates can vary between runs because fitting involves random sampling. The agent should account for expected sampling variation when comparing results, rather than require identical posterior draws.
+
+[^tk-container-image-id]: A *digest* identifies particular image content. A *tag* is a convenient name that can later refer to a different image. The agent should record enough information to recover the version actually used.

@@ -2,39 +2,41 @@
 title: "15. Divide work between agents: shared projects and git worktrees"
 ---
 
-Several agents can develop different parts of a research project at the same time. The benefit depends on whether those tasks can proceed independently and how their results will be combined. Decide which files each agent may change, what information it receives, and what it must supply to the other tasks.
+Several agents can develop different parts of a research project at the same time. This helps when each task can make progress without waiting for the others. For a small change involving the same few files, one agent may finish sooner because there is less work to coordinate.
 
-For example, one agent can develop modeling code while another develops figures. Before they start, agree on the saved estimates the plotting code will read, including column names, units, and uncertainty intervals. The agents can then work on their own files and check the complete model-to-figure workflow when the pieces are ready.
+Suppose an analysis needs new modeling code and figures. The agent in your current conversation can coordinate two others: an analysis agent to write the modeling code and a figure agent to develop the plots. It establishes the format of the results they will exchange, assigns their files, and later combines and checks their work. You continue to direct the work through that coordinating agent.
 
-## Agree on tasks and exchanged results {#assign-tasks-and-interfaces}
+## Assign tasks and agree on exchanged results {#assign-tasks-and-interfaces}
 
-A *subagent* is another agent given a separate assignment by a coordinating agent. Availability depends on the application; [`Claude Code`'s subagents](https://code.claude.com/docs/en/sub-agents) provide one documented route. Separate sessions with distinct assignments are another option. Ask the coordinating agent to use the capabilities available in the current application; a particular terminal layout is not required.
+A *subagent* is another agent given a separate assignment by a coordinating agent. [`Claude Code` supports subagents](https://code.claude.com/docs/en/sub-agents); other applications may offer different ways to delegate work. Ask the coordinating agent to check the available capabilities and launch separate sessions if needed. Each assignment should identify the task, inputs, expected outputs, and files that agent may change.
 
-::: {.prompt}
-> Divide this work between a modeling agent and a visualization agent. Agree on the saved-results format first. Assign the files each may edit, coordinate changes to shared configuration, and have a lead agent run the combined workflow. Preserve existing edits and report unresolved research decisions.
+In the analysis-and-figure example, both agents need to know what the saved estimates will contain. The coordinator might specify an `estimates.csv` file with a row for each quantity to plot and columns for its name, estimate, and lower and upper uncertainty limits. It should also specify the units and meaning of those limits. The figure agent can develop its plotting code using a clearly labeled synthetic example of this file while the analysis agent builds the code that produces the actual estimates.
+
+Shared files need an assigned maintainer. Have the coordinator handle changes to functions used by both tasks, software requirements, and commands that connect the analysis to the figures. It also coordinates changes to version history so one agent does not remove work another is using.
+
+::: {#prompt-coordinate-agents .prompt}
+> Coordinate an analysis agent and a figure agent for this project. Define the saved-estimates format first, including the quantities, units, and uncertainty limits. Give each agent its inputs, expected outputs, and files to edit. Let the figure agent develop against a labeled synthetic example while the analysis code is being built. Coordinate shared files and preserve existing edits. When both agents finish, combine their work and run the analysis followed by the figures using the newly produced estimates. Report any research decisions that need my input.
 :::
-
-Each assignment should name its inputs, expected outputs, and files it may change. Give one agent responsibility for shared files, such as functions used by both tasks, records of required software, or definitions connecting analysis steps. The lead agent also coordinates changes to version history so one agent does not remove work another is using.
-
-Record the agreed results format in the project context files, the maintained files that guide later sessions. Assign one agent to update `SPECIFICATION.md`, the current scientific requirements, and `METHODOLOGY.md`, the dated decisions and reasons, after you approve a scientific change.
 
 ## Choose shared or separate working copies
 
-Agents editing different files can often share one project directory. [`Git` worktrees](https://git-scm.com/docs/git-worktree) provide separate working copies attached to the same repository, the stored version history, usually on different branches.[^tk-parallel-branch] They help when agents need overlapping files, alternative versions, or a stable copy for testing while other work continues.
+Agents editing different files can often share one project directory. [`Git` worktrees](https://git-scm.com/docs/git-worktree) provide separate working copies attached to the same *repository*, the project's stored version history. Each worktree usually uses a different branch, allowing changes to be developed separately and combined later.[^tk-parallel-branch] Worktrees help when agents need to edit overlapping files or test different versions of the code.
 
-| Arrangement | Useful when | What still needs coordination |
-|---|---|---|
-| One project directory | Tasks own different files and can share current results | Shared files, output names, version-history operations, and results format |
-| Separate worktrees | Tasks need different versions or overlapping edits | Inputs and environments in each copy, shared resources, and integration of changes |
+| Arrangement | Useful when | What the coordinating agent manages |
+|------------------------|----------------------------------|--------------------------------------------|
+| One project directory | The tasks edit different files and can share current results | Shared files, output names, and changes to version history |
+| Separate worktrees | The tasks need overlapping edits or different versions | Inputs and software in each copy, separate outputs, and combining the changes |
 
-![](figures/agent-coordination.svg){#fig-agent-coordination fig-alt="Agents can work on different files in one project or in separate working copies. Both arrangements use an agreed results format and end with a combined workflow check."}
+Have the coordinating agent choose and prepare the arrangement. A new worktree may lack data excluded from version control, installed packages, or saved model fits. The agent should supply the permitted inputs and restore the recorded software environment before work begins. Separate output locations prevent one run from replacing another's results. Worktrees share repository history and do not restrict access to other files or services.
 
-A new worktree may not contain ignored data, installed packages, or saved model fits. Have the agent supply the approved inputs and restore the recorded environment before starting work. Separate output locations prevent one run from replacing another's results. Worktrees share repository history and can still reach other files and services; they are not security sandboxes.
+![](figures/agent-coordination.svg){#fig-agent-coordination fig-alt="Three agents collaborate: the coordinating agent in the main session launches an analysis agent and a figure agent. The workers develop complementary code, either in different files in one project folder or in separate Git worktrees with shared history. The coordinating agent then integrates their changes and runs an analysis-to-figure check. The repeated coordinator icon and label refer to the same main-session agent."}
 
-## Integrate the work
+## Combine and check the work {#integrate-the-work}
 
-The coordinating agent should run a representative path through the combined workflow. Code that works separately can still disagree about a result column, a file location, or a modeling assumption. Resolve those mismatches before the full run. Preserve needed work before removing a worktree, and leave research choices that cannot be inferred from the specification for your decision.
+Once both tasks are complete, the coordinating agent combines their changes and runs the analysis followed by the plotting code. In this example, it should confirm that the figure reads the newly produced `estimates.csv`, includes the intended quantities and uncertainty limits, and no longer uses the synthetic example. This can expose mismatches that neither worker would find alone, such as a renamed column or an estimate reported in different units.
 
-Parallel development differs from the independent-implementation check described in [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) of the companion guide *Doing Research with AI Agents*. For that check, fresh agents receive the same fixed specification version and permitted inputs without seeing the other implementation or results. Do not supply a decision log that reveals those results. A worktree alone does not achieve this separation, especially when the earlier code remains in shared history.
+Have the coordinator fix implementation problems and report scientific choices that require your decision. It should document the results format, relevant files, and commands in `README.md`, the project's overview, so a later session can repeat the combined workflow. After an approved scientific change, it updates the current requirements in `SPECIFICATION.md` and adds the dated decision and reason to `METHODOLOGY.md`. Before removing a worktree, it should confirm that the needed code and outputs have been retained.
 
-[^tk-parallel-branch]: A branch names a line of work within the repository's version history. Separate branches let the agent develop alternative changes and combine the chosen work later.
+These agents collaborate on one implementation. An independent-implementation check instead asks separate agents to build from the same fixed specification and inputs without seeing one another's code or results. [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) in the companion guide *Doing Research with AI Agents* explains that different purpose. A worktree alone does not provide the required separation; [Chapter 16: Run agents from saved prompts](#control-what-each-run-receives) explains how to configure and check what a separate session receives.
+
+[^tk-parallel-branch]: A branch names a line of work within a repository's version history. The agent can develop changes on separate branches and combine them when ready; see the [`Git` branching introduction](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).

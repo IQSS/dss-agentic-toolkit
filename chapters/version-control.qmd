@@ -2,11 +2,11 @@
 title: "4. Recover earlier work: git and gh"
 ---
 
-Research projects change as sample definitions, analyses, and manuscripts develop. [`Git`](https://git-scm.com/)[^tk-git-command] records versions of selected files so an agent can explain what changed or recover earlier work. The history remains available after your conversation with the agent has ended.
+Research projects change as sample definitions, analyses, and manuscripts develop. Keeping a version history of selected files lets the agent explain what changed or recover earlier work. The history remains available after your conversation with the agent has ended.
 
-Suppose a revised exclusion rule removes far more observations than expected. You decide which sample definition is appropriate; the agent finds the relevant change and can recover the earlier rule while preserving unrelated manuscript edits. A restored rule can change the results, so affected figures and manuscript values must be regenerated too.
+Suppose a revised exclusion rule removes far more observations than expected. You decide which sample definition is appropriate; the agent can use [`Git`](https://git-scm.com/)[^tk-git-command] to find the relevant change and recover the earlier rule while preserving unrelated manuscript edits. A restored rule can change the results, so affected figures and manuscript values must be regenerated too.
 
-![](figures/version-recovery.svg){#fig-version-recovery fig-alt="Git retains an earlier sample rule. The agent restores that rule while keeping unrelated later text and styling edits, then regenerates affected results."}
+![](figures/version-recovery.svg){#fig-version-recovery fig-alt="Three saved commits preserve an earlier exclusion rule and later manuscript edits. The agent restores the earlier rule, retains the later wording, and regenerates affected results."}
 
 ## Give the project a useful history
 
@@ -14,7 +14,7 @@ A `Git` *repository* (often shortened to “repo”) stores the project's histor
 
 `Git` preserves versions of the project's files, but the study's requirements and the reasons for research decisions still need to be written down. For a paper, keep the current scientific requirements in `SPECIFICATION.md` and dated decisions with their reasons in `METHODOLOGY.md`.[^tk-git-project-context] When you make or revise a research decision, have the agent keep `SPECIFICATION.md` current and record the decision and its reason at the top of `METHODOLOGY.md`, preserving earlier entries.
 
-::: {.prompt}
+::: {#prompt-version-history .prompt}
 > Maintain version history for this project using `Git`. Inspect any existing repository and preserve current edits. Track the code, manuscript, and appropriate configuration, excluding protected data, credentials, generated libraries, and caches. Record meaningful checkpoints as tasks are completed, and summarize changes affecting the analysis or reported results.
 :::
 
@@ -26,7 +26,7 @@ A `Git` repository can contain thousands of small internal files that record cha
 
 State the desired outcome rather than a `Git` operation:
 
-::: {.prompt}
+::: {#prompt-recover-analysis .prompt}
 > Restore the earlier sample-selection rule while preserving unrelated manuscript wording and figure-formatting edits. Update the approved analysis requirements and record why the rule changed. Rerun the affected analysis, regenerate its figures, and identify manuscript values that need updating.
 :::
 
@@ -40,6 +40,6 @@ If you want to share your project online, ask the agent to use `GitHub` or a rep
 
 For guidance on sharing a completed study so others can reproduce it, see [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html) in *Doing Research with AI Agents*.
 
-[^tk-git-command]: `Git` is the software's name; `git` is the command the agent uses to operate it.
+[^tk-git-command]: `Git` is the software's name; `git` is the command the agent uses to operate it. The illustration uses the [Git logo by Jason Long](https://git-scm.com/community/logos), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
 [^tk-git-project-context]: These are project context files: saved instructions and records that the agent can consult in later sessions. See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.

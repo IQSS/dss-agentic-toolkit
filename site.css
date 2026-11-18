@@ -37,6 +37,7 @@ main .chapter-map-frame > img {
   border: 0;
 }
 .chapter-map-link {
+  --chapter-map-highlight: 69, 110, 150;
   position: absolute;
   display: block;
   border-radius: 10px;
@@ -44,14 +45,25 @@ main .chapter-map-frame > img {
 }
 .chapter-map-link:hover,
 .chapter-map-link:focus-visible {
-  outline: 3px solid #456e96;
+  outline: 3px solid rgb(var(--chapter-map-highlight));
   outline-offset: 3px;
-  background: rgba(69, 110, 150, 0.1);
+  background: rgba(var(--chapter-map-highlight), 0.1);
 }
-body.quarto-dark .chapter-map-link:hover,
-body.quarto-dark .chapter-map-link:focus-visible {
-  outline-color: #97c8ee;
-  background: rgba(151, 200, 238, 0.1);
+body.quarto-dark .chapter-map-link {
+  --chapter-map-highlight: 151, 200, 238;
+}
+/* Match the purple LLM route and green handoff outlines in the research map. */
+#fig-research-process .chapter-map-link:is([href$="llm-measurements.html"], [href$="research-models.html"]) {
+  --chapter-map-highlight: 128, 103, 129;
+}
+#fig-research-process .chapter-map-link[href$="research-handoff.html"] {
+  --chapter-map-highlight: 101, 126, 105;
+}
+body.quarto-dark #fig-research-process .chapter-map-link:is([href$="llm-measurements.html"], [href$="research-models.html"]) {
+  --chapter-map-highlight: 201, 175, 232;
+}
+body.quarto-dark #fig-research-process .chapter-map-link[href$="research-handoff.html"] {
+  --chapter-map-highlight: 158, 206, 172;
 }
 
 /* The empty anchor the filter puts before each subsection, so a §13c from another page lands on the

@@ -71,7 +71,7 @@ website:
         contents:
           - chapters/working-environment.qmd
           - chapters/shared-settings.qmd
-          - chapters/usage-tools.qmd
+          - chapters/prompt-bank.qmd
           - chapters/troubleshooting.qmd
           - chapters/terminal-history.qmd
       # END chapters
@@ -98,7 +98,7 @@ chapter-map:
   "18": /chapters/terminal-agents.qmd
   "A": /chapters/working-environment.qmd
   "B": /chapters/shared-settings.qmd
-  "C": /chapters/usage-tools.qmd
+  "C": /chapters/prompt-bank.qmd
   "D": /chapters/troubleshooting.qmd
   "E": /chapters/terminal-history.qmd
 
@@ -113,6 +113,7 @@ anchor-map:
   "cloud-sync-storage": /chapters/troubleshooting.qmd#cloud-sync-storage
   "connect-the-literature-task": /chapters/service-connections.qmd#connect-the-literature-task
   "containers": /chapters/containers.qmd
+  "control-what-each-run-receives": /chapters/headless-agents.qmd#control-what-each-run-receives
   "credentials": /chapters/credentials.qmd
   "environments": /chapters/environments.qmd
   "finding-files": /chapters/finding-files.qmd
@@ -122,10 +123,47 @@ anchor-map:
   "parallel-work": /chapters/parallel-work.qmd
   "pipeline-dependencies": /chapters/pipeline-dependencies.qmd
   "project-commands": /chapters/project-commands.qmd
+  "prompt-adapt-llm": /chapters/local-models.qmd#prompt-adapt-llm
+  "prompt-bank": /chapters/prompt-bank.qmd
+  "prompt-build-manuscript": /chapters/research-documents.qmd#prompt-build-manuscript
+  "prompt-check-website": /chapters/browser-work.qmd#prompt-check-website
+  "prompt-coauthor-edits": /chapters/research-documents.qmd#prompt-coauthor-edits
+  "prompt-collect-web-data": /chapters/browser-work.qmd#prompt-collect-web-data
+  "prompt-configure-access": /chapters/tool-access.qmd#prompt-configure-access
+  "prompt-connect-library": /chapters/service-connections.qmd#prompt-connect-library
+  "prompt-container-analysis": /chapters/containers.qmd#prompt-container-analysis
+  "prompt-coordinate-agents": /chapters/parallel-work.qmd#prompt-coordinate-agents
+  "prompt-diagnose-problem": /chapters/troubleshooting.qmd#prompt-diagnose-problem
+  "prompt-headless-archive": /chapters/headless-agents.qmd#prompt-headless-archive
+  "prompt-install-tools": /chapters/adding-tools.qmd#prompt-install-tools
+  "prompt-local-labeling": /chapters/local-models.qmd#prompt-local-labeling
+  "prompt-preserve-settings": /chapters/shared-settings.qmd#prompt-preserve-settings
+  "prompt-queue-fits": /chapters/job-queues.qmd#prompt-queue-fits
+  "prompt-recover-analysis": /chapters/version-control.qmd#prompt-recover-analysis
+  "prompt-recover-interruption": /chapters/pipeline-dependencies.qmd#prompt-recover-interruption
+  "prompt-restore-environment": /chapters/environments.qmd#prompt-restore-environment
+  "prompt-saved-commands": /chapters/project-commands.qmd#prompt-saved-commands
+  "prompt-search-project": /chapters/finding-files.qmd#prompt-search-project
+  "prompt-selective-reruns": /chapters/pipeline-dependencies.qmd#prompt-selective-reruns
+  "prompt-service-credentials": /chapters/credentials.qmd#prompt-service-credentials
+  "prompt-smoke-test": /chapters/project-commands.qmd#prompt-smoke-test
+  "prompt-terminal-figure": /chapters/terminal-agents.qmd#prompt-terminal-figure
+  "prompt-terminal-setup": /chapters/working-environment.qmd#prompt-terminal-setup
+  "prompt-use-library": /chapters/service-connections.qmd#prompt-use-library
+  "prompt-version-history": /chapters/version-control.qmd#prompt-version-history
+  "prompts-agents": /chapters/prompt-bank.qmd#prompts-agents
+  "prompts-documents": /chapters/prompt-bank.qmd#prompts-documents
+  "prompts-services": /chapters/prompt-bank.qmd#prompts-services
+  "prompts-settings": /chapters/prompt-bank.qmd#prompts-settings
+  "prompts-setup": /chapters/prompt-bank.qmd#prompts-setup
+  "prompts-troubleshooting": /chapters/prompt-bank.qmd#prompts-troubleshooting
+  "prompts-workflow": /chapters/prompt-bank.qmd#prompts-workflow
   "r-on-macos": /chapters/troubleshooting.qmd#r-on-macos
+  "record-the-language-and-packages": /chapters/environments.qmd#record-the-language-and-packages
   "research-documents": /chapters/research-documents.qmd
   "restore-and-check-it": /chapters/environments.qmd#restore-and-check-it
   "review-results-and-recover-failures": /chapters/job-queues.qmd#review-results-and-recover-failures
+  "run-the-pipeline-unattended-when-useful": /chapters/pipeline-dependencies.qmd#run-the-pipeline-unattended-when-useful
   "service-connections": /chapters/service-connections.qmd
   "shared-settings": /chapters/shared-settings.qmd
   "smoke-tests": /chapters/project-commands.qmd#smoke-tests
@@ -135,8 +173,6 @@ anchor-map:
   "tex-table-counter": /chapters/troubleshooting.qmd#tex-table-counter
   "tool-access": /chapters/tool-access.qmd
   "troubleshooting": /chapters/troubleshooting.qmd
-  "turn-the-task-into-a-saved-workflow": /chapters/headless-agents.qmd#turn-the-task-into-a-saved-workflow
-  "usage-tools": /chapters/usage-tools.qmd
   "version-control": /chapters/version-control.qmd
   "working-environment": /chapters/working-environment.qmd
 

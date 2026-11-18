@@ -2,37 +2,73 @@
 title: "8. Rerun only affected steps: targets and Snakemake"
 ---
 
-A figure depends on the estimates it reads. If only its label changes, those estimates can be reused. A *dependency* is a step's reliance on a particular input or earlier result. A dependency runner records these relationships and selects the steps affected by a change.
+When an analysis changes, the agent needs to identify which steps must be repeated and which saved results can still be used. Each step has *dependencies*: the data, code, or earlier results it uses. A *dependency runner* tracks these relationships and determines which steps are affected by a change.
 
-[`targets`](https://docs.ropensci.org/targets/) provides this for [`R`](https://www.r-project.org/) workflows; [`Snakemake`](https://snakemake.readthedocs.io/) organizes steps that produce files and can use different languages. [`just`](https://just.systems/), a command runner that gives project tasks familiar names, can call either tool. The agent can keep `just build` as the command while the dependency runner decides which calculations to repeat.
+For example, a Bayesian model may take hours to fit. Its *posterior draws* (the sampled parameter values) can be saved and reused to calculate new comparisons or generate figures. A change to the data or model requires updating the fit and the outputs that use it. The agent can manage these dependencies with [`targets`](https://docs.ropensci.org/targets/) for an [`R`](https://www.r-project.org/) workflow, or [`Snakemake`](https://snakemake.readthedocs.io/) for workflows using other languages or combining several.
 
 ## Show the dependencies
 
-The diagram illustrates a possible workflow with two fitted specifications, based on the [synthetic heat-and-birthweight project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in *Doing Research with AI Agents*. Its reruns are expected behavior to check, not findings from a trial of the downloadable project.
+Suppose two Bayesian models use the same prepared data. The agent uses their saved posterior draws to make a comparison figure included in the manuscript. These connected steps form a *pipeline*.
 
-![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="The same dependency graph shows three changes: a figure edit reruns the figure and document, a specification-B edit also reruns fit B, and a shared-data change reruns both fits. Unaffected results are reused."}
+![](figures/research-dependencies.svg){#fig-research-dependencies fig-alt="The agent runs just all, whose recipe starts targets or Snakemake. With only model B changed, the dependency runner reuses the prepared data and model A's saved posterior draws, reruns model B, and updates the comparison figure and manuscript. Orange paths and labels indicate repeated calculations; blue labels identify reuse."}
 
-Have the agent identify each step's inputs, code, parameters, and outputs. External inputs count too: a script that reads an unrecorded file or a response from a data service can produce a result the runner does not know is out of date. Save and declare those inputs according to the project's acquisition procedure.
+Have the agent identify the data, model settings, code, and saved results each step needs, and the outputs it produces. It should record these relationships and show them in a diagram for your project.[^tk-dependency-definitions] You check whether they match the intended analysis.
 
-The [targets manual](https://books.ropensci.org/targets/) explains tracking objects, functions, and files. [`Snakemake` rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html) describe how inputs produce outputs. The agent writes and maintains the definitions; you check that the proposed relationships match the intended research workflow.
+If a step downloads data, have the agent save a copy and record that file as an input. When the copy is refreshed, the runner can identify the calculations that depend on it. If the agent does not record a required file or setting as a dependency, the runner may reuse old results even after that input changes.
 
-::: {.needspace height="7cm"}
+## Use saved commands to run the pipeline {#connect-the-analysis}
+
+[`just`](https://just.systems/) is a command runner: it saves instructions for starting a task under a short name (see [Chapter 7: Give research tasks reliable commands: just](#project-commands)). The agent can set up `just all`[^tk-just-all] to start `targets` or `Snakemake`. The dependency runner then checks which results are current and runs the steps needed to update the analysis. Either dependency runner can also be used on its own. Adding `just` gives the agent a consistent front door for running the project's tasks.
+
+For the two-model example, the expected behavior is:
+
+| What changes | What runs again | What can be reused |
+|-------------------------|---------------------------------------------|------------------------------|
+| A figure label | The figure and manuscript | Prepared data and both model fits |
+| The specification of model B | Model B, the comparison figure, and manuscript | Prepared data and model A |
+| The shared input data | Affected data preparation, both fits, and the outputs that use them | Any unaffected earlier work |
+| Nothing changes and all outputs are present | No analysis steps | All current saved results |
+
+The agent uses the same `just all` command in every case. The dependency runner determines which calculations actually run. Reusing the saved posterior draws avoids repeating hours of fitting when only a later step has changed.
+
+The agent can also configure `just figures` to ask the dependency runner for the figures. The runner checks the inputs and saved results those figures need, updating them if necessary.
+
+The following prompt uses `targets` for an `R` analysis with Bayesian models. For a workflow using other languages, ask the agent to use `Snakemake` instead.
+
+::: {#prompt-selective-reruns .prompt}
+> Preserve this project's current results and software versions. Set up `targets` for this `R` analysis, installing it in the project's software environment if needed and recording its version. Use the existing analysis code to connect data preparation, the Bayesian model fits, saved posterior draws, comparison figures, and the manuscript through their dependencies. Configure the command `just all` to run the complete workflow through `targets`, and configure `just figures` to request the figures through the same runner. Show me the dependency diagram. Check selective reruns with small representative inputs, keeping test outputs separate from the study's results. Report which steps run and which results are reused, and investigate unexpected differences. Use these commands for future updates to the analysis.
 :::
-
-## Connect the analysis
-
-::: {.prompt}
-> Preserve the current results and environment. Connect the analysis through targets for this R workflow, declaring its inputs, functions, files, and outputs. Keep just as the command runner. Show the dependency graph, identify which steps should rerun after different changes, and compare the resulting outputs with the previously checked results saved for this comparison.
-:::
-
-For a workflow organized around files and multiple languages, request `Snakemake` instead. The agent should install it in the recorded project environment. Existing scripts can become steps, with finer selection where the code already separates coherent operations. There is no requirement to divide every function into a new file.
 
 ## Check what reruns
 
-Ask the agent to preview planned work without executing it, using `targets`' `tar_outdated()` or a `Snakemake` *dry run*. It should then run a small representative workload and compare the actual reruns with the expected graph. The report should identify steps performed, results reused, and any unexpected output changes. This checks execution; a full analysis and its scientific evaluation still have their own requirements.
+Before a long analysis run, ask the agent to show which steps it expects to repeat.[^tk-dependency-preview] It should verify that behavior in a [smoke test](#smoke-tests), using small representative inputs and saving test outputs separately from the study's results.
 
-## Run the pipeline unattended when useful
+Have the agent check the three changes in the table: a figure edit, a change to one statistical model, and a change to shared data. It should then run the workflow without further changes and confirm that completed results are reused. Ask it to name the steps repeated and results reused, check the output files, and diagnose any unexpected behavior before running the full analysis. These checks concern how the workflow runs; the statistical methods still need their own evaluation.
 
-The runner can reuse completed results after an interruption when they remain current. Continuing an unfinished fit midway requires a *checkpoint*: saved intermediate state that the fitting program can reload. Keep the workflow definitions, environment records, and needed inputs with the project; large stores of reusable results, often called caches, need separate storage management.
+## Recover work after an interruption {#run-the-pipeline-unattended-when-useful}
 
-[`pueue`](https://github.com/Nukesor/pueue) can queue `just build`, which starts the dependency runner. The queue controls when that command starts; the runner selects the calculations. One queued job may start several *workers*, separate processes doing calculations concurrently, and each worker may itself use several processor cores. `targets` can use [`crew`](https://wlandau.github.io/crew/) for workers. Have the agent coordinate memory and processor use across both levels; [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains those limits. In an environment affected by the [R/macOS issue](#r-on-macos), check the actual worker route before enabling it.
+After an interruption, have the agent identify completed steps and restart the workflow, reusing saved results that remain current. Suppose a simulation study needs 100 model fits, each defined as a separate pipeline step with a saved result. If 40 fits finish before an interruption, the runner can reuse those results and run the remaining fits. An unfinished fit may still need to start again.
+
+Continuing partway through an unfinished calculation requires a *checkpoint*: a saved intermediate state that the program can reload.[^tk-pipeline-checkpoint] Checkpointing usually uses capabilities of the existing analysis software, or progress-saving and recovery logic the agent adds to the project's code. It does not generally require another tool.
+
+| What needs to survive an interruption? | What provides it? |
+|--------------------------------------------------|--------------------------------------------------|
+| Submitted tasks, their status, and logs | The job-queue tool [`pueue`](https://github.com/Nukesor/pueue) |
+| Completed analysis steps and their results | Saved outputs managed by `targets` or `Snakemake` |
+| Progress inside an unfinished calculation | Checkpoint support in the analysis software or project code |
+
+Have the agent explain what the project's software can recover. If a fit cannot resume partway through, saving each completed fit still limits how much work must be repeated. A single pipeline step containing all 100 fits does not automatically save them individually.
+
+::: {#prompt-recover-interruption .prompt}
+> Make this simulation workflow recoverable after an interruption. Save each completed repetition so restarting does not repeat it when the inputs, code, and settings are unchanged. Check whether the fitting software can also save and reload progress within an unfinished fit, and configure that where supported. Choose how often to save progress and document its location and the restart command in `README.md`. Test recovery on five repetitions, interrupting after some finish and while another is running. Keep test outputs separate from the study's results. Restart with the same inputs, settings, and software versions, then check that completed work is reused without missing or duplicating repetitions. Explain which unfinished work still needs to start again.
+:::
+
+Have the agent keep the workflow definitions, software-version records, and required inputs with the project, and record the location of saved results in `README.md`. To run the saved commands unattended, see [Chapter 9: Keep unattended jobs moving: pueue](#job-queues).
+
+[^tk-dependency-definitions]: The agent usually defines a `targets` workflow in `_targets.R` and a `Snakemake` workflow in a `Snakefile`. It writes and maintains these files; see the [`targets` manual](https://books.ropensci.org/targets/) and [`Snakemake` rules](https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html).
+
+[^tk-just-all]: In this example, `all` is the name of a recipe: saved instructions the agent defines in the project's `justfile` to update the complete workflow. `just all` runs that recipe.
+
+[^tk-dependency-preview]: For `targets`, the agent can use [`tar_outdated()`](https://docs.ropensci.org/targets/reference/tar_outdated.html) to identify steps that need updating. A [`Snakemake` dry run](https://snakemake.readthedocs.io/en/stable/tutorial/basics.html#step-1-the-first-rule) shows the planned steps without executing them.
+
+[^tk-pipeline-checkpoint]: Saved posterior draws do not necessarily contain all the state needed to continue sampling. Have the agent check what the fitting software can save and reload. The dependency runner's record of completed steps does not itself provide checkpoints within a fit.

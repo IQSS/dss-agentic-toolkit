@@ -12,7 +12,7 @@ In [`Claude Code`](https://code.claude.com/docs/en/overview), permission rules[^
 
 Some tools send work to a background service: a program that runs separately from the agent and carries out submitted tasks. For example, `pueue` uses one to start queued jobs. Ask the agent to check what the service and the programs it starts can access.[^tk-pueue-process]
 
-![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="The agent can run a command inside a configured sandbox, submit work to a separate queue service, or use a connected service. Each route needs its own access checks. Returned information reaches the agent; built-in file tools have separate permission checks."}
+![](figures/tool-access-routes.svg){#fig-tool-access-routes fig-alt="An agent sends requests and receives information along three distinct routes. A command runs inside a configured sandbox with specified project access. A separate pueue background service starts queued jobs under the service's own access controls. A connected online service provides records through account permissions. Built-in file tools have separate checks. The sandbox shown does not imply that it encloses the other routes."}
 
 `Claude Code`'s built-in sandbox is off by default. When enabled, it covers commands run inside it and the programs they start. It does not enclose every tool available to the agent. Built-in file tools have their own permission checks; connected services and separately running services need their own access controls.[^tk-sandbox-scope]
 
@@ -38,7 +38,7 @@ Keep secret values out of these files and saved command approvals. [Chapter 12: 
 
 Describe the files and services the work needs. For the batch of fits, you could ask:
 
-::: {.prompt}
+::: {#prompt-configure-access .prompt}
 > Set up access for these statistical model fits. The approved inputs are in [folder]; results and logs belong in [folder]. Leave the inputs unchanged and block access to [excluded folder]. Check the current agent settings and the queue service's access. Explain where changes are needed before applying them. Test permitted and blocked actions with harmless substitute files, then report the settings changed, the outcomes, and anything you could not verify.
 :::
 

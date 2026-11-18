@@ -2,9 +2,9 @@
 title: "6. Preserve a software environment: rig, renv, and uv"
 ---
 
-Suppose a collaborator reruns the synthetic heat-and-birthweight analysis ([Chapter 10: The example research project](https://dss-agentic-research.pages.dev/chapters/example-project.html) in the companion guide *Doing Research with AI Agents*) and obtains different intervals. The agent needs to know which software versions were used for the original analysis to check whether a software change explains the discrepancy. Installing the latest releases would give it a different comparison.
+An analysis depends on particular versions of its language, packages, and other software. Recording those versions lets the agent recreate the software setup when investigating a result or preparing to share the project. The agent can recreate an earlier setup without changing the one currently in use.
 
-Recording the software versions prepares the project for repeatable commands, selective reruns, and unattended jobs. It also lets the agent recreate the earlier software setup without changing the current one, for example when investigating a result or preparing to share the project.
+Suppose a collaborator reruns an analysis and obtains different intervals. The agent can recreate the original software setup to investigate whether a change in software explains the discrepancy. It can use [`rig`](https://rig.r-lib.org/) to select the [`R`](https://www.r-project.org/) version and [`renv`](https://rstudio.github.io/renv/) to restore its packages, or [`uv`](https://docs.astral.sh/uv/) to manage both language and package versions for [`Python`](https://www.python.org/).
 
 ## Record the language and package versions {#record-the-language-and-packages}
 
@@ -15,11 +15,9 @@ A *software environment* includes the language, packages, and other programs use
 | Install and select the language | [`rig`](https://rig.r-lib.org/) manages [`R`](https://www.r-project.org/) installations. | [`uv`](https://docs.astral.sh/uv/) manages [`Python`](https://www.python.org/) installations; `.python-version` records a selection. |
 | Record and restore packages | [`renv`](https://rstudio.github.io/renv/) maintains `renv.lock`. | `uv` maintains `pyproject.toml` and `uv.lock`. |
 
-The `R` package `renv` records the `R` version and package versions in `renv.lock`, but does not install or switch `R` itself. The standalone tool `rig` supplies that capability. For `Python`, the standalone tool `uv` handles both language and package management. The agent can install [`rig`](https://formulae.brew.sh/formula/r-rig) and [`uv`](https://docs.astral.sh/uv/getting-started/installation/#homebrew) through [`Homebrew`](https://brew.sh/); it installs `renv` from within `R`.
+The `R` package `renv` records the `R` version and package versions in `renv.lock`, but does not install or switch `R` itself. The standalone tool `rig` supplies that capability. For `Python`, the standalone tool `uv` handles both language and package management. The agent can install [`rig`](https://formulae.brew.sh/formula/r-rig) and [`uv`](https://docs.astral.sh/uv/getting-started/installation/#homebrew) through [`Homebrew`](https://brew.sh/); it installs `renv` from within `R`. [`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded.
 
-[`Stata`](https://www.stata.com/) projects also need their `Stata` release and community-command versions recorded.
-
-![](figures/research-environments.svg){#fig-research-environments fig-alt="The agent records a working R or Python environment, restores the recorded software separately, and compares a selected output with a saved reference result. Both language routes require the restore-and-check step."}
+![](figures/research-environments.svg){#fig-research-environments fig-alt="R uses rig for its language version and renv for packages; renv.lock records both. Python uses uv with .python-version, pyproject.toml and uv.lock. The agent restores the recorded setup separately and compares a selected output without changing the current working environment."}
 
 ## When other environment tools are useful
 
@@ -33,8 +31,8 @@ These tools can coexist on the same computer, with different projects using diff
 
 Have the agent use the appropriate tools to record the project's language and package versions. For an existing project, it should capture the versions already in use without upgrading them. To check that the setup can be recreated, the agent should save the output from a small part of the analysis, restore the recorded software versions, and rerun that part to compare the results.
 
-::: {.prompt}
-> Inspect this project's software and record the language version and all required package versions without upgrading them. Choose a small, representative part of the analysis, run it with the current setup, and save the output. Recreate the recorded software setup in a separate environment, leaving the current one unchanged. Rerun the same part of the analysis and compare the outputs. Report anything that could not be restored and any differences in the results. Keep the setup files with the project and update README.md with any additional software requirements, restoration instructions, and the outcome of the check.
+::: {#prompt-restore-environment .prompt}
+> Inspect this project's software and record the language version and all required package versions without upgrading them. Choose a small, representative part of the analysis, run it with the current setup, and save the output. Recreate the recorded software setup in a separate environment, leaving the current one unchanged. Rerun the same part of the analysis and compare the outputs. Report anything that could not be restored and any differences in the results. Keep the setup files with the project and update `README.md` with any additional software requirements, restoration instructions, and the outcome of the check.
 :::
 
 When adding or updating a package later, have the agent update the lockfile and rerun the affected part of the analysis.

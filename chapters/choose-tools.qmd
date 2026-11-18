@@ -8,7 +8,7 @@ Suppose a study needs 100 simulation runs, but your computer can handle four at 
 
 Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://dss-agentic-research.pages.dev/chapters/first-session.html).
 
-![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved instructions guide an agent using an installed job queue or a connection to a reference library."}
+![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved TOOLCHAIN.md instructions tell an agent when to use tools and what to report. From a conversation in the app, the agent can operate an installed simulation queue or use a connection to a reference library. The queue produces a run report; the library supplies sources and notes. These are examples of capabilities rather than a list of mandatory tools."}
 
 ## Find the tool for your task
 
@@ -43,9 +43,9 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) |
 | **Reference** | |
-| Choose optional terminal and editor conveniences | [Appendix A: Optional working environment](#working-environment) |
-| Restore personal settings across computers | [Appendix B: Keep records of shared settings: chezmoi](#shared-settings) |
-| Investigate account usage | [Appendix C: Account-usage tools](#usage-tools) |
+| Customize the terminal, shell, prompts and panes | [Appendix A: Tools for customizing your terminal](#working-environment) |
+| Restore personal settings across computers | [Appendix B: Maintain personal settings: chezmoi](#shared-settings) |
+| Find and adapt prompts from the guide | [Appendix C: Prompt bank](#prompt-bank) |
 | Diagnose execution and document-build problems | [Appendix D: Troubleshooting](#troubleshooting) |
 | Understand terminal terminology | [Appendix E: Terminal vocabulary](#terminal-history) |
 
