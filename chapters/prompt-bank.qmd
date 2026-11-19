@@ -1,10 +1,6 @@
 ---
 title: "Appendix C. Prompt bank"
-aliases:
-  - /chapters/usage-tools.html
 ---
-
-<!-- aliases: usage-tools -->
 
 []{#usage-tools}
 []{#ask-for-a-report-that-answers-a-question}

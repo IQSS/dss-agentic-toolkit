@@ -1,10 +1,6 @@
 ---
 title: "18. Use an agent from the terminal: Claude Code"
-aliases:
-  - /chapters/terminal-commands.html
 ---
-
-<!-- aliases: terminal-commands -->
 
 A terminal provides another way to work with an agent: you type a research prompt and read its response in the same window where you can run project commands. This can be useful when you already work with scripts and job logs there, or connect to another computer to run an analysis. You can continue to give the agent instructions in ordinary language.
 

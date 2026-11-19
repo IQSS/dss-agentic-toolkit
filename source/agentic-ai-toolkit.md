@@ -384,8 +384,6 @@ If supporting software remains difficult to reproduce, ask the agent whether a c
 
 # 7. Give research tasks reliable commands: just {#project-commands}
 
-<!-- aliases: runnable-checks -->
-
 Repeating a research task means knowing which scripts to run, in what order, and with which settings. A *command* tells the computer which program or saved task to run. Saving the instructions for a task under one command lets the agent or a collaborator repeat it without reconstructing those details.
 
 Suppose a figure shows estimates from a statistical model. If model fitting and plotting are separate steps, the agent can regenerate the figure from saved estimates without fitting the model again. [`just`](https://just.systems/) is a command runner that gives these tasks short names. The agent saves each task's instructions as a *recipe* in the project's `justfile`.
@@ -1178,8 +1176,6 @@ For longer training, have the agent configure *checkpoints*: saved training stat
 
 # 18. Use an agent from the terminal: Claude Code {#terminal-agents}
 
-<!-- aliases: terminal-commands -->
-
 A terminal provides another way to work with an agent: you type a research prompt and read its response in the same window where you can run project commands. This can be useful when you already work with scripts and job logs there, or connect to another computer to run an analysis. You can continue to give the agent instructions in ordinary language.
 
 Suppose you need to regenerate a figure from saved statistical estimates. You can ask the agent to do this, have it identify the files it used, and then repeat the task through a saved command. This chapter follows that sequence using [`Claude Code`](https://code.claude.com/docs/en/overview). The project keeps its code and results whichever interface you use.
@@ -1381,8 +1377,6 @@ Some settings can be identical across computers, while others refer to different
 [^tk-chezmoi-machines]: See [`chezmoi`'s guide to differences between machines](https://www.chezmoi.io/user-guide/manage-machine-to-machine-differences/). Templates can vary particular settings without requiring independently maintained copies of every file.
 
 # Appendix C. Prompt bank {#prompt-bank}
-
-<!-- aliases: usage-tools -->
 
 []{#usage-tools}
 []{#ask-for-a-report-that-answers-a-question}

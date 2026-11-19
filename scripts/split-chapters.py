@@ -22,6 +22,16 @@ What it writes into the site repository:
     SOURCE.lock           upstream repo, commit, path, sha256 of the copy
     _quarto.yml           the sidebar contents and the chapter map, between generated markers
 
+Chapter addresses and aliases:
+
+    chapters/<id>.qmd takes its name from the H1's explicit {#id}, so a retitle keeps its address and
+    only a change of id moves a page. To keep an old address alive, the upstream document puts
+    `<!-- aliases: old-id -->` on its own line directly under the heading (one line per old id);
+    chapter_text() turns each into a Quarto `aliases` entry and the render writes a bare redirect stub
+    at chapters/old-id.html that forwards to the page. A stub is not a themed page: no header includes,
+    so no visitor count; the visit is counted on the destination. Remove the marker once nothing
+    outside the site links to the old address.
+
 Run it from anywhere:
 
     split-chapters.py --upstream ../../publishing/agentic-ai-for-researchers --site .

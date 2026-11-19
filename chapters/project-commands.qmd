@@ -1,10 +1,6 @@
 ---
 title: "7. Give research tasks reliable commands: just"
-aliases:
-  - /chapters/runnable-checks.html
 ---
-
-<!-- aliases: runnable-checks -->
 
 Repeating a research task means knowing which scripts to run, in what order, and with which settings. A *command* tells the computer which program or saved task to run. Saving the instructions for a task under one command lets the agent or a collaborator repeat it without reconstructing those details.
 
