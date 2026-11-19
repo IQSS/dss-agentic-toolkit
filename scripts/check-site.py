@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Check a rendered agentic-AI site for the things the conversion can break silently.
 
-Used by both sites from CI, after `quarto render`. See
-training/dss-training-ops/docs/plans/2026-08-30-agentic-sites-conversion-plan.md, Phase 4.
+Used by both sites from CI, after `quarto render`.
 
 Every failure this looks for is one that leaves a page that renders fine and reads wrong: an authoring
 note in the page source, a figure that 404s, a cross-reference to a chapter that moved, a landing-page
@@ -133,7 +132,7 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
                 problems.append(f"{page.relative_to(site)}: link to {path}#{fragment}, "
                                 "which is not in that page")
 
-    # 6. The not-found page links by absolute path. A static host answers a request for any
+    # 6. The not-found page links by absolute path. A web host answers a request for any
     # unmatched address with this page's body, and the browser keeps the address it asked for, so a
     # relative link would resolve against whatever wrong path the reader typed: from
     # /chpaters/12-analysis.html, "index.html" points at /chpaters/index.html. Only a root-absolute
@@ -159,11 +158,8 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     # 7. Every console recipe points at a chapter that exists. The landing page is a hand-drawn
     # console (console.js on the research site, garage.js on the toolkit site) whose controls link to
     # chapters by slug, and it builds those links in JavaScript at runtime -- so they never appear in
-    # the rendered HTML and check 4 cannot see them. A retitled chapter changes its slug and leaves
-    # the recipe pointing at nothing, which is exactly how the landing page went stale on 2026-09-27
-    # while every static link resolved. Checked against chapters/*.qmd, the sync's output, rather
-    # than against _site: Quarto never prunes _site, so a stale render of the old slug can still be
-    # sitting there and would let a dead recipe pass.
+    # the rendered HTML and check 4 cannot see them. Check against chapters/*.qmd because
+    # a stale rendered page in _site could conceal a link to a removed chapter.
     chapters = {p.stem for p in (root / "chapters").glob("*.qmd")}
     for js in sorted(root.glob("*.js")):
         for slug in re.findall(r'slug:\s*"([^"]+)"', js.read_text(errors="replace")):

@@ -1,6 +1,4 @@
-/* site.css — the styling counterpart of scripts/site-filter.lua, shared by both agentic-AI sites and
-   copied into each by `just sync`. Rules that apply to only one of the two documents are inert on the
-   other, which is why they live together rather than in two nearly identical files. */
+/* Styles for filters/site-filter.lua, shared by both agentic-AI guides. */
 
 /* Neither document captions a figure: each carries its own title inside the image, and the PDF sets
    them as plain centred images with no number. Quarto reads the `#fig-` identifier out of the
@@ -101,11 +99,8 @@ body.quarto-dark #fig-research-process .chapter-map-link[href$="research-handoff
   scroll-margin-top: 4rem;
 }
 
-/* The tool-chain's function matrix. filters/site-filter.lua marks each row's first cell: an
-   alternating band so a numbered group (1a/1b, 15a-15d) reads as one block, and a green pill on the
-   rows the author uses every day -- the prose promises a green highlight, and the print build draws
-   one. The daily-use list is the author's, kept upstream beside the document and carried here by the
-   sync, so the two builds cannot disagree about which rows are marked.
+/* The tool-chain's function matrix. filters/site-filter.lua marks each row's first cell with an
+   alternating band for numbered groups and a green pill for the configured daily-use rows.
 
    The mark sits on the cell rather than the row because pandoc's HTML writer gives every row its own
    odd/even class and discards row attributes. :has() reaches the row from the cell; where it is not

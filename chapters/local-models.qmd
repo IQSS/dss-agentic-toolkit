@@ -28,7 +28,7 @@ For `Ollama`, have the agent configure the runtime that serves the responses. It
 <details class="guide-example">
 <summary>Apple's on-device LLM</summary>
 
-On a compatible Mac, Apple's system LLM offers another documented option for tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for access from a program, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; an offered cloud-processing mode changes where the request runs. Have the agent record the system and SDK versions and evaluate the intended task. These options were reviewed through documentation, not included in this guide's setup trial.
+On a compatible Mac, Apple's system LLM offers another documented option for tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for access from a program, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; an offered cloud-processing mode changes where the request runs. Have the agent record the system and SDK versions and evaluate the intended task.
 
 </details>
 
@@ -48,7 +48,7 @@ An input must fit both the LLM's context capacity and the memory available to th
 
 Have the agent keep the *raw response*, the exact returned text, separately from the fields extracted into the analysis table, retaining failures and retries with their excerpt identifiers. It should record the prompt, generation settings, runtime version, and exact LLM identifier with each run.[^tk-local-version] The [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) should explain how to start the runtime, run the command, and locate the records. These instructions should point to the saved configuration files rather than require someone to reconstruct the settings.
 
-The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling) explains how to assess the labels and their consequences for the analysis. This guide's earlier [setup trial](resources/local-model-setup-trial.md) is a record of software checks, not a recommendation of a particular LLM for the study.[^tk-local-trial]
+The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling) explains how to assess the labels and their consequences for the analysis.
 
 ## Connect the LLM to an agent
 
@@ -99,8 +99,6 @@ For longer training, have the agent configure *checkpoints*: saved training stat
 [^tk-local-toolchain]: For global `TOOLCHAIN.md`, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
 
 [^tk-local-version]: A tag is a convenient name that can later point to different weights; a digest identifies particular content. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) provides identifying information. An API is an interface through which one program requests an operation from another. Have the agent retain the returned identifier for the LLM actually used.
-
-[^tk-local-trial]: The earlier trial used Qwen3 4B and demonstrated a response with required fields and a file-reading tool call. It did not establish research accuracy, comprehensive access restrictions, or installation on a clean computer. Its linked record retains the configuration and observed limitations.
 
 [^tk-local-training-format]: `MLX LM` can read `.jsonl` files, meaning JSON Lines: a text format with one structured record per line. Each training record can pair a prompt with the desired response. Its [data-format documentation](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md#data) explains supported layouts; the agent should convert the study's reviewed examples to the selected tool's format.
 

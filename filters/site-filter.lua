@@ -1,7 +1,7 @@
 --[[ site-filter.lua — everything the two agentic-AI sites need that is genuinely HTML-only.
 
 Shared by dss-agentic-research and dss-agentic-toolkit; wired into each `_quarto.yml` under
-`filters:`. See dss-training-ops/docs/plans/2026-08-30-agentic-sites-conversion-plan.md, Phase 3.
+`filters:`.
 
 It runs at render time rather than at sync time on purpose: the chapters are byte-for-byte slices of
 the upstream markdown, so any rule here can change without re-syncing a single file, and a chapter can
@@ -9,20 +9,14 @@ always be diffed against its source.
 
 What it does, and why each one is a silent failure without it:
 
-  1. Strips every HTML comment. Pandoc passes them straight into the page, where the guide's
-     per-chapter STATUS / PHASE / VERIFY authoring notes -- including which claims rest on secondary
-     sources -- are readable with view-source.
-  2. Drops the print-only divs (.pagebreak, .vspace, .needspace, .subsection-rule). Upstream's own
-     filter drops them for non-LaTeX output, but that filter belongs to the PDF build; here they would
-     render as stray empty divs.
-  3. Errors on any surviving raw-LaTeX block. After the upstream conversion there are none, and a
-     dropped figure is exactly what this pipeline exists to prevent, so absence is asserted.
+  1. Strips HTML comments so source annotations do not appear in published page source.
+  2. Drops the print-only divs (.pagebreak, .vspace, .needspace, .subsection-rule).
+  3. Errors on raw-LaTeX blocks instead of silently dropping their content.
   4. Points figure and in-document links at the right page. A `figures/x.svg` in a chapter resolves to
      `chapters/figures/x.svg` and 404s; an in-document `#anchor` written when the document was one
      file now names a heading on some other page.
   5. Turns a section reference into a link, from the maps the splitter writes into `_quarto.yml`.
-  6. Marks up the tool-chain's function matrix so CSS can shade it, replacing what the LaTeX-only
-     matrix-shade.lua does for print.
+  6. Marks up function-matrix rows for CSS shading using the configured daily-use list.
 
 Automatic § references inside footnotes are left alone because they may cite the companion guide.
 Explicit Markdown links still resolve through this site's anchor map, including in footnotes.
@@ -30,7 +24,7 @@ Explicit Markdown links still resolve through this site's anchor map, including 
 
 local chapters = {}   -- "13"       -> /chapters/13-permissions-and-sandboxing.qmd
 local anchors = {}    -- "#package-manager" -> /chapters/01-foundation.qmd#package-manager
-local daily = {}      -- "13a" -> true, the matrix rows the author marks as everyday tools
+local daily = {}      -- "13a" -> true, the configured everyday-tool matrix rows
 local this_page       -- the slug of the chapter being rendered, to keep same-page links on the page
 local this_number     -- its chapter number, for the subsection anchors below
 local subsection = 0  -- H2 counter, so §13c can land on the third subsection of chapter 13
@@ -91,7 +85,7 @@ local function link_sections(str)
   local matched = false
   while true do
     -- [a-z], not %l: Lua patterns match bytes and %l can take the lead byte of a multi-byte
-    -- character, which turned "§9’s" into a corrupted anchor and a broken apostrophe.
+    -- character, corrupting anchors that end with a typographic apostrophe.
     local before, number, letter, after = rest:match("^(.-)§(%d+)([a-z]?)(.*)$")
     if not before then break end
     matched = true
@@ -163,7 +157,7 @@ local function rewrite_link(link)
   local anchor = link.target:match("^#(.+)$")
   local target = anchor and anchors[anchor]
   if not target then return nil end
-  -- Quarto otherwise misclassifies local preview links as external.
+  -- Quarto otherwise misclassifies same-site links as external.
   link.classes:insert("no-external")
   if this_page and target:match("/([^/]+)%.qmd") == this_page then
     link.target = "#" .. anchor
@@ -270,8 +264,7 @@ return {
     Str = link_sections,
 
     -- 6. the tool-chain's function matrix: shade each numbered group, and mark the everyday rows.
-    -- The LaTeX build draws these with matrix-shade.lua; the marks come from the same list, carried
-    -- into _quarto.yml by the splitter so the two cannot drift.
+    -- Read the everyday-tool list from _quarto.yml.
     Table = function(tbl)
       local head = tbl.head.rows[1]
       if not head or #head.cells == 0 then return nil end

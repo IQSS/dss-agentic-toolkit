@@ -13,7 +13,7 @@ $headings-font-weight: 400 !default;
 $font-size-base: 1rem !default;
 $body-color: #1e1e1e !default;
 $pre-color: $body-color !default;   // output blocks; Bootstrap's default is $body-emphasis-color, black in both modes
-// The ground is paper rather than white (0.7.0, Steve): a white page reads as too bright to work on.
+// Use a paper-colored background to reduce glare.
 // One warmth for the whole surface -- ground, navbar, footer -- with the panel tone and the rule
 // stepped off it by the same amounts the old gray pair sat off white, so nothing reads half-changed.
 // Chosen from a swatch page that repainted real pages; it is the tone the console drawing calls paper.
@@ -173,14 +173,14 @@ body.nav-fixed { padding-top: 112px; }
 // Callouts and code.
 .callout { border-radius: 4px; }
 .callout .callout-header, .callout .callout-title-container { font-weight: 500; }
-// Callouts (Steve, 2026-08-29, chosen from a mockup of the options): Quarto's simple appearance (the rule down the
+// Callouts: Quarto's simple appearance (the rule down the
 // left edge, no title strip; untitled boxes stay untitled) with the whole box washed in the callout's color and the
 // the gray outer border gone, so a box reads as a box, as the 2021 alert boxes did.
 @each $k, $c in (note: $callout-color-note, tip: $callout-color-tip, warning: $callout-color-warning, important: $callout-color-important, caution: $callout-color-caution) {
   div.callout-#{$k}.callout-style-simple { background: mix($c, $body-bg, $dss-callout-tint); border-right-color: transparent; border-top-color: transparent; border-bottom-color: transparent; }
 }
 pre.sourceCode, div.sourceCode { border-radius: 4px; }
-// Output blocks (Steve, 2026-08-29, chosen from a mockup): a rule down the left edge marks what the code printed, no fill;
+// Output blocks: a rule down the left edge marks what the code printed, no fill;
 // it pairs with the callouts. The text color is $pre-color above, so output follows the mode like everything else.
 .cell-output pre { border-left: 3px solid mix($dss-muted, $body-bg, 45%); padding: .1em 0 .1em .7em; margin-left: 2px; }
 code { font-size: 0.9em; }

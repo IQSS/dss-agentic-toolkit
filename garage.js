@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     { n: "C", group: "REFERENCE", slug: "prompt-bank", title: "Prompt bank", tool: "the multimeter",
       body: "Find the guide's example prompts collected by task. Adapt one to your project, return to its explanation, or download the complete collection." },
     { n: "D", group: "REFERENCE", slug: "troubleshooting", title: "Troubleshooting", tool: "the level and square",
-      body: "Diagnose the observed R-on-macOS execution problem and the recorded PDF table error. Check the actual process, output, and build log." },
+      body: "Diagnose R execution and PDF build problems. Check the actual process, output, and build log." },
   ];
   const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
@@ -456,8 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
     a.insertBefore(el("rect", Object.assign({ class: "hit" }, frame)), a.firstChild);
     el("rect", Object.assign({ class: "ring" }, frame), a);
     const tg = el("g", { class: "tag", transform: "translate(" + o.tag[0] + "," + o.tag[1] + ")" }, a);
-    // The tag carries the section number only; Part membership is the legend's and the readout's job
-    // (the per-tag colour dot was dropped 2026-09-27 as too small to read against the wall).
+    // The tag carries the section number; the legend and readout identify the Part.
     const wd = n.length > 1 ? 34 : 28;
     R(tg, -wd / 2, -8.5, wd, 17, "none", { rx: 4 });
     const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = n === "0" ? "Start" : n;
