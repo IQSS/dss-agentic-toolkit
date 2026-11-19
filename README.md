@@ -4,24 +4,15 @@ A guide for researchers, with 18 chapters and five appendices. [Read the guide](
 
 ## Build and check
 
-The repository includes the manuscript snapshot, generated chapter pages, figures, resources, and DSS theme needed to build the website. Building does not require access to the private authoring repositories or execute research code.
+This repository contains the public manuscript snapshot, generated chapter pages, figures, resources, and DSS theme. It builds independently and does not execute research code.
 
-Install Quarto 1.9.38, Python 3, and `just`, then run:
+Install Quarto 1.9.38, Python 3, and `just`, then run `just check`. The Python checks use the standard library. GitHub Actions checks pull requests and publishes successful `main` builds to GitHub Pages.
 
-```sh
-just check      # render and check sources, figures, links, and navigation
-just preview    # serve the site locally
-```
+## Contribute and maintain
 
-The Python checks use the standard library. GitHub Actions runs the same source and rendered-site checks. Successful builds of `main` in the IQSS repository publish to GitHub Pages; pull requests are checked without publishing.
+Start from the latest public version and propose changes through a pull request. Preserve contributions already incorporated here. `SOURCE.lock` identifies the manuscript snapshot used to generate the chapters.
 
-## Maintain the guide
-
-Prose and figures are authored in the separate `agentic-ai-toolkit` manuscript project. `SOURCE.lock` identifies the committed manuscript snapshot. Maintainers with the authoring repositories and shared `dss-training-ops` tooling can use `just sync` to refresh this site and `just verify` to check it against those sources. `just watch` supports local editorial previews, including uncommitted prose; make a normal sync from committed source before publishing.
-
-Edit prose upstream rather than in generated `chapters/` pages. Chapter identifiers keep URLs stable when titles or order change. The landing illustration and its `garage.js` controls are maintained here. Figures have light and dark variants.
-
-An existing private Cloudflare preview can be refreshed with `just deploy-preview`, using locally supplied `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` environment variables. This is separate from the public GitHub Pages deployment.
+The author maintains development material in a separate private repository. Approved guide content and its required website files are transferred into a branch of this repository and reviewed through a pull request. Private repositories are never merged or mirrored here. Do not edit generated chapter pages directly; reconcile manuscript changes before regenerating them. Chapter identifiers keep URLs stable when titles or order change.
 
 ## License
 
