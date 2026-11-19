@@ -447,7 +447,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const ch = byN(n);
     // A section opens in a new tab: this page is the way into the map and stays put, the same rule the
     // companion site's console follows.
-    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot" + (o.heavy ? " heavy" : ""), "data-n": n, tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, layer);
+    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot no-external" + (o.heavy ? " heavy" : ""), "data-n": n, tabindex: "0", role: "link" }, layer);
     el("title", {}, a).textContent = chapterLabel(n) + " " + ch.title;
     if (o.ghost) draw(el("g", { class: "ghost" }, a));
     const obj = el("g", { class: "obj" }, a);
@@ -525,7 +525,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // The robot is §1: the agent itself. It stands in front of everything, so its link is the last thing drawn.
   (function () {
     const ch = byN("1"), svg = document.getElementById("scene");
-    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy", "data-n": "1", tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, svg);
+    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy no-external", "data-n": "1", tabindex: "0", role: "link" }, svg);
     el("title", {}, a).textContent = chapterLabel(ch.n) + " · " + ch.title;
     const frame = { x: 1040, y: 366, width: 136, height: 312, rx: 10 };
     el("rect", Object.assign({ class: "hit" }, frame), a);
@@ -594,8 +594,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cueBadges.set(n, label);
   }
   const roNext = document.createElement("a");
-  roNext.className = "sequence-next-link";
-  roNext.target = "_blank"; roNext.rel = "noopener";
+  roNext.className = "sequence-next-link no-external";
   const roActions = document.createElement("div");
   roActions.className = "sequence-actions";
   roActions.append(roLink, roNext);

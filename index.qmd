@@ -53,13 +53,13 @@ resources:
                 <h1>Extend Your Agent's Toolkit</h1>
                 <p>Add tools when your research needs them. Run, check, and reproduce the work.</p>
                 <p class="how"><b>Each tool opens a chapter.</b> <span id="ro-how">Hover to explore; click to open. The blue glow marks the next chapter.</span></p>
-                <a class="go" href="chapters/choose-tools.html" target="_blank" rel="noopener">Start with the introduction →</a>
+                <a class="go no-external" href="chapters/choose-tools.html">Start with the introduction →</a>
               </div>
               <div class="chapter" id="ro-chapter" hidden>
                 <div class="eyebrow"><i></i><span id="ro-part"></span></div>
                 <h2 id="ro-title"></h2>
                 <p id="ro-body"></p>
-                <a class="go" id="ro-link" href="chapters/choose-tools.html" target="_blank" rel="noopener" hidden>Open section</a>
+                <a class="go no-external" id="ro-link" href="chapters/choose-tools.html" hidden>Open section</a>
                 <div class="hint" id="ro-hint" hidden></div>
               </div>
             </section>
