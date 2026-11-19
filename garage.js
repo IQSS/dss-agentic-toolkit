@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     { n: "10", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
       body: "Package system software, restrict task access, or run a local model with selected tools. Configure each container for its specific research purpose." },
     { n: "12", group: "IV", slug: "credentials", title: "Keep credentials out of research files: 1Password and direnv", tool: "the drawers and keys",
-      body: "Keep API keys out of code and conversation. Supply credentials to the commands that need them and reduce accidental disclosure and unauthorized usage." },
+      body: "Give approved commands the credentials they need. Keep passwords and API keys out of code and conversations." },
     { n: "13", group: "IV", slug: "service-connections", title: "Connect to research data and services: MCP", tool: "the power strip and jars",
       body: "Connect the agent to useful application operations. A literature-library example explains when MCP adds value alongside files, commands, and APIs." },
     { n: "14", group: "IV", slug: "browser-work", title: "Inspect and interact with a browser", tool: "the window",
@@ -74,6 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
   const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
+  // Reading order is independent of the SVG painting order.
+  const sequence = [...CH].sort((a, b) => a.n.localeCompare(b.n, "en", { numeric: true }));
+  const nextChapter = ch => sequence[sequence.indexOf(ch) + 1];
+  const fullLabel = n => /^[A-Z]$/.test(n) ? "Appendix " + n : "Chapter " + n;
 
   // ---- svg helpers ----
   const el = (name, attrs, parent) => {
@@ -574,8 +578,49 @@ document.addEventListener("DOMContentLoaded", function () {
   const roIntro = document.getElementById("ro-intro"), roChapter = document.getElementById("ro-chapter"), roHow = document.getElementById("ro-how");
   const roPart = document.getElementById("ro-part"), roTitle = document.getElementById("ro-title"),
         roBody = document.getElementById("ro-body"), roLink = document.getElementById("ro-link"), roHint = document.getElementById("ro-hint");
-  let pinned = null;
-  function show(ch, preview) {
+  const sceneSvg = document.getElementById("scene");
+  const hotLinks = [...document.querySelectorAll(".hot")];
+  const primaryTools = new Map(sequence.map(ch => [ch.n, hotLinks.find(a => a.dataset.n === ch.n)]));
+  // Two chapters have more than one illustration: cue a single main object.
+  primaryTools.set("3", benchL.querySelector('.hot[data-n="3"]'));
+  const cueBadges = new Map();
+  for (const [n, a] of primaryTools) {
+    const tag = a.querySelector(".tag");
+    // The wider Chapter 6 cue needs clearance from the neighboring hammer.
+    const badgeTransform = tag.getAttribute("transform") + (n === "6" ? " translate(-60 0)" : "");
+    const badge = el("g", { class: "tag sequence-badge", transform: badgeTransform, "aria-hidden": "true" }, a);
+    R(badge, -43, -11, 86, 22, "none", { rx: 6 });
+    const label = el("text", { x: 0, y: 4, "text-anchor": "middle" }, badge);
+    cueBadges.set(n, label);
+  }
+  const roNext = document.createElement("a");
+  roNext.className = "sequence-next-link";
+  roNext.target = "_blank"; roNext.rel = "noopener";
+  const roActions = document.createElement("div");
+  roActions.className = "sequence-actions";
+  roActions.append(roLink, roNext);
+  roChapter.insertBefore(roActions, roHint);
+  function cueSequence(ch) {
+    hotLinks.forEach(a => a.classList.remove("sequence-next", "sequence-start"));
+    const next = ch ? nextChapter(ch) : byN("1");
+    sceneSvg.dataset.sequenceStart = ch ? "0" : "1";
+    sceneSvg.dataset.activeChapter = ch ? ch.n : "";
+    if (next) {
+      primaryTools.get(next.n).classList.add(ch ? "sequence-next" : "sequence-start");
+      cueBadges.get(next.n).textContent = (ch ? "Next" : "Start") + " · " + next.n;
+    }
+    roNext.hidden = !ch || !next;
+    if (ch && next) {
+      roNext.textContent = "Next: " + fullLabel(next.n) + " →";
+      roNext.href = SITE + next.slug + ".html";
+      roNext.title = fullLabel(next.n) + ": " + next.title;
+      roNext.setAttribute("aria-label", "Next: " + fullLabel(next.n) + ": " + next.title);
+    }
+  }
+  let pinned = null, explored = null, selectedTool = null;
+  function show(ch, preview, toolLink) {
+    explored = ch;
+    selectedTool = toolLink || selectedTool || primaryTools.get(ch.n);
     pose("point");
     roIntro.hidden = true; roChapter.hidden = false;
     ro.style.setProperty("--dot", GROUPS[ch.group].dot);
@@ -587,11 +632,12 @@ document.addEventListener("DOMContentLoaded", function () {
     roHint.textContent = preview ? "" : "Tap the tool again to open the section, or use the link.";
     roHint.hidden = preview;
     document.querySelectorAll(".hot.on").forEach(a => a.classList.remove("on"));
-    const keep = pinned || (!preview ? ch : null);
-    if (keep) { const k = document.querySelector('.hot[data-n="' + keep.n + '"]'); if (k) k.classList.add("on"); }
+    selectedTool.classList.add("on");
+    cueSequence(ch);
   }
   function restore() {
-    if (pinned) { show(pinned, false); return; }
+    // Keep the destination visible while crossing the space between tools.
+    if (explored) { show(explored, !pinned || pinned.n !== explored.n); return; }
     pose("rest");
     ro.dataset.preview = "0"; ro.style.setProperty("--dot", v("mustard"));
     roChapter.hidden = true; roIntro.hidden = false;
@@ -604,12 +650,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (fine) return;                          // pointer: hover previews, a press opens the section
       const ch = find(a);                        // touch: first tap pins the readout, second opens
       if (pinned && pinned.n === ch.n) return;
-      e.preventDefault(); pinned = ch; show(ch, false);
+      e.preventDefault(); pinned = ch; show(ch, false, a);
     });
-    a.addEventListener("focus", () => show(find(a), !pinned || pinned.n !== a.dataset.n));
+    a.addEventListener("focus", () => show(find(a), !pinned || pinned.n !== a.dataset.n, a));
     a.addEventListener("blur", restore);
     if (fine) {
-      a.addEventListener("mouseenter", () => show(find(a), !pinned || pinned.n !== a.dataset.n));
+      a.addEventListener("mouseenter", () => show(find(a), !pinned || pinned.n !== a.dataset.n, a));
       a.addEventListener("mouseleave", restore);
     }
   });
@@ -624,5 +670,10 @@ document.addEventListener("DOMContentLoaded", function () {
     else { home.appendChild(ro); fo.style.display = ""; noteTitle.style.display = "none"; }
   };
   narrow.addEventListener("change", placeReadout); placeReadout();
+  roHow.textContent = fine
+    ? "Hover to explore; click to open. The blue glow marks the next chapter."
+    : "Tap to explore; tap again to open. The blue glow marks the next chapter.";
+  roHow.closest(".how").querySelector("b").textContent = "Each tool opens a chapter.";
+  cueSequence(null);
   pose("rest");
 });
