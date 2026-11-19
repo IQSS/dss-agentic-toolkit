@@ -12,7 +12,7 @@ Install Quarto 1.9.38, Python 3, and `just`, then run `just check`. The Python c
 
 Start from the latest public version and propose changes through a pull request. Preserve contributions already incorporated here. `SOURCE.lock` identifies the manuscript snapshot used to generate the chapters.
 
-The author maintains development material in a separate private repository. Approved guide content and its required website files are transferred into a branch of this repository and reviewed through a pull request. Private repositories are never merged or mirrored here. Do not edit generated chapter pages directly; reconcile manuscript changes before regenerating them. Chapter identifiers keep URLs stable when titles or order change.
+Keep the manuscript snapshot and generated chapter pages consistent. Preserve chapter identifiers so URLs remain stable when titles or order change.
 
 ## License
 
