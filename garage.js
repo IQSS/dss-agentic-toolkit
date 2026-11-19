@@ -445,8 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================================================================================
   function tool(layer, n, draw, o) {
     const ch = byN(n);
-    // A section opens in a new tab: this page is the way into the map and stays put, the same rule the
-    // companion site's console follows.
+    // Chapters use the current tab. no-external keeps Quarto from overriding native link behavior.
     const a = el("a", { href: SITE + ch.slug + ".html", class: "hot no-external" + (o.heavy ? " heavy" : ""), "data-n": n, tabindex: "0", role: "link" }, layer);
     el("title", {}, a).textContent = chapterLabel(n) + " " + ch.title;
     if (o.ghost) draw(el("g", { class: "ghost" }, a));
