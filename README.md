@@ -4,15 +4,21 @@ A guide for researchers, with 18 chapters and five appendices. [Read the guide](
 
 ## Build and check
 
-This repository contains the public manuscript snapshot, generated chapter pages, figures, resources, and DSS theme. It builds independently and does not execute research code.
+The repository includes the manuscript snapshot, generated chapter pages, figures, resources, and DSS theme needed to build the website. The build is self-contained and executes no research code.
 
-Install Quarto 1.9.38, Python 3, and `just`, then run `just check`. The Python checks use the standard library. GitHub Actions checks pull requests and publishes successful `main` builds to GitHub Pages.
+Install Quarto 1.9.38, Python 3, and `just`, then run:
 
-## Contribute and maintain
+```sh
+just check      # render and check sources, figures, links, and navigation
+```
 
-Start from the latest public version and propose changes through a pull request. Preserve contributions already incorporated here. `SOURCE.lock` identifies the manuscript snapshot used to generate the chapters.
+The Python checks use the standard library. GitHub Actions runs the same source and rendered-site checks. Successful builds of `main` in the IQSS repository publish to GitHub Pages; pull requests are checked without publishing.
 
-Keep the manuscript snapshot and generated chapter pages consistent. Preserve chapter identifiers so URLs remain stable when titles or order change.
+## Maintain the guide
+
+Prepare changes on a branch based on the latest IQSS `main`, preserving newer contributions. Run `just check` and open a pull request. Reviewed merges to `main` publish the website.
+
+The manuscript snapshot is in `source/`; `SOURCE.lock` records its content fingerprint. Chapter pages in `chapters/` are generated from that snapshot, and checks enforce their agreement. Propose prose corrections against the manuscript snapshot; maintainers regenerate the chapter pages as part of review. Chapter identifiers keep URLs stable when titles or order change. The landing illustration and its `garage.js` controls are maintained here. Figures have light and dark variants.
 
 ## License
 
