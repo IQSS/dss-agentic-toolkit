@@ -1,9 +1,14 @@
 default: check
 
-# Build the committed public snapshot. GitHub Actions publishes checked main builds.
+# Build the website from the files included in this repository.
 render:
     python3 scripts/render-site.py
 
+# Match the source, figure, link, and navigation checks run by GitHub Actions.
 check: render
-    python3 scripts/split-chapters.py --check --site .
-    python3 scripts/check-site.py
+    scripts/split-chapters.py --check --site .
+    scripts/check-site.py
+
+# Serve locally, rebuilding when files change.
+preview:
+    python3 scripts/render-site.py --preview

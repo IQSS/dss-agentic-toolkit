@@ -26,8 +26,7 @@ resources:
 
       <!-- ===== the room, and what hangs on the wall: drawn by garage.js ===== -->
       <g id="room"></g>
-      <!-- The wall sits 20 left of where garage.js draws it: the corkboard grew leftward by that much
-           on 2026-09-27 so the readout heading fits one line. The tools keep their distances. -->
+      <!-- Offset the wall to leave room for the readout heading. -->
       <g id="wall" transform="translate(-20 0)"></g>
 
       <!-- ===== the corkboard, holding the readout ===== -->

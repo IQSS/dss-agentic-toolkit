@@ -7,13 +7,13 @@
 
 **/*.quarto_ipynb
 
-# Build intermediates from the figure pipeline (see AGENTS.md)
+# Figure build intermediates
 figures/*.aux
 figures/*.log
 figures/*.pdf
 figures/*.xdv
 
-# Working notes kept on the maintainer's machine, never committed
+# Local files
 AGENTS.md
 CLAUDE.md
 STATUS.md

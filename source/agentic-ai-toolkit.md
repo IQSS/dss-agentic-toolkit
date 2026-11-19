@@ -1093,7 +1093,7 @@ For `Ollama`, have the agent configure the runtime that serves the responses. It
 <details class="guide-example">
 <summary>Apple's on-device LLM</summary>
 
-On a compatible Mac, Apple's system LLM offers another documented option for tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for access from a program, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; an offered cloud-processing mode changes where the request runs. Have the agent record the system and SDK versions and evaluate the intended task. These options were reviewed through documentation, not included in this guide's setup trial.
+On a compatible Mac, Apple's system LLM offers another documented option for tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for access from a program, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; an offered cloud-processing mode changes where the request runs. Have the agent record the system and SDK versions and evaluate the intended task.
 
 </details>
 
@@ -1113,7 +1113,7 @@ An input must fit both the LLM's context capacity and the memory available to th
 
 Have the agent keep the *raw response*, the exact returned text, separately from the fields extracted into the analysis table, retaining failures and retries with their excerpt identifiers. It should record the prompt, generation settings, runtime version, and exact LLM identifier with each run.[^tk-local-version] The [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) should explain how to start the runtime, run the command, and locate the records. These instructions should point to the saved configuration files rather than require someone to reconstruct the settings.
 
-The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling) explains how to assess the labels and their consequences for the analysis. This guide's earlier [setup trial](resources/local-model-setup-trial.md) is a record of software checks, not a recommendation of a particular LLM for the study.[^tk-local-trial]
+The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling) explains how to assess the labels and their consequences for the analysis.
 
 ## Connect the LLM to an agent
 
@@ -1164,8 +1164,6 @@ For longer training, have the agent configure *checkpoints*: saved training stat
 [^tk-local-toolchain]: For global `TOOLCHAIN.md`, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
 
 [^tk-local-version]: A tag is a convenient name that can later point to different weights; a digest identifies particular content. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) provides identifying information. An API is an interface through which one program requests an operation from another. Have the agent retain the returned identifier for the LLM actually used.
-
-[^tk-local-trial]: The earlier trial used Qwen3 4B and demonstrated a response with required fields and a file-reading tool call. It did not establish research accuracy, comprehensive access restrictions, or installation on a clean computer. Its linked record retains the configuration and observed limitations.
 
 [^tk-local-training-format]: `MLX LM` can read `.jsonl` files, meaning JSON Lines: a text format with one structured record per line. Each training record can pair a prompt with the desired response. Its [data-format documentation](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md#data) explains supported layouts; the agent should convert the study's reviewed examples to the selected tool's format.
 
@@ -1731,11 +1729,11 @@ Once the cause is understood, the agent should make a targeted correction and re
 > Diagnose why [operation] produced [observed result] instead of [expected result]. Inspect the exact command, relevant logs, software setup, and outputs before changing anything. Check whether an earlier attempt is still running and making progress. Explain the likely cause and make a targeted correction, preserving existing work. Use a small representative check first if the full operation is expensive, then repeat the affected operation and inspect its output. Report what changed, what now works, and anything unresolved. Record lasting setup corrections in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), or in [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) if they apply across projects. Ask me before changing research methods or inputs.
 :::
 
-The sections below cover particular execution and build problems encountered while developing these guides. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://iqss.github.io/dss-agentic-research/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
+The sections below cover particular execution and build problems. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://iqss.github.io/dss-agentic-research/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
 
 ## R launched by an agent on macOS {#r-on-macos}
 
-In the environment used to develop these guides, [`R`](https://www.r-project.org/) has sometimes stalled when an agent starts it without a terminal connection: the process uses a processor core but produces no output. This is an observed macOS issue, not a claim about every `R` installation or operating system. When the agent identifies this problem, a *pseudo-terminal*, a software-created terminal connection, provides a workaround that has been dependable in that environment.
+On some macOS setups, [`R`](https://www.r-project.org/) can stall when an agent starts it without a terminal connection: the process uses a processor core but produces no output. If the agent identifies these symptoms, have it try a *pseudo-terminal*, a software-created terminal connection, and verify that the command finishes and produces the expected output.
 
 Have the agent put the workaround in `bin/rscript-pty`, an executable helper: a small program that launches the project's `R` commands with that connection. It changes how the analysis is started, without changing the analysis code. Ask the agent to check a small run through the method the project will actually use, including the queue if jobs will be queued. It should confirm that the expected output is produced and the process finishes before launching a long run.
 
@@ -1771,19 +1769,19 @@ If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly ap
 
 ## Cloud-synchronized project storage {#cloud-sync-storage}
 
-An installed software environment can contain thousands of small files. Synchronizing these files while tools replace them has sometimes blocked file operations in the `Dropbox`/macOS environment used for these guides. Caches, logs, and version-history files can create similar activity. A [`Git`](https://git-scm.com/) ignore rule controls what `Git` records; it does not control what `Dropbox` synchronizes.
+An installed software environment can contain thousands of small files. Synchronizing these files while tools replace them can block file operations with `Dropbox` on macOS. Caches, logs, and version-history files can create similar activity. A [`Git`](https://git-scm.com/) ignore rule controls what `Git` records; it does not control what `Dropbox` synchronizes.
 
 For example, a [`Python`](https://www.python.org/) project's `.venv/` directory contains installed packages, while `uv.lock` records their versions. Have the agent keep that version record and the analysis source with the project, but place the installed environment outside the synchronized folder if syncing it causes problems. The agent must configure the project commands to use the new location and check that the analysis still runs. [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains the files needed to recreate the software.
 
 To prevent unnecessary synchronization, the agent can place large rebuildable environments and caches outside cloud storage from the start. If it instead uses the storage provider's exclusion setting, it should configure and verify that setting on an empty directory before filling it. [`Dropbox` documents different mechanisms](https://help.dropbox.com/sync/ignored-files) for different platforms, so the agent must check the one in use.
 
-For an already populated or stalled directory, ask the agent to preserve the work and diagnose the synchronization state before changing exclusions. Adding an exclusion after a service has indexed thousands of files can itself trigger further synchronization work. The recovery used for these guides was to recreate the installed environment outside cloud storage from the recorded dependencies, then update the project to use it. Source files, uncommitted edits, and `Git` history need preservation; a repository is not a disposable software environment.
+For an already populated or stalled directory, ask the agent to preserve the work and diagnose the synchronization state before changing exclusions. Adding an exclusion after a service has indexed thousands of files can itself trigger further synchronization work. One recovery option is to recreate the installed environment outside cloud storage from the recorded dependencies, then update the project to use it. Source files, uncommitted edits, and `Git` history need preservation; a repository is not a disposable software environment.
 
 After a repair, have the agent rerun the affected project command and record the new locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). It should explain which files remain in the normal backup arrangement and how the excluded software can be recreated.
 
 ## PDF reports “No counter 'none' defined” {#tex-table-counter}
 
-A PDF build in these guides encountered “No counter 'none' defined” for a table without a caption. [`Pandoc`](https://pandoc.org/) emitted a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template's *preamble*, the setup section before the document content begins:
+A PDF build can report “No counter 'none' defined” for a table without a caption when [`Pandoc`](https://pandoc.org/) emits a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expect to name an existing counter. For that specific error, have the agent add this guarded definition in the template's *preamble*, the setup section before the document content begins:
 
 ```tex
 \makeatletter
@@ -1795,7 +1793,7 @@ The guard preserves a counter if it already exists. Have the agent rebuild the d
 
 [^tk-troubleshooting-context-files]: See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
 
-[^tk-troubleshooting-stdin]: Standard input is the input channel a program reads. The helper redirects it from `/dev/null`, which supplies no input. Retain that redirection as part of this observed workaround.
+[^tk-troubleshooting-stdin]: Standard input is the input channel a program reads. The helper redirects it from `/dev/null`, which supplies no input. Retain that redirection as part of this workaround.
 
 # Appendix E. Terminal vocabulary {#terminal-history}
 

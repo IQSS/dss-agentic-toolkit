@@ -1,12 +1,12 @@
 # Extending Your Agent's Toolkit as a Quarto website on the dss-theme extension.
 # Chapters are generated from the upstream manuscript; see README.md for the build workflow.
 # Nothing executes: the source is prose and pre-built SVG figures.
-# The release candidate supplies the render-time filter; it strips authoring comments, points figure and
+# The HTML filter removes source comments, points figure and
 # in-document links at the right page, and turns section references into links.
 filters:
   - filters/site-filter.lua
 
-# The filter's styling counterpart is supplied with the release candidate.
+# Styles for the HTML filter.
 format:
   dss-theme-html:
     lightbox: true
@@ -19,7 +19,7 @@ format:
       - text: |
           <meta name="google-site-verification" content="yQHSXWQVwOPIg4wRh9A8zusoTpcfgW05SWdbVN0rF-s">
           <script>
-            // Count visits on the public site; exclude local and private previews.
+            // Count visits only at the published address.
             window.goatcounter = {no_onload: location.hostname !== "iqss.github.io"};
           </script>
           <script data-goatcounter="https://dss-agentic-toolkit.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
