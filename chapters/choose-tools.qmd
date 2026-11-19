@@ -8,7 +8,7 @@ Suppose a study needs 100 simulation runs, but your computer can handle four at 
 
 Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://iqss.github.io/dss-agentic-research/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://iqss.github.io/dss-agentic-research/chapters/first-session.html).
 
-![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved TOOLCHAIN.md instructions tell an agent when to use tools and what to report. From a conversation in the app, the agent can operate an installed simulation queue or use a connection to a reference library. The queue produces a run report; the library supplies sources and notes. These are examples of capabilities rather than a list of mandatory tools."}
+![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="The global user instructions file TOOLCHAIN.md tells an agent when to use tools and what to report. From a conversation in the app, the agent can operate an installed simulation queue or use a connection to a reference library. The queue produces a run report; the library supplies sources and notes. These are examples of capabilities rather than a list of mandatory tools."}
 
 ## Find the tool for your task
 

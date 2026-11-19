@@ -4,7 +4,7 @@ title: "Appendix B. Maintain personal settings: chezmoi"
 
 Personal tool settings can contain months of useful work: global user instructions[^tk-settings-user-instructions] refined through research projects, a terminal layout that works well, or settings that resolved a recurring software problem. Recreating them after a lost computer or an accidental overwrite would mean repeating that work. Their configuration files are scattered across locations chosen by different tools, rather than collected in one project folder that can simply be put under version control.
 
-[`chezmoi`](https://www.chezmoi.io/) maintains copies of selected configuration files in one directory and installs them in the locations where the tools read them. [`Git`](https://git-scm.com/) can then record changes to that collection, and a repository stored elsewhere provides a copy from which to recover or set up another computer. `chezmoi` manages the relationship between the collection and the scattered working files; `Git` supplies their version history.
+[`chezmoi`](https://www.chezmoi.io/) is a tool that maintains copies of selected configuration files in one directory and installs them in the locations where the tools read them. [`Git`](https://git-scm.com/) can then record changes to that collection, and a repository stored elsewhere provides a copy from which to recover or set up another computer. `chezmoi` manages the relationship between the collection and the scattered working files; `Git` supplies their version history.
 
 ## Choose which settings to preserve {#choose-settings-to-preserve}
 
@@ -16,7 +16,7 @@ Configuration files supply a program's settings or instructions. Many have names
 | Shell configuration for [`zsh`](https://www.zsh.org/) | `~/.zshrc` |
 | Terminal panes and shortcuts for [`Zellij`](https://zellij.dev/documentation/configuration) | `~/.config/zellij/config.kdl` |
 
-Here, `~` means your home folder. These are example locations: ask the agent to identify the files your tools actually use and preserve any existing settings-management arrangement. [Appendix A: Tools for customizing your terminal](#working-environment) explains the terminal tools.
+In macOS and Linux shell paths, `~` means your home folder. These are example locations: ask the agent to identify the files your tools actually use and preserve any existing settings-management arrangement. [Appendix A: Tools for customizing your terminal](#working-environment) explains the terminal tools.
 
 Have the agent select the files with you before adding them. Keep passwords, access tokens, and saved sign-in state out of an ordinary settings repository, including a private one. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how programs can obtain secret values when needed. If a selected file controls agent permissions, the protection must cover both its maintained copy and the file the agent application reads, as explained in [Chapter 2: Control what added tools can access](#tool-access).
 

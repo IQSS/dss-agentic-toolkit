@@ -2,33 +2,33 @@
 title: "Appendix E. Terminal vocabulary"
 ---
 
-This appendix explains terms encountered in terminal windows, commands, and tool diagnostics. Use it to look up an unfamiliar word or ask the agent to explain that word in the command or error you are reading. [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) explains using the terminal agent, and [Appendix A: Tools for customizing your terminal](#working-environment) explains the software choices for its appearance and layout.
+This appendix explains terms encountered in terminal windows, commands, and tool diagnostics. Use it to look up an unfamiliar word or ask the agent to explain that word in the command or error you are reading.
 
 ## From a device to a window
 
-Many terminal terms describe physical equipment that software has replaced. A terminal was a device through which a person communicated with a computer. A teletype combined a keyboard and printer: typed characters went to the connected machine, and responses appeared on paper. [Museum collections preserve examples](https://collections.museumsvictoria.com.au/items/407696) used for computer access. Later terminals displayed text on a screen.
+Many terminal terms describe physical equipment that software has replaced. A terminal was a device through which a person communicated with a computer. A *teletype* combined a keyboard and printer: typed characters went to the connected machine, and responses appeared on paper. [Museum collections preserve examples](https://collections.museumsvictoria.com.au/items/407696) used for computer access. Later terminals displayed text on a screen.
 
-The abbreviation *TTY*, from teletype, remained in computing. A modern *terminal emulator* provides a similar text interface in a software window. The program inside that interface may be a shell, an editor, or an agent. Its appearance alone does not tell you which program is receiving your input.
+A modern *terminal emulator* provides a similar text interface in a software window. It can display a *shell* for entering commands and starting programs, a *text editor* for changing text files, or an *AI agent* that follows instructions and uses tools to carry out tasks. The window's appearance alone does not tell you which program is receiving your input.
 
 ![](figures/terminal-vocabulary.svg){#fig-terminal-vocabulary fig-alt="A teletype-style keyboard and printer leads to a physical screen terminal and then a terminal-emulator window. TTY preserves the older name. The lower cutaway shows three alternative programs inside the interface: a shell receiving commands, an editor receiving document text, or an agent receiving a research prompt. The hardware drawings are original schematic illustrations, not particular models."}
 
 ## The program receiving your commands
 
-A *shell* [reads commands](https://www.gnu.org/software/bash/manual/bash.html) and starts programs. [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) are examples. A shell can interpret a saved script as well as something you type. When it starts an interactive program such as an agent, your input goes to that program until it finishes or you exit it; the shell then becomes ready for another command.
+Shells such as [`Bash`](https://www.gnu.org/software/bash/) and [`zsh`](https://www.zsh.org/) can run saved scripts as well as commands you type. When a shell starts a program such as an agent, your input goes to that program until it finishes or you exit it; the shell then becomes ready for another command. [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) demonstrates this sequence. [Appendix A: Tools for customizing your terminal](#working-environment) explains shell choices and terminal configuration.
 
 | Term | Meaning in this guide |
 |--------------------------------|--------------------------------------------------------------------------|
 | Terminal / terminal emulator | The text interface, now usually a software window, in which programs receive typed input and display output |
 | Shell | The program interpreting commands and starting other programs; for example, `zsh` starts the agent when you enter `claude` |
 | Shell prompt | The text indicating that the shell is ready for a command; distinct from a written prompt addressed to an agent |
-| TTY | A name for a terminal connection, inherited from *teletype* |
+| TTY | A terminal connection; the term appears in diagnostics about how programs receive input |
 | Pseudo-terminal, PTY | A software-created connection that behaves like a terminal for the program using it |
 
-Programs can behave differently when connected to a terminal than when reading from a file or another process. A [pseudo-terminal](https://man7.org/linux/man-pages/man7/pty.7.html) supplies a terminal connection when needed, as in the observed [R-on-macOS problem](#r-on-macos). This does not mean every unattended command requires one.
+Programs can behave differently when their input comes from a terminal rather than a file or another program. That distinction explains messages such as `not a tty`: *TTY* names a terminal connection, so the message means that the program's input is not connected to one.[^tk-vocabulary-tty] A pseudo-terminal[^tk-vocabulary-pty] supplies a terminal connection when needed. [Appendix D: Troubleshooting](#r-on-macos) explains an example involving [`R`](https://www.r-project.org/) started by an agent on macOS. This does not mean every unattended command requires one.
 
 ## Commands and file locations {#commands-and-file-locations}
 
-In `just figures`, [`just`](https://just.systems/) names the program and `figures` tells it which recipe to run. Programs also need to locate their files. A path such as `data/analysis.csv` is interpreted from the program's *working directory*, its current folder, so the same command can find different files when started elsewhere.
+In `just figures`, [`just`](https://just.systems/) names the program and `figures` selects a saved task, called a *recipe*. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how the agent creates those recipes. Programs also need to locate their files. A path such as `data/analysis.csv` is interpreted from the program's *working directory*, its current folder, so the same command can find different files when started elsewhere.
 
 | Term | Meaning in this guide |
 |--------------------------------|--------------------------------------------------------------------------|
@@ -42,7 +42,9 @@ In `just figures`, [`just`](https://just.systems/) names the program and `figure
 | `PATH` | The list of directories searched for a program when its command is given without a file path |
 | Dotfile | A file whose name begins with a dot, such as `.zshrc`; these files are usually hidden in normal file listings and often contain configuration |
 
-The home folder and working directory are different concepts. For example, the working directory may be a research project while `~/.zshrc` still points to the shell settings in your home folder. The examples follow this guide's macOS and Linux conventions, including the Linux shell supplied by [`WSL2`](https://learn.microsoft.com/windows/wsl/) on Windows.
+The home folder and working directory are different concepts. For example, the working directory may be a research project while `~/.zshrc` still points to the shell settings in your home folder.
+
+The file-path examples above use *Unix* conventions shared by the macOS and Linux operating systems.[^tk-vocabulary-unix] Their shells use forward slashes to separate folders and `~` for the home folder. These conventions also apply in the Linux environment provided on Windows by [`WSL2`](https://learn.microsoft.com/windows/wsl/); [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) introduces that Windows route. The `/Users/your-name/Research/my-project` path is specific to macOS.
 
 ## Programs, input, and output {#program-input-and-output}
 
@@ -56,6 +58,14 @@ A running program can receive information from the terminal, files, or another p
 | Standard output, `stdout` | The channel a program uses for ordinary output, which can be displayed or saved |
 | Standard error, `stderr` | A separate output channel commonly used for errors and other diagnostic messages |
 | Pipe | A connection passing one program's output to another program's input; for example, passing a status report to a tool that selects the failed jobs |
-| Exit status | A code reporting how a program ended according to that program's rules |
+| Exit status | A number a program returns when it finishes |
 
-An exit status of zero usually indicates success for the command that returned it, but does not by itself establish that the intended research job succeeded. The [`pueue wait` example](#review-results-and-recover-failures) shows why the program's own meaning and the saved result both matter.
+A zero exit status[^tk-vocabulary-exit-status] reports success according to the program's own rules. In [Chapter 9: Keep unattended jobs moving: pueue](#review-results-and-recover-failures), the `pueue wait` command returns zero when it finishes waiting, even if the queued job failed. The agent must check the job's recorded outcome and saved research outputs.
+
+[^tk-vocabulary-tty]: TTY abbreviates teletype, an early keyboard-and-printer terminal. In modern software, the name refers to a terminal connection, including connections created by software.
+
+[^tk-vocabulary-pty]: A pseudo-terminal (PTY) is a software-created connection that lets a program behave as though it were attached to a terminal. It can provide terminal input and output without a person opening a terminal window.
+
+[^tk-vocabulary-unix]: An operating system manages a computer's hardware and runs programs. Unix is an operating system whose design influenced many later systems. macOS is based on Unix, and Linux follows many of the same conventions.
+
+[^tk-vocabulary-exit-status]: An exit status is a number a program returns when it finishes. By convention, zero reports success; other numbers usually indicate an error. The number describes the program's own outcome, which may cover only one step of a research task.

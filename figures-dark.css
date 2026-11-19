@@ -18,6 +18,7 @@ body.quarto-dark img[src$="detachable-pipeline.svg"] { content: url("figures/det
 body.quarto-dark img[src$="document-production.svg"] { content: url("figures/document-production-dark.svg"); }
 body.quarto-dark img[src$="entry-points.svg"] { content: url("figures/entry-points-dark.svg"); }
 body.quarto-dark img[src$="four-pillars.svg"] { content: url("figures/four-pillars-dark.svg"); }
+body.quarto-dark img[src$="headless-manuscript-check.svg"] { content: url("figures/headless-manuscript-check-dark.svg"); }
 body.quarto-dark img[src$="headless-research.svg"] { content: url("figures/headless-research-dark.svg"); }
 body.quarto-dark img[src$="job-queues.svg"] { content: url("figures/job-queues-dark.svg"); }
 body.quarto-dark img[src$="literature-connection.svg"] { content: url("figures/literature-connection-dark.svg"); }

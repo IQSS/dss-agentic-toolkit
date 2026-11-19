@@ -29,7 +29,7 @@ Once the cause is understood, the agent should make a targeted correction and re
 > Diagnose why [operation] produced [observed result] instead of [expected result]. Inspect the exact command, relevant logs, software setup, and outputs before changing anything. Check whether an earlier attempt is still running and making progress. Explain the likely cause and make a targeted correction, preserving existing work. Use a small representative check first if the full operation is expensive, then repeat the affected operation and inspect its output. Report what changed, what now works, and anything unresolved. Record lasting setup corrections in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), or in [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) if they apply across projects. Ask me before changing research methods or inputs.
 :::
 
-The sections below cover particular execution and build problems. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://iqss.github.io/dss-agentic-research/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
+The sections below cover problems with running research code and building documents. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://iqss.github.io/dss-agentic-research/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
 
 ## R launched by an agent on macOS {#r-on-macos}
 
@@ -69,15 +69,16 @@ If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly ap
 
 ## Cloud-synchronized project storage {#cloud-sync-storage}
 
-An installed software environment can contain thousands of small files. Synchronizing these files while tools replace them can block file operations with `Dropbox` on macOS. Caches, logs, and version-history files can create similar activity. A [`Git`](https://git-scm.com/) ignore rule controls what `Git` records; it does not control what `Dropbox` synchronizes.
+[`Git`](https://git-scm.com/) repositories and installed software environments can contain thousands of small files. Synchronizing frequent changes to these files through cloud-storage services such as [`Dropbox`](https://www.dropbox.com/), [`Google Drive`](https://workspace.google.com/products/drive/), or [`OneDrive`](https://www.microsoft.com/microsoft-365/onedrive/online-cloud-storage) can create heavy background activity and slow or block work on the project. A `Git` ignore rule controls what `Git` records; it does not control what a cloud-storage service synchronizes.
 
-For example, a [`Python`](https://www.python.org/) project's `.venv/` directory contains installed packages, while `uv.lock` records their versions. Have the agent keep that version record and the analysis source with the project, but place the installed environment outside the synchronized folder if syncing it causes problems. The agent must configure the project commands to use the new location and check that the analysis still runs. [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains the files needed to recreate the software.
+For an existing or stalled directory, first have the agent preserve the work and diagnose the synchronization state. Changing exclusions after a service has indexed thousands of files can itself trigger further synchronization work. There are two approaches:
 
-To prevent unnecessary synchronization, the agent can place large rebuildable environments and caches outside cloud storage from the start. If it instead uses the storage provider's exclusion setting, it should configure and verify that setting on an empty directory before filling it. [`Dropbox` documents different mechanisms](https://help.dropbox.com/sync/ignored-files) for different platforms, so the agent must check the one in use.
+1. **Exclude the affected folders from synchronization.** This is the preferred option when the service supports keeping those folders locally without syncing them. Have the agent configure and verify the appropriate exclusion. For a new directory, it should do this before adding files. The mechanism depends on the service and platform; [`Dropbox` documents its supported methods](https://help.dropbox.com/sync/ignored-files).
+2. **Move the affected folders outside cloud storage.** Use this option when suitable exclusions are unavailable or cannot resolve the problem. Have the agent move or recreate the affected items, configure the project to use their new locations, and check that its commands still work. It must preserve source files, uncommitted edits, and `Git` history.
 
-For an already populated or stalled directory, ask the agent to preserve the work and diagnose the synchronization state before changing exclusions. Adding an exclusion after a service has indexed thousands of files can itself trigger further synchronization work. One recovery option is to recreate the installed environment outside cloud storage from the recorded dependencies, then update the project to use it. Source files, uncommitted edits, and `Git` history need preservation; a repository is not a disposable software environment.
+The agent should target the folders causing the activity. For `Git`, this may be the `.git/` directory that stores the repository's history. A [`Python`](https://www.python.org/) project's `.venv/` directory holds installed packages, while `uv.lock` records their versions. The installed environment can be excluded or recreated elsewhere while the version record and analysis source remain with the synchronized project. [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains software restoration.
 
-After a repair, have the agent rerun the affected project command and record the new locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). It should explain which files remain in the normal backup arrangement and how the excluded software can be recreated.
+After the repair, have the agent rerun the affected project command and, for a repository, confirm that its history and uncommitted changes remain intact. It should record any changed locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) and explain how excluded files are backed up or recreated.
 
 ## PDF reports “No counter 'none' defined” {#tex-table-counter}
 
@@ -89,7 +90,7 @@ A PDF build can report “No counter 'none' defined” for a table without a cap
 \makeatother
 ```
 
-The guard preserves a counter if it already exists. Have the agent rebuild the document and inspect the affected table. A different error may need a missing font, package, or source correction; this block is not a general repair for failed PDF builds.
+The guard preserves a counter if it already exists. Have the agent rebuild the document and inspect the affected table. A different error may need a missing font, package, or source correction; this code block is not a general repair for failed PDF builds.
 
 [^tk-troubleshooting-context-files]: See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
 
