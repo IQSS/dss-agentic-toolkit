@@ -26,7 +26,7 @@ After setup, ask the agent to confirm that it can use the tool for the project a
 
 ## Keep a record of installed tools
 
-A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with `Homebrew`, helping the agent set up the same tools on another computer. Your global `TOOLCHAIN.md`[^tk-install-toolchain] records what each tool does and when the agent should use it. Ask the agent to maintain both as tools are added, removed, or changed.
+A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with `Homebrew`, helping the agent set up the same tools on another computer. Your global user instructions file `TOOLCHAIN.md`[^tk-install-toolchain] records what each tool does and when the agent should use it. Ask the agent to maintain both as tools are added, removed, or changed.
 
 The exact language and package versions used by an analysis need their own records; [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains these.
 

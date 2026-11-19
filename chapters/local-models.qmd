@@ -54,7 +54,7 @@ The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-age
 
 When the task requires an agent, its harness must be able to communicate with the selected runtime. [`Ollama`'s `Claude Code` integration](https://docs.ollama.com/integrations/claude-code) provides one documented option. `Claude Code` supplies the agent software; in this arrangement, a compatible LLM served through `Ollama` supplies the responses. Using the `Claude Code` application therefore does not, by itself, identify which LLM service is being used.
 
-Have the setup agent configure a separate way to launch this local agent, preserving the settings for your usual hosted service. It should verify the destination of LLM requests and test an actual tool call, such as reading a permitted test file. Fluent text alone does not show that the LLM can produce a tool request the harness can execute. Ask the setup agent to retain the tool call and result and record the working launch command and settings in global `TOOLCHAIN.md`.[^tk-local-toolchain]
+Have the setup agent configure a separate way to launch this local agent, preserving the settings for your usual hosted service. It should verify the destination of LLM requests and test an actual tool call, such as reading a permitted test file. Fluent text alone does not show that the LLM can produce a tool request the harness can execute. Ask the setup agent to retain the tool call and result and record the working launch command and settings in the global user instructions file `TOOLCHAIN.md`.[^tk-local-toolchain]
 
 Runtime settings govern LLM processing; an agent's other tools can still contact remote services. Have the setup agent apply and check the file and network controls in [Chapter 2: Control what added tools can access](#tool-access). The local agent can also be launched from a saved prompt using [Chapter 16: Run agents from saved prompts](#headless-agents), or take part in the coordinated work in [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work). Local execution, unattended execution, and delegation are separate choices that can be combined.
 
@@ -96,7 +96,7 @@ For longer training, have the agent configure *checkpoints*: saved training stat
 
 [^tk-local-context]: Context capacity is the amount of information the LLM can process in one response generation, measured in tokens. The agent should check the runtime's input/output limits and the actual token count instead of estimating capacity from document pages.
 
-[^tk-local-toolchain]: For global `TOOLCHAIN.md`, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
+[^tk-local-toolchain]: For the global user instructions file TOOLCHAIN.md, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
 
 [^tk-local-version]: A tag is a convenient name that can later point to different weights; a digest identifies particular content. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) provides identifying information. An API is an interface through which one program requests an operation from another. Have the agent retain the returned identifier for the LLM actually used.
 

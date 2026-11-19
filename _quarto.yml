@@ -182,6 +182,7 @@ anchor-map:
   "service-connections": /chapters/service-connections.qmd
   "shared-settings": /chapters/shared-settings.qmd
   "smoke-tests": /chapters/project-commands.qmd#smoke-tests
+  "start-a-conversation-with-the-agent": /chapters/terminal-agents.qmd#start-a-conversation-with-the-agent
   "supply-a-credential-to-a-command": /chapters/credentials.qmd#supply-a-credential-to-a-command
   "terminal-agents": /chapters/terminal-agents.qmd
   "terminal-history": /chapters/terminal-history.qmd
