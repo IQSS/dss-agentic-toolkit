@@ -19,11 +19,5 @@ CLAUDE.md
 STATUS.md
 TASKS.md
 
-# wrangler drops a cache dir wherever `just deploy` runs
-/.wrangler
-/mockups/
-
-.quarto-before-author-revision/
-
 # Cache may be a symlink to external storage.
 /.quarto

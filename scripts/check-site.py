@@ -133,7 +133,7 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
                 problems.append(f"{page.relative_to(site)}: link to {path}#{fragment}, "
                                 "which is not in that page")
 
-    # 6. The not-found page links by absolute path. Cloudflare Pages answers a request for any
+    # 6. The not-found page links by absolute path. A static host answers a request for any
     # unmatched address with this page's body, and the browser keeps the address it asked for, so a
     # relative link would resolve against whatever wrong path the reader typed: from
     # /chpaters/12-analysis.html, "index.html" points at /chpaters/index.html. Only a root-absolute
