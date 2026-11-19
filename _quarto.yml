@@ -10,6 +10,19 @@ filters:
 format:
   dss-theme-html:
     lightbox: true
+    include-in-header:
+      # Search Console: the meta tag proves ownership of the URL-prefix property; the token is per Google
+      # account, the same on every DSS site. Visitor counts: GoatCounter at dss-agentic-toolkit.goatcounter.com;
+      # a page view is recorded with its path, title and referrer, no cookie, nothing that identifies the reader.
+      # Only the public iqss.github.io address is counted: local renders and private previews send nothing.
+      # Adding #toggle-goatcounter to any iqss.github.io address switches counting off in that browser.
+      - text: |
+          <meta name="google-site-verification" content="yQHSXWQVwOPIg4wRh9A8zusoTpcfgW05SWdbVN0rF-s">
+          <script>
+            // Count visits on the public site; exclude local and private previews.
+            window.goatcounter = {no_onload: location.hostname !== "iqss.github.io"};
+          </script>
+          <script data-goatcounter="https://dss-agentic-toolkit.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
     include-after-body: prompt-controls.html
     css:
       - site.css
