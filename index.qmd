@@ -1,5 +1,5 @@
 ---
-title: "Agentic AI Tool Chain"
+title: "Extending Your Agent's Toolkit"
 page-layout: custom
 sidebar: false
 toc: false
@@ -14,7 +14,7 @@ resources:
 <link rel="stylesheet" href="garage.css">
 <div class="garage-scene">
 <svg id="scene" viewBox="0 0 1200 712" role="img" aria-label="The tool chain as a garage" aria-describedby="scene-desc">
-      <desc id="scene-desc">A garage workshop seen from the front: a pegboard of hand tools and a power drill over a long workbench, shelves and a window to the left, a clock, a clipboard and a corkboard to the right, a drawer unit and a padlocked cabinet under the bench, and a robot in a hat and trench coat standing beside it. Each tool is a section of the map; selecting one pins that section's summary to the corkboard, and the robot points at it.</desc>
+      <desc id="scene-desc">A garage workshop seen from the front: a pegboard of hand tools and a power drill over a long workbench, shelves and a window to the left, a clock, a clipboard and a corkboard to the right, a drawer unit and a padlocked cabinet under the bench, and a robot in a hat and trench coat standing beside it. Each tool is a section of the guide; selecting one pins that section's summary to the corkboard, and the robot points at it.</desc>
       <defs>
         <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="var(--g-glow)" stop-opacity="1"/>
@@ -26,38 +26,40 @@ resources:
 
       <!-- ===== the room, and what hangs on the wall: drawn by garage.js ===== -->
       <g id="room"></g>
-      <g id="wall"></g>
+      <!-- The wall sits 20 left of where garage.js draws it: the corkboard grew leftward by that much
+           on 2026-09-27 so the readout heading fits one line. The tools keep their distances. -->
+      <g id="wall" transform="translate(-20 0)"></g>
 
       <!-- ===== the corkboard, holding the readout ===== -->
       <g id="board">
-        <rect x="856" y="83" width="336" height="284" fill="var(--g-shadow)"/>
-        <rect x="850" y="76" width="336" height="284" fill="var(--g-cork)" stroke="var(--g-cork-frame)" stroke-width="9"/>
+        <rect x="836" y="83" width="356" height="269" fill="var(--g-shadow)"/>
+        <rect x="830" y="76" width="356" height="269" fill="var(--g-cork)" stroke="var(--g-cork-frame)" stroke-width="9"/>
         <g fill="var(--g-cork-2)">
-          <circle cx="862" cy="96" r="1.6"/><circle cx="1176" cy="120" r="1.6"/><circle cx="860" cy="212" r="1.6"/><circle cx="1177" cy="260" r="1.6"/>
-          <circle cx="905" cy="352" r="1.6"/><circle cx="1010" cy="351" r="1.6"/><circle cx="1130" cy="352" r="1.6"/><circle cx="960" cy="85" r="1.6"/>
-          <circle cx="1100" cy="86" r="1.6"/><circle cx="861" cy="318" r="1.6"/><circle cx="1178" cy="330" r="1.6"/><circle cx="1176" cy="190" r="1.6"/>
+          <circle cx="842" cy="96" r="1.6"/><circle cx="1176" cy="120" r="1.6"/><circle cx="840" cy="212" r="1.6"/><circle cx="1177" cy="260" r="1.6"/>
+          <circle cx="895" cy="337" r="1.6"/><circle cx="1000" cy="336" r="1.6"/><circle cx="1120" cy="337" r="1.6"/><circle cx="950" cy="85" r="1.6"/>
+          <circle cx="1090" cy="86" r="1.6"/><circle cx="841" cy="318" r="1.6"/><circle cx="1178" cy="330" r="1.6"/><circle cx="1176" cy="190" r="1.6"/>
         </g>
-        <rect x="869" y="96" width="304" height="252" fill="var(--g-shadow)"/>
-        <rect class="note" x="866" y="92" width="304" height="252"/>
-        <rect class="note-edge" x="866" y="92" width="304" height="252"/>
-        <circle cx="1018" cy="100" r="6" fill="var(--g-red)"/><circle cx="1016.5" cy="98.5" r="2" fill="var(--g-red-lt)"/>
+        <rect x="849" y="96" width="324" height="237" fill="var(--g-shadow)"/>
+        <rect class="note" x="846" y="92" width="324" height="237"/>
+        <rect class="note-edge" x="846" y="92" width="324" height="237"/>
+        <circle cx="1008" cy="100" r="6" fill="var(--g-red)"/><circle cx="1006.5" cy="98.5" r="2" fill="var(--g-red-lt)"/>
         <g id="note-title" style="display:none" font-family="Questrial, Montserrat, sans-serif" font-size="40" text-anchor="middle" fill="var(--g-note-ink)">
-          <text x="1018" y="206">Agentic AI</text><text x="1018" y="256">Tool Chain</text>
+          <text x="1008" y="196" font-size="30">Extend Your</text><text x="1008" y="240" font-size="30">Agent's Toolkit</text>
         </g>
-        <foreignObject id="board-fo" x="882" y="110" width="272" height="232">
+        <foreignObject id="board-fo" x="862" y="115" width="292" height="212">
           <div xmlns="http://www.w3.org/1999/xhtml" id="board-home">
             <section class="garage-readout" id="readout" aria-live="polite">
               <div class="intro" id="ro-intro">
-                <h1>Agentic AI Tool Chain</h1>
-                <p>An opinionated map of the tools I work with, organized by what each one is for.</p>
-                <p class="how"><b>Every tool in the garage is a section of the map.</b> <span id="ro-how">Hover over one to see what it covers, and press it to open that section.</span></p>
-                <a class="go" href="chapters/00-introduction.html" target="_blank" rel="noopener">Start with the introduction →</a>
+                <h1>Extend Your Agent's Toolkit</h1>
+                <p>Add tools when your research needs them. Run, check, and reproduce the work.</p>
+                <p class="how"><b>Each tool opens a chapter.</b> <span id="ro-how">Hover to explore; click to open. The blue glow marks the next chapter.</span></p>
+                <a class="go" href="chapters/choose-tools.html" target="_blank" rel="noopener">Start with the introduction →</a>
               </div>
               <div class="chapter" id="ro-chapter" hidden>
                 <div class="eyebrow"><i></i><span id="ro-part"></span></div>
                 <h2 id="ro-title"></h2>
                 <p id="ro-body"></p>
-                <a class="go" id="ro-link" href="chapters/00-introduction.html" target="_blank" rel="noopener" hidden>Open section</a>
+                <a class="go" id="ro-link" href="chapters/choose-tools.html" target="_blank" rel="noopener" hidden>Open section</a>
                 <div class="hint" id="ro-hint" hidden></div>
               </div>
             </section>

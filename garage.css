@@ -230,3 +230,44 @@ body.quarto-dark .garage-readout h2 .n { color: var(--g-mustard); }
   .arm-seg, .hot .obj, .hot .ghost, .hot .ring, #board .note-edge, #figure .iris { transition: none; }
   .hot:hover .obj, .hot:focus-visible .obj, .hot.on .obj { transform: none; }
 }
+
+/* Gold marks the selected tool; a steady blue glow identifies the next chapter. */
+:root { --g-sequence: #296f92; --g-sequence-halo: #c0e6f2; --g-sequence-label: #d8eff5; }
+body.quarto-dark { --g-sequence: #8bd6ef; --g-sequence-halo: #438aab; --g-sequence-label: #c5eaf5; }
+.sequence-badge { display: none; }
+.hot:is(.sequence-next, .sequence-start) > .tag:not(.sequence-badge) { visibility: hidden; }
+.hot:is(.sequence-next, .sequence-start) > .sequence-badge { display: block; }
+.hot:is(.sequence-next, .sequence-start) .sequence-badge rect {
+  fill: var(--g-sequence-label); stroke: var(--g-sequence); stroke-width: 2;
+  filter: drop-shadow(0 2px 2px rgb(20 30 35 / 25%));
+}
+.hot:is(.sequence-next, .sequence-start) .sequence-badge text {
+  fill: #183b4b; font-size: 11.5px;
+}
+.hot.sequence-next .obj {
+  filter: drop-shadow(0 0 2px var(--g-sequence-label)) drop-shadow(0 0 7px var(--g-sequence));
+}
+#scene[data-sequence-start="1"] #figure {
+  animation: sequence-start-glow 3s ease-in-out infinite;
+}
+#scene[data-active-chapter="1"] #figure {
+  filter: drop-shadow(0 0 6px var(--g-mustard-2));
+}
+@keyframes sequence-start-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px var(--g-sequence-halo)); }
+  50% { filter: drop-shadow(0 0 3px var(--g-sequence-label)) drop-shadow(0 0 9px var(--g-sequence)); }
+}
+.sequence-next-link {
+  display: inline-block; width: fit-content; font-size: .9rem;
+  font-weight: 600; color: var(--g-sequence);
+}
+.sequence-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-top: 10px; }
+#board .sequence-actions { margin-top: 2px; line-height: 1.35; }
+#board .sequence-next-link { font-size: 13px; color: #296f92; }
+.sequence-next-link[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  #scene[data-sequence-start="1"] #figure {
+    animation: none;
+    filter: drop-shadow(0 0 3px var(--g-sequence-label)) drop-shadow(0 0 7px var(--g-sequence));
+  }
+}

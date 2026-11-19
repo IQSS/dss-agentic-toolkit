@@ -1,63 +1,83 @@
 // garage.js — the landing page's garage. Hand-maintained, like index.qmd; not part of the sync.
-// Every tool in the room is a section of the map and a real link to its page. The room, the bench and
+// Every tool in the room is a section of the guide and a real link to its page. The room, the bench and
 // the tools are drawn here; the corkboard, its readout and the robot are the static SVG in index.qmd.
 // Pointer: hover previews on the corkboard, a press opens the section. Touch: the first tap pins the
 // section to the corkboard, with a link, and the second opens it.
 // Named garage.js on purpose: the shared splitter takes a console.js as the sign of a site with
 // per-chapter robots, and this site has none.
-(function () {
+// Quarto's earlier DOM-ready handler normalizes HTML links using string hrefs.
+// Build SVG links afterward: their href property is an SVGAnimatedString.
+document.addEventListener("DOMContentLoaded", function () {
   const SITE = "chapters/";
   const NS = "http://www.w3.org/2000/svg";
   const v = n => "var(--g-" + n + ")";
 
   const GROUPS = {
-    F: { name: "Foundation", long: "Foundation",                 dot: v("foundation") },
-    S: { name: "Terminal",   long: "The terminal surface",       dot: v("surface") },
-    L: { name: "Languages",  long: "Languages and documents",    dot: v("language") },
-    A: { name: "Agents",     long: "Agents and their reach",     dot: v("agents") },
-    C: { name: "Control",    long: "Control and verification",   dot: v("control") },
+    I: { name: "Part I", long: "I · Foundations", dot: v("foundation") },
+    II: { name: "Part II", long: "II · Install tools and manage project files", dot: v("language") },
+    III: { name: "Part III", long: "III · Run and reproduce research", dot: v("control") },
+    IV: { name: "Part IV", long: "IV · Connect to data and services", dot: v("surface") },
+    V: { name: "Part V", long: "V · Run and coordinate agents", dot: v("agents") },
+    VI: { name: "Part VI", long: "VI · Work from the terminal", dot: v("language") },
+    REFERENCE: { name: "Reference", long: "Reference", dot: v("surface") },
   };
 
   // ---- sections: the tool that stands for each, and what the corkboard says about it ----
+  // Stable slugs are the chapter filenames; numbers and groups follow the current manuscript.
   const CH = [
-    { n: "1",  group: "F", slug: "01-foundation", title: "Foundation", tool: "the workbench",
-      body: "Everything else sits on these two: the package manager that installs the rest of the stack, and the version control that makes an agent's work reversible." },
-    { n: "2",  group: "F", slug: "02-configuration-and-environment", title: "Configuration and Environment", tool: "the drawers and keys",
-      body: "Four tools with one job each: dotfiles, secrets, environment variables and runtime versions, in the order a fresh machine needs them." },
-    { n: "3",  group: "L", slug: "03-documentation-production", title: "Documentation Production", tool: "the pencil cup",
-      body: "Most of this work ships as documents. Quarto for anything that runs code; plain pandoc and a LaTeX template for everything else, this map included." },
-    { n: "4",  group: "S", slug: "04-terminal-emulator", title: "Terminal Emulator", tool: "the strip light",
-      body: "The surface every other tool appears through. It has to be fast and then stay out of the way; the picks differ on the small conveniences." },
-    { n: "5",  group: "S", slug: "05-shell-framework-and-prompt", title: "Shell, Framework, and Prompt", tool: "the hammer",
-      body: "The plainest tool on the board and the one in your hand all day: the shell, the framework that loads its plugins, and the prompt." },
-    { n: "6",  group: "S", slug: "06-session-persistence-and-pane-management", title: "Session Persistence and Pane Management", tool: "the vise",
-      body: "Holds the work while you walk away. A multiplexer keeps the shell alive when the terminal closes, and splits one window into panes for several agents." },
-    { n: "7",  group: "S", slug: "07-long-running-jobs", title: "Long-Running Jobs", tool: "the clock",
-      body: "A model fit that outlives the shell that started it: why jobs die when an agent's session resets, and the job queue that stops it." },
-    { n: "8",  group: "L", slug: "08-programming-languages", title: "Programming Languages", tool: "the wrench set",
-      body: "Three sizes of the same tool. Python, R and Julia, each as a whole stack: the interpreter, its version manager, its environments and its packages." },
-    { n: "9",  group: "L", slug: "09-ide-and-ide-side-agent", title: "IDE and IDE-Side Agent", tool: "the toolbox",
-      body: "Everything in one box. The editor worth opening for a long read-and-write session, and the agent that runs inside it with your open files in view." },
-    { n: "10", group: "A", slug: "10-cli-agentic-coding-tools", title: "CLI Agentic Coding Tools", tool: "the power drill",
-      body: "The one tool here that works under its own power, and the core of the stack: an agent in the terminal that reads files, edits them and runs commands." },
-    { n: "11", group: "A", slug: "11-browser-and-computer-use", title: "Browser and Computer-Use", tool: "the window",
-      body: "Where local work meets the outside: looking things up, fetching public data, checking a rendered report. Three layers that are easy to conflate." },
-    { n: "12", group: "A", slug: "12-integration-and-memory", title: "Integration and Memory", tool: "the power strip and jars",
-      body: "What the agent plugs into and what it keeps. MCP reaches out to tools and data, ACP lets an editor reach the agent, and memory carries across sessions." },
-    { n: "13", group: "C", slug: "13-permissions-and-sandboxing", title: "Permissions and Sandboxing", tool: "the locked cabinet",
-      body: "What can the agent touch if it goes wrong? Deny rules, approval prompts, a kernel sandbox and a container, each adding a guarantee the last one lacks." },
-    { n: "14", group: "C", slug: "14-agent-telemetry", title: "Agent Telemetry", tool: "the multimeter",
-      body: "What did the agent do, and what did it cost? Two questions and two sets of tools, split by vendor because the tooling differs." },
-    { n: "15", group: "C", slug: "15-reproducible-pipelines-and-human-qa", title: "Reproducible Pipelines and Human QA", tool: "the level and square",
-      body: "The check that the work is true. The agent helps build the pipeline; the pipeline then runs without it, so you can re-run, audit and ship." },
-    { n: "16", group: "A", slug: "16-multi-agent-orchestration", title: "Multi-Agent Orchestration", tool: "the charging dock",
-      body: "Several at once, each in its own slot: a working tree, a pane and a branch per agent, so parallel work does not collide." },
-    { n: "17", group: "C", slug: "17-task-management", title: "Task Management", tool: "the clipboard",
-      body: "Two lists that are easy to confuse: the task manager I drive day to day, and the task file written for the agent to work through." },
-    { n: "18", group: "A", slug: "18-personal-ai-assistant", title: "Personal AI Assistant", tool: "the radio",
-      body: "The agent behind your messaging: it schedules, replies, watches and pings. It is built to reach into live accounts, so the security story is different." },
+    { n: "1", group: "I", slug: "choose-tools", title: "Choose tools for a research need", tool: "the robot",
+      body: "Ask an agent to install and use tools for a specific research need. Choose the capability you need, then follow its chapter independently." },
+    { n: "2", group: "I", slug: "tool-access", title: "Control what added tools can access", tool: "the locked cabinet",
+      body: "Decide which files, commands, accounts, and network destinations the task needs. Have the agent configure and check access for each execution route." },
+    { n: "3", group: "II", slug: "adding-tools", title: "Install and manage tools with Homebrew", tool: "the workbench",
+      body: "Homebrew installs and manages tools and their supporting software. Ask the agent to use the established package manager and record new tools." },
+    { n: "4", group: "II", slug: "version-control", title: "Recover earlier work: git and gh", tool: "the tape measure",
+      body: "Have the agent maintain meaningful checkpoints and recover earlier work without discarding unrelated changes. Add sharing when the project needs it." },
+    { n: "5", group: "II", slug: "finding-files", title: "Find and inspect project files", tool: "the hammer",
+      body: "Use modern search and structured-data tools to locate evidence efficiently. The agent reports relevant files and values without loading the whole project." },
+    { n: "6", group: "III", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
+      body: "Record the language version separately from project packages. Have the agent restore both and check the working analysis." },
+    { n: "7", group: "III", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
+      body: "Give modular research steps dependable names. Just saves commands; a smoke test checks the actual workflow before a large batch." },
+    { n: "8", group: "III", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
+      body: "Combine named just commands with targets or Snakemake. The pipeline tracks dependencies and reruns affected steps while reusing current results." },
+    { n: "9", group: "III", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
+      body: "Submit prepared jobs and let pueue start the next one automatically when capacity is available. Have the agent report outputs and failures." },
+    { n: "11", group: "III", slug: "research-documents", title: "Generate documents from research outputs: Quarto and Pandoc", tool: "the pencil cup",
+      body: "Build maintained text and saved results into Markdown, Word, PDF, or HTML. Have the agent set up the renderer and check the produced document." },
+    { n: "10", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
+      body: "Package system software, restrict task access, or run a local model with selected tools. Configure each container for its specific research purpose." },
+    { n: "12", group: "IV", slug: "credentials", title: "Keep credentials out of research files: 1Password and direnv", tool: "the drawers and keys",
+      body: "Give approved commands the credentials they need. Keep passwords and API keys out of code and conversations." },
+    { n: "13", group: "IV", slug: "service-connections", title: "Connect to research data and services: MCP", tool: "the power strip and jars",
+      body: "Connect the agent to useful application operations. A literature-library example explains when MCP adds value alongside files, commands, and APIs." },
+    { n: "14", group: "IV", slug: "browser-work", title: "Inspect and interact with a browser", tool: "the window",
+      body: "Have the agent inspect and test a website as it builds it, or navigate a source to collect research data. Preserve recurring collection as a saved workflow." },
+    { n: "15", group: "V", slug: "parallel-work", title: "Divide work between agents: shared projects and git worktrees", tool: "the charging dock",
+      body: "Divide tasks between agents with clear file ownership. Use a shared project or separate git worktrees according to the work and coordinate combined results." },
+    { n: "16", group: "V", slug: "headless-agents", title: "Run agents from saved prompts", tool: "the vise",
+      body: "Launch saved agent prompts from an app or script. Record each case and output, smoke-test the workflow, and configure context deliberately." },
+    { n: "17", group: "V", slug: "local-models", title: "Run and adapt an LLM on your own hardware", tool: "the desk lamp",
+      body: "Run a trained model on your computer and connect it to an agent. Keep setup checks separate from research quality and data-access decisions." },
+    { n: "E", group: "REFERENCE", slug: "terminal-history", title: "Terminal vocabulary", tool: "the light switch",
+      body: "Learn why terminal, shell, TTY, and related names persist. The history explains the interface without requiring a shell-programming tutorial." },
+    { n: "18", group: "VI", slug: "terminal-agents", title: "Use an agent from the terminal: Claude Code", tool: "the radio",
+      body: "Open the project, start Claude, and give research prompts. Run saved just workflows directly when useful; shell commands and agent prompts are different inputs." },
+    { n: "A", group: "REFERENCE", slug: "working-environment", title: "Tools for customizing your terminal", tool: "the strip light",
+      body: "Choose a terminal emulator, shell, plugins, prompt theme and multiplexer. Have the agent configure and check a setup suited to your projects." },
+    { n: "B", group: "REFERENCE", slug: "shared-settings", title: "Maintain personal settings: chezmoi", tool: "the parts organizer",
+      body: "Preserve accumulated instructions and tested settings from scattered files. Have the agent maintain a recoverable copy and transfer it to another computer." },
+    { n: "C", group: "REFERENCE", slug: "prompt-bank", title: "Prompt bank", tool: "the multimeter",
+      body: "Find the guide's example prompts collected by task. Adapt one to your project, return to its explanation, or download the complete collection." },
+    { n: "D", group: "REFERENCE", slug: "troubleshooting", title: "Troubleshooting", tool: "the level and square",
+      body: "Diagnose the observed R-on-macOS execution problem and the recorded PDF table error. Check the actual process, output, and build log." },
   ];
+  const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
+  // Reading order is independent of the SVG painting order.
+  const sequence = [...CH].sort((a, b) => a.n.localeCompare(b.n, "en", { numeric: true }));
+  const nextChapter = ch => sequence[sequence.indexOf(ch) + 1];
+  const fullLabel = n => /^[A-Z]$/.test(n) ? "Appendix " + n : "Chapter " + n;
 
   // ---- svg helpers ----
   const el = (name, attrs, parent) => {
@@ -347,6 +367,62 @@
       E(t, 0, -30, 17, 3.4, v("metal"));
       E(t, 0, 0, 13, 2.4, v("metal-2"), { opacity: 0.5 });
     },
+    tape(g) {                                   // §6: every change can be reeled back in
+      const t = G(g, 322, 446);
+      R(t, 16, -10, 66, 6, v("mustard-2"));
+      for (let i = 0; i < 9; i++) R(t, 24 + i * 6.5, -10, 1, i % 2 ? 2.5 : 4, v("dark"), D);
+      R(t, 81, -13, 3, 11, v("metal-3"));
+      R(t, -20, -38, 42, 38, v("mustard"), { rx: 8 });
+      R(t, -20, -38, 42, 8, v("mustard-2"), { rx: 5, opacity: 0.75 });
+      C(t, 1, -18, 12, v("dark"), D); C(t, 1, -18, 4.5, v("metal"), D);
+      R(t, -24, -30, 5, 16, v("metal-3"), { rx: 2 });
+    },
+    screwdrivers(g) {                           // §23: the shell, the everyday hand tools of Part V
+      R(g, 336, 290, 108, 6, v("wood-dk"), { rx: 2 });
+      [["red", 24], ["blue", 19], ["mustard", 27], ["teal", 17]].forEach(([c, len], i) => {
+        const x = 351 + i * 26;
+        R(g, x - 6, 296, 12, 23, v(c), { rx: 4 });
+        R(g, x - 6, 303, 12, 2, v("dark"), Object.assign({ opacity: 0.35 }, D)); R(g, x - 6, 309, 12, 2, v("dark"), Object.assign({ opacity: 0.35 }, D));
+        R(g, x - 3, 319, 6, 4, v("metal-3"));
+        R(g, x - 1.6, 323, 3.2, len, v("steel"));
+        P(g, "M" + (x - 2.4) + " " + (323 + len) + " h4.8 l-1.2 4 h-2.4z", v("metal-2"));
+      });
+    },
+    gears(g) {                                  // §11: only the wheels that need to turn, turn
+      R(g, 360, 502, 110, 66, v("metal-3"), { rx: 5, opacity: 0.55 });
+      const gear = (cx, cy, r, n, fill, rot) => {
+        const t = el("g", { transform: "translate(" + cx + "," + cy + ") rotate(" + rot + ")" }, g);
+        for (let i = 0; i < n; i++) R(t, -2.6, -r - 5, 5.2, 7, fill, { transform: "rotate(" + (i * 360 / n) + ")" });
+        C(t, 0, 0, r, fill); C(t, 0, 0, r * 0.62, v("metal-3"), D); C(t, 0, 0, r * 0.24, v("steel"), D);
+        for (let i = 0; i < 3; i++) R(t, -1.4, -r * 0.62, 2.8, r * 0.62, fill, Object.assign({ transform: "rotate(" + (i * 120) + ")" }, D));
+      };
+      gear(392, 536, 20, 12, v("mustard"), 0);
+      gear(427, 521, 13, 8, v("metal"), 11);
+      gear(449, 545, 10, 7, v("red"), 4);
+    },
+    organizer(g) {                              // §19: many small drawers, each a setting that lives somewhere else
+      const x = 352, y = 592, w = 112, h = 50;
+      box(g, x, y, w, h, 0.06, v("metal-2"), v("metal-3"), v("metal"));
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
+        const dx = x + 4 + c * 26.5, dy = y + 4 + r * 15;
+        R(g, dx, dy, 24, 12.5, v("blue-lt"), { rx: 1.5 });
+        R(g, dx + 7, dy + 3, 10, 4, v("cream"), { rx: 1 });
+      }
+    },
+    lamp(g) {                                   // §25: for close reading
+      R(g, 740, 439, 34, 8, v("dark"), { rx: 3 });
+      S(g, "M757 439 L746 394 L783 366", v("metal-2"), 5);
+      C(g, 746, 394, 4.5, v("metal-3")); C(g, 757, 439, 4, v("metal-3"));
+      C(g, 790, 362, 16, v("sky"), { opacity: 0.55 });
+      C(g, 790, 362, 16, "none", { stroke: v("metal-3"), "stroke-width": 5 });
+      S(g, "M781 356 q5 -7 13 -6", "#fff", 2, Object.assign({ opacity: 0.7 }, D));
+    },
+    lightswitch(g) {                            // §20: a way in, not a tool
+      R(g, 244, 104, 24, 38, v("cream"), { rx: 3, stroke: v("metal"), "stroke-width": 1.5 });
+      R(g, 252, 114, 8, 18, v("metal-2"), { rx: 2 });
+      R(g, 252, 114, 8, 9, v("steel"), { rx: 2 });
+      C(g, 256, 109, 1.3, v("metal-3")); C(g, 256, 137, 1.3, v("metal-3"));
+    },
     toolbox(g) {
       const x = 800, y = 396, w = 104, h = 54, t = 0.07, lid = 19;
       box(g, x, y + lid, w, h - lid, t, v("red-dk"), "#6f2f25", v("red-dk"), false);
@@ -372,7 +448,7 @@
     // A section opens in a new tab: this page is the way into the map and stays put, the same rule the
     // companion site's console follows.
     const a = el("a", { href: SITE + ch.slug + ".html", class: "hot" + (o.heavy ? " heavy" : ""), "data-n": n, tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, layer);
-    el("title", {}, a).textContent = "§" + n + " " + ch.title;
+    el("title", {}, a).textContent = chapterLabel(n) + " " + ch.title;
     if (o.ghost) draw(el("g", { class: "ghost" }, a));
     const obj = el("g", { class: "obj" }, a);
     draw(obj);
@@ -381,10 +457,11 @@
     a.insertBefore(el("rect", Object.assign({ class: "hit" }, frame)), a.firstChild);
     el("rect", Object.assign({ class: "ring" }, frame), a);
     const tg = el("g", { class: "tag", transform: "translate(" + o.tag[0] + "," + o.tag[1] + ")" }, a);
-    const wd = n.length > 1 ? 42 : 35;
+    // The tag carries the section number only; Part membership is the legend's and the readout's job
+    // (the per-tag colour dot was dropped 2026-09-27 as too small to read against the wall).
+    const wd = n.length > 1 ? 34 : 28;
     R(tg, -wd / 2, -8.5, wd, 17, "none", { rx: 4 });
-    C(tg, -wd / 2 + 8, 0, 3.2, GROUPS[ch.group].dot);
-    const tx = el("text", { x: 4, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = "§" + n;
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = n === "0" ? "Start" : n;
     return a;
   }
 
@@ -402,21 +479,23 @@
   }
 
   const wall = document.getElementById("wall"), benchL = document.getElementById("bench");
-  tool(wall, "11", DRAW.window, { heavy: true, tag: [222, 170] });
+  tool(wall, "14", DRAW.window, { heavy: true, tag: [222, 170] });
+  tool(wall, "E", DRAW.lightswitch, { heavy: true, tag: [256, 90] });
   shelf(wall, 46, 250, 214);
-  tool(wall, "12", DRAW.jars, { tag: [226, 222] });
+  tool(wall, "13", DRAW.jars, { tag: [226, 222] });
   shelf(wall, 46, 350, 214);
   tool(wall, "18", DRAW.radio, { tag: [100, 376] });
-  tool(wall, "16", DRAW.dock, { tag: [200, 376] });
+  tool(wall, "15", DRAW.dock, { tag: [200, 376] });
   pegboard(wall, 285, 92, 470, 262);
-  tool(wall, "4", DRAW.striplight, { heavy: true, tag: [704, 56] });
-  tool(wall, "8", DRAW.wrenches, { ghost: true, tag: [366, 284] });
+  tool(wall, "A", DRAW.striplight, { heavy: true, tag: [704, 56] });
+  tool(wall, "6", DRAW.wrenches, { ghost: true, tag: [440, 252] });
+  tool(wall, "A", DRAW.screwdrivers, { ghost: true, tag: [312, 318] });
   tool(wall, "5", DRAW.hammer, { ghost: true, tag: [512, 262] });
-  tool(wall, "10", DRAW.drill, { ghost: true, tag: [652, 232] });
-  tool(wall, "14", DRAW.meter, { ghost: true, tag: [722, 112] });
-  tool(wall, "15", DRAW.level, { ghost: true, tag: [600, 340] });
-  tool(wall, "7", DRAW.clock, { ghost: true, tag: [806, 174] });
-  tool(wall, "17", DRAW.clipboard, { ghost: true, tag: [806, 322] });
+  tool(wall, "7", DRAW.drill, { ghost: true, tag: [652, 232] });
+  tool(wall, "C", DRAW.meter, { ghost: true, tag: [722, 112] });
+  tool(wall, "D", DRAW.level, { ghost: true, tag: [600, 340] });
+  tool(wall, "9", DRAW.clock, { ghost: true, tag: [806, 174] });
+  tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [806, 322] });
   cone(wall);
 
   // the bench: back legs and recess, the bench itself, what stands under it, the front legs, what stands on it
@@ -425,18 +504,35 @@
     const under = el("g", {}, benchL);
     R(under, xfl + 20, yf + apron, xfr - xfl - 40, FLOOR - yf - apron, v("recess"));
     for (const fx of [xfl + 8, xfr - 8]) { const b = back(fx, front, t); R(under, b[0] - 7, back(fx, yf, t)[1] + 14, 14, b[1] - back(fx, yf, t)[1] - 14, v("wood-dk"), { opacity: 0.85 }); }
-    tool(benchL, "1", DRAW.bench, { heavy: true, tag: [515, 480] });
-    tool(benchL, "2", DRAW.drawers, { heavy: true, tag: [145, 493] });
-    tool(benchL, "13", DRAW.cabinet, { heavy: true, tag: [825, 493] });
+    tool(benchL, "3", DRAW.bench, { heavy: true, tag: [515, 480] });
+    tool(benchL, "12", DRAW.drawers, { heavy: true, tag: [145, 493] });
+    tool(benchL, "2", DRAW.cabinet, { heavy: true, tag: [825, 493] });
+    tool(benchL, "8", DRAW.gears, { tag: [492, 536] });
+    tool(benchL, "B", DRAW.organizer, { heavy: true, tag: [408, 654] });
     // the stool is furniture
-    const st = G(benchL, 520, 650, 1.1);
+    const st = G(benchL, 560, 650, 1.1);
     S(st, "M-20 -62 L-30 0 M20 -62 L30 0 M-25 -24 H25", v("wood-dk"), 5);
     S(st, "M-8 -62 L-11 -8 M8 -62 L11 -8", v("wood-dk"), 4, { opacity: 0.55 });
     R(st, -32, -70, 64, 11, v("red-dk"), { rx: 4 }); E(st, 0, -70, 32, 6, v("red"));
     for (const x of [xfl + 8, xfr - 28]) box(benchL, x, yf + apron, 20, front - yf - apron, 0.035, v("wood"), v("wood-dk"), v("wood"), false);
-    tool(benchL, "6", DRAW.vise, { tag: [222, 442] });
-    tool(benchL, "3", DRAW.pencils, { tag: [510, 442] });
-    tool(benchL, "9", DRAW.toolbox, { tag: [938, 442] });
+    tool(benchL, "16", DRAW.vise, { tag: [222, 442] });
+    tool(benchL, "4", DRAW.tape, { tag: [322, 396] });
+    tool(benchL, "17", DRAW.lamp, { tag: [722, 430] });
+    tool(benchL, "11", DRAW.pencils, { tag: [510, 442] });
+    tool(benchL, "10", DRAW.toolbox, { tag: [938, 442] });
+  })();
+
+  // The robot is §1: the agent itself. It stands in front of everything, so its link is the last thing drawn.
+  (function () {
+    const ch = byN("1"), svg = document.getElementById("scene");
+    const a = el("a", { href: SITE + ch.slug + ".html", class: "hot heavy", "data-n": "1", tabindex: "0", role: "link", target: "_blank", rel: "noopener" }, svg);
+    el("title", {}, a).textContent = chapterLabel(ch.n) + " · " + ch.title;
+    const frame = { x: 1040, y: 366, width: 136, height: 312, rx: 10 };
+    el("rect", Object.assign({ class: "hit" }, frame), a);
+    el("rect", Object.assign({ class: "ring" }, frame), a);
+    const tg = el("g", { class: "tag", transform: "translate(1150,560)" }, a);
+    R(tg, -14, -8.5, 28, 17, "none", { rx: 4 });
+    const tx = el("text", { x: 0, y: 3.8, "text-anchor": "middle" }, tg); tx.textContent = ch.n;
   })();
 
   const lg = document.getElementById("legend");
@@ -482,42 +578,84 @@
   const roIntro = document.getElementById("ro-intro"), roChapter = document.getElementById("ro-chapter"), roHow = document.getElementById("ro-how");
   const roPart = document.getElementById("ro-part"), roTitle = document.getElementById("ro-title"),
         roBody = document.getElementById("ro-body"), roLink = document.getElementById("ro-link"), roHint = document.getElementById("ro-hint");
-  let pinned = null;
-  function show(ch, preview) {
+  const sceneSvg = document.getElementById("scene");
+  const hotLinks = [...document.querySelectorAll(".hot")];
+  const primaryTools = new Map(sequence.map(ch => [ch.n, hotLinks.find(a => a.dataset.n === ch.n)]));
+  // Two chapters have more than one illustration: cue a single main object.
+  primaryTools.set("3", benchL.querySelector('.hot[data-n="3"]'));
+  const cueBadges = new Map();
+  for (const [n, a] of primaryTools) {
+    const tag = a.querySelector(".tag");
+    // The wider Chapter 6 cue needs clearance from the neighboring hammer.
+    const badgeTransform = tag.getAttribute("transform") + (n === "6" ? " translate(-60 0)" : "");
+    const badge = el("g", { class: "tag sequence-badge", transform: badgeTransform, "aria-hidden": "true" }, a);
+    R(badge, -43, -11, 86, 22, "none", { rx: 6 });
+    const label = el("text", { x: 0, y: 4, "text-anchor": "middle" }, badge);
+    cueBadges.set(n, label);
+  }
+  const roNext = document.createElement("a");
+  roNext.className = "sequence-next-link";
+  roNext.target = "_blank"; roNext.rel = "noopener";
+  const roActions = document.createElement("div");
+  roActions.className = "sequence-actions";
+  roActions.append(roLink, roNext);
+  roChapter.insertBefore(roActions, roHint);
+  function cueSequence(ch) {
+    hotLinks.forEach(a => a.classList.remove("sequence-next", "sequence-start"));
+    const next = ch ? nextChapter(ch) : byN("1");
+    sceneSvg.dataset.sequenceStart = ch ? "0" : "1";
+    sceneSvg.dataset.activeChapter = ch ? ch.n : "";
+    if (next) {
+      primaryTools.get(next.n).classList.add(ch ? "sequence-next" : "sequence-start");
+      cueBadges.get(next.n).textContent = (ch ? "Next" : "Start") + " · " + next.n;
+    }
+    roNext.hidden = !ch || !next;
+    if (ch && next) {
+      roNext.textContent = "Next: " + fullLabel(next.n) + " →";
+      roNext.href = SITE + next.slug + ".html";
+      roNext.title = fullLabel(next.n) + ": " + next.title;
+      roNext.setAttribute("aria-label", "Next: " + fullLabel(next.n) + ": " + next.title);
+    }
+  }
+  let pinned = null, explored = null, selectedTool = null;
+  function show(ch, preview, toolLink) {
+    explored = ch;
+    selectedTool = toolLink || selectedTool || primaryTools.get(ch.n);
     pose("point");
     roIntro.hidden = true; roChapter.hidden = false;
     ro.style.setProperty("--dot", GROUPS[ch.group].dot);
     ro.dataset.preview = preview ? "1" : "0";
     roPart.textContent = GROUPS[ch.group].name + " · " + ch.tool;
-    roTitle.innerHTML = '<span class="n">§' + ch.n + "</span>" + ch.title;
+    roTitle.innerHTML = '<span class="n">' + chapterLabel(ch.n) + "</span>" + ch.title;
     roBody.textContent = ch.body;
-    roLink.href = SITE + ch.slug + ".html"; roLink.textContent = "Open §" + ch.n + " →"; roLink.hidden = preview;
+    roLink.href = SITE + ch.slug + ".html"; roLink.textContent = "Open " + chapterLabel(ch.n) + " →"; roLink.hidden = preview;
     roHint.textContent = preview ? "" : "Tap the tool again to open the section, or use the link.";
     roHint.hidden = preview;
     document.querySelectorAll(".hot.on").forEach(a => a.classList.remove("on"));
-    const keep = pinned || (!preview ? ch : null);
-    if (keep) { const k = document.querySelector('.hot[data-n="' + keep.n + '"]'); if (k) k.classList.add("on"); }
+    selectedTool.classList.add("on");
+    cueSequence(ch);
   }
   function restore() {
-    if (pinned) { show(pinned, false); return; }
+    // Keep the destination visible while crossing the space between tools.
+    if (explored) { show(explored, !pinned || pinned.n !== explored.n); return; }
     pose("rest");
     ro.dataset.preview = "0"; ro.style.setProperty("--dot", v("mustard"));
     roChapter.hidden = true; roIntro.hidden = false;
   }
   const find = a => byN(a.dataset.n);
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (!fine) roHow.textContent = "Tap one to see what it covers, and tap it again to open that section.";
+  if (!fine) roHow.textContent = "Tap one to see what it covers, and tap it again to open that chapter.";
   document.querySelectorAll(".hot").forEach(a => {
     a.addEventListener("click", e => {
       if (fine) return;                          // pointer: hover previews, a press opens the section
       const ch = find(a);                        // touch: first tap pins the readout, second opens
       if (pinned && pinned.n === ch.n) return;
-      e.preventDefault(); pinned = ch; show(ch, false);
+      e.preventDefault(); pinned = ch; show(ch, false, a);
     });
-    a.addEventListener("focus", () => show(find(a), !pinned || pinned.n !== a.dataset.n));
+    a.addEventListener("focus", () => show(find(a), !pinned || pinned.n !== a.dataset.n, a));
     a.addEventListener("blur", restore);
     if (fine) {
-      a.addEventListener("mouseenter", () => show(find(a), !pinned || pinned.n !== a.dataset.n));
+      a.addEventListener("mouseenter", () => show(find(a), !pinned || pinned.n !== a.dataset.n, a));
       a.addEventListener("mouseleave", restore);
     }
   });
@@ -532,5 +670,10 @@
     else { home.appendChild(ro); fo.style.display = ""; noteTitle.style.display = "none"; }
   };
   narrow.addEventListener("change", placeReadout); placeReadout();
+  roHow.textContent = fine
+    ? "Hover to explore; click to open. The blue glow marks the next chapter."
+    : "Tap to explore; tap again to open. The blue glow marks the next chapter.";
+  roHow.closest(".how").querySelector("b").textContent = "Each tool opens a chapter.";
+  cueSequence(null);
   pose("rest");
-})();
+});

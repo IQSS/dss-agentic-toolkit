@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/data/restricted/**)",
+      "Edit(/data/restricted/**)",
+      "Edit(/data/raw/**)",
+      "Edit(/.claude/**)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)"
+    ],
+    "ask": ["Bash(git push*)"]
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": ["./data/restricted"],
+      "denyWrite": ["./data/restricted", "./data/raw", "./.claude"]
+    },
+    "network": {"allowedDomains": []}
+  }
+}

@@ -1,0 +1,96 @@
+---
+title: "Appendix D. Troubleshooting"
+---
+
+This appendix helps identify the next step when a tool fails or behaves unexpectedly. Use the symptom table to find the relevant explanation, then ask the agent to diagnose the problem. Tell it what you expected and what happened instead, and provide any error message it cannot already see. It should inspect the command, logs (recorded execution messages), and saved outputs before changing software or starting another copy of a job.
+
+| Symptom (links to help) | First check for the agent |
+|---|---|
+| [Command missing](#ask-the-agent-to-install-the-tool) | Whether the program is installed and this session can find it |
+| [Queued job stalled or failed](#review-results-and-recover-failures) | Recorded status, whether the program is still running, and progress in its logs or outputs |
+| [Restored environment differs](#restore-and-check-it) | Actual software versions against recorded versions |
+| [Unexpected pipeline reruns](#check-what-reruns) | The saved dependencies and which input or code files changed |
+| [Account access fails](#supply-a-credential-to-a-command) | Whether the actual command uses the intended account, without printing secrets |
+| [Connected records missing](#connect-the-literature-task) | Whether the connection can retrieve a known record and its attachment |
+| [Wrong browser session](#choose-the-browser-account) | The browser profile and signed-in account |
+| [Headless agent fails](#control-what-each-run-receives) | The account, tools, inputs, and permissions supplied when that run starts |
+| [Local LLM fails](#choose-hardware-and-a-runtime) | Memory use, input length, and the original response or error |
+| [Agent-launched `R` stalls on macOS](#r-on-macos) | Whether the process is making progress and how it was launched |
+| [Cloud-synchronized files stall](#cloud-sync-storage) | Synchronization activity and the locations of files being rewritten |
+| [PDF reports “No counter 'none' defined”](#tex-table-counter) | The exact error and the document template |
+
+## Have the agent diagnose, repair, and verify {#diagnose-repair-verify}
+
+A symptom can have several causes. For example, a queued fit that has produced no results may still be computing, may be unable to read its inputs, or may have failed before writing a file. Ask the agent to distinguish these possibilities using the running process, logs, and expected outputs. A *process* is a running instance of a program. High processor use alone does not establish whether that program is progressing or stuck.
+
+Once the cause is understood, the agent should make a targeted correction and repeat the failed operation. For a long calculation, it can first use a small representative case through the same app, queue, or other execution method. It should check the resulting files as well as the reported status, then record lasting setup changes in the project context files, or in global user instructions if they apply across projects.[^tk-troubleshooting-context-files]
+
+::: {#prompt-diagnose-problem .prompt}
+> Diagnose why [operation] produced [observed result] instead of [expected result]. Inspect the exact command, relevant logs, software setup, and outputs before changing anything. Check whether an earlier attempt is still running and making progress. Explain the likely cause and make a targeted correction, preserving existing work. Use a small representative check first if the full operation is expensive, then repeat the affected operation and inspect its output. Report what changed, what now works, and anything unresolved. Record lasting setup corrections in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records), or in [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) if they apply across projects. Ask me before changing research methods or inputs.
+:::
+
+The sections below cover particular execution and build problems encountered while developing these guides. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://dss-agentic-research.pages.dev/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
+
+## R launched by an agent on macOS {#r-on-macos}
+
+In the environment used to develop these guides, [`R`](https://www.r-project.org/) has sometimes stalled when an agent starts it without a terminal connection: the process uses a processor core but produces no output. This is an observed macOS issue, not a claim about every `R` installation or operating system. When the agent identifies this problem, a *pseudo-terminal*, a software-created terminal connection, provides a workaround that has been dependable in that environment.
+
+Have the agent put the workaround in `bin/rscript-pty`, an executable helper: a small program that launches the project's `R` commands with that connection. It changes how the analysis is started, without changing the analysis code. Ask the agent to check a small run through the method the project will actually use, including the queue if jobs will be queued. It should confirm that the expected output is produced and the process finishes before launching a long run.
+
+[Download the macOS `R` helper](resources/rscript-pty){.download-button download="rscript-pty"}
+
+<details class="guide-example">
+<summary>Helper code and additional checks for targets, workers, and Quarto</summary>
+
+Have the agent save this helper as `bin/rscript-pty`, make it executable, and use it for the project's `R` commands. Keep its standard-input handling intact.[^tk-troubleshooting-stdin]
+
+```sh
+#!/bin/sh
+command -v script >/dev/null 2>&1 || {
+  echo "No script command; cannot allocate a pseudo-terminal" >&2
+  exit 127
+}
+exec script -q /dev/null Rscript "$@" < /dev/null
+```
+
+For [`targets`](https://docs.ropensci.org/targets/), use `callr_function = NULL` and disable [`crew`](https://wlandau.github.io/crew/) for the initial check so the work stays in the process with the terminal connection. Separately launched workers need their own verification. Retain the helper for queued `R` jobs too; success with one worker or queue configuration does not establish that another will behave the same way.
+
+For [`Quarto`](https://quarto.org/) that executes `R`, the macOS workaround wraps the complete render:
+
+```text
+script -q /dev/null quarto render paper.qmd < /dev/null
+```
+
+Linux uses a different `script` interface, so this command should not be copied unchanged there. [Appendix E: Terminal vocabulary](#terminal-history) explains terminal connections and program input.
+
+</details>
+
+If the agent's sandbox prevents pseudo-terminal allocation, use an explicitly approved execution method or run the saved command from your own terminal. Do not silently turn off the restrictions. If a process stalls, have the agent identify it and inspect its progress before stopping it; launching a replacement without resolving the earlier attempt can leave both consuming resources.
+
+## Cloud-synchronized project storage {#cloud-sync-storage}
+
+An installed software environment can contain thousands of small files. Synchronizing these files while tools replace them has sometimes blocked file operations in the `Dropbox`/macOS environment used for these guides. Caches, logs, and version-history files can create similar activity. A [`Git`](https://git-scm.com/) ignore rule controls what `Git` records; it does not control what `Dropbox` synchronizes.
+
+For example, a [`Python`](https://www.python.org/) project's `.venv/` directory contains installed packages, while `uv.lock` records their versions. Have the agent keep that version record and the analysis source with the project, but place the installed environment outside the synchronized folder if syncing it causes problems. The agent must configure the project commands to use the new location and check that the analysis still runs. [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains the files needed to recreate the software.
+
+To prevent unnecessary synchronization, the agent can place large rebuildable environments and caches outside cloud storage from the start. If it instead uses the storage provider's exclusion setting, it should configure and verify that setting on an empty directory before filling it. [`Dropbox` documents different mechanisms](https://help.dropbox.com/sync/ignored-files) for different platforms, so the agent must check the one in use.
+
+For an already populated or stalled directory, ask the agent to preserve the work and diagnose the synchronization state before changing exclusions. Adding an exclusion after a service has indexed thousands of files can itself trigger further synchronization work. The recovery used for these guides was to recreate the installed environment outside cloud storage from the recorded dependencies, then update the project to use it. Source files, uncommitted edits, and `Git` history need preservation; a repository is not a disposable software environment.
+
+After a repair, have the agent rerun the affected project command and record the new locations in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). It should explain which files remain in the normal backup arrangement and how the excluded software can be recreated.
+
+## PDF reports “No counter 'none' defined” {#tex-table-counter}
+
+A PDF build in these guides encountered “No counter 'none' defined” for a table without a caption. [`Pandoc`](https://pandoc.org/) emitted a table setting that the installed [`LaTeX`](https://www.latex-project.org/) packages expected to name an existing counter. For that specific error, have the agent add this guarded definition in the template's *preamble*, the setup section before the document content begins:
+
+```tex
+\makeatletter
+\@ifundefined{c@none}{\newcounter{none}}{}
+\makeatother
+```
+
+The guard preserves a counter if it already exists. Have the agent rebuild the document and inspect the affected table. A different error may need a missing font, package, or source correction; this block is not a general repair for failed PDF builds.
+
+[^tk-troubleshooting-context-files]: See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
+
+[^tk-troubleshooting-stdin]: Standard input is the input channel a program reads. The helper redirects it from `/dev/null`, which supplies no input. Retain that redirection as part of this observed workaround.

@@ -1,0 +1,39 @@
+---
+title: "3. Install and manage tools with Homebrew"
+---
+
+The agent may need a program that is not yet installed. A package manager installs the program and its supporting software, and provides a consistent way to update or remove it.
+
+[`Homebrew`](https://brew.sh/) supplies many of the tools in this guide. For example, [`pueue`](https://github.com/Nukesor/pueue) is a tool that manages a job queue, starting waiting simulation runs as others finish. The agent checks whether it is installed on the computer that will run the simulations, installs it if needed, and configures the queue for the project.[^tk-homebrew-artwork]
+
+![](figures/tool-installation.svg){#fig-tool-installation fig-alt="An agent checks for pueue on the computer where work will run. If missing, Homebrew installs it and its dependencies; an existing installation can be reused. The agent then confirms the program is found, records its version and checks that a task runs from the session. Institutional installation methods take precedence where appropriate."}
+
+## Ask the agent to install the tool
+
+Describe the task to the agent and name the tool if you have one in mind. Otherwise, ask it to recommend a suitable tool or consult [Chapter 1: Choose tools for a research need](#choose-tools).
+
+`Homebrew` is the package manager we recommend in this guide. It works on macOS and Linux, including Windows through [`Windows Subsystem for Linux` (`WSL2`)](https://learn.microsoft.com/windows/wsl/install). Before adding software, have the agent check what is already installed. On a computing cluster or another institution-managed system, it should also check for established installation methods and use those where appropriate. Otherwise, ask it to install `Homebrew` if needed, explaining any steps you must complete yourself.
+
+::: {#prompt-install-tools .prompt}
+> Set up a job queue for this project's simulations, using `pueue` unless a suitable tool is already available. Check existing installations and how software is managed on the computer that will run the jobs. Use `Homebrew` unless an established institutional method is more appropriate, particularly on a computing cluster. Install `Homebrew` if needed, and explain any steps I must complete myself. Configure the queue and confirm that you can submit and monitor jobs from this session.
+:::
+
+The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords only when prompted by the installer or system, not in the conversation.
+
+The agent can install `Homebrew` using its [official installation script](https://brew.sh/). If a step needs your input, such as an administrator password, it should explain exactly what to do in the [`Claude`](https://claude.com/download) app's built-in terminal[^tk-install-terminal] or the relevant system dialog.
+
+After setup, ask the agent to confirm that it can use the tool for the project and tell you which version is installed. If it cannot find a program that is already installed, have it investigate why before installing another copy.
+
+## Keep a record of installed tools
+
+A [`Brewfile`](https://docs.brew.sh/Brew-Bundle-and-Brewfile) lists software to install with `Homebrew`, helping the agent set up the same tools on another computer. Your global `TOOLCHAIN.md`[^tk-install-toolchain] records what each tool does and when the agent should use it. Ask the agent to maintain both as tools are added, removed, or changed.
+
+The exact language and package versions used by an analysis need their own records; [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains these.
+
+Before updating software used by an analysis, ask the agent to explain the proposed change and preserve the software versions needed to rerun that analysis.
+
+[^tk-homebrew-artwork]: The illustration uses the official `Homebrew` logo, by Homebrew contributors, distributed under BSD-2-Clause. The guide includes its [complete license notice](resources/artwork-licenses/homebrew.txt) and [credits for the software logos](resources/artwork-licenses/README.md).
+
+[^tk-install-terminal]: A terminal is a panel where you can enter commands and see their output. See [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents).
+
+[^tk-install-toolchain]: See [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.

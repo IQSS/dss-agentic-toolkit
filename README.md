@@ -1,33 +1,27 @@
-# dss-agentic-toolkit
+# Extending Your Agent’s Toolkit
 
-An opinionated map of the tools that compose an agentic-AI working surface, organized by function.
+The website is generated from the canonical manuscript in `workspace/publishing/agentic-ai-toolkit/`, which also builds the PDF. Edit prose and figures upstream; regenerate the chapter copies here. Explicit chapter ids keep addresses stable when titles or order change.
 
-The prose is generated from a single markdown source that also produces the PDF, so the two never
-diverge. The source lives in a separate repository; the chapters here are build products, committed so
-that a clone builds without it.
+## Local reading draft
 
-## Build
+The November 17, 2026 reading draft has 18 chapters in six parts and five appendices, including a bank of 27 prompts with a single Markdown download. All 22 approved diagrams have light and dark variants. The local render has 28 pages, including the landing page, 404 page, and three compatibility redirects. Source and link checks pass. The source lock records the matching committed manuscript. The landing workshop now guides readers through the chapter order: Chapter 1 pulses initially, the selected tool glows gold, and a steady blue glow identifies the next chapter.
+
+## Build and check
 
 ```sh
-quarto preview   # or quarto render; needs Quarto 1.9+
+just sync       # refresh from the committed upstream manuscript
+just check      # render and validate sources, figures, links, and navigation
+just preview    # serve locally
 ```
 
-Nothing executes, so a render needs only Quarto. The look is the `dss-theme` extension, vendored in
-`_extensions/` (`quarto update IQSS/dss-theme` takes a newer version). CI
-(`.github/workflows/publish.yml`) renders on every push to `main` and publishes to `gh-pages`.
+Quarto renders prebuilt prose and SVG figures without executing research code. The vendored DSS theme supplies the site treatment. On this Dropbox checkout, `_site` points to an external render cache. `just watch` supports authoring against uncommitted upstream changes.
 
-## Layout
+Chapter pages, sidebar/maps, figure palettes, and shared checks are generated through `dss-training-ops/scripts/split-chapters.py`. The landing illustration and its garage.js controls are maintained here. Figures can be enlarged and have both light and dark variants.
 
-One `.qmd` per chapter in `chapters/`, with the order set by the sidebar in `_quarto.yml`; figures as SVG
-in `figures/`. On a Dropbox-synced checkout, `_site` is a symlink outside Dropbox.
-
-## Status
-
-A private working repository, not yet published anywhere. Publishing will come from Cloudflare Pages
-building from this repository; a move to IQSS and the DSS training index waits on iteration over the
-materials themselves.
+Publication uses the existing Cloudflare Pages direct-upload recipe, `just deploy`, after its validation gates. It is separate from the editorial build and from CI checks. This revision has not been deployed; hosting and final public addresses remain release-stage work.
 
 ## License
+
 
 Code is MIT, see `LICENSE`: the scripts, the Lua filters, the site configuration, and the landing
 page's JavaScript and CSS. The guide's text and figures are CC BY 4.0, see `LICENSE-content`. The code

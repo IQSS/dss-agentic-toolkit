@@ -24,12 +24,8 @@ What it does, and why each one is a silent failure without it:
   6. Marks up the tool-chain's function matrix so CSS can shade it, replacing what the LaTeX-only
      matrix-shade.lua does for print.
 
-Section references get the one rule that is easy to get backwards: a reference inside a footnote is
-SKIPPED. In both documents a footnote's section reference cites the *other* document -- the guide
-footnotes the tool-chain map, never itself -- so linking it would send the reader to the wrong chapter
-of the wrong book. Verified on the current sources: with comments stripped, every body reference in
-the guide is unlettered and internal (§1–§18), while its footnotes are the only place lettered
-references appear (§15a, §17b), and those are the map's.
+Automatic § references inside footnotes are left alone because they may cite the companion guide.
+Explicit Markdown links still resolve through this site's anchor map, including in footnotes.
 ]]
 
 local chapters = {}   -- "13"       -> /chapters/13-permissions-and-sandboxing.qmd
@@ -118,13 +114,104 @@ local function link_sections(str)
   return out, false
 end
 
+local function html_escape(value)
+  return value:gsub("&", "&amp;"):gsub('"', "&quot;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+end
+
+-- Opt-in chapter maps keep their hit areas beside the drawing geometry in SVG metadata.
+-- Native HTML links work without JavaScript; the image retains normal theme switching.
+local function chapter_map(img)
+  if not img.classes:includes("chapter-map") then return nil end
+  local root = (quarto and quarto.project and quarto.project.directory) or "."
+  local file = assert(io.open(root .. img.src, "r"), "Cannot read chapter-map SVG: " .. img.src)
+  local svg = file:read("*a")
+  file:close()
+  local metadata = assert(svg:match('<metadata id="chapter%-links">(.-)</metadata>'),
+                          "Chapter-map SVG has no link coordinates: " .. img.src)
+  local map = pandoc.json.decode(metadata)
+  img.classes:insert("nolightbox")
+  if img.attributes["fig-alt"] then
+    img.caption = {pandoc.Str(img.attributes["fig-alt"])}
+  end
+  local image_html = pandoc.write(pandoc.Pandoc({pandoc.Plain({img})}), "html")
+  local out = {'<span class="chapter-map-frame" role="group" aria-label="Research chapters">', image_html}
+  for _, link in ipairs(map.links) do
+    local target = anchors[link.anchor]
+    -- The anchor map can omit a chapter id already represented by the chapter map.
+    for _, chapter_path in pairs(chapters) do
+      if chapter_path:match("/([^/]+)%.qmd$") == link.anchor then target = chapter_path end
+    end
+    assert(target, "Unknown chapter-map anchor: " .. link.anchor)
+    target = target:gsub("%.qmd", ".html")
+    local style = string.format("left:%.5f%%;top:%.5f%%;width:%.5f%%;height:%.5f%%;",
+      100 * link.x / map.width, 100 * link.y / map.height,
+      100 * link.w / map.width, 100 * link.h / map.height)
+    out[#out + 1] = '<a class="chapter-map-link no-external" href="' .. html_escape(target) ..
+      '" aria-label="' .. html_escape(link.label) .. '" title="' .. html_escape(link.label) ..
+      '" style="' .. style .. '"></a>'
+  end
+  out[#out + 1] = '</span>'
+  return pandoc.RawInline("html", table.concat(out))
+end
+
+local function rewrite_link(link)
+  if link.target:match("^resources/") then
+    link.target = "/" .. link.target
+    link.classes:insert("no-external")
+    return link
+  end
+  local anchor = link.target:match("^#(.+)$")
+  local target = anchor and anchors[anchor]
+  if not target then return nil end
+  -- Quarto otherwise misclassifies local preview links as external.
+  link.classes:insert("no-external")
+  if this_page and target:match("/([^/]+)%.qmd") == this_page then
+    link.target = "#" .. anchor
+  else
+    link.target = target
+  end
+  return link
+end
+
+-- Keep the familiar TeX/LaTeX lettering in prose while preserving searchable,
+-- copyable names. Commands and filenames are not whole-name matches.
+local function tex_logo(name)
+  if name ~= "TeX" and name ~= "LaTeX" then return nil end
+  local letters = {}
+  if name == "LaTeX" then
+    letters[#letters + 1] = pandoc.Str("L")
+    letters[#letters + 1] = pandoc.Span("a", pandoc.Attr("", {"tex-logo-a"}))
+  end
+  letters[#letters + 1] = pandoc.Str("T")
+  letters[#letters + 1] = pandoc.Span("e", pandoc.Attr("", {"tex-logo-e"}))
+  letters[#letters + 1] = pandoc.Str("X")
+  local visible = pandoc.Span(letters, pandoc.Attr("", {}, {["aria-hidden"] = "true"}))
+  return pandoc.Span({visible}, pandoc.Attr("", {"tex-logo"}, {role = "img", ["aria-label"] = name}))
+end
+
+local function prose_tex_logos(el)
+  local result, cursor = {}, 1
+  for first, word, after in el.text:gmatch("()(%w+)()") do
+    local logo = tex_logo(word)
+    if logo then
+      if first > cursor then result[#result + 1] = pandoc.Str(el.text:sub(cursor, first - 1)) end
+      result[#result + 1] = logo
+      cursor = after
+    end
+  end
+  if cursor == 1 then return nil end
+  if cursor <= #el.text then result[#result + 1] = pandoc.Str(el.text:sub(cursor)) end
+  return result
+end
+
 return {
   { Meta = read_meta },
   {
-    -- Top-down, so a footnote can be handed back whole and never descended into. Bottom-up would
-    -- rewrite the section references inside it before this filter ever saw the footnote.
+    -- Resolve explicit footnote links without guessing which guide a bare § reference cites.
     traverse = "topdown",
-    Note = function(note) return note, false end,
+    Note = function(note)
+      return pandoc.walk_inline(note, {Link = rewrite_link}), false
+    end,
 
     RawBlock = function(el) return drop_comment(el) or check_raw(el) end,
     RawInline = function(el) return drop_comment(el) or check_raw(el) end,
@@ -139,6 +226,7 @@ return {
     -- 4a. figures live at the site root, not beside the chapter that shows them
     Image = function(img)
       img.src = img.src:gsub("^figures/", "/figures/")
+      img.src = img.src:gsub("^resources/", "/resources/")
       -- `above` and `below` are the print build's figure spacing; here they ride along into the page
       -- as data- attributes. Rebuild the attribute set rather than assigning nil into it: the table
       -- read off an element is a copy, so the deletion would apply to nothing.
@@ -151,22 +239,11 @@ return {
       -- float and prints a bare "Figure 1" under it. Neither document cross-references a figure.
       local id = img.identifier:match("^fig%-") and "" or img.identifier
       img.attr = pandoc.Attr(id, img.classes, keep)
-      return img
+      return chapter_map(img) or img
     end,
 
     -- 4b. an in-document anchor from when the document was one file
-    Link = function(link)
-      local anchor = link.target:match("^#(.+)$")
-      local target = anchor and anchors[anchor]
-      if not target then return nil end
-      -- Still on this page? Keep it a fragment so the browser scrolls instead of reloading.
-      if this_page and target:match("/([^/]+)%.qmd") == this_page then
-        link.target = "#" .. anchor
-      else
-        link.target = target
-      end
-      return link
-    end,
+    Link = rewrite_link,
 
     -- 5 + the anchors it points at: name each H2 of a numbered chapter `sec-13c`, by its position,
     -- which is how both documents letter their subsections. Generated here rather than upstream so
@@ -227,5 +304,9 @@ return {
       end
       return tbl
     end,
+  },
+  {
+    Str = prose_tex_logos,
+    Code = function(el) return tex_logo(el.text) end,
   },
 }

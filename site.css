@@ -10,12 +10,87 @@ figure.quarto-float-fig > figcaption {
   display: none;
 }
 
+/* TeX-family logos retain plain names for copying and accessible labels.
+   The letter offsets affect neither surrounding line spacing nor code blocks. */
+.tex-logo {
+  font-family: "Times New Roman", Times, serif;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.tex-logo-a,
+.tex-logo-e {
+  display: inline-block;
+  position: relative;
+  text-transform: uppercase;
+}
+.tex-logo-a {
+  font-size: 0.75em;
+  top: -0.45em;
+  margin-left: -0.36em;
+  margin-right: -0.15em;
+}
+.tex-logo-e {
+  top: 0.22em;
+  margin-left: -0.1667em;
+  margin-right: -0.125em;
+}
+
 /* The same identifier makes Quarto mark the float `anchored`, and the theme's AnchorJS then hangs a
    link icon off it on hover, as it does on headings. A figure nobody cross-references has no use for
    a permalink, so the icon is hidden on figures alone; heading anchors are left as they are. AnchorJS
    appends the link as the wrapper's last child, which is what the selector reaches. */
 .quarto-figure > .anchorjs-link {
   display: none;
+}
+
+/* Chapter-map links share the SVG's coordinates and scale with its displayed size. */
+.chapter-map-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 0;
+}
+main .chapter-map-frame > img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.chapter-map-link {
+  --chapter-map-highlight: 69, 110, 150;
+  position: absolute;
+  display: block;
+  border-radius: 10px;
+  text-decoration: none;
+}
+.chapter-map-link:hover,
+.chapter-map-link:focus-visible {
+  outline: 3px solid rgb(var(--chapter-map-highlight));
+  outline-offset: 3px;
+  background: rgba(var(--chapter-map-highlight), 0.1);
+}
+body.quarto-dark .chapter-map-link {
+  --chapter-map-highlight: 151, 200, 238;
+}
+/* Match the purple LLM route and green handoff outlines in the research map. */
+#fig-research-process .chapter-map-link:is([href$="llm-measurements.html"], [href$="research-models.html"]) {
+  --chapter-map-highlight: 128, 103, 129;
+}
+#fig-research-process .chapter-map-link[href$="research-handoff.html"] {
+  --chapter-map-highlight: 101, 126, 105;
+}
+body.quarto-dark #fig-research-process .chapter-map-link:is([href$="llm-measurements.html"], [href$="research-models.html"]) {
+  --chapter-map-highlight: 201, 175, 232;
+}
+body.quarto-dark #fig-research-process .chapter-map-link[href$="research-handoff.html"] {
+  --chapter-map-highlight: 158, 206, 172;
 }
 
 /* The empty anchor the filter puts before each subsection, so a §13c from another page lands on the
@@ -52,6 +127,30 @@ table tr:has(.matrix-band-1) > td {
   .matrix-daily { background-color: #2f5f47; color: #dff0e6; }
 }
 
+/* Both guides: one point below body text, with subtle, theme-aware row bands. */
+main { --guide-table-band: rgba(0, 0, 0, 0.045); }
+body.quarto-dark main { --guide-table-band: rgba(255, 255, 255, 0.07); }
+main table { font-size: calc(1rem - 1pt); }
+/* Tool names in headings retain monospace without a light code badge in dark mode. */
+main table th code,
+body.quarto-dark main table th code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+  font-size: 1em;
+  font-weight: inherit;
+}
+main table > tbody > tr:nth-child(odd) > * {
+  background-color: var(--guide-table-band);
+}
+/* Grouped lookup tables shade the section labels rather than alternate rows. */
+main .toolkit-lookup table > tbody > tr > * {
+  background-color: transparent;
+}
+main .toolkit-lookup table > tbody > tr:has(td:first-child strong) > * {
+  background-color: var(--guide-table-band);
+}
+
 /* ---- the chapter agent ----
    The landing page's robot, dressed by that chapter's own recipe and floated at the head of the
    page, so the figure a reader hovered on the console is the one that greets them inside. The
@@ -81,3 +180,25 @@ main:has(.chapter-agent) #title-block-header .quarto-title { display: none; }
 @media (max-width: 700px) {
   .chapter-agent { float: none; width: min(60%, 250px); margin: 0 auto 16px; }
 }
+
+/* Transparent SVGs need a reading surface when enlarged over the lightbox overlay. */
+.glightbox-container .gslide-image img { background: #f7f4ec; }
+body.quarto-dark .glightbox-container .gslide-image img { background: #14181e; }
+
+/* Prompts have copy controls; notes and example outputs use a neutral reading panel. */
+.prompt { margin-block: 1.25rem; padding: 1rem; border: 1px solid var(--bs-border-color); border-radius: .45rem; }
+.prompt blockquote { margin: 0 0 .75rem; }
+.guide-note, .example-output { margin-block: 1.25rem; padding: .85rem 1rem; background: rgba(0, 0, 0, .035); border-radius: .35rem; }
+body.quarto-dark .guide-note, body.quarto-dark .example-output { background: rgba(255, 255, 255, .07); }
+.guide-note > :first-child, .example-output > :first-child { margin-top: 0; }
+.guide-note > :last-child, .example-output > :last-child { margin-bottom: 0; }
+.copy-prompt, a.download-button { display: inline-block; border: 1px solid currentColor; border-radius: .3rem; padding: .35rem .65rem; color: var(--bs-link-color); background: transparent; font-size: .9rem; }
+.copy-prompt:focus-visible, a.download-button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+.copy-status { margin-inline-start: .6rem; font-size: .85rem; }
+/* Wide result tables scroll within the reading column on narrow screens. */
+main { min-width: 0; }
+main table { display: block; max-width: 100%; overflow-x: auto; }
+.research-use { display: grid; grid-template-columns: 70px 1fr; gap: 1rem; align-items: start; margin-block: 1.25rem; }
+.research-use > p { margin: 0; }
+.research-use .use-icon { width: 64px; height: auto; border: 0 !important; box-shadow: none !important; }
+@media (max-width: 480px) { .research-use { grid-template-columns: 50px 1fr; gap: .6rem; } .research-use .use-icon { width: 48px; } }

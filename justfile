@@ -21,7 +21,7 @@ check-upstream:
 
 # Build the site into _site
 render:
-    quarto render
+    python3 scripts/render-site.py
 
 # What CI runs: the committed tree is what the committed source produces, and the render is clean.
 check: render
@@ -30,7 +30,25 @@ check: render
 
 # Serve locally, rebuilding on save
 preview:
-    quarto preview
+    python3 scripts/render-site.py --preview
+
+# Live local preview while the author edits the guide: one sync, then quarto serves and reloads
+# the browser on save while watchexec re-runs the sync whenever the upstream source markdown or a
+# figure SVG changes. The sync here passes --allow-dirty, because the point is to see edits before
+# they are committed; SOURCE.lock then names a commit that lacks them, so run a plain `just sync`
+# after the edits are committed (check-upstream will say so). Nothing deploys. Ctrl-C stops both.
+# Needs watchexec (brew install watchexec).
+watch:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    up=../../publishing/agentic-ai-toolkit
+    sync="../dss-training-ops/scripts/split-chapters.py --upstream $up --site . --allow-dirty"
+    $sync
+    # The initial sync is complete; another startup sync would race the preview's file copy.
+    watchexec --postpone --watch "$up/source" --watch "$up/figures" --exts md,svg -- $sync &
+    watcher=$!
+    trap 'kill "$watcher" 2>/dev/null || true' EXIT INT TERM
+    python3 scripts/render-site.py --preview
 
 # Publish to Cloudflare Pages -- project `dss-agentic-toolkit`, https://dss-agentic-toolkit.pages.dev
 # Direct upload, deliberately not a git integration: CI renders and checks but never publishes, so no

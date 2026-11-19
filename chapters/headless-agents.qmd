@@ -1,0 +1,71 @@
+---
+title: "16. Run agents from saved prompts"
+---
+
+Suppose you have prepared an `archive/` folder containing the data, code, and instructions needed to reproduce a paper's results. You want an agent to test those instructions, report missing files or failed calculations, and repeat the check after repairs. Saving the prompt and a command that launches the checking agent lets you repeat this task without reconstructing the assignment each time.
+
+A *headless* agent runs without an interactive conversation: a program supplies its prompt and collects its response.[^tk-headless-execution-terms] [`Claude Code` supports this through `claude -p`](https://code.claude.com/docs/en/headless). The agent in your desktop app can prepare and launch these runs if its tools have the required access. Starting each run with a fresh conversation is a separate choice; headless operation can also continue an earlier conversation.
+
+Ordinary analysis code can run directly. In this example, the agent adds the ability to read the archive's instructions, operate the required tools, and investigate why a check failed. If a task only sends supplied text to a large language model (LLM) for labeling, a direct API call may suffice; an *API* is a defined way for one program to request an operation from another. The [interview-labeling example](https://dss-agentic-research.pages.dev/chapters/llm-measurements.html#headless-agents) in the companion guide *Doing Research with AI Agents* explains that simpler arrangement.
+
+## Define the check and its report
+
+For the archive check, the saved prompt should tell the agent to follow the supplied reproduction instructions and compare the rerun outputs with the saved results. It should investigate and report problems without repairing the files during the check. Repairs can then be tested in a new run. [Chapter 19: Reproduce and hand off the research](https://dss-agentic-research.pages.dev/chapters/research-handoff.html#test-and-name-the-reproduction-route) in the research guide explains how to prepare the archive and its comparison criteria.
+
+The report should distinguish checks that passed, failed, or could not be tested. For example, a results table might reproduce within the specified tolerance, a figure might fail because its input file is missing, and another analysis might remain untested because the required software could not be installed. Each outcome needs a reason and a reference to the command output or file that supports it.
+
+## Prepare the inputs and access {#control-what-each-run-receives}
+
+Have the agent preparing the workflow make a test copy in a temporary folder outside the working project. Configure the checking agent to use that copy and the software setup described in the archive, with access to the working project excluded. Otherwise it could find an omitted input there and report success even though another researcher would not have that file.
+
+*Context* is the information supplied to the LLM for generating a response. A fresh conversation may still load project context files, global user instructions,[^tk-headless-context-files] or saved memory, and its tools may reach files elsewhere. Ask the setup agent to identify what the checking session will load and which files its tools can read. It should configure the check to receive only the intended material, without resuming a previous conversation.
+
+Before relying on these restrictions, have the setup agent test them using harmless files. It should confirm that the checking agent can read a test file in the assigned copy and cannot read another in the excluded working project. It should also inspect which instructions and memories were loaded, and record any access route it could not test. [Chapter 2: Control what added tools can access](#tool-access) explains the controls; [Chapter 10: Run work in a separate environment: containers](#containers) describes one way to provide a separate execution environment.
+
+The setup agent also checks the account and tool permissions used by the unattended run. An action requiring an unavailable approval should be reported as blocked, rather than leaving the run waiting indefinitely. Personal sign-in and any decision to use separately billed API access remain yours.
+
+<details class="guide-example">
+<summary>`Claude Code` configuration for controlled runs</summary>
+
+The documented [`--bare` option](https://code.claude.com/docs/en/cli-reference) skips much automatic discovery of instructions and extensions. It does not restrict file access by itself, and it uses a different authentication route from ordinary subscription sign-in. Have the setup agent check the installed version and account requirements before selecting it, then specify the tools, settings, and inputs the checking session needs.
+
+The [`dontAsk` permission mode](https://code.claude.com/docs/en/permissions) denies tool calls that would otherwise prompt. Normally permitted actions still run, and installed extensions can affect approvals. Check the complete configuration rather than treating either option as proof that excluded files are inaccessible. The access check described above is a procedure to request and test; this guide has not established a successful containment result for it.
+
+</details>
+
+## Turn the task into a saved workflow
+
+Ask the setup agent to save the prompt in a file such as `check.md` and create a command that launches the checking session with the intended inputs and settings.[^tk-headless-sdk] [`just`](https://just.systems/), a command runner, can give it a name such as `just check-archive`. The agent creates this command for the project; installing `just` does not supply it. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how these saved commands work.
+
+First, have the agent run a *smoke test*: a small representative check through the actual command, account, tools, and reporting steps. It might reproduce one table from a small prepared archive, then confirm that the report and supporting files were saved. This checks whether the workflow operates before it is used for a full archive.
+
+::: {#prompt-headless-archive .prompt}
+> Turn this archive reproduction check into a saved headless-agent workflow. Save the prompt and create `just check-archive`, or use the project's existing command system. Give each checking session a fresh conversation and a test copy, with access to the working project excluded. Check the intended account, tools, and access restrictions. Have the checking agent follow the reproduction instructions, investigate failures without repairing the archive, and report passed, failed, and untested checks with supporting files. Smoke-test the command on a small prepared archive. Keep each run's inputs, report, and supporting records together, and document how to repeat it in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) of the working project.
+:::
+
+![](figures/headless-research.svg){#fig-headless-research fig-alt="A fixed check.md prompt and prepared test copy feed a saved claude -p command. The agent smoke-tests the route before the full check. Each fresh headless session reads assigned inputs, uses permitted tools and saves its response, tool record and test report in a separate run folder. A corrected archive copy gets a new run; both records remain. Fresh context is distinct from configured file-access restrictions."}
+
+Have the setup agent keep the prompt and command definition with the working project. Its [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) should explain the required account and software, how to select the archive copy, and where reports are saved. You can then ask the agent to run the saved check whenever a new version is ready.
+
+## Save the report from each run {#record-each-case}
+
+Each run should have its own output folder, so a later check cannot overwrite an earlier report. Keep the *raw response*, the exact text returned by the checking agent, alongside its tool calls and their results. If a program extracts fields such as the check name and outcome from that response, save this *parsed result* separately so the original remains available.
+
+| Record | What it establishes |
+|----------------------------------------|------------------------------------------------------------|
+| Run identifier, prompt, and tested archive version | Which instructions and files were checked |
+| Agent software, LLM identifier and settings, tools, and loaded instructions | How the checking session was configured |
+| Original response, tool calls and results, and any parsed report | What the agent did and what supports its assessment |
+| Completion status, errors, and retry identifiers | Whether the run finished and which attempts produced usable reports |
+
+Keep the tested specification and relevant methodological decisions with that archive version. A later revision to the working project's [`SPECIFICATION.md`](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) or [`METHODOLOGY.md`](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) should not replace the copies used for the check.
+
+A run can finish without producing a usable report. Have the setup agent check for the expected files and report fields, preserve incomplete or unreadable responses, and explain what failed. Any automatic retry should follow a specified limit and retain its own record. After repairs to the archive, rerun the check on a new copy and retain both versions and reports.
+
+For many checks, [`pueue`](https://github.com/Nukesor/pueue) can queue the saved commands and limit how many run at once. The agent should test the account and software access from the queue too, because it may differ from the interactive session; see [Chapter 9: Keep unattended jobs moving: pueue](#job-queues).
+
+[^tk-headless-execution-terms]: For a comparison with subagents and background execution, see [Chapter 15: Divide work between agents: shared projects and git worktrees](#agent-execution-terms).
+
+[^tk-headless-context-files]: See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
+
+[^tk-headless-sdk]: An SDK, or software development kit, supplies libraries for controlling software from a program. The [Agent SDK documentation](https://code.claude.com/docs/en/agent-sdk/overview) describes `Python` and `TypeScript` packages for controlling agent runs. The setup agent can use these when the workflow needs more control than a saved command provides.

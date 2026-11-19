@@ -1,0 +1,89 @@
+---
+title: "11. Generate documents from research outputs: Quarto and Pandoc"
+---
+
+A manuscript often reports the same result in a table, a figure, and a sentence. Linking those locations to saved analysis outputs makes updates easier to carry through consistently. The agent can maintain the text and its supporting inputs as the document's *source*, then *build* or *render* a readable document from them.
+
+Suppose a revised sample definition changes the number of participants and the estimated difference between two groups. The agent can use [`Quarto`](https://quarto.org/), a tool for producing documents from text and code, to read the updated values from saved analysis results and insert them into the results table and accompanying text. It can then produce a [`Word`](https://www.microsoft.com/microsoft-365/word) draft for coauthors and a PDF for review.
+
+## Connect the document to saved results {#connect-the-document-to-saved-results}
+
+Markdown is a plain-text format that uses simple symbols to indicate headings, lists, and links. A `Quarto` source file, usually ending in `.qmd`, can contain this text, document settings, and code. The agent writes and maintains that source.
+
+Have the agent configure the `.qmd` file to read numerical results from saved analysis files. Code within the document can format those values for tables and insert them into the relevant sentences.[^tk-document-inline] The document can also include figures that the analysis has saved as image files.
+
+Have the agent keep the code for fitting statistical models in separate analysis scripts and save their results before building the document. It can then rebuild a draft after a wording or layout change without fitting the statistical models again.
+
+`Quarto` runs the document's code and uses [`Pandoc`](https://pandoc.org/), a tool for converting documents between formats, to produce the requested output. Both are standalone programs.[^tk-document-tools] `Quarto` is the recommended starting point for a new manuscript that reads saved research results. For a document whose text, tables, and figures are already prepared, the agent can use `Pandoc` directly.
+
+![](figures/document-production.svg){#fig-document-production fig-alt="Manuscript source, references and saved results feed a Quarto build. The agent directs the build, shown as a running render command with a processing gear and progress bar. The build produces Word, HTML and PDF documents; the depicted PDF route requires LaTeX."}
+
+## Choose the output formats and prepare the tools {#choose-the-deliverable}
+
+Tell the agent which formats you need and supply any journal or collaborator formatting requirements.
+
+| Output | Typical purpose | What the agent checks |
+|---|---|---|
+| `Word` (`.docx`) | Editable drafts for coauthors. | Required styles, equations, and editable tables. |
+| PDF | Reading, printing, or submission. | Fonts, page layout, equations, and figure placement. |
+| Web document (HTML) | Reports read in a browser. | Links, images, interactive elements, and supporting files. |
+
+Have the agent inspect the project's existing document setup and confirm that it can use the required tools from its session. It should install missing components through [`Homebrew`](https://brew.sh/) or the established installation route, preserving a working setup where one exists. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains this process.
+
+For the PDF route described here, [`LaTeX`](https://www.latex-project.org/), a document typesetting system, arranges the text, equations, and figures on the page. The agent should check that the required typesetting software and fonts are available, then produce and inspect a PDF.[^tk-document-pdf]
+
+`Word` formatting can come from a [*reference document*](https://quarto.org/docs/output-formats/ms-word-templates.html): a `.docx` file that supplies styles for headings, text, and tables. If a journal or collaborator provides a template, have the agent use its styles and check the resulting draft.
+
+## Build and check the document {#configure-and-inspect-the-build}
+
+The agent can use [`just`](https://just.systems/), a command runner, to save the build instructions as a command such as `just paper`. It creates that command for the project, specifying the manuscript source, output formats, and destination folder. If an equivalent command already exists, have the agent retain it. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how it creates and maintains these commands.
+
+When analysis results change, have the agent confirm that rebuilding reads the updated files. If the document reuses earlier computed output, the agent should configure and document how that output is refreshed.[^tk-document-refresh] In the sample-definition example, it should compare the new sample size and group difference in both the table and the text with the saved analysis results.
+
+If the project already uses a dependency runner, such as [`targets`](https://docs.ropensci.org/targets/) or [`Snakemake`](https://snakemake.readthedocs.io/), to decide which steps need rerunning, have the agent include the document build and its saved inputs in that workflow. This lets the runner identify when changed results require a new draft; see [Chapter 8: Rerun only affected steps: targets and Snakemake](#pipeline-dependencies).
+
+::: {#prompt-build-manuscript .prompt}
+> Configure this manuscript in `Quarto` to produce a `Word` draft for coauthors and a PDF for review. Check the existing document tools and install any missing components through the appropriate route. Generate the results table and insert numerical values in the text from saved analysis outputs, keeping model fitting separate from document production. Save the build as `just paper`, or use the project's existing equivalent. Build both formats and confirm that the revised sample size and group difference appear correctly in the table and accompanying text. Inspect both documents for citation, equation, figure, and layout problems, and fix any build problems. Record the setup, input files, output locations, and build instructions in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). Use the saved command for subsequent drafts.
+:::
+
+Have the agent inspect each requested format for missing citations, misplaced tables, clipped figures, and broken equations. After the build, it should report where it saved the documents, which results files it used, any analysis steps it repeated, and what it checked. It should diagnose and fix build problems and identify anything still unresolved. [Appendix D: Troubleshooting](#troubleshooting) explains known [`R`](https://www.r-project.org/) and TeX build problems.
+
+You review interpretation and prose. [Chapter 18: Write and revise the manuscript](https://dss-agentic-research.pages.dev/chapters/research-writing.html#trace-manuscript) in the companion guide *Doing Research with AI Agents* explains how the agent checks reported results throughout the manuscript against their saved sources.
+
+## Save the setup for future drafts
+
+Have the agent keep the manuscript source, bibliography, formatting files, and build configuration with the project. For example, `paper.qmd` can hold the manuscript and `sources.bib`[^tk-document-bibliography] the bibliographic details used to generate its citations and reference list. Retain the saved results and figures that the build reads too.
+
+Ask the agent to record the installed versions of `Quarto`, `Pandoc`, and any PDF software, along with the required fonts, in the global `TOOLCHAIN.md` file.[^tk-document-toolchain] If the document runs [`R`](https://www.r-project.org/) or [`Python`](https://www.python.org/) code, its packages belong in the project's software-version records; [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains how the agent maintains those records.
+
+Have the agent save document build instructions in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). These should identify the maintained manuscript, required software and versions, input files, and output locations. They should give the build command, explain how to refresh reused output, and record the checks completed. Ask the agent to use these instructions for subsequent drafts and keep them current as the setup changes.
+
+## Bring coauthor edits back into the source {#bring-coauthor-edits-back-into-the-source}
+
+Tell the agent which document is being maintained. For a manuscript built from Markdown or `Quarto` source, have it preserve each returned `Word` file and compare it with the draft sent to that coauthor. It should inspect comments and tracked changes before conversion and identify revisions that need your decision.[^tk-document-word-changes] The agent generates each new `Word` draft from the `.qmd` file. It therefore needs to transfer accepted coauthor edits into that file so they appear in subsequent drafts.
+
+::: {#prompt-coauthor-edits .prompt}
+> Preserve this coauthor's returned `Word` document and compare it with the draft sent. Inspect its comments and tracked changes, and flag conflicting edits or changes to claims and results that need my decision. Transfer the edits I have accepted into the maintained `Quarto` source. Keep unresolved comments available for review. Use the saved build command to produce a new draft without overwriting the returned copy, then check that the accepted edits appear in the new document.
+:::
+
+After transferring the edits, have the agent rebuild and check a new draft. It should confirm that accepted wording, citations, and formatting changes appear as intended, and report any comments or conflicting revisions still awaiting a decision.
+
+If collaborators maintain the manuscript directly in `Word` or [`Google Docs`](https://docs.google.com/), keep that as the working document. Have the agent check which editing tools it can use and propose how to incorporate changes while preserving comments and other collaborators' edits. The research guide's [Incorporate coauthor edits](https://dss-agentic-research.pages.dev/chapters/research-writing.html#preserve-coauthor-edits-and-respond-to-reviewers) section explains direct editing and review of an exported copy.
+
+When you approve a revision that changes the analysis, have the agent preserve the earlier results, update the current scientific requirements in `SPECIFICATION.md`, and add the dated decision and reason to `METHODOLOGY.md`.[^tk-document-project-context] It should then rerun the affected analysis and checks, rebuild the manuscript, and check that the new draft uses the revised results.
+
+[^tk-document-inline]: *Inline code* inserts a computed value into a sentence. The agent can configure it to use a value read from a saved results file and apply the appropriate rounding; see [Quarto's inline-code documentation](https://quarto.org/docs/computations/inline-code.html).
+
+[^tk-document-tools]: These programs are installed separately from the analysis language and its packages. The standard `Quarto` installation includes `Pandoc`, so this route does not ordinarily require a separate `Pandoc` installation; see [Quarto's FAQ](https://quarto.org/docs/faq/#how-can-i-upgrade-dependencies).
+
+[^tk-document-pdf]: A *TeX distribution* supplies the programs and packages used by `LaTeX`. If none is suitable, the agent can follow [Quarto's PDF setup](https://quarto.org/docs/output-formats/pdf-basics.html) and install [`TinyTeX`](https://yihui.org/tinytex/) with `quarto install tinytex`. It should retain a working [`MacTeX`](https://tug.org/mactex/) or [`TeX Live`](https://tug.org/texlive/) installation. `Word` and HTML output do not require this PDF software.
+
+[^tk-document-refresh]: `Quarto` can save and reuse the output of code run within a document. This is called *caching* or *freezing*, depending on the mechanism. A change to an external results file may not trigger fresh execution under those settings. The agent should check the actual build route and configure the required refresh; see [Quarto's execution settings](https://quarto.org/docs/projects/code-execution.html).
+
+[^tk-document-bibliography]: A `.bib` file stores references in BibTeX format: plain-text entries containing details such as authors, titles, and publication dates. The agent connects citations in the manuscript to these records and applies the required citation style; see [Quarto's citation documentation](https://quarto.org/docs/authoring/citations.html).
+
+[^tk-document-toolchain]: See [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.
+
+[^tk-document-word-changes]: When reading a `.docx` file, `Pandoc` accepts tracked insertions and deletions and omits comments by default. Its `--track-changes=all` option retains them for inspection in the converted content; it does not guarantee that a later conversion back to `Word` preserves the original review features. See [Pandoc's tracked-change options](https://pandoc.org/MANUAL.html#option--track-changes).
+
+[^tk-document-project-context]: These are project context files: saved instructions and records that the agent can consult in later sessions. See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.
