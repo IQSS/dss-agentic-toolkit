@@ -6,7 +6,7 @@ Research involves tasks worth setting up once and repeating reliably: running a 
 
 Suppose a study needs 100 simulation runs, but your computer can handle four at once. A job queue can keep four running and automatically start another whenever one finishes. Ask the agent to prepare the batch, choose a suitable limit, and report completed and failed jobs when you return.
 
-Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://dss-agentic-research.pages.dev/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://dss-agentic-research.pages.dev/chapters/first-session.html).
+Use this guide as a reference. Read the next chapter on access, then turn to the tool your work needs. Each chapter explains its purpose and what to ask the agent to do. The companion [*Doing Research with AI Agents*](https://iqss.github.io/dss-agentic-research/) covers research workflows and judgment; if you are new to the app, start with its [Chapter 2: Get started with the app](https://iqss.github.io/dss-agentic-research/chapters/first-session.html).
 
 ![](figures/agent-toolkit.svg){#fig-agent-toolkit fig-alt="Saved TOOLCHAIN.md instructions tell an agent when to use tools and what to report. From a conversation in the app, the agent can operate an installed simulation queue or use a connection to a reference library. The queue produces a run report; the library supplies sources and notes. These are examples of capabilities rather than a list of mandatory tools."}
 
@@ -53,7 +53,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 
 ## Tell the agent when to use each tool {#make-the-tool-part-of-the-workflow}
 
-Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://dss-agentic-research.pages.dev/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
+Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
 
 ## Use tools from the app
 
@@ -63,4 +63,4 @@ The setup examples cover macOS and Linux. On Windows, the examples assume the to
 
 [^tk-overview-agent]: An agent combines a large language model (LLM), which processes supplied information and generates responses or tool requests, with tools and software that runs them and returns their results.
 
-[^tk-toolchain]: See [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.
+[^tk-toolchain]: See [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.

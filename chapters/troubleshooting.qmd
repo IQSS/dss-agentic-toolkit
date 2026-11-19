@@ -26,10 +26,10 @@ A symptom can have several causes. For example, a queued fit that has produced n
 Once the cause is understood, the agent should make a targeted correction and repeat the failed operation. For a long calculation, it can first use a small representative case through the same app, queue, or other execution method. It should check the resulting files as well as the reported status, then record lasting setup changes in the project context files, or in global user instructions if they apply across projects.[^tk-troubleshooting-context-files]
 
 ::: {#prompt-diagnose-problem .prompt}
-> Diagnose why [operation] produced [observed result] instead of [expected result]. Inspect the exact command, relevant logs, software setup, and outputs before changing anything. Check whether an earlier attempt is still running and making progress. Explain the likely cause and make a targeted correction, preserving existing work. Use a small representative check first if the full operation is expensive, then repeat the affected operation and inspect its output. Report what changed, what now works, and anything unresolved. Record lasting setup corrections in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records), or in [global user instructions](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) if they apply across projects. Ask me before changing research methods or inputs.
+> Diagnose why [operation] produced [observed result] instead of [expected result]. Inspect the exact command, relevant logs, software setup, and outputs before changing anything. Check whether an earlier attempt is still running and making progress. Explain the likely cause and make a targeted correction, preserving existing work. Use a small representative check first if the full operation is expensive, then repeat the affected operation and inspect its output. Report what changed, what now works, and anything unresolved. Record lasting setup corrections in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), or in [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) if they apply across projects. Ask me before changing research methods or inputs.
 :::
 
-The sections below cover particular execution and build problems encountered while developing these guides. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://dss-agentic-research.pages.dev/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
+The sections below cover particular execution and build problems encountered while developing these guides. For incorrect analyses, unsupported claims, or other problems with the research itself, see [Appendix C: Troubleshooting](https://iqss.github.io/dss-agentic-research/chapters/troubleshooting.html) in the companion guide *Doing Research with AI Agents*.
 
 ## R launched by an agent on macOS {#r-on-macos}
 
@@ -77,7 +77,7 @@ To prevent unnecessary synchronization, the agent can place large rebuildable en
 
 For an already populated or stalled directory, ask the agent to preserve the work and diagnose the synchronization state before changing exclusions. Adding an exclusion after a service has indexed thousands of files can itself trigger further synchronization work. The recovery used for these guides was to recreate the installed environment outside cloud storage from the recorded dependencies, then update the project to use it. Source files, uncommitted edits, and `Git` history need preservation; a repository is not a disposable software environment.
 
-After a repair, have the agent rerun the affected project command and record the new locations in the [project context files](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records). It should explain which files remain in the normal backup arrangement and how the excluded software can be recreated.
+After a repair, have the agent rerun the affected project command and record the new locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). It should explain which files remain in the normal backup arrangement and how the excluded software can be recreated.
 
 ## PDF reports “No counter 'none' defined” {#tex-table-counter}
 
@@ -91,6 +91,6 @@ A PDF build in these guides encountered “No counter 'none' defined” for a ta
 
 The guard preserves a counter if it already exists. Have the agent rebuild the document and inspect the affected table. A different error may need a missing font, package, or source correction; this block is not a general repair for failed PDF builds.
 
-[^tk-troubleshooting-context-files]: See [Chapter 7: Give the agent context for your project](https://dss-agentic-research.pages.dev/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
+[^tk-troubleshooting-context-files]: See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) for project context files and [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) for global user instructions in *Doing Research with AI Agents*.
 
 [^tk-troubleshooting-stdin]: Standard input is the input channel a program reads. The helper redirects it from `/dev/null`, which supplies no input. Retain that redirection as part of this observed workaround.

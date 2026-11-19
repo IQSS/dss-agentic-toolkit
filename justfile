@@ -50,17 +50,14 @@ watch:
     trap 'kill "$watcher" 2>/dev/null || true' EXIT INT TERM
     python3 scripts/render-site.py --preview
 
-# Publish to Cloudflare Pages -- project `dss-agentic-toolkit`, https://dss-agentic-toolkit.pages.dev
-# Direct upload, deliberately not a git integration: CI renders and checks but never publishes, so no
-# Cloudflare credential lives in the workflow. It depends on `verify`, so a site that is stale against
-# its upstream document, or that fails either check, cannot be published by accident.
-# Credential: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID from the environment if set, otherwise from
-# 1Password (op://Credentials/cloudflare-api-token-dss-pages: Pages Edit only, no expiry; the account ID
-# is in its username field). wrangler's own OAuth login is not used: it expires after a few hours and
-# cannot be refreshed without a terminal, which is what stranded the 2026-09-10 deploy.
-deploy: verify
+# Refresh the existing private Cloudflare preview. Public publication uses GitHub Actions.
+# Supply credentials in the local environment; never commit them.
+deploy-preview: verify
     #!/usr/bin/env bash
     set -euo pipefail
-    export CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN:-$(op read 'op://Credentials/cloudflare-api-token-dss-pages/credential')}"
-    export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-$(op read 'op://Credentials/cloudflare-api-token-dss-pages/username')}"
+    : "${CLOUDFLARE_API_TOKEN:?Set CLOUDFLARE_API_TOKEN for the private preview}"
+    : "${CLOUDFLARE_ACCOUNT_ID:?Set CLOUDFLARE_ACCOUNT_ID for the private preview}"
     wrangler pages deploy _site --project-name dss-agentic-toolkit --branch main
+
+# Retain the existing private-preview command for maintainer scripts.
+alias deploy := deploy-preview

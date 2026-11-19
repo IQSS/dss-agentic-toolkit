@@ -21,6 +21,7 @@ TASKS.md
 
 # wrangler drops a cache dir wherever `just deploy` runs
 /.wrangler
+/mockups/
 
 .quarto-before-author-revision/
 

@@ -1,6 +1,6 @@
 # Local-LLM setup trial
 
-Recorded November 3, 2026, on the guide author’s Mac. This was a setup and tool-use trial with Qwen3 4B through `Ollama`, not an evaluation of research accuracy or comprehensive access restrictions. The details below let an agent reconstruct the tested setup; [Chapter 17: Run and adapt an LLM on your own hardware](https://dss-agentic-toolkit.pages.dev/chapters/local-models.html) explains the terms and current setup decisions.
+Recorded November 3, 2026, on the guide author’s Mac. This was a setup and tool-use trial with Qwen3 4B through `Ollama`, not an evaluation of research accuracy or comprehensive access restrictions. The details below let an agent reconstruct the tested setup; [Chapter 17: Run and adapt an LLM on your own hardware](https://iqss.github.io/dss-agentic-toolkit/chapters/local-models.html) explains the terms and current setup decisions.
 
 A category-labeling prompt without a required output format returned explanatory text and reached the output limit. Repeating the prompt with a JSON schema, a definition of the required response fields and structure, returned the required category object. A separate two-turn `Claude Code` run through `Ollama` read an assigned harmless marker file and returned its content.
 

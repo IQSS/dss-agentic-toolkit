@@ -1,28 +1,28 @@
 # Extending Your Agent’s Toolkit
 
-The website is generated from the canonical manuscript in `workspace/publishing/agentic-ai-toolkit/`, which also builds the PDF. Edit prose and figures upstream; regenerate the chapter copies here. Explicit chapter ids keep addresses stable when titles or order change.
-
-## Local reading draft
-
-The November 17, 2026 reading draft has 18 chapters in six parts and five appendices, including a bank of 27 prompts with a single Markdown download. All 22 approved diagrams have light and dark variants. The local render has 28 pages, including the landing page, 404 page, and three compatibility redirects. Source and link checks pass. The source lock records the matching committed manuscript. The landing workshop now guides readers through the chapter order: Chapter 1 pulses initially, the selected tool glows gold, and a steady blue glow identifies the next chapter.
+A guide for researchers, with 18 chapters and five appendices. [Read the guide](https://iqss.github.io/dss-agentic-toolkit/).
 
 ## Build and check
 
+The repository includes the manuscript snapshot, generated chapter pages, figures, resources, and DSS theme needed to build the website. Building does not require access to the private authoring repositories or execute research code.
+
+Install Quarto 1.9.38, Python 3, and `just`, then run:
+
 ```sh
-just sync       # refresh from the committed upstream manuscript
-just check      # render and validate sources, figures, links, and navigation
-just preview    # serve locally
+just check      # render and check sources, figures, links, and navigation
+just preview    # serve the site locally
 ```
 
-Quarto renders prebuilt prose and SVG figures without executing research code. The vendored DSS theme supplies the site treatment. On this Dropbox checkout, `_site` points to an external render cache. `just watch` supports authoring against uncommitted upstream changes.
+The Python checks use the standard library. GitHub Actions runs the same source and rendered-site checks. Successful builds of `main` in the IQSS repository publish to GitHub Pages; pull requests are checked without publishing.
 
-Chapter pages, sidebar/maps, figure palettes, and shared checks are generated through `dss-training-ops/scripts/split-chapters.py`. The landing illustration and its garage.js controls are maintained here. Figures can be enlarged and have both light and dark variants.
+## Maintain the guide
 
-Publication uses the existing Cloudflare Pages direct-upload recipe, `just deploy`, after its validation gates. It is separate from the editorial build and from CI checks. This revision has not been deployed; hosting and final public addresses remain release-stage work.
+Prose and figures are authored in the separate `agentic-ai-toolkit` manuscript project. `SOURCE.lock` identifies the committed manuscript snapshot. Maintainers with the authoring repositories and shared `dss-training-ops` tooling can use `just sync` to refresh this site and `just verify` to check it against those sources. `just watch` supports local editorial previews, including uncommitted prose; make a normal sync from committed source before publishing.
+
+Edit prose upstream rather than in generated `chapters/` pages. Chapter identifiers keep URLs stable when titles or order change. The landing illustration and its `garage.js` controls are maintained here. Figures have light and dark variants.
+
+An existing private Cloudflare preview can be refreshed with `just deploy-preview`, using locally supplied `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` environment variables. This is separate from the public GitHub Pages deployment.
 
 ## License
 
-
-Code is MIT, see `LICENSE`: the scripts, the Lua filters, the site configuration, and the landing
-page's JavaScript and CSS. The guide's text and figures are CC BY 4.0, see `LICENSE-content`. The code
-examples inside the guide are MIT too, so they can be copied into a project without attribution.
+Code, including the guide’s code examples, is [MIT licensed](LICENSE). Text and figures are [CC BY 4.0](LICENSE-content).

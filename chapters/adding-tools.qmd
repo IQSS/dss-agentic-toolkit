@@ -36,4 +36,4 @@ Before updating software used by an analysis, ask the agent to explain the propo
 
 [^tk-install-terminal]: A terminal is a panel where you can enter commands and see their output. See [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents).
 
-[^tk-install-toolchain]: See [Chapter 8: Apply your conventions across projects](https://dss-agentic-research.pages.dev/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.
+[^tk-install-toolchain]: See [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents* for guidance on organizing these files and telling the agent when to read them.

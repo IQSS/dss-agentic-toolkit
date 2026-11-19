@@ -12,7 +12,7 @@ Suppose a figure shows estimates from a statistical model. If model fitting and 
 
 ## Make each task runnable on its own {#give-the-commands-useful-work}
 
-Have the agent check that each task can run separately. For example, the plotting code should read the statistical model's estimates from a saved file, so it can regenerate the figure even after the original analysis session has ended. If the code needs reorganizing, the agent should first save the current results, then check that the revised code reproduces them. [Chapter 13: Build a modular analysis workflow](https://dss-agentic-research.pages.dev/chapters/research-workflows.html#modular-steps) in the companion guide *Doing Research with AI Agents* explains how to structure the code this way.
+Have the agent check that each task can run separately. For example, the plotting code should read the statistical model's estimates from a saved file, so it can regenerate the figure even after the original analysis session has ended. If the code needs reorganizing, the agent should first save the current results, then check that the revised code reproduces them. [Chapter 13: Build a modular analysis workflow](https://iqss.github.io/dss-agentic-research/chapters/research-workflows.html#modular-steps) in the companion guide *Doing Research with AI Agents* explains how to structure the code this way.
 
 ![](figures/project-commands.svg){#fig-project-commands fig-alt="The agent calls just figures. The project's justfile maps that name to Rscript code/figures.R. The plotting script reads saved estimates and produces a revised figure without refitting the statistical model."}
 
@@ -56,4 +56,4 @@ To have the workflow determine which steps need rerunning after a change, see [C
 
 [^tk-command-model]: Here, `age-spline` is an example name for a statistical model allowing a curved relationship between age and the outcome. The name after `fit` identifies which model the agent should fit.
 
-[^tk-smoke-scientific-checks]: For checks of statistical performance and independent implementations, see [Chapter 14: Test the analysis against known truth](https://dss-agentic-research.pages.dev/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://dss-agentic-research.pages.dev/chapters/checking-analysis.html) in *Doing Research with AI Agents*.
+[^tk-smoke-scientific-checks]: For checks of statistical performance and independent implementations, see [Chapter 14: Test the analysis against known truth](https://iqss.github.io/dss-agentic-research/chapters/simulation.html) and [Chapter 15: Check the agent with independent implementations](https://iqss.github.io/dss-agentic-research/chapters/checking-analysis.html) in *Doing Research with AI Agents*.

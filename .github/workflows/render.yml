@@ -1,10 +1,5 @@
-# Build and content checks on every push. The render catches a broken source; the two checks catch the
-# failures a render cannot see -- a chapter edited here instead of upstream, an authoring comment in the
-# page source, a figure or cross-reference that no longer resolves.
-# Nothing is published from CI. The repository is a private sandbox; publishing will come from Cloudflare
-# Pages, which builds from the repository itself. If the site later moves to IQSS and GitHub Pages, restore
-# a publish step (quarto-dev/quarto-actions/publish@v2 with target: gh-pages).
-name: Render
+# Validate every change; publish checked main-branch builds from the IQSS repository.
+name: Render and publish
 
 on:
   push:
@@ -12,19 +7,47 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: "1.9.38"
       - name: Chapters match the committed source
         run: scripts/split-chapters.py --check --site .
-
       - name: Render
         run: quarto render
-
       - name: Rendered site is clean
         run: scripts/check-site.py
+      - name: Configure GitHub Pages
+        if: github.repository_owner == 'IQSS' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Upload checked site
+        if: github.repository_owner == 'IQSS' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    if: github.repository_owner == 'IQSS' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: render
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish checked site
+        id: deployment
+        uses: actions/deploy-pages@v4

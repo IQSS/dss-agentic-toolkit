@@ -21,6 +21,7 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 
 COMMENT = re.compile(r"<!--(.*?)-->", re.S)
 FOOTNOTES = re.compile(r'<section[^>]*class="[^"]*footnotes[^"]*".*?</section>', re.S)
@@ -55,6 +56,21 @@ class PageReferences(HTMLParser):
 
 def check(site: Path, source_dir: Path, root: Path) -> list[str]:
     problems: list[str] = []
+    # GitHub project sites live under /repository/, while _site contains the
+    # contents of that directory. Quarto includes the prefix on 404-page URLs.
+    config = root / "_quarto.yml"
+    site_url = re.search(r"^\s*site-url:\s*([^\s#]+)", config.read_text(), re.M) if config.exists() else None
+    prefix = urlsplit(site_url[1].strip("'\"")).path.rstrip("/") if site_url else ""
+
+    def local_target(page: Path, path: str) -> Path | None:
+        if path.startswith("/"):
+            if prefix:
+                if not path.startswith(prefix + "/"):
+                    return None
+                path = path[len(prefix):]
+            return (site / path.lstrip("/")).resolve()
+        return (page.parent / path).resolve()
+
     pages = sorted(site.rglob("*.html"))
     if not pages:
         return [f"no rendered pages under {site}; did `quarto render` run?"]
@@ -90,8 +106,8 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
                 continue
             # Root-absolute, like the links in check 4: resolved against the site root, since a
             # page can sit at any depth and 404.html is served from all of them.
-            base = site if src.startswith("/") else page.parent
-            if not (base / src.lstrip("/")).exists():
+            target = local_target(page, src)
+            if target is None or not target.exists():
                 problems.append(f"{page.relative_to(site)}: image does not resolve — {src}")
 
     # 4. Every link resolves: a fragment to an id on this page, a path to a file that exists, and a
@@ -110,9 +126,8 @@ def check(site: Path, source_dir: Path, root: Path) -> list[str]:
             # A root-absolute href resolves against the site root, not the page's own folder.
             # Quarto emits these on 404.html deliberately -- see check 6 -- and joining them to
             # the page's folder would resolve them against the filesystem root instead.
-            base = site if path.startswith("/") else page.parent
-            target = (base / path.lstrip("/")).resolve()
-            if not target.exists():
+            target = local_target(page, path)
+            if target is None or not target.exists():
                 problems.append(f"{page.relative_to(site)}: link to {path}, which does not exist")
             elif fragment and target.suffix == ".html" and fragment not in ids.get(target, set()):
                 problems.append(f"{page.relative_to(site)}: link to {path}#{fragment}, "
