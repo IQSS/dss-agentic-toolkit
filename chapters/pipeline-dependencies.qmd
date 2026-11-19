@@ -33,7 +33,9 @@ The agent uses the same `just all` command in every case. The dependency runner 
 
 The agent can also configure `just figures` to ask the dependency runner for the figures. The runner checks the inputs and saved results those figures need, updating them if necessary.
 
-The following prompt uses `targets` for an `R` analysis with Bayesian models. For a workflow using other languages, ask the agent to use `Snakemake` instead.
+The following prompt uses `targets` for an `R` analysis with Bayesian models.[^tk-dss-targets] For a workflow using other languages, ask the agent to use `Snakemake` instead.
+
+[^tk-dss-targets]: The [DSS targets skill](https://iqss.github.io/dss-agent-skills/skills/targets.html) provides a reusable procedure for building and checking an R pipeline.
 
 ::: {#prompt-selective-reruns .prompt}
 > Preserve this project's current results and software versions. Set up `targets` for this `R` analysis, installing it in the project's software environment if needed and recording its version. Use the existing analysis code to connect data preparation, the Bayesian model fits, saved posterior draws, comparison figures, and the manuscript through their dependencies. Configure the command `just all` to run the complete workflow through `targets`, and configure `just figures` to request the figures through the same runner. Show me the dependency diagram. Check selective reruns with small representative inputs, keeping test outputs separate from the study's results. Report which steps run and which results are reused, and investigate unexpected differences. Use these commands for future updates to the analysis.

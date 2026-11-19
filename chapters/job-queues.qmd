@@ -10,7 +10,9 @@ Suppose a sensitivity analysis requires 100 independent model fits, but the comp
 
 ## Prepare the job batch {#prepare-the-batch}
 
-Have the agent check for `pueue` on the computer that will run the work, install it if needed through [`Homebrew`](https://brew.sh/) or your preferred package manager, and configure and check its background service. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation. For short tasks, the agent can run the work directly. On a computing cluster, it should use the institution's *scheduler*, the service that assigns jobs to available computing resources.
+Have the agent check for `pueue` on the computer that will run the work, install it if needed through [`Homebrew`](https://brew.sh/) or your preferred package manager, and configure and check its background service.[^tk-dss-pueue] [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation. For short tasks, the agent can run the work directly. On a computing cluster, it should use the institution's *scheduler*, the service that assigns jobs to available computing resources.
+
+[^tk-dss-pueue]: The [DSS Pueue skill](https://iqss.github.io/dss-agent-skills/skills/pueue.html) covers job submission, progress checks, and verification of saved outputs.
 
 Each fit needs specified inputs and settings, the intended software versions, and its own output files. Have the agent check that it can run independently, without relying on objects left in an earlier analysis session. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how to prepare tasks this way.
 

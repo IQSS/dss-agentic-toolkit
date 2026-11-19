@@ -59,7 +59,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 
 ## Tell the agent when to use each tool {#make-the-tool-part-of-the-workflow}
 
-Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
+Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks. The [DSS agent skills catalogue](https://iqss.github.io/dss-agent-skills/) provides reusable procedures for research tasks.
 
 ## Use tools from the app
 
@@ -469,7 +469,9 @@ The agent uses the same `just all` command in every case. The dependency runner 
 
 The agent can also configure `just figures` to ask the dependency runner for the figures. The runner checks the inputs and saved results those figures need, updating them if necessary.
 
-The following prompt uses `targets` for an `R` analysis with Bayesian models. For a workflow using other languages, ask the agent to use `Snakemake` instead.
+The following prompt uses `targets` for an `R` analysis with Bayesian models.[^tk-dss-targets] For a workflow using other languages, ask the agent to use `Snakemake` instead.
+
+[^tk-dss-targets]: The [DSS targets skill](https://iqss.github.io/dss-agent-skills/skills/targets.html) provides a reusable procedure for building and checking an R pipeline.
 
 ::: {#prompt-selective-reruns .prompt}
 > Preserve this project's current results and software versions. Set up `targets` for this `R` analysis, installing it in the project's software environment if needed and recording its version. Use the existing analysis code to connect data preparation, the Bayesian model fits, saved posterior draws, comparison figures, and the manuscript through their dependencies. Configure the command `just all` to run the complete workflow through `targets`, and configure `just figures` to request the figures through the same runner. Show me the dependency diagram. Check selective reruns with small representative inputs, keeping test outputs separate from the study's results. Report which steps run and which results are reused, and investigate unexpected differences. Use these commands for future updates to the analysis.
@@ -519,7 +521,9 @@ Suppose a sensitivity analysis requires 100 independent model fits, but the comp
 
 ## Prepare the job batch {#prepare-the-batch}
 
-Have the agent check for `pueue` on the computer that will run the work, install it if needed through [`Homebrew`](https://brew.sh/) or your preferred package manager, and configure and check its background service. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation. For short tasks, the agent can run the work directly. On a computing cluster, it should use the institution's *scheduler*, the service that assigns jobs to available computing resources.
+Have the agent check for `pueue` on the computer that will run the work, install it if needed through [`Homebrew`](https://brew.sh/) or your preferred package manager, and configure and check its background service.[^tk-dss-pueue] [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation. For short tasks, the agent can run the work directly. On a computing cluster, it should use the institution's *scheduler*, the service that assigns jobs to available computing resources.
+
+[^tk-dss-pueue]: The [DSS Pueue skill](https://iqss.github.io/dss-agent-skills/skills/pueue.html) covers job submission, progress checks, and verification of saved outputs.
 
 Each fit needs specified inputs and settings, the intended software versions, and its own output files. Have the agent check that it can run independently, without relying on objects left in an earlier analysis session. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how to prepare tasks this way.
 

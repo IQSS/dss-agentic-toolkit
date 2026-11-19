@@ -53,7 +53,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 
 ## Tell the agent when to use each tool {#make-the-tool-part-of-the-workflow}
 
-Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks.
+Tell the agent when you want it to use each tool and what it should report, or ask it for suggestions if you are unsure. Ask it to save guidance that applies across projects in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), such as `TOOLCHAIN.md`.[^tk-toolchain] Keep requirements specific to one study in its [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). A longer recurring procedure can become a [skill](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html#what-skills-add): saved instructions that guide the agent through a task and its checks. The [DSS agent skills catalogue](https://iqss.github.io/dss-agent-skills/) provides reusable procedures for research tasks.
 
 ## Use tools from the app
 
