@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     { n: "15", group: "V", slug: "parallel-work", title: "Divide work between agents: shared projects and git worktrees", tool: "the charging dock",
       body: "Assign tasks to agents using shared or separate folders. Have a coordinating agent combine their changes and check that the parts work together." },
     { n: "16", group: "V", slug: "headless-agents", title: "Run agents from saved prompts", tool: "the vise",
-      body: "Automate recurring agent tasks, such as checking each manuscript draft against saved results. Save the prompt and command, and keep each run’s report." },
+      body: "Have the agent review a collection of manuscripts, giving each paper a fresh session with the same prompt and tools. Keep each review for comparison." },
     { n: "17", group: "V", slug: "local-models", title: "Run and adapt an LLM on your own hardware", tool: "the desk lamp",
       body: "Have the agent set up an LLM for your hardware, run a research task, and test whether further training on reviewed examples improves results." },
     { n: "E", group: "REFERENCE", slug: "terminal-history", title: "Terminal vocabulary", tool: "the light switch",

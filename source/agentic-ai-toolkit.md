@@ -44,7 +44,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
-| Automate repeated agent tasks, such as checking whether an analysis can be reproduced | [Chapter 16: Run agents from saved prompts](#headless-agents) |
+| Review a collection of manuscripts using the same prompt in a fresh session for each paper | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) |
@@ -1001,88 +1001,73 @@ These agents collaborate on one implementation. An independent-implementation ch
 
 # 16. Run agents from saved prompts {#headless-agents}
 
-Some research tasks need to be repeated as their inputs change. The agent can prepare a saved command that starts another agent, supplies its instructions, and collects its results. This is *headless execution*: a program supplies the agent's prompt and receives its response, without an interactive conversation.[^tk-headless-execution-terms]
+Does a paper draw conclusions that go beyond what its results show? For one manuscript, you can ask the agent to read it and point to any claims it finds weakly supported. To ask the same question across a collection of manuscripts, you can have the agent set up a command that starts a fresh session for each paper, supplies the same review prompt, and saves each review with the paper’s identifier. Running an agent this way, with a program supplying the prompt and collecting the response, is called *headless execution*.[^tk-headless-execution-terms]
 
-Suppose you update an analysis of students' test scores and rebuild the manuscript. The table updates automatically, but the abstract still says that average scores fell when the revised results show they rose. A checking agent can compare the draft with the saved analysis results and flag this outdated wording. [`Claude Code` supports headless execution through the command `claude -p`](https://code.claude.com/docs/en/headless), which the agent can use to launch this check. Once configured, the workflow can check each new draft automatically.
+Suppose you want to know whether AI and human reviewers independently notice the same weaknesses in a paper’s evidence. A human reviewer might question a conclusion because many participants dropped out of the study. If the AI reviewer reads that comment first, you can no longer tell whether it would have raised the issue on its own. The [`Claude Code` command `claude -p`](https://code.claude.com/docs/en/headless) launches a headless agent to carry out a review. For this example study, have the agent supply each session with the review instructions and one manuscript. The human reviews stay separate until you’re ready to compare them with the AI reviews.
 
 []{#define-the-check-and-its-report}
 
-## Save the task and its launch command {#turn-the-task-into-a-saved-workflow}
+## Define one review {#turn-the-task-into-a-saved-workflow}
 
-Tell the agent what the check should do and what it should return. For the manuscript check, ask it to compare reported numbers and descriptions of results with the saved analysis outputs, allowing for the manuscript's stated rounding. Each finding should identify the passage and the supporting results file. The checking agent should report problems without editing the manuscript or rerunning the analysis, so its findings can be reviewed before changes are made.
+Ask each AI reviewer to identify the paper’s main claim, assess how well the evidence supports it, and point to the passage, table, or figure behind its assessment. This gives you a specific criticism to compare with a human reviewer’s, even when the two use different words. Have the agent save the agreed wording as the review prompt. If you already have a *skill*, a reusable set of instructions for this task, each session can use it.[^tk-headless-skill]
 
-Have the agent save the checking instructions in a prompt file such as `check-manuscript.md`. These instructions could also be packaged as a *skill*: a reusable procedure that an agent follows, including during a headless run.[^tk-headless-skill] The saved instructions describe the work; the launch command starts the agent that will carry it out.
+Have the agent create a command that starts one review session, gives it the saved prompt and one manuscript, and collects its response. The command saves the review under the manuscript’s identifier, for example as `A/review.md` for manuscript A. The agent can then run the same command for each manuscript on your list.[^tk-headless-command]
 
-The saved command starts the checking agent with its prompt, the selected draft and results files, and a new folder for its report.[^tk-headless-sdk] [`just`](https://just.systems/), a command runner, lets the agent give this command a name such as `just check-paper`. The agent creates that command for the project; [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how. The same instructions can be reused while the draft and results change between runs.
+## Choose what each session can see {#control-what-each-run-receives}
 
-## Choose the inputs, software, and access {#control-what-each-run-receives}
+A headless run can start a new conversation or continue an earlier one. Starting fresh for each paper keeps the previous conversation out of the review. A new session could still read another reviewer’s comments if its tools let it open the folder where those comments are saved.
 
-To prepare the workflow, have the agent check whether the `claude` command is available and install or configure it if needed. Having the desktop app installed does not establish that the command is available; [Chapter 18: Use an agent from the terminal: Claude Code](#start-a-conversation-with-the-agent) explains its setup. The agent should check which account the command uses, explain any additional charges, and guide any personal sign-in you need to complete.
+Because the reviewer receives the manuscript directly, have the agent disable the tools it could use to open other files or search the web. Apply the same settings to every review. Also have the agent check which instructions or saved memories load automatically. These can become part of the *context*, the information supplied to the large language model (LLM) as it produces a response.[^tk-headless-context-files] The command that launches the session collects and saves the review.
 
-When setting up the command, the agent can specify whether each run starts a new session, with a separate conversation history, or continues an existing one. For this manuscript check, have it start a new session for each draft and supply the draft, its saved results, and the instructions it needs.
+![](figures/headless-manuscript-reviews.svg){#fig-headless-research fig-alt="Three review sessions use the same saved prompt and tools. Each receives only its assigned manuscript, A, B, or C, and returns a review under the matching identifier. The collected AI reviews and the separately held human reviews come together for comparison after the sessions finish."}
 
-*Context* is the information supplied to the agent's large language model (LLM) for generating a response. A new session may still load project context files, global user instructions,[^tk-headless-context-files] or saved memory. Have the agent identify what will be loaded and select the material the task needs. It should give the checking agent read-only access to the draft and supporting results, and permission to save its report in the designated output folder.
-
-Ask the agent to check the tools and permissions from the headless session itself. An action requiring an unavailable approval should be reported as blocked rather than leave the run waiting indefinitely. If the task requires files to be excluded, have it test those restrictions with harmless files; [Chapter 2: Control what added tools can access](#tool-access) explains the controls.
+If the `claude` command is missing on the computer where the reviews will run, the agent can install it as described in [Chapter 18: Use an agent from the terminal: Claude Code](#start-a-conversation-with-the-agent). Have the agent confirm that it can run the reviews under your intended account and guide you through sign-in if needed.
 
 <details class="guide-example">
 <summary>Claude Code settings for unattended runs</summary>
 
-The [`dontAsk` permission mode](https://code.claude.com/docs/en/permissions) denies tool actions that would otherwise require approval, although installed extensions can affect that behavior. Normally permitted actions still run. The [`--bare` option](https://code.claude.com/docs/en/headless#start-faster-with-bare-mode) skips most automatically loaded instructions and extensions, but requires service credentials[^tk-headless-credentials] rather than ordinary subscription sign-in. Have the agent check the installed version, account requirements, and instructions needed before selecting these settings. Neither option alone establishes which files the checking agent can access.
+An unattended session needs a way to handle an action that would normally ask for your approval. The [`dontAsk` permission mode](https://code.claude.com/docs/en/permissions) generally denies such actions. Have the agent report when a restriction prevents a review. The [`--bare` option](https://code.claude.com/docs/en/headless#start-faster-with-bare-mode) skips most automatically loaded instructions and extensions, including skills it would normally discover. It uses separate service credentials.[^tk-headless-credentials] If the agent selects this option, have it supply the review instructions explicitly and check which files the available tools can read.
 
 </details>
 
-<details class="guide-example">
-<summary>Another example: test a research archive</summary>
+## Test two manuscripts, then run the collection {#test-and-run-the-workflow}
 
-A headless agent can also check whether another researcher could reproduce a paper's results from an `archive/` folder. This task needs deliberate separation from the working project. Have the agent prepare a test copy, recreate the software from the archive's documented requirements, and exclude unprovided files, instructions, and previous conversations. It should verify the intended access restrictions before launching the check.[^tk-headless-archive-check] The checking agent follows the reproduction instructions and reports problems without repairing the archive during the check.
+Before reviewing the collection, have the agent perform a *smoke test*, a small trial using the actual review command, account, and tools.[^tk-headless-smoke] Two short mock manuscripts on different subjects, such as street trees and seed growth, make it easy to spot a mix-up. The agent should check that each review discusses its assigned paper and that saving the second review leaves the first intact.
 
-</details>
+Test file access through the same headless setup. For example, the agent can place a harmless file beside the second mock manuscript and have the first session try to read it. Ask for the result of the attempted read. If it succeeds, have the agent correct the permissions and repeat the test before using the study manuscripts. [Chapter 2: Control what added tools can access](#tool-access) explains how to check the tools the task will use.
 
-## Test and run the workflow
-
-Before checking a complete manuscript, have the agent run a *smoke test*: a small representative task through the actual command, account, tools, and reporting steps. For example, it can check one results paragraph and table against their saved estimates. It should also test a temporary copy with a deliberately changed value, confirm that the checking agent reports the discrepancy and its source, and verify that the original files remain unchanged. Have it resolve any setup failures before enabling automatic checks.
-
-Once that works, have the agent connect `just check-paper` to the command that builds the manuscript, such as `just paper`, so each successful build launches the checking agent and saves its report. [Chapter 11: Generate documents from research outputs: Quarto and Pandoc](#research-documents) explains the document build. The checking command can also run on an existing draft without rebuilding it.
-
-Give the following prompt to the agent to set up this workflow; it prepares the separate checking prompt.
+The following prompt asks the agent to set up the workflow. The saved review prompt is what each new session receives.
 
 ::: {#prompt-headless-archive .prompt}
-> Set up a headless check of this manuscript against its saved analysis results. Save the checking instructions and create `just check-paper`, or use the project's existing command system. Each run should start a new checking session with the selected draft, results files, and instructions needed for the check, and save its report in a new folder. Check that the command can use the intended account and tools. Have the checking agent compare reported numbers and descriptions with the saved results, identify supporting file locations, and report anything it cannot check. It should leave the manuscript and analysis unchanged. Test a small draft and a temporary copy containing a deliberate mismatch. Resolve setup failures before arranging for the check to run after each successful manuscript build. Ensure failed or incomplete checks are reported even if the manuscript builds successfully. Record how to use it in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+> Set up a headless workflow to review this collection of manuscripts. Give each fresh session my review prompt and one manuscript directly. Disable the tools it could use to open other files or search the web. Save each review under the manuscript’s identifier. Keep earlier AI reviews and the human reviews out of reach. Test the workflow on two mock manuscripts, check what each session can open, and show me both reviews before running the collection. Flag any manuscript that fails to produce a complete review.
 :::
 
-![](figures/headless-manuscript-check.svg){#fig-headless-research fig-alt="The agent runs a saved workflow that builds the manuscript and then launches a headless checking agent. Saved checking instructions, the current draft, and saved analysis results feed the checking agent. It reports a discrepancy between a statement that the mean test score decreased and a saved increase of 3.2 points. The report is saved separately from earlier reports and returned to the agent for review. The same procedure can check later drafts. The values are illustrative."}
+Read the two trial reviews. Can you tell which claim each reviewer assessed and what evidence it used? If either review is too general to compare with a human review, revise the prompt and have the agent repeat the trial.
 
-## Review and retain each run's results {#record-each-case}
+For a large collection, the agent can queue the review jobs and limit how many run at once, as described in [Chapter 9: Keep unattended jobs moving: pueue](#job-queues).
 
-Have the agent review the checking agent's report and inspect the evidence for its findings. The report should distinguish statements that match the saved results, discrepancies, and statements it could not check. For example, it might flag the abstract's claim that average test scores fell, confirm that the main table matches the saved estimates, and leave a claim about one student group unchecked because its supporting results file is missing. Each finding should identify the relevant passage and file location.
+## Account for every manuscript {#record-each-case}
 
-Have the agent keep each report with the exact draft and results it checked, so later revisions cannot replace its evidence. It should retain the following records:
+When the sessions finish, have the agent match the saved reviews to your manuscript list and flag missing, incomplete, or duplicate reviews. A session might return a message saying it could not read the manuscript file. Saving that message tells you what went wrong, but the paper still needs a review.
 
-| Record | Why keep it? |
-|----------------------------------------|------------------------------------------------------------|
-| Run identifier, checking prompt, and input versions | Identify the assignment and files checked. |
-| Agent software, LLM identifier, settings, and available tools | Record how the checking session ran. |
-| Original response and the tool operations and results it used | Preserve the findings and their supporting evidence.[^tk-headless-parsed] |
-| Completion status, errors, and any further attempts | Distinguish completed checks from failed or interrupted runs. |
+| [When to record it]{.text-nowrap} | What the agent keeps |
+|----------------------------|----------------------------------------------------------|
+| Once for the collection | The agreed review prompt, launch command, agent software version, LLM identifier, settings, and tools used across sessions. |
+| For each attempt | The manuscript identifier and version, the original response if one was returned, and whether the review was completed. For a repeat attempt, also record the reason. |
 
-A run can finish without producing a usable report. Have the agent check that the expected report was saved and that failed or incomplete checks are clearly identified, even if the manuscript built successfully. It should preserve incomplete responses, diagnose failures before retrying, and limit automatic retries. After reviewing the findings, it can correct implementation or reporting errors within the agreed task; changes to scientific choices or interpretation need your decision. A revised draft can then be checked again.
+If a session needs another attempt, have the agent diagnose the failure and save the new response separately. You can then apply the study’s criteria to decide which reviews to include and match the AI and human reviews by manuscript.
 
-Have the agent keep the checking prompt and command with the project and briefly record how to run the check and find its reports in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). If many checks need to run unattended, it can use [`pueue`](https://github.com/Nukesor/pueue), a tool that queues jobs and records their progress. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains how to set this up.
+[^tk-headless-execution-terms]: [Chapter 15: Divide work between agents: shared projects and git worktrees](#agent-execution-terms) compares headless sessions, subagents, and background execution.
 
-[^tk-headless-execution-terms]: For a comparison with subagents and background execution, see [Chapter 15: Divide work between agents: shared projects and git worktrees](#agent-execution-terms).
+[^tk-headless-skill]: See [Chapter 9: Use skills for recurring tasks](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html) in the companion guide *Doing Research with AI Agents*.
 
-[^tk-headless-skill]: See [Chapter 9: Use skills for recurring tasks](https://iqss.github.io/dss-agentic-research/chapters/reusable-procedures.html) in the companion guide *Doing Research with AI Agents* for finding, creating, and reusing skills.
+[^tk-headless-command]: If the project uses [`just`](https://just.systems/), the agent can give the review command a short name. See [Chapter 7: Give research tasks reliable commands: just](#project-commands).
 
-[^tk-headless-context-files]: Project context files hold instructions and records for the current project; global user instructions apply across projects. See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) and [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) in *Doing Research with AI Agents*.
+[^tk-headless-context-files]: Automatically loaded instructions can include project context files and global user instructions. See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) and [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) in *Doing Research with AI Agents*.
 
-[^tk-headless-credentials]: A credential establishes access to an account. An API key is one kind, used when a program accesses a service through its application programming interface (API). See [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for supplying credentials to saved commands.
+[^tk-headless-credentials]: A credential establishes access to an account. See [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) for supplying credentials to saved commands.
 
-[^tk-headless-archive-check]: [Chapter 19: Reproduce and hand off the research](https://iqss.github.io/dss-agentic-research/chapters/research-handoff.html#test-and-name-the-reproduction-route) in *Doing Research with AI Agents* explains archive preparation. For restoring software and configuring a separate environment, see [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) and [Chapter 10: Run work in a separate environment: containers](#containers).
-
-[^tk-headless-parsed]: The *raw response* is the exact text returned by the checking agent. A *parsed result* contains fields a program extracts from it, such as the passage and reported discrepancy. If the workflow extracts fields, save them separately from the original response.
-
-[^tk-headless-sdk]: An SDK, or software development kit, supplies libraries for controlling software from a program. The [Agent SDK documentation](https://code.claude.com/docs/en/agent-sdk/overview) describes `Python` and `TypeScript` packages for controlling agent runs. The agent can use these when the workflow needs more control than a saved command provides.
+[^tk-headless-smoke]: See [“Run a smoke test” in Chapter 7](#smoke-tests) for a worked example using a few simulation repetitions.
 
 # 17. Run and adapt an LLM on your own hardware {#local-models}
 
@@ -1193,25 +1178,27 @@ For longer training, have the agent configure *checkpoints*: saved training stat
 
 # 18. Use an agent from the terminal: Claude Code {#terminal-agents}
 
-A terminal provides another way to work with an agent: you type a research prompt and read its response in the same window where you can run project commands. This can be useful when you already work with scripts and job logs there, or connect to another computer to run an analysis. You can continue to give the agent instructions in ordinary language.
+A *terminal* is a window where you can give a computer typed commands and read their output. Commands can start programs, list files, or run an analysis. You can also start an AI agent there and converse with it in ordinary language. Some researchers prefer a terminal workspace because they can arrange conversations, project commands, and output in tabs or panes. The Claude desktop app also includes a terminal; you can choose the arrangement that suits your work.
 
-Suppose you need to regenerate a figure from saved statistical estimates. You can ask the agent to do this, have it identify the files it used, and then repeat the task through a saved command. This chapter follows that sequence using [`Claude Code`](https://code.claude.com/docs/en/overview). The project keeps its code and results whichever interface you use.
+A terminal can also connect you to another computer. For example, a university may offer access to more powerful computers for an analysis, such as Harvard's [Cannon computing cluster](https://docs.rc.fas.harvard.edu/kb/iqss-cannon-quickstart-guide/).[^tk-terminal-cluster] The walkthrough below uses your own computer: you will ask the agent to regenerate a figure and prepare a saved command that you can use to repeat the task.
 
 ## Open the project in a terminal
 
-A *terminal* is the window that displays typed input and program output. A *shell* is the program that interprets commands and starts other programs. Its *prompt* is the text indicating that it is ready for a command; this differs from a research prompt addressed to an agent. On a Mac, open `Terminal` through Spotlight. For this guide's Windows route, open Ubuntu in [`WSL2`](https://learn.microsoft.com/windows/wsl/) through [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/). The examples use that Ubuntu shell, not a `PowerShell` tab.
+Inside a terminal, a *shell* is the program that reads commands and starts other programs. The *shell prompt* is the text showing that the shell is ready for a command. It may look different on each computer and is separate from a written prompt you give the agent.
 
-The shell has a *working directory*: the folder from which it starts its work. Use `cd` followed by the project's path to select that folder. The agent in the desktop app can supply the exact command. Replace the example path below with your project's location, keeping the quotes if the path contains spaces:
+On a Mac, you can open `Terminal` through Spotlight. On Windows, this guide uses [`WSL2`](https://learn.microsoft.com/windows/wsl/), which provides a Linux environment on your computer, and Ubuntu, a version of Linux, within it. [`Windows Terminal`](https://learn.microsoft.com/windows/terminal/) provides the window in which to open Ubuntu. Ask the agent in the desktop app to help you identify or set up the terminal you will use.
+
+Before starting, ask the agent in the app to check whether the `claude` command is available in that terminal, install it if needed, and give you the command for opening your project folder. The desktop app and the terminal command are separate ways to use `Claude Code`; installing the app does not guarantee that the command is available. The agent can guide any personal sign-in needed for the command-line version.[^tk-terminal-cli]
+
+The shell's *working directory* is its current folder. To select the project, enter the `cd` command supplied by the agent at the shell prompt. On a Mac, it might look like this, with your own project path in place of the example:
 
 ```text
 cd "/Users/your-name/Research/my-project"
 ```
 
-Enter `pwd` to display the current directory and confirm that it is the intended project. [Appendix E: Terminal vocabulary](#terminal-history) explains paths and related terms further.
+The quotes keep a path containing spaces together. Then enter `pwd` to display the current folder and check that it is the project you intended. [Appendix E: Terminal vocabulary](#terminal-history) explains paths and related terms.
 
 ## Start a conversation with the agent
-
-First, ask the agent in the app to check whether the `claude` command is available in the terminal you will use. This command starts the *command-line interface*, the version of `Claude Code` launched by typing a command. If it is missing, have the agent install it using the [platform instructions](https://code.claude.com/docs/en/quickstart) and guide any sign-in you need to complete. Having the desktop app installed does not establish that this command is available.
 
 At the shell prompt in your project folder, enter:
 
@@ -1219,54 +1206,68 @@ At the shell prompt in your project folder, enter:
 claude
 ```
 
-Once `Claude Code` is running, type an instruction such as:
+This starts [`Claude Code`](https://code.claude.com/docs/en/overview) in the terminal. Your typed instructions now go to the agent rather than the shell. For a project with saved statistical estimates and a main results figure, you might ask:
 
 ::: {#prompt-terminal-figure .prompt}
-> Regenerate the main figure from the saved estimates and explain which files you used.
+> Regenerate the main results figure from the saved estimates. Prepare and check a `just figures` command that repeats this task. Report the estimates file and the path to the figure produced.
 :::
 
-Your input now goes to the agent. It can read the project context files[^tk-terminal-project-context] and use its permitted tools to carry out the task. When you have finished the conversation, enter `/exit` to return to the shell prompt.
+The agent can read the project context files[^tk-terminal-project-context] and use its permitted tools to carry out the task. It can prepare the saved command using [`just`](https://just.systems/), the command runner described in [Chapter 7: Give research tasks reliable commands: just](#project-commands). Check its report for the estimates file and figure location.
 
-![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Three states of the same terminal keep the project path visible. At the shell prompt, claude starts the agent. Inside Claude Code, the researcher supplies an ordinary-language prompt and uses /exit to return. At the shell prompt again, just figures runs the saved plotting script without an LLM call."}
-
-Starting in a project folder does not restrict every file the agent can reach; the access controls in [Chapter 2: Control what added tools can access](#tool-access) still apply. A hosted large language model (LLM) runs on the provider's computers, so information supplied to it is sent there even when you use a local terminal.
-
-## Run a saved command
-
-[`just`](https://just.systems/) gives project tasks short names. Each *recipe* contains the instructions for one task, saved in the project's `justfile`. If the project has a figure recipe, enter these commands at the shell prompt to list the available recipes and regenerate the figure:
-
-```text
-just --list
-just figures
-```
-
-In this example, `just figures` runs the plotting code using saved estimates. It does not ask an LLM to recreate the analysis. Installing `just` does not create that recipe: ask the agent to prepare and check it if it is missing, following [Chapter 7: Give research tasks reliable commands: just](#project-commands).[^tk-terminal-missing-command]
+Starting in a project folder does not by itself restrict every file the agent can access; [Chapter 2: Control what added tools can access](#tool-access) explains the controls. A hosted large language model (LLM) runs on the provider's computers, so information supplied to it is sent there even when you use a terminal on your own computer.
 
 ## Find session controls
 
-While `Claude Code` is running, type `/` to see its available controls. These *slash commands* are instructions to the agent application, rather than commands for the shell. The [command reference](https://code.claude.com/docs/en/commands) explains the controls supported by each version and account.
+While `Claude Code` is running, type `/` to see its available controls. These *slash commands* control the agent application; they are entered in the conversation, not at the shell prompt. Availability varies by version, account, and environment; the [command reference](https://code.claude.com/docs/en/commands) gives details.
+
+*Context* is the information supplied to the LLM for its next response. The controls below include ways to inspect that information and manage a long conversation.
 
 | Control | What it does |
 |------------------------------|----------------------------------------------------------------------|
 | `/model`, `/effort` | Select an available LLM and its reasoning effort. |
 | `/context` | Show how much of the session's context capacity is in use. |
 | `/compact` | Summarize conversation history to reduce the space it occupies. |
-| `/usage` | Show account-usage information. |
-| `/exit` | End the conversation and return to the shell. |
+| `/usage` | Show account-usage information available for your plan. |
+| `/exit` | Leave the agent and return to the shell. |
 
-Use `/usage` or the app or account display to check the usage and reset information available for your plan. This concerns account consumption; `/context` concerns the information held within the current session.
+Compaction replaces some conversation history with a summary, which can omit details.[^tk-terminal-controls] Before leaving, have the agent record current work and decisions in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). Ending the session does not necessarily delete its conversation: to choose an earlier conversation later, enter `claude -r` at the shell prompt.
 
-*Context* is the information supplied to the LLM for its next response. Compaction replaces some conversation history with a summary, which can omit details.[^tk-terminal-controls] Before ending a session, have the agent record the current work and decisions in the maintained [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+## Run a saved command
 
-[Appendix A: Tools for customizing your terminal](#working-environment) explains additional software for the terminal's appearance, shell, prompts and panes. For unattended computation, use [Chapter 9: Keep unattended jobs moving: pueue](#job-queues); for agent runs started from saved prompts, use [Chapter 16: Run agents from saved prompts](#headless-agents).
+When you are ready to leave the agent, enter `/exit` in the conversation. The shell prompt returns, ready for another command. You can ask the agent to run the prepared task in a later conversation, or run it yourself when you want to repeat the same task directly.
+
+`just` stores each named task as a *recipe* in the project's `justfile`. Once the agent has prepared and checked the recipe, enter the following at the shell prompt to regenerate the figure:
+
+```text
+just figures
+```
+
+Here, `just figures` runs the saved plotting code with the saved estimates; it does not ask an LLM to reconstruct the analysis. Look for the figure at the location the agent reported. If a command fails, give the agent the message and ask it to investigate.[^tk-terminal-missing-command]
+
+To see the other saved tasks available in the project, enter:
+
+```text
+just --list
+```
+
+The diagram below shows the change in who receives your input. The `%` is an example shell prompt; you do not type it. Your own shell prompt may look different.
+
+![](figures/terminal-agent.svg){#fig-terminal-agent fig-alt="Three states of the same terminal: a shell starts Claude Code; the researcher asks the agent to regenerate a figure and prepare a checked command, then exits; the shell runs the saved just figures command directly."}
+
+To arrange terminal tabs and panes for your work, see [Appendix A: Tools for customizing your terminal](#working-environment). For unattended research jobs, see [Chapter 9: Keep unattended jobs moving: pueue](#job-queues); for agent runs started from saved prompts, see [Chapter 16: Run agents from saved prompts](#headless-agents).
+
+[^tk-terminal-cluster]: A computing cluster is a group of computers available for research work. Follow the institution's guidance for connecting, using agents, and submitting analyses; Harvard's [FAS Research Computing AI guidance](https://docs.rc.fas.harvard.edu/kb/fasrc-ai-facilitation/) describes requirements for its clusters.
+
+[^tk-terminal-cli]: A *command-line interface* lets you start and control a program by typing commands. See the [Claude Code quickstart](https://code.claude.com/docs/en/quickstart) for installation and sign-in.
 
 [^tk-terminal-missing-command]: If the shell reports “command not found,” have the agent check whether the program is installed and available in that shell. [Chapter 3: Install and manage tools with Homebrew](#adding-tools) explains installation.
 
-[^tk-terminal-project-context]: See [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.
+[^tk-terminal-project-context]: For project context files, see [Chapter 7: Give the agent context for your project](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) in *Doing Research with AI Agents*.
 
-[^tk-terminal-controls]: [Chapter 5: Choose settings for the task](https://iqss.github.io/dss-agentic-research/chapters/directing-work.html#usage-and-context) explains account-usage limits, the context window and compaction.
+[^tk-terminal-controls]: [Chapter 5: Choose settings for the task](https://iqss.github.io/dss-agentic-research/chapters/directing-work.html#usage-and-context) in *Doing Research with AI Agents* explains account-usage limits, the context window, and compaction.
 
 <!-- ===================== REFERENCE ===================== -->
+
 
 # Appendix A. Tools for customizing your terminal {#working-environment}
 
@@ -1341,7 +1342,7 @@ After configuration, the agent should check the actual terminal you will use, in
 
 Personal tool settings can contain months of useful work: global user instructions[^tk-settings-user-instructions] refined through research projects, a terminal layout that works well, or settings that resolved a recurring software problem. Recreating them after a lost computer or an accidental overwrite would mean repeating that work. Their configuration files are scattered across locations chosen by different tools, rather than collected in one project folder that can simply be put under version control.
 
-[`chezmoi`](https://www.chezmoi.io/) is a tool that maintains copies of selected configuration files in one directory and installs them in the locations where the tools read them. [`Git`](https://git-scm.com/) can then record changes to that collection, and a repository stored elsewhere provides a copy from which to recover or set up another computer. `chezmoi` manages the relationship between the collection and the scattered working files; `Git` supplies their version history.
+[`chezmoi`](https://www.chezmoi.io/) is a tool that maintains copies of selected configuration files together in one folder and installs them in the locations where the tools read them. The agent can use [`Git`](https://git-scm.com/) to record changes to this collection in a *repository*: a folder with a recorded history of its files. Keeping a copy of that repository elsewhere allows recovery after a lost computer or setup on another one.
 
 ## Choose which settings to preserve {#choose-settings-to-preserve}
 
@@ -1355,37 +1356,41 @@ Configuration files supply a program's settings or instructions. Many have names
 
 In macOS and Linux shell paths, `~` means your home folder. These are example locations: ask the agent to identify the files your tools actually use and preserve any existing settings-management arrangement. [Appendix A: Tools for customizing your terminal](#working-environment) explains the terminal tools.
 
-Have the agent select the files with you before adding them. Keep passwords, access tokens, and saved sign-in state out of an ordinary settings repository, including a private one. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how programs can obtain secret values when needed. If a selected file controls agent permissions, the protection must cover both its maintained copy and the file the agent application reads, as explained in [Chapter 2: Control what added tools can access](#tool-access).
+Have the agent check the selected files before adding them to `chezmoi`. Files containing passwords, access tokens, or saved sign-in details should be left out, even if the settings repository is private. [Chapter 12: Keep credentials out of research files: 1Password and direnv](#credentials) explains how to store and supply credentials separately. Once you have agreed which files to preserve, ask the agent to save their current contents and install and configure `chezmoi` if needed.
 
-## Understand the two copies {#understand-the-two-copies}
+## How chezmoi manages the files {#understand-the-two-copies}
 
-The *source* is the maintained copy held by `chezmoi`, normally under `~/.local/share/chezmoi/`. The *applied file* is the copy installed where its program reads it. For example, the source file `dot_zshrc` becomes `~/.zshrc` when applied; the `dot_` prefix tells `chezmoi` to restore the leading dot.[^tk-chezmoi-files] The diagram shows this relationship on two computers, but preserving settings is useful even if you use only one.
+Each tool expects to find its settings in a particular location. `chezmoi` keeps a second copy of selected files together in one folder, so the agent can maintain them as a collection and use `Git` to record their history. The tools continue reading their settings from the original locations.
 
-![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Two computers each contain a chezmoi source folder and an applied settings file. The example maps dot_zshrc in the default source directory to .zshrc in the home directory. Apply goes from source to installed settings; capture goes back after an applied-file edit. The shell reads the applied file. Git transfers source changes between computers; chezmoi then applies the source on the receiving computer."}
+The copy stored by `chezmoi` is called the *source copy*.[^tk-chezmoi-files] The copy that the tool reads is called the *applied file*. *Applying* a change means updating the file the tool reads from the source copy.[^tk-chezmoi-permissions]
 
-Suppose you add a convention to your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions): retain full-precision numerical results and round values only when presenting them. The agent can edit the maintained source, check what applying it would change, and apply the update to [`~/.claude/CLAUDE.md`](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). It should then confirm that a new agent session loads the intended instructions. The instruction has been preserved only when the source also contains the change; editing the applied file alone leaves it vulnerable to being replaced by an older source copy.
+Suppose you want agents to keep numerical results at full precision and round them only in tables and prose. Ask the agent to add this rule to the source copy of your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). It then uses `chezmoi` to update the file that `Claude Code` reads, such as [`~/.claude/CLAUDE.md`](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), and checks that a new session reads the updated instructions.
 
 ## Maintain the settings and recover earlier versions {#maintain-and-recover-settings}
 
-Ask the agent to preserve existing files, set up `chezmoi` if needed, and record which files it manages. For a new [global user instruction](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions), editing the source and applying it provides a straightforward routine. Some applications also rewrite their settings themselves. Before applying a source version over such a file, the agent must compare the copies and capture any intended changes from the applied file back into the source.[^tk-chezmoi-edits]
+Settings can also change directly in the files that tools read. For example, changing the font size in a terminal application can update its settings file without updating the `chezmoi` source copy. Have the agent save that change back into the source copy before applying other updates; otherwise, the older font setting could overwrite the new one.[^tk-chezmoi-edits]
 
-Have the agent record checked changes in the settings repository and keep the agreed backup copy current. For example, it can push the source repository to a private [`GitHub`](https://github.com/) repository you authorize. A repository kept only on the same computer cannot recover files after that computer is lost.
+Both copies are normally on the same computer, so both could be lost if that computer fails. After checking that the tools use the intended settings, have the agent use `Git` to record changes to the source files and keep an updated copy elsewhere, such as a private [`GitHub`](https://github.com/) repository you authorize.
 
-If a later instruction causes problems, ask the agent to restore its earlier wording from version history while retaining unrelated improvements. It should apply the correction and check the result in a new session. Have it save the managed file locations and the update, backup, and recovery instructions in the settings repository's `README.md`, linked from your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions).
-
-::: {#prompt-preserve-settings .prompt}
-> Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding secret values and sign-in state, and preserve their current contents. Set up the maintained source and version history, then check that applying the source produces the intended files and that the relevant tools read them. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in the settings repository's `README.md`, linked from my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
-:::
+If a later edit accidentally removes the full-precision rule, ask the agent to restore that instruction from version history while retaining other changes. It should then update the applied file and check that a new session reads the restored instruction. Have the agent record the file locations and the update, backup, and recovery procedure in your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions).
 
 ## Use the settings on another computer {#preserve-differences-between-machines}
 
-On another computer, have the agent install `chezmoi`, retrieve the source repository, and inspect the proposed changes before applying them. Existing settings there may need to be preserved or merged. Transferring the repository and applying its contents are separate steps; saving a change on one computer does not automatically update the files on another.[^tk-chezmoi-transfer]
+On another computer, have the agent install `chezmoi` if needed and retrieve the source collection from the backup location. It should compare the saved settings with any already on that computer, preserve anything you want to keep, and then apply the agreed settings to the files the tools will read.[^tk-chezmoi-transfer]
 
-Some settings can be identical across computers, while others refer to different folder locations or available programs. A `chezmoi` *template* produces the appropriate settings for each computer. The agent can configure these differences while maintaining [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) once.[^tk-chezmoi-machines] It should check the actual result on the new computer, such as opening the intended terminal layout or confirming which [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) a new agent session loads.
+Some settings need to differ between computers. For example, your research folder may have a different path on each one. The agent can use a `chezmoi` *template*, a source file containing rules for those differences, to insert the correct path while keeping shared settings consistent.[^tk-chezmoi-machines] It should check the result on the new computer, such as opening the intended terminal layout or confirming that a new agent session reads your [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions).
+
+![](figures/research-shared-settings.svg){#fig-chezmoi-source-and-applied fig-alt="Two computers each contain a chezmoi source folder and an applied settings file. The example maps dot_zshrc in the default source directory to .zshrc in the home directory. Apply goes from source to installed settings; capture goes back after an applied-file edit. The shell reads the applied file. Git transfers source changes between computers; chezmoi then applies the source on the receiving computer."}
+
+::: {#prompt-preserve-settings .prompt}
+> Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding passwords, access tokens, and saved sign-in details, and preserve their current contents. Use `chezmoi` to maintain the source copies and `Git` to record their history. Check that applying the source copies updates the intended files and that the tools read the settings correctly. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
+:::
 
 [^tk-settings-user-instructions]: See [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) in *Doing Research with AI Agents*.
 
-[^tk-chezmoi-files]: The [`chezmoi` setup guide](https://www.chezmoi.io/user-guide/setup/) explains source and destination directories; its [source-state attributes](https://www.chezmoi.io/reference/source-state-attributes/) explain filename prefixes. The agent handles this mapping, so you do not need to rename the files yourself.
+[^tk-chezmoi-files]: Source copies normally live under `~/.local/share/chezmoi/`. The source file `dot_zshrc`, for example, becomes `~/.zshrc` when applied: the `dot_` prefix represents the leading dot. The [`chezmoi` setup guide](https://www.chezmoi.io/user-guide/setup/) explains the file locations, and its [source-state attributes](https://www.chezmoi.io/reference/source-state-attributes/) explain filename prefixes. The agent handles these names.
+
+[^tk-chezmoi-permissions]: An unauthorized change to the source copy of a permissions file could change the agent's access when applied. Protect both copies as described in [Chapter 2: Control what added tools can access](#tool-access).
 
 [^tk-chezmoi-edits]: See [`chezmoi` daily operations](https://www.chezmoi.io/user-guide/daily-operations/) for editing and applying source changes, and [`re-add`](https://www.chezmoi.io/reference/commands/re-add/) for capturing changes made to applied files.
 
@@ -1638,12 +1643,12 @@ Explanation and checks: [Chapter 15: Divide work between agents: shared projects
 :::
 
 ::: {.keep-together}
-### Check a manuscript with a headless agent {#bank-headless-archive .unlisted}
+### Set up one review session per manuscript {#bank-headless-archive .unlisted}
 
 Explanation and checks: [Chapter 16: Run agents from saved prompts](#prompt-headless-archive).
 
 ::: {.prompt}
-> Set up a headless check of this manuscript against its saved analysis results. Save the checking instructions and create `just check-paper`, or use the project's existing command system. Each run should start a new checking session with the selected draft, results files, and instructions needed for the check, and save its report in a new folder. Check that the command can use the intended account and tools. Have the checking agent compare reported numbers and descriptions with the saved results, identify supporting file locations, and report anything it cannot check. It should leave the manuscript and analysis unchanged. Test a small draft and a temporary copy containing a deliberate mismatch. Resolve setup failures before arranging for the check to run after each successful manuscript build. Ensure failed or incomplete checks are reported even if the manuscript builds successfully. Record how to use it in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+> Set up a headless workflow to review this collection of manuscripts. Give each fresh session my review prompt and one manuscript directly. Disable the tools it could use to open other files or search the web. Save each review under the manuscript’s identifier. Keep earlier AI reviews and the human reviews out of reach. Test the workflow on two mock manuscripts, check what each session can open, and show me both reviews before running the collection. Flag any manuscript that fails to produce a complete review.
 :::
 
 :::
@@ -1678,7 +1683,7 @@ Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](
 Explanation and checks: [Chapter 18: Use an agent from the terminal: Claude Code](#prompt-terminal-figure).
 
 ::: {.prompt}
-> Regenerate the main figure from the saved estimates and explain which files you used.
+> Regenerate the main results figure from the saved estimates. Prepare and check a `just figures` command that repeats this task. Report the estimates file and the path to the figure produced.
 :::
 
 :::
@@ -1700,7 +1705,7 @@ Explanation and checks: [Appendix A: Tools for customizing your terminal](#promp
 Explanation and checks: [Appendix B: Maintain personal settings: chezmoi](#prompt-preserve-settings).
 
 ::: {.prompt}
-> Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding secret values and sign-in state, and preserve their current contents. Set up the maintained source and version history, then check that applying the source produces the intended files and that the relevant tools read them. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in the settings repository's `README.md`, linked from my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
+> Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding passwords, access tokens, and saved sign-in details, and preserve their current contents. Use `chezmoi` to maintain the source copies and `Git` to record their history. Check that applying the source copies updates the intended files and that the tools read the settings correctly. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
 :::
 
 :::
