@@ -142,13 +142,13 @@ Set up a headless workflow to review this collection of manuscripts. Give each f
 
 Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](https://iqss.github.io/dss-agentic-toolkit/chapters/local-models.html#prompt-local-labeling).
 
-Prepare the approved computer for this interview-labeling task. Check its resources, choose a compatible LLM and runtime, and configure local execution without changing my usual hosted-agent settings. Use permitted test excerpts during setup. Create a saved command that reads the labeling instructions and excerpts and saves each original response alongside the extracted identifier, category, and supporting passage. Check representative input lengths, response fields, and memory use. Preserve failed attempts and report any inputs the setup cannot process. Record the software, settings, commands, and output locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+Set up a command to label interview excerpts on the approved computer. Use synthetic excerpts to check where the text goes and whether the longest expected excerpt fits. Have the script save each excerpt’s identifier, original response, label, and supporting passage. Flag missing or invalid answers. Once I approve the setup, run the command on the human-labeled examples, keeping the human labels out of the prompt. Save the disagreements for me to inspect on the approved computer before we label the full collection.
 
 ### Prepare and evaluate an adapted LLM
 
 Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](https://iqss.github.io/dss-agentic-toolkit/chapters/local-models.html#prompt-adapt-llm).
 
-Set up the agreed adaptation study using the approved training, development, and held-out test assignments. Preserve the base LLM and the selected prompt for the unadapted comparison. Before the planned training run, check that a short run can save an adapter and reload it with the base LLM in a separate program run. Save the training configuration and progress. Evaluate the selected adapted version and the unadapted comparison on the same held-out test excerpts using the agreed criteria. Keep both sets of responses and document the commands and files needed to use the saved version again.
+Test whether further training helps distinguish cost from transport in the interview excerpts. Keep the original LLM and prompt for comparison. Use separate excerpts for training, choosing an adapter, and the final test. Show that the labeling script can reload the adapter from a short run. Compare the selected adapter and the original LLM on the same held-out excerpts. Show me which errors training corrected and which it introduced.
 
 ## Use the terminal and preserve settings
 

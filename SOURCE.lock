@@ -1,5 +1,5 @@
 # Manuscript snapshot. CI checks generated chapters against the source hash.
 source_path: source/agentic-ai-toolkit.md
-source_sha256: 385dbfbb8091440cae43525ee7581114d5d4dbb4558bcc837a11cfe2a0c71529
+source_sha256: dd45eee0e47efae3110e09c6f32cdac29c263fe6ebcb967ae27b0d34f0e5d28b
 chapters: 23
 figures: 74
