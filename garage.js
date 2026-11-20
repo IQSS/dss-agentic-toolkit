@@ -26,51 +26,51 @@ document.addEventListener("DOMContentLoaded", function () {
   // Stable slugs are the chapter filenames; numbers and groups follow the current manuscript.
   const CH = [
     { n: "1", group: "I", slug: "choose-tools", title: "Choose tools for a research need", tool: "the robot",
-      body: "Ask an agent to install and use tools for a specific research need. Choose the capability you need, then follow its chapter independently." },
+      body: "Find tools for a research task, such as running a batch of analyses or rebuilding a manuscript. Ask the agent to install, configure, and check what you need." },
     { n: "2", group: "I", slug: "tool-access", title: "Control what added tools can access", tool: "the locked cabinet",
-      body: "Decide which files, commands, accounts, and network destinations the task needs. Have the agent configure and check access for each execution route." },
+      body: "Have the agent configure and test access for each tool, including programs it starts separately. Limit access to the files and services the task needs." },
     { n: "3", group: "II", slug: "adding-tools", title: "Install and manage tools with Homebrew", tool: "the workbench",
-      body: "Homebrew installs and manages tools and their supporting software. Ask the agent to use the established package manager and record new tools." },
+      body: "Homebrew manages software installation and updates. Have the agent add missing tools and record the setup so it can recreate it on another computer." },
     { n: "4", group: "II", slug: "version-control", title: "Recover earlier work: git and gh", tool: "the tape measure",
-      body: "Have the agent maintain meaningful checkpoints and recover earlier work without discarding unrelated changes. Add sharing when the project needs it." },
+      body: "Have the agent save a history of your files and restore earlier work without losing unrelated changes. Use GitHub when you want to collaborate." },
     { n: "5", group: "II", slug: "finding-files", title: "Find and inspect project files", tool: "the hammer",
-      body: "Use modern search and structured-data tools to locate evidence efficiently. The agent reports relevant files and values without loading the whole project." },
+      body: "Find the script that defines a variable or produces a result. Have the agent search and inspect relevant files, then report findings with their locations." },
     { n: "6", group: "III", slug: "environments", title: "Preserve a software environment: rig, renv, and uv", tool: "the wrench set",
-      body: "Record the language version separately from project packages. Have the agent restore both and check the working analysis." },
+      body: "Record the programming language and package versions used by an analysis. Have the agent restore that setup separately and check that it reproduces saved results." },
     { n: "7", group: "III", slug: "project-commands", title: "Give research tasks reliable commands: just", tool: "the power drill",
-      body: "Give modular research steps dependable names. Just saves commands; a smoke test checks the actual workflow before a large batch." },
+      body: "Give repeated tasks short commands, such as rebuilding figures from saved estimates. Have the agent save the instructions and test them before a long run." },
     { n: "8", group: "III", slug: "pipeline-dependencies", title: "Rerun only affected steps: targets and Snakemake", tool: "the gears",
-      body: "Combine named just commands with targets or Snakemake. The pipeline tracks dependencies and reruns affected steps while reusing current results." },
+      body: "Have the agent connect analysis steps through their inputs and outputs. Use targets or Snakemake to rerun affected steps and reuse results that remain current." },
     { n: "9", group: "III", slug: "job-queues", title: "Keep unattended jobs moving: pueue", tool: "the clock",
-      body: "Submit prepared jobs and let pueue start the next one automatically when capacity is available. Have the agent report outputs and failures." },
+      body: "Run a batch of analyses while you are away. Have the agent use pueue to limit simultaneous jobs, check results, and investigate failures." },
     { n: "11", group: "III", slug: "research-documents", title: "Generate documents from research outputs: Quarto and Pandoc", tool: "the pencil cup",
-      body: "Build maintained text and saved results into Markdown, Word, PDF, or HTML. Have the agent set up the renderer and check the produced document." },
+      body: "Produce Word, PDF, or HTML documents from manuscript text and saved results. Have the agent check the output and incorporate accepted coauthor edits." },
     { n: "10", group: "III", slug: "containers", title: "Run work in a separate environment: containers", tool: "the toolbox",
-      body: "Package system software, restrict task access, or run a local model with selected tools. Configure each container for its specific research purpose." },
+      body: "Package the software an analysis needs in a separate environment. Have the agent test it and configure which files and network connections it can access." },
     { n: "12", group: "IV", slug: "credentials", title: "Keep credentials out of research files: 1Password and direnv", tool: "the drawers and keys",
-      body: "Give approved commands the credentials they need. Keep passwords and API keys out of code and conversations." },
+      body: "Keep passwords and access keys in a password manager, and supply them when scripts need them. Have the agent configure and test this access." },
     { n: "13", group: "IV", slug: "service-connections", title: "Connect to research data and services: MCP", tool: "the power strip and jars",
-      body: "Connect the agent to useful application operations. A literature-library example explains when MCP adds value alongside files, commands, and APIs." },
+      body: "Connect the agent to a reference manager such as Zotero so it can retrieve papers and notes. Check its permissions and the information it returns." },
     { n: "14", group: "IV", slug: "browser-work", title: "Inspect and interact with a browser", tool: "the window",
-      body: "Have the agent inspect and test a website as it builds it, or navigate a source to collect research data. Preserve recurring collection as a saved workflow." },
+      body: "Let the agent open a research website, try its controls, and inspect what readers see. Browser access can also help it locate and download data." },
     { n: "15", group: "V", slug: "parallel-work", title: "Divide work between agents: shared projects and git worktrees", tool: "the charging dock",
-      body: "Divide tasks between agents with clear file ownership. Use a shared project or separate git worktrees according to the work and coordinate combined results." },
+      body: "Assign tasks to agents using shared or separate folders. Have a coordinating agent combine their changes and check that the parts work together." },
     { n: "16", group: "V", slug: "headless-agents", title: "Run agents from saved prompts", tool: "the vise",
-      body: "Launch saved agent prompts from an app or script. Record each case and output, smoke-test the workflow, and configure context deliberately." },
+      body: "Automate recurring agent tasks, such as checking each manuscript draft against saved results. Save the prompt and command, and keep each run’s report." },
     { n: "17", group: "V", slug: "local-models", title: "Run and adapt an LLM on your own hardware", tool: "the desk lamp",
-      body: "Run a trained model on your computer and connect it to an agent. Keep setup checks separate from research quality and data-access decisions." },
+      body: "Have the agent set up an LLM for your hardware, run a research task, and test whether further training on reviewed examples improves results." },
     { n: "E", group: "REFERENCE", slug: "terminal-history", title: "Terminal vocabulary", tool: "the light switch",
-      body: "Learn why terminal, shell, TTY, and related names persist. The history explains the interface without requiring a shell-programming tutorial." },
+      body: "Look up terms used in terminal commands and error messages, including shells, file paths, and exit status. Examples explain what the agent is checking." },
     { n: "18", group: "VI", slug: "terminal-agents", title: "Use an agent from the terminal: Claude Code", tool: "the radio",
-      body: "Open the project, start Claude, and give research prompts. Run saved just workflows directly when useful; shell commands and agent prompts are different inputs." },
+      body: "Start Claude Code in a terminal and give it research instructions in ordinary language. Learn where to enter agent prompts and where to run saved commands." },
     { n: "A", group: "REFERENCE", slug: "working-environment", title: "Tools for customizing your terminal", tool: "the strip light",
-      body: "Choose a terminal emulator, shell, plugins, prompt theme and multiplexer. Have the agent configure and check a setup suited to your projects." },
+      body: "Customize the terminal so you can direct an agent while monitoring research jobs. Have the agent configure the appearance, command history, and reusable layouts." },
     { n: "B", group: "REFERENCE", slug: "shared-settings", title: "Maintain personal settings: chezmoi", tool: "the parts organizer",
-      body: "Preserve accumulated instructions and tested settings from scattered files. Have the agent maintain a recoverable copy and transfer it to another computer." },
+      body: "Use chezmoi to collect scattered settings and Git to record their history. Have the agent preserve, restore, or transfer your setup between computers." },
     { n: "C", group: "REFERENCE", slug: "prompt-bank", title: "Prompt bank", tool: "the multimeter",
       body: "Find the guide's example prompts collected by task. Adapt one to your project, return to its explanation, or download the complete collection." },
     { n: "D", group: "REFERENCE", slug: "troubleshooting", title: "Troubleshooting", tool: "the level and square",
-      body: "Diagnose R execution and PDF build problems. Check the actual process, output, and build log." },
+      body: "Find help with stalled R jobs, problems with cloud storage, and PDF errors. Have the agent diagnose the cause, preserve affected files, and verify the repair." },
   ];
   const chapterLabel = n => n === "0" ? "Start" : /^[A-Z]$/.test(n) ? "Appendix " + n : "§" + n;
   const byN = n => CH.find(c => c.n === n);
@@ -639,6 +639,21 @@ document.addEventListener("DOMContentLoaded", function () {
     ro.dataset.preview = "0"; ro.style.setProperty("--dot", v("mustard"));
     roChapter.hidden = true; roIntro.hidden = false;
   }
+  function resetOverview() {
+    const moveFocus = ro.contains(document.activeElement) || hotLinks.includes(document.activeElement);
+    pinned = null; explored = null; selectedTool = null;
+    hotLinks.forEach(a => a.classList.remove("on"));
+    restore();
+    cueSequence(null);
+    if (moveFocus) roIntro.querySelector("h1").focus({ preventScroll: true });
+  }
+  document.getElementById("ro-back").addEventListener("click", resetOverview);
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape" || e.defaultPrevented || !explored) return;
+    if (e.target.closest("input, textarea, select, [contenteditable='true'], [role='dialog']")) return;
+    e.preventDefault();
+    resetOverview();
+  });
   const find = a => byN(a.dataset.n);
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   if (!fine) roHow.textContent = "Tap one to see what it covers, and tap it again to open that chapter.";

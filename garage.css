@@ -148,7 +148,7 @@ body:has(.garage-page) #title-block-header { display: none; }   /* the title liv
 #board .note-edge { fill: none; stroke: transparent; stroke-width: 3; transition: stroke .15s; }
 #board:has(#readout[data-preview="1"]) .note-edge { stroke: var(--g-mustard); }
 #board foreignObject { pointer-events: none; }
-#board a { pointer-events: auto; }
+#board a, #board button { pointer-events: auto; }
 #board-home { display: flow-root; font-family: Montserrat, Questrial, sans-serif; color: var(--g-note-ink); }
 
 .garage-readout {
@@ -178,6 +178,24 @@ body.quarto-dark .garage-readout h2 .n { color: var(--g-mustard); }
 .garage-readout .go { font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--g-mustard); padding-bottom: 1px; }
 .garage-readout .go:hover, .garage-readout .go:focus-visible { border-bottom-color: currentColor; outline: none; }
 .garage-readout .hint { color: var(--g-muted); font-size: 0.85rem; margin-top: 6px; }
+.garage-readout .overview-back {
+  display: inline-block; margin: 0 0 8px; padding: 2px 0; min-height: 24px;
+  border: 0; background: transparent; color: var(--g-ink-2); cursor: pointer;
+  font: inherit; font-size: 13px; line-height: 1.4; text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.garage-readout .overview-back:hover { color: var(--g-ink); }
+.garage-readout .overview-back:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.garage-readout .intro h1:focus { outline: none; }
+.garage-page .creator-credit { margin: .75rem 0 0; text-align: center; font-family: var(--g-mono); font-size: 12px; color: var(--g-muted); }
+.garage-page .creator-credit a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+#board .garage-readout .overview-back {
+  display: block; width: fit-content; margin-bottom: 2px; color: var(--g-note-ink-2);
+}
+#board .garage-readout .overview-back:hover { color: var(--g-note-ink); }
+@media (max-width: 760px) {
+  .garage-readout .overview-back { min-height: 44px; font-size: .85rem; }
+}
 /* on the board: no card, the note's own ink, and sizes set for the drawing's scale */
 #board .garage-readout { background: none; border: 0; border-radius: 0; padding: 0; margin: 0; color: var(--g-note-ink); }
 #board .garage-readout .eyebrow { font-size: 11px; gap: 8px; margin-bottom: 7px; color: var(--g-note-muted); }
@@ -190,10 +208,13 @@ body.quarto-dark .garage-readout h2 .n { color: var(--g-mustard); }
 #board .garage-readout .intro p.how b { color: var(--g-note-ink); }
 #board .garage-readout .go { font-size: 14px; color: var(--c-blue); }
 #board .garage-readout .hint { display: none; }   /* no room on the note; the link is the affordance there */
+#board .garage-readout .chapter .eyebrow { margin-bottom: 5px; }
+#board .garage-readout .chapter h2 { margin-bottom: 5px; }
+#board .garage-readout .chapter p { margin-bottom: 4px; }
 
 .garage-legend {
   display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; padding-left: 2px;
-  font-family: var(--g-mono); font-size: 12px; color: var(--g-muted);
+  font-family: var(--g-mono); font-size: calc(12px + 1pt); color: var(--g-muted);
 }
 .garage-legend span::before {
   content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--dot);
