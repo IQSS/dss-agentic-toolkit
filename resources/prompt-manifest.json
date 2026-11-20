@@ -29,7 +29,7 @@
     {"id": "check-website", "title": "Check an interactive research website", "group": "services"},
     {"id": "collect-web-data", "title": "Collect data from a statistics portal", "group": "services"},
     {"id": "coordinate-agents", "title": "Coordinate analysis and figure agents", "group": "agents"},
-    {"id": "headless-archive", "title": "Check a manuscript with a headless agent", "group": "agents"},
+    {"id": "headless-archive", "title": "Set up one review session per manuscript", "group": "agents"},
     {"id": "local-labeling", "title": "Run interview labeling with a local LLM", "group": "agents"},
     {"id": "adapt-llm", "title": "Prepare and evaluate an adapted LLM", "group": "agents"},
     {"id": "terminal-figure", "title": "Ask the terminal agent to regenerate a figure", "group": "settings"},

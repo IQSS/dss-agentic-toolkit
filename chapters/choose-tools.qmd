@@ -38,7 +38,7 @@ The table below is a menu of capabilities, not a list to install in order. Keep 
 | Build, inspect, or collect data from a website | [Chapter 14: Inspect and interact with a browser](#browser-work) |
 | **Run and coordinate agents** | |
 | Divide a project between several agents | [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work) |
-| Automate repeated agent tasks, such as checking whether an analysis can be reproduced | [Chapter 16: Run agents from saved prompts](#headless-agents) |
+| Review a collection of manuscripts using the same prompt in a fresh session for each paper | [Chapter 16: Run agents from saved prompts](#headless-agents) |
 | Run or adapt a large language model (LLM) on your own hardware | [Chapter 17: Run and adapt an LLM on your own hardware](#local-models) |
 | **Work from the terminal** | |
 | Use a terminal interface to the agent | [Chapter 18: Use an agent from the terminal: Claude Code](#terminal-agents) |

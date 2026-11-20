@@ -132,11 +132,11 @@ Explanation and checks: [Chapter 15: Divide work between agents: shared projects
 
 Coordinate an analysis agent and a figure agent for this project. The figure agent will write plotting code that reads results saved by the analysis agent. Before they start, specify the contents and layout of that results file, including the estimates, their units, and the lower and upper uncertainty limits. Give each agent its inputs, expected outputs, and files to edit. Let the figure agent develop against a labeled synthetic example while the analysis code is being built. Coordinate shared files and preserve existing edits. When both agents finish, combine their work and run the analysis followed by the figures using the newly produced estimates. Report any research decisions that need my input.
 
-### Check a manuscript with a headless agent
+### Set up one review session per manuscript
 
 Explanation and checks: [Chapter 16: Run agents from saved prompts](https://iqss.github.io/dss-agentic-toolkit/chapters/headless-agents.html#prompt-headless-archive).
 
-Set up a headless check of this manuscript against its saved analysis results. Save the checking instructions and create `just check-paper`, or use the project's existing command system. Each run should start a new checking session with the selected draft, results files, and instructions needed for the check, and save its report in a new folder. Check that the command can use the intended account and tools. Have the checking agent compare reported numbers and descriptions with the saved results, identify supporting file locations, and report anything it cannot check. It should leave the manuscript and analysis unchanged. Test a small draft and a temporary copy containing a deliberate mismatch. Resolve setup failures before arranging for the check to run after each successful manuscript build. Ensure failed or incomplete checks are reported even if the manuscript builds successfully. Record how to use it in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+Set up a headless workflow to review this collection of manuscripts. Give each fresh session my review prompt and one manuscript directly. Disable the tools it could use to open other files or search the web. Save each review under the manuscript’s identifier. Keep earlier AI reviews and the human reviews out of reach. Test the workflow on two mock manuscripts, check what each session can open, and show me both reviews before running the collection. Flag any manuscript that fails to produce a complete review.
 
 ### Run interview labeling with a local LLM
 
@@ -156,7 +156,7 @@ Set up the agreed adaptation study using the approved training, development, and
 
 Explanation and checks: [Chapter 18: Use an agent from the terminal: Claude Code](https://iqss.github.io/dss-agentic-toolkit/chapters/terminal-agents.html#prompt-terminal-figure).
 
-Regenerate the main figure from the saved estimates and explain which files you used.
+Regenerate the main results figure from the saved estimates. Prepare and check a `just figures` command that repeats this task. Report the estimates file and the path to the figure produced.
 
 ### Configure the terminal and its panes
 
@@ -168,7 +168,7 @@ Inspect my current terminal setup and configure `iTerm2`, `zsh`, `Oh My Zsh`, `P
 
 Explanation and checks: [Appendix B: Maintain personal settings: chezmoi](https://iqss.github.io/dss-agentic-toolkit/chapters/shared-settings.html#prompt-preserve-settings).
 
-Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding secret values and sign-in state, and preserve their current contents. Set up the maintained source and version history, then check that applying the source produces the intended files and that the relevant tools read them. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in the settings repository's `README.md`, linked from my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
+Preserve my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions) and useful personal tool settings. Inspect their current locations and any existing settings manager before changing anything. Identify the files to manage with `chezmoi`, excluding passwords, access tokens, and saved sign-in details, and preserve their current contents. Use `chezmoi` to maintain the source copies and `Git` to record their history. Check that applying the source copies updates the intended files and that the tools read the settings correctly. Propose a backup location outside this computer and configure it after my approval. Record how to maintain the settings, recover an earlier version, and set up another computer in my [global user instructions](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#shared-instructions). Use that maintenance process for future settings changes.
 
 ## Diagnose a problem
 
