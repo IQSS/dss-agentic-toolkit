@@ -1075,103 +1075,104 @@ Suppose a study uses a large language model (LLM) to identify barriers to attend
 
 For each excerpt, the study needs its identifier, an assigned category, and a supporting passage. For example, an excerpt describing a missed appointment because no bus was available might be labeled `transport`, with the relevant passage saved beside it. An existing LLM may already perform this task adequately with clear instructions and examples. Training it further is a separate option, considered after evaluating that starting point.
 
-## Decide how the research task will use the LLM
+## Label an excerpt on the approved computer {#decide-how-the-research-task-will-use-the-llm}
 
-An LLM's *weights* are numerical values learned during training. An *LLM runtime* loads those weights and generates responses to supplied prompts. This operation is called *inference*: the trained LLM predicts successive tokens, the units of text it processes.[^tk-local-inference] Here, inference refers to generating a response, rather than drawing statistical conclusions about a population or effect.
+For the interview study, the agent can write a script that sends one excerpt and the study’s category definitions to an LLM running on the approved computer. The software that runs the LLM and returns its answer is called a *runtime*. Generating an answer with a trained LLM is called *inference*.[^tk-local-inference] The LLM supplies a label and a supporting passage. The script saves them with the identifier of the excerpt it submitted, then moves on to the next excerpt.
 
-For the interview task, a script can read each excerpt, send it with the labeling instructions to the runtime, and save the response. The agent builds and checks that script. If the task instead requires an agent to choose and operate tools, it also needs a *software harness*: the program that supplies context to the LLM, carries out its tool requests, and returns the results for the next response. Context is the information the LLM receives to generate its response.
-
-![](figures/local-llm-execution.svg){#fig-local-llm-execution fig-alt="On approved hardware, a research script can send text to an LLM runtime and save the returned fields. Alternatively, an agent harness supplies context to the runtime, receives responses or tool requests, executes permitted tools and returns their results. The runtime loads the LLM weights and generates responses; it does not provide the agent's complete tool environment or access restrictions. The alternatives share one runtime in this conceptual diagram."}
-
-An agent using a hosted LLM can help write the code and configure local software without reading the protected interview records. Have it use permitted test material, such as synthetic excerpts, during setup. Before processing the study records, have it confirm that they will be read only by software permitted to handle them and sent only to the approved runtime.
+An agent that uses a hosted LLM, one running on a provider’s computers, can still write and test this script. Give it synthetic interview excerpts, and keep the study records outside its reach. Before using those records, have the agent demonstrate with the synthetic excerpts where the script sends its requests and where it saves the responses. The study excerpts, responses, and any logs containing interview text must stay in the approved environment.
 
 ## Choose hardware and a runtime
 
-*Open weights* are available to download under specified terms. Have the agent check those terms and flag restrictions relevant to the study; downloadable weights do not necessarily make the whole system open source. [`Ollama`](https://docs.ollama.com/quickstart) is one runtime for compatible downloaded LLMs. If an approved institutional service already meets the study's needs, have the agent use it rather than install another runtime.
+If your institution already runs an LLM service inside the approved environment, the agent can connect the script to it. To run the study on your own computer, the agent can install a runtime such as [`Ollama`](https://docs.ollama.com/quickstart) and download a compatible *open-weights* LLM. Its *weights* are the numerical values learned during training. Making them available for download lets others run the LLM on their own hardware. Have the agent check that the license permits the study’s use.
 
-Ask the agent to check the computer's operating system, memory, processing hardware, and storage before selecting an LLM.[^tk-local-hardware] The download size is not the memory needed during use: longer inputs and more simultaneous requests increase that requirement. *Quantization* stores weights at lower numerical precision, often reducing memory use, but it can change the responses. The study should evaluate the actual LLM version and quantization it will use.[^tk-local-quantization]
+Can the computer handle the longest excerpts in the study? Have the agent check the computer’s memory, processing hardware, and storage when choosing an LLM. A download that fits on disk may still need more memory than the computer has once the prompt and excerpt are included. The agent may suggest a smaller version to try.[^tk-local-quantization] Evaluate the version you expect to use for the study.
 
-For `Ollama`, have the agent configure the runtime that serves the responses. Its documented [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) disables cloud features. If the research script runs on the same computer, the runtime can listen on the *loopback address*, `127.0.0.1`, so other computers cannot connect directly to it. An institutional server needs its own approved connection arrangements. Ask the agent to store downloaded weights outside cloud-synchronized project folders.
+With `Ollama`, have the agent enable the [local-only setting](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) and verify that the script sends test excerpts to the intended computer. If the script and runtime run on the same computer, the agent can also limit incoming connections to that computer.[^tk-local-loopback] On an institutional server, use the connection method approved for the study.
 
 ::: {#apple-on-device}
 <details class="guide-example">
 <summary>Apple's on-device LLM</summary>
 
-On a compatible Mac, Apple's system LLM offers another documented option for tasks such as extracting specified fields. Its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk), a library for access from a program, and the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/) have system and execution-mode requirements the agent must check. This differs from downloading open weights for `Ollama`; an offered cloud-processing mode changes where the request runs. Have the agent record the system and SDK versions and evaluate the intended task.
+On a compatible Mac, the agent can check whether Apple’s built-in LLM can extract the fields the study needs. Apple documents access from a script through its [`Foundation Models Python SDK`](https://github.com/apple/python-apple-fm-sdk) and from the terminal through the [`fm` command](https://developer.apple.com/videos/play/wwdc2026/334/). Have the agent verify that the chosen method processes the excerpts on the device and record the system and software versions used in the trial.
 
 </details>
 
 :::
 
-## Run the research task
+## Test the labels before running the collection {#run-the-research-task}
 
-Have the agent prepare the labeling script and save a command to run it. For example, [`just`](https://just.systems/) can provide `just label-excerpts`, with the input file, instructions, and output folder specified by the agent. This is a command to create for the project, not a built-in `Ollama` command. [Chapter 7: Give research tasks reliable commands: just](#project-commands) explains how the agent maintains it.
+Have the agent save a command that runs the labeling script. If the project uses [`just`](https://just.systems/), for example, the agent could name it `just label-excerpts`. Ask it to test the actual command with permitted excerpts spanning the lengths you expect. For the longest ones, check that the runtime received the full text and had room to generate an answer.[^tk-local-context] If an excerpt is too long, the agent should flag it so you can decide how to handle it.
 
-Have the agent test that command on a small set of permitted excerpts before processing the full collection. The examples should span the expected input lengths. Each response should retain the correct excerpt identifier, a permitted category, and the requested supporting passage. The agent should report unreadable responses and missing fields, and check that passages attributed to an interview actually occur in the supplied excerpt. These checks establish that the software handles the responses; comparison with human judgments evaluates the labels themselves.
+Have the script save the original response for each excerpt and record any failed or repeated attempt. It can check that the label is one of the study’s categories and that the quoted passage occurs in the excerpt. An answer can pass both checks and still get the barrier wrong.
+
+Suppose a synthetic interview excerpt reads, “The bus was running, but I couldn’t afford the clinic fee.” The LLM could assign `transport` and quote “The bus was running” exactly. A human reviewer might assign `cost` because the fee kept the interviewee from attending.
+
+To see how often this happens, have the agent run the script on excerpts that people have already labeled, keeping their labels out of the prompt. For each disagreement, the script should show both labels and the quoted passage on the approved computer. You can then judge whether the labels are accurate enough for the study. The companion guide explains [how to evaluate LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling).
 
 ::: {#prompt-local-labeling .prompt}
-> Prepare the approved computer for this interview-labeling task. Check its resources, choose a compatible LLM and runtime, and configure local execution without changing my usual hosted-agent settings. Use permitted test excerpts during setup. Create a saved command that reads the labeling instructions and excerpts and saves each original response alongside the extracted identifier, category, and supporting passage. Check representative input lengths, response fields, and memory use. Preserve failed attempts and report any inputs the setup cannot process. Record the software, settings, commands, and output locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+> Set up a command to label interview excerpts on the approved computer. Use synthetic excerpts to check where the text goes and whether the longest expected excerpt fits. Have the script save each excerpt’s identifier, original response, label, and supporting passage. Flag missing or invalid answers. Once I approve the setup, run the command on the human-labeled examples, keeping the human labels out of the prompt. Save the disagreements for me to inspect on the approved computer before we label the full collection.
 :::
 
-An input must fit both the LLM's context capacity and the memory available to the runtime.[^tk-local-context] If the setup cannot process the intended excerpts, the agent should explain the limitation so you can choose another candidate or approved computer. It should not silently shorten the material or substitute an LLM, because either change alters the labeling procedure.
-
-Have the agent keep the *raw response*, the exact returned text, separately from the fields extracted into the analysis table, retaining failures and retries with their excerpt identifiers. It should record the prompt, generation settings, runtime version, and exact LLM identifier with each run.[^tk-local-version] The [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) should explain how to start the runtime, run the command, and locate the records. These instructions should point to the saved configuration files rather than require someone to reconstruct the settings.
-
-The research guide's [evaluation of LLM labeling](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#evaluate-llm-labeling) explains how to assess the labels and their consequences for the analysis.
+If the results meet the study’s criteria, the agent can run the collection with the same LLM, prompt, and settings. Have it record the versions used[^tk-local-version] and keep the command and output locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) so the analysis can be repeated. A script and a runtime are sufficient for this workflow.
 
 ## Connect the LLM to an agent
 
-When the task requires an agent, its harness must be able to communicate with the selected runtime. [`Ollama`'s `Claude Code` integration](https://docs.ollama.com/integrations/claude-code) provides one documented option. `Claude Code` supplies the agent software; in this arrangement, a compatible LLM served through `Ollama` supplies the responses. Using the `Claude Code` application therefore does not, by itself, identify which LLM service is being used.
+Suppose several excerpts produce empty responses. You want an agent to read an affected excerpt, check the corresponding error log, and decide what to inspect next. Both files must stay on the approved computer. A local LLM can do this work as part of an agent. The agent’s *software harness* runs the tools the LLM requests and returns the results to it. Those results become part of its *context*, the information the LLM receives when producing its next response.
 
-Have the setup agent configure a separate way to launch this local agent, preserving the settings for your usual hosted service. It should verify the destination of LLM requests and test an actual tool call, such as reading a permitted test file. Fluent text alone does not show that the LLM can produce a tool request the harness can execute. Ask the setup agent to retain the tool call and result and record the working launch command and settings in the global user instructions file `TOOLCHAIN.md`.[^tk-local-toolchain]
+![](figures/local-llm-execution.svg){#fig-local-llm-execution fig-alt="A script sends an interview excerpt to a local LLM runtime and saves the label and supporting passage with the excerpt ID. A second route uses the same runtime with an agent harness. The harness runs permitted tools and sends their results back to the LLM."}
 
-Runtime settings govern LLM processing; an agent's other tools can still contact remote services. Have the setup agent apply and check the file and network controls in [Chapter 2: Control what added tools can access](#tool-access). The local agent can also be launched from a saved prompt using [Chapter 16: Run agents from saved prompts](#headless-agents), or take part in the coordinated work in [Chapter 15: Divide work between agents: shared projects and git worktrees](#parallel-work). Local execution, unattended execution, and delegation are separate choices that can be combined.
+For example, [`Claude Code` can connect to `Ollama`](https://docs.ollama.com/integrations/claude-code). `Claude Code` runs the tools, and a compatible local LLM supplies the responses. Ask the agent helping with setup to configure a separate launch command so you can still use the hosted service for other work. Have it test the local agent by asking it to read a synthetic file, then report which runtime received the request, which tool ran, and what text it returned.
 
-## Prepare an adaptation study {#adapt-a-model-when-the-study-calls-for-it}
+A tool available to the local agent could still send interview text to an external service. Before allowing it to inspect study files, have the agent check its file and network access as described in [Chapter 2: Control what added tools can access](#tool-access). It can record the working launch command and settings in the global user instructions file `TOOLCHAIN.md`.[^tk-local-toolchain]
 
-If an existing LLM does not perform the labeling task well enough, training on reviewed examples may help it follow the study's categories. *Fine-tuning* means training an existing LLM further. *LoRA*, or low-rank adaptation, is one approach: it keeps the original, or *base*, weights fixed and trains a relatively small set of additional values. Those values are saved as an *adapter*, which must be loaded with the compatible base LLM. Full fine-tuning instead updates the original weights.
+## When further training is worth testing {#adapt-a-model-when-the-study-calls-for-it}
 
-The research guide explains [when to consider training](https://iqss.github.io/dss-agentic-research/chapters/research-models.html#context-or-training) and [how to evaluate the adapted LLM](https://iqss.github.io/dss-agentic-research/chapters/research-models.html#evaluate-adapted-model). Here, the agent's task is to prepare the software for the approved study. It needs tools that support the chosen LLM, adaptation method, and hardware. Training can require more memory than generating responses, so the inference setup alone does not establish that the computer can handle it.
+Suppose the local LLM repeatedly confuses cost and transport, even after you clarify the category definitions and give it examples. You could train it on excerpts with reviewed labels to see whether it improves. This further training is called *fine-tuning*. One method, *low-rank adaptation* (LoRA), keeps the weights of the original LLM (the *base LLM*) fixed and trains a small set of additional values. The agent saves these as an *adapter*. Keep the original LLM and its prompt so you can later compare the labels with and without the adapter.
 
-| Computing environment | Candidate tool | What the agent checks |
-|---------------------------|---------------------------|----------------------------------------------|
-| Apple silicon Mac | [`MLX LM`](https://github.com/ml-explore/mlx-lm) | Support for the base LLM, available memory, and the required training-data format |
-| A supported [`PyTorch`](https://pytorch.org/) environment, commonly with a suitable GPU | [`Hugging Face PEFT`](https://huggingface.co/docs/peft/main/en/quicktour) | Support for the base LLM and adapter method, hardware, and software requirements |
-| An institutional training service | Its approved training tools | Access to data, assigned computing resources, and where trained files are saved |
+Reserve a set of human-labeled excerpts that no one has used to refine the prompt. These are the *held-out* excerpts for the final comparison. From the remaining examples, the agent uses one set to train the adapter and a separate *development set* to help you choose which version to keep. The training files, logs, and adapter can retain information from the interviews, so keep them in storage approved for the study.
 
-Have the agent install the tools in a recorded project environment, following [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments). It should prepare the examples in the format those tools require[^tk-local-training-format] while preserving their assigned roles: training examples update the LLM, development examples help choose the setup, and held-out test examples support the final evaluation. Converting the files must not change which examples belong to each set.
+<details class="guide-example">
+<summary>Training tools for different computers</summary>
 
-## Save, reload, and evaluate the adapted LLM
+Training can require more memory than labeling. Have the agent check the available hardware and record the software it installs as described in [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments).
 
-Before a long training run, have the agent check that a short run can save an adapter and load it with the base LLM in a separate program run. This confirms that the saved files can be used after the training session ends. Loading also requires the matching *tokenizer*, the software that divides text into the units the LLM processes. The loaded version should generate responses through the same labeling workflow used for the unadapted LLM.[^tk-local-reload]
+| Where training runs | Candidate tool | What the agent checks |
+|-------------------------|--------------------|--------------------------------------------------|
+| Apple silicon Mac | [`MLX LM`](https://github.com/ml-explore/mlx-lm) | Support for the base LLM, available memory, and the format of the training examples.[^tk-local-training-format] |
+| A computer using [`PyTorch`](https://pytorch.org/) | [`Hugging Face PEFT`](https://huggingface.co/docs/peft/main/en/quicktour) | Support for the adapter method, the selected LLM, and the available hardware. |
+| An institutional training service | The service’s approved tools | Where it can read the training examples and save the trained files. |
 
-::: {#prompt-adapt-llm .prompt}
-> Set up the agreed adaptation study using the approved training, development, and held-out test assignments. Preserve the base LLM and the selected prompt for the unadapted comparison. Before the planned training run, check that a short run can save an adapter and reload it with the base LLM in a separate program run. Save the training configuration and progress. Evaluate the selected adapted version and the unadapted comparison on the same held-out test excerpts using the agreed criteria. Keep both sets of responses and document the commands and files needed to use the saved version again.
-:::
+</details>
+
+### Save and reload the adapter {#save-reload-and-evaluate-the-adapted-llm}
+
+Before a long training run, have the agent fit and save an adapter using a small training sample. To use it later, the labeling script needs the adapter, the compatible base LLM, and its *tokenizer*, the software that divides text into the units the LLM processes. Have the agent end the training session and use the script to reload the adapter and label another excerpt. Keep the working command for future runs.[^tk-local-reload]
 
 ![](figures/llm-adaptation.svg){#fig-llm-adaptation fig-alt="The original base weights and tokenizer remain unchanged. After training, the agent retains adapter weights and configuration. The agent reloads the adapter with the compatible base LLM and compares this configuration with the unadapted baseline on the same held-out cases, using selected prompts and recorded generation settings. Both response files retain case identifiers for scoring against human reference labels."}
 
-For the interview study, the comparison is between the selected adapted LLM and the unadapted LLM with its selected prompt. Have the agent save both sets of responses with matching excerpt identifiers, then score them against the same human reference labels. The scientific evaluation determines whether adaptation improved the task; successfully saving and loading an adapter establishes only that those software steps worked.
+For a long run, have the agent check whether the training software can save a *checkpoint*, the state it needs to continue interrupted training. If so, ask it to test restarting from one. Use the institution’s job scheduler where required. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains how the agent can queue a job on your own computer.
 
-Have the agent retain the adapter and its configuration with the matching base LLM and tokenizer. It should preserve the training-data assignments, software environment, and evaluation results, with commands for loading and using the adapter in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records). If using another runtime requires converting or combining the adapter and base weights, have the agent evaluate that exported version too; it is the version that will generate the study's labels.
+::: {#prompt-adapt-llm .prompt}
+> Test whether further training helps distinguish cost from transport in the interview excerpts. Keep the original LLM and prompt for comparison. Use separate excerpts for training, choosing an adapter, and the final test. Show that the labeling script can reload the adapter from a short run. Compare the selected adapter and the original LLM on the same held-out excerpts. Show me which errors training corrected and which it introduced.
+:::
 
-For longer training, have the agent configure *checkpoints*: saved training state from which an interrupted calculation can continue. It should check the software's recovery procedure and arrange job management for the approved computer. [Chapter 9: Keep unattended jobs moving: pueue](#job-queues) explains local job queues; institutional systems may provide their own scheduler. Training data, responses, logs, and adapters can contain or retain sensitive information, so their storage and sharing must follow the study's requirements.
+For the final comparison, use the adapter in the runtime and format that will produce the study labels. Have the agent match both sets of responses to the human labels by excerpt identifier. Did training reduce confusion between cost and transport? Did it introduce errors in other categories? You can weigh those results against the cost of further training and decide which version to use for the collection. The research guide discusses [how to evaluate an adapted LLM](https://iqss.github.io/dss-agentic-research/chapters/research-models.html#evaluate-adapted-model).
 
-[^tk-local-inference]: A token is a unit of text, often a word or part of a word. The LLM predicts a distribution over possible next tokens and uses it to generate a response. The research guide's [explanation of LLM inference](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#define-the-output-and-its-research-meaning) places this prediction step in the research workflow.
+[^tk-local-inference]: In LLM inference, the trained LLM generates a response one *token* at a time. A token can be a word or part of a word. Statistical inference concerns what data can tell us about a population or effect. See the research guide’s [explanation of LLM inference](https://iqss.github.io/dss-agentic-research/chapters/llm-measurements.html#define-the-output-and-its-research-meaning).
 
-[^tk-local-hardware]: An accelerator performs particular calculations faster than a general-purpose processor. A GPU, or graphics processing unit, is commonly used for LLM calculations. The agent should check the runtime's actual hardware support rather than infer it from the computer's name.
+[^tk-local-quantization]: One way to reduce memory use is *quantization*, which stores weights at lower numerical precision. This can change the responses, so include the chosen version in the labeling trial. See the [`Hugging Face` explanation of quantization](https://huggingface.co/docs/optimum/en/concept_guides/quantization).
 
-[^tk-local-quantization]: Lower precision uses fewer bits to represent numerical values. For example, a quantized LLM may use four-bit weights in place of higher-precision values. The [Hugging Face explanation of quantization](https://huggingface.co/docs/optimum/en/concept_guides/quantization) describes how this reduces memory requirements. Evaluate the chosen version on the research task.
+[^tk-local-loopback]: A service that listens on the *loopback address*, `127.0.0.1`, can accept direct connections only from the same computer. On a shared server, the agent should check how access is restricted to authorized users.
 
-[^tk-local-context]: Context capacity is the amount of information the LLM can process in one response generation, measured in tokens. The agent should check the runtime's input/output limits and the actual token count instead of estimating capacity from document pages.
+[^tk-local-context]: The *context capacity* is the amount of text that can fit in one request and its response together, measured in units called *tokens*. The runtime can have a lower limit than the LLM supports. Have the agent test the limit with the study’s instructions and longest excerpts.
 
-[^tk-local-toolchain]: For the global user instructions file TOOLCHAIN.md, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
+[^tk-local-toolchain]: For the global user instructions file `TOOLCHAIN.md`, see [Chapter 8: Apply your conventions across projects](https://iqss.github.io/dss-agentic-research/chapters/shared-conventions.html#specialist-conventions) in *Doing Research with AI Agents*.
 
-[^tk-local-version]: A tag is a convenient name that can later point to different weights; a digest identifies particular content. [`Ollama`'s model-list API](https://docs.ollama.com/api/tags) provides identifying information. An API is an interface through which one program requests an operation from another. Have the agent retain the returned identifier for the LLM actually used.
+[^tk-local-version]: Record the runtime version and an exact identifier for the LLM. A *tag* is a name that can later refer to different weights. A *digest* identifies particular content. [`Ollama`’s model-list documentation](https://docs.ollama.com/api/tags) shows where to find both.
 
-[^tk-local-training-format]: `MLX LM` can read `.jsonl` files, meaning JSON Lines: a text format with one structured record per line. Each training record can pair a prompt with the desired response. Its [data-format documentation](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md#data) explains supported layouts; the agent should convert the study's reviewed examples to the selected tool's format.
+[^tk-local-training-format]: For example, `MLX LM` accepts JSON Lines, a text format with one structured record per line. Each training record can pair a prompt with its reviewed response. See the [`MLX LM` data formats](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md#data).
 
-[^tk-local-reload]: The [`MLX LM` adaptation guide](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md) and [`PEFT` quicktour](https://huggingface.co/docs/peft/main/en/quicktour) document saving adapters and using them with a base LLM. The agent should check compatibility with the software that will generate the study responses.
+[^tk-local-reload]: The [`MLX LM` adaptation guide](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md) and [`Hugging Face PEFT` quicktour](https://huggingface.co/docs/peft/main/en/quicktour) describe saving adapters and loading them with compatible base LLMs.
 
 
 <!-- ===================== PART VI — WORK FROM THE TERMINAL ===================== -->
@@ -1659,7 +1660,7 @@ Explanation and checks: [Chapter 16: Run agents from saved prompts](#prompt-head
 Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](#prompt-local-labeling).
 
 ::: {.prompt}
-> Prepare the approved computer for this interview-labeling task. Check its resources, choose a compatible LLM and runtime, and configure local execution without changing my usual hosted-agent settings. Use permitted test excerpts during setup. Create a saved command that reads the labeling instructions and excerpts and saves each original response alongside the extracted identifier, category, and supporting passage. Check representative input lengths, response fields, and memory use. Preserve failed attempts and report any inputs the setup cannot process. Record the software, settings, commands, and output locations in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records).
+> Set up a command to label interview excerpts on the approved computer. Use synthetic excerpts to check where the text goes and whether the longest expected excerpt fits. Have the script save each excerpt’s identifier, original response, label, and supporting passage. Flag missing or invalid answers. Once I approve the setup, run the command on the human-labeled examples, keeping the human labels out of the prompt. Save the disagreements for me to inspect on the approved computer before we label the full collection.
 :::
 
 :::
@@ -1670,7 +1671,7 @@ Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](
 Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](#prompt-adapt-llm).
 
 ::: {.prompt}
-> Set up the agreed adaptation study using the approved training, development, and held-out test assignments. Preserve the base LLM and the selected prompt for the unadapted comparison. Before the planned training run, check that a short run can save an adapter and reload it with the base LLM in a separate program run. Save the training configuration and progress. Evaluate the selected adapted version and the unadapted comparison on the same held-out test excerpts using the agreed criteria. Keep both sets of responses and document the commands and files needed to use the saved version again.
+> Test whether further training helps distinguish cost from transport in the interview excerpts. Keep the original LLM and prompt for comparison. Use separate excerpts for training, choosing an adapter, and the final test. Show that the labeling script can reload the adapter from a short run. Compare the selected adapter and the original LLM on the same held-out excerpts. Show me which errors training corrected and which it introduced.
 :::
 
 :::
