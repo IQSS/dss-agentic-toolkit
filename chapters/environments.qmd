@@ -4,7 +4,9 @@ title: "6. Preserve a software environment: rig, renv, and uv"
 
 An analysis depends on particular versions of its language, packages, and other software. Recording those versions lets the agent recreate the software setup when investigating a result or preparing to share the project. The agent can recreate an earlier setup without changing the one currently in use.
 
-Suppose a collaborator reruns an analysis and obtains different intervals. The agent can recreate the original software setup to investigate whether a change in software explains the discrepancy. It can use [`rig`](https://rig.r-lib.org/) to select the [`R`](https://www.r-project.org/) version and [`renv`](https://rstudio.github.io/renv/) to restore its packages, or [`uv`](https://docs.astral.sh/uv/) to manage both language and package versions for [`Python`](https://www.python.org/).
+Suppose a collaborator reruns an analysis and obtains different intervals. The agent can recreate the original software setup to investigate whether a change in software explains the discrepancy.[^tk-version-comparison] It can use [`rig`](https://rig.r-lib.org/) to select the [`R`](https://www.r-project.org/) version and [`renv`](https://rstudio.github.io/renv/) to restore its packages, or [`uv`](https://docs.astral.sh/uv/) to manage both language and package versions for [`Python`](https://www.python.org/).
+
+[^tk-version-comparison]: Gronenschild and colleagues (2012) processed the same brain scans with different versions of FreeSurfer and obtained different estimates of brain-region volumes and cortical thickness. [FreeSurfer version comparison](https://doi.org/10.1371/journal.pone.0038234)
 
 ## Record the language and package versions {#record-the-language-and-packages}
 

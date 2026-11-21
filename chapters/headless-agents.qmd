@@ -10,7 +10,9 @@ Suppose you want to know whether AI and human reviewers independently notice the
 
 ## Define one review {#turn-the-task-into-a-saved-workflow}
 
-Ask each AI reviewer to identify the paper’s main claim, assess how well the evidence supports it, and point to the passage, table, or figure behind its assessment. This gives you a specific criticism to compare with a human reviewer’s, even when the two use different words. Have the agent save the agreed wording as the review prompt. If you already have a *skill*, a reusable set of instructions for this task, each session can use it.[^tk-headless-skill]
+Ask each AI reviewer to identify the paper’s main claim, assess how well the evidence supports it, and point to the passage, table, or figure behind its assessment. This gives you a specific criticism to compare with a human reviewer’s, even when the two use different words.[^tk-review-comparison] Have the agent save the agreed wording as the review prompt. If you already have a *skill*, a reusable set of instructions for this task, each session can use it.[^tk-headless-skill]
+
+[^tk-review-comparison]: Liang and colleagues (2024) compared the points GPT-4 raised about manuscripts with those raised by human reviewers. They also measured how often two human reviewers raised the same points, giving readers a reference for interpreting the overlap. [“Can Large Language Models Provide Useful Feedback on Research Papers?”](https://doi.org/10.1056/AIoa2400196)
 
 Have the agent create a command that starts one review session, gives it the saved prompt and one manuscript, and collects its response. The command saves the review under the manuscript’s identifier, for example as `A/review.md` for manuscript A. The agent can then run the same command for each manuscript on your list.[^tk-headless-command]
 
