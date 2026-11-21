@@ -325,7 +325,9 @@ When inspecting a JSON or YAML file, the agent should distinguish between an abs
 
 An analysis depends on particular versions of its language, packages, and other software. Recording those versions lets the agent recreate the software setup when investigating a result or preparing to share the project. The agent can recreate an earlier setup without changing the one currently in use.
 
-Suppose a collaborator reruns an analysis and obtains different intervals. The agent can recreate the original software setup to investigate whether a change in software explains the discrepancy. It can use [`rig`](https://rig.r-lib.org/) to select the [`R`](https://www.r-project.org/) version and [`renv`](https://rstudio.github.io/renv/) to restore its packages, or [`uv`](https://docs.astral.sh/uv/) to manage both language and package versions for [`Python`](https://www.python.org/).
+Suppose a collaborator reruns an analysis and obtains different intervals. The agent can recreate the original software setup to investigate whether a change in software explains the discrepancy.[^tk-version-comparison] It can use [`rig`](https://rig.r-lib.org/) to select the [`R`](https://www.r-project.org/) version and [`renv`](https://rstudio.github.io/renv/) to restore its packages, or [`uv`](https://docs.astral.sh/uv/) to manage both language and package versions for [`Python`](https://www.python.org/).
+
+[^tk-version-comparison]: Gronenschild and colleagues (2012) processed the same brain scans with different versions of FreeSurfer and obtained different estimates of brain-region volumes and cortical thickness. [FreeSurfer version comparison](https://doi.org/10.1371/journal.pone.0038234)
 
 ## Record the language and package versions {#record-the-language-and-packages}
 
@@ -1009,7 +1011,9 @@ Suppose you want to know whether AI and human reviewers independently notice the
 
 ## Define one review {#turn-the-task-into-a-saved-workflow}
 
-Ask each AI reviewer to identify the paper’s main claim, assess how well the evidence supports it, and point to the passage, table, or figure behind its assessment. This gives you a specific criticism to compare with a human reviewer’s, even when the two use different words. Have the agent save the agreed wording as the review prompt. If you already have a *skill*, a reusable set of instructions for this task, each session can use it.[^tk-headless-skill]
+Ask each AI reviewer to identify the paper’s main claim, assess how well the evidence supports it, and point to the passage, table, or figure behind its assessment. This gives you a specific criticism to compare with a human reviewer’s, even when the two use different words.[^tk-review-comparison] Have the agent save the agreed wording as the review prompt. If you already have a *skill*, a reusable set of instructions for this task, each session can use it.[^tk-headless-skill]
+
+[^tk-review-comparison]: Liang and colleagues (2024) compared the points GPT-4 raised about manuscripts with those raised by human reviewers. They also measured how often two human reviewers raised the same points, giving readers a reference for interpreting the overlap. [“Can Large Language Models Provide Useful Feedback on Research Papers?”](https://doi.org/10.1056/AIoa2400196)
 
 Have the agent create a command that starts one review session, gives it the saved prompt and one manuscript, and collects its response. The command saves the review under the manuscript’s identifier, for example as `A/review.md` for manuscript A. The agent can then run the same command for each manuscript on your list.[^tk-headless-command]
 
