@@ -142,7 +142,7 @@ Set up a headless workflow to review this collection of manuscripts. Give each f
 
 Explanation and checks: [Chapter 17: Run and adapt an LLM on your own hardware](https://iqss.github.io/dss-agentic-toolkit/chapters/local-models.html#prompt-local-labeling).
 
-Set up a command to label interview excerpts on the approved computer. Use synthetic excerpts to check where the text goes and whether the longest expected excerpt fits. Have the script save each excerpt’s identifier, original response, label, and supporting passage. Flag missing or invalid answers. Once I approve the setup, run the command on the human-labeled examples, keeping the human labels out of the prompt. Save the disagreements for me to inspect on the approved computer before we label the full collection.
+Set up a command that uses an LLM running on my computer to label interview excerpts. Use synthetic excerpts to check where the text goes and whether the longest expected excerpt fits. Have the script save each excerpt’s identifier, original response, label, and supporting passage. Flag missing or invalid answers. Once I approve the setup, run the command on the human-labeled examples, keeping the human labels out of the prompt. Save the disagreements on my computer so I can inspect them before we label the full collection.
 
 ### Prepare and evaluate an adapted LLM
 
