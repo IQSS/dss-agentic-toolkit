@@ -292,3 +292,8 @@ body.quarto-dark { --g-sequence: #8bd6ef; --g-sequence-halo: #438aab; --g-sequen
     filter: drop-shadow(0 0 3px var(--g-sequence-label)) drop-shadow(0 0 7px var(--g-sequence));
   }
 }
+
+/* Ordinary chapter navigation when scripting is unavailable. */
+.landing-contents { max-width: 900px; margin: 32px auto; padding: 0 24px; }
+.landing-contents h2 { font-size: 1.25rem; margin-top: 1.75rem; }
+.landing-contents li { margin: 0.5rem 0; }
