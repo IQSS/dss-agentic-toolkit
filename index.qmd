@@ -10,6 +10,8 @@ resources:
 
 ::: {.garage-page}
 
+{{< include _landing-contents.qmd >}}
+
 ```{=html}
 <link rel="stylesheet" href="garage.css">
 <div class="garage-scene">

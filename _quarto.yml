@@ -31,6 +31,8 @@ format:
 project:
   type: dss-theme
   output-dir: _site
+  pre-render:
+    - python3 -B scripts/build-landing-contents.py
   resources:
     - "resources/**"
     - "!mockups/**"

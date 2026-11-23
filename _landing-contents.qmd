@@ -1,0 +1,52 @@
+```{=html}
+<noscript>
+<style>.console-scene,.console-legend,.garage-scene,.garage-legend {display:none!important}</style>
+<nav class="landing-contents" aria-labelledby="landing-contents-title">
+<h1 id="landing-contents-title">Contents</h1>
+<section><h2>Part I — Foundations</h2>
+<ul>
+<li><a href="chapters/choose-tools.html">1. Choose tools for a research need</a></li>
+<li><a href="chapters/tool-access.html">2. Control what added tools can access</a></li>
+</ul></section>
+<section><h2>Part II — Install Tools And Manage Project Files</h2>
+<ul>
+<li><a href="chapters/adding-tools.html">3. Install and manage tools with Homebrew</a></li>
+<li><a href="chapters/version-control.html">4. Recover earlier work: git and gh</a></li>
+<li><a href="chapters/finding-files.html">5. Find and inspect project files</a></li>
+</ul></section>
+<section><h2>Part III — Run And Reproduce Research</h2>
+<ul>
+<li><a href="chapters/environments.html">6. Preserve a software environment: rig, renv, and uv</a></li>
+<li><a href="chapters/project-commands.html">7. Give research tasks reliable commands: just</a></li>
+<li><a href="chapters/pipeline-dependencies.html">8. Rerun only affected steps: targets and Snakemake</a></li>
+<li><a href="chapters/job-queues.html">9. Keep unattended jobs moving: pueue</a></li>
+<li><a href="chapters/containers.html">10. Run work in a separate environment: containers</a></li>
+<li><a href="chapters/research-documents.html">11. Generate documents from research outputs: Quarto and Pandoc</a></li>
+</ul></section>
+<section><h2>Part IV — Connect To Data And Services</h2>
+<ul>
+<li><a href="chapters/credentials.html">12. Keep credentials out of research files: 1Password and direnv</a></li>
+<li><a href="chapters/service-connections.html">13. Connect to research data and services: MCP</a></li>
+<li><a href="chapters/browser-work.html">14. Inspect and interact with a browser</a></li>
+</ul></section>
+<section><h2>Part V — Run And Coordinate Agents</h2>
+<ul>
+<li><a href="chapters/parallel-work.html">15. Divide work between agents: shared projects and git worktrees</a></li>
+<li><a href="chapters/headless-agents.html">16. Run agents from saved prompts</a></li>
+<li><a href="chapters/local-models.html">17. Run and adapt an LLM on your own hardware</a></li>
+</ul></section>
+<section><h2>Part VI — Work From The Terminal</h2>
+<ul>
+<li><a href="chapters/terminal-agents.html">18. Use an agent from the terminal: Claude Code</a></li>
+</ul></section>
+<section><h2>Reference</h2>
+<ul>
+<li><a href="chapters/working-environment.html">Appendix A. Tools for customizing your terminal</a></li>
+<li><a href="chapters/shared-settings.html">Appendix B. Maintain personal settings: chezmoi</a></li>
+<li><a href="chapters/prompt-bank.html">Appendix C. Prompt bank</a></li>
+<li><a href="chapters/troubleshooting.html">Appendix D. Troubleshooting</a></li>
+<li><a href="chapters/terminal-history.html">Appendix E. Terminal vocabulary</a></li>
+</ul></section>
+</nav>
+</noscript>
+```
