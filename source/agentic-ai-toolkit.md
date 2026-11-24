@@ -212,7 +212,7 @@ Describe the task to the agent and name the tool if you have one in mind. Otherw
 > Set up a job queue for this project's simulations, using `pueue` unless a suitable tool is already available. Check existing installations and how software is managed on the computer that will run the jobs. Use `Homebrew` unless an established institutional method is more appropriate, particularly on a computing cluster. Install `Homebrew` if needed, and explain any steps I must complete myself. Configure the queue and confirm that you can submit and monitor jobs from this session.
 :::
 
-The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords only when prompted by the installer or system, not in the conversation.
+The agent installs `pueue` with `brew install pueue`. `Homebrew` calls the instructions for building and installing a program like `pueue` a [*formula*](https://formulae.brew.sh/formula/pueue). A *cask* tells `Homebrew` how to install software that its developer has already packaged, such as the [`Zotero`](https://www.zotero.org/) app for Mac. You handle system password prompts and institutional authorization. Enter passwords only when prompted by the installer or system, not in the conversation.
 
 The agent can install `Homebrew` using its [official installation script](https://brew.sh/). If a step needs your input, such as an administrator password, it should explain exactly what to do in the [`Claude`](https://claude.com/download) app's built-in terminal[^tk-install-terminal] or the relevant system dialog.
 
@@ -311,7 +311,7 @@ The agent can install any missing programs through [`Homebrew`](https://brew.sh/
 
 ## Investigate a missing match
 
-`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check [which files were searched](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) and whether any relevant files were excluded.
+`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check [which files were searched](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) and whether any relevant files were excluded. Even if a search skips a file, the agent can still open it directly if it has permission to read it.
 
 A text search can miss information even when it includes the right files. The agent may need a suitable tool to read a PDF, image, or saved dataset. If code builds a variable name or filename from several pieces of text, the agent should follow the code to identify it.
 
@@ -354,7 +354,7 @@ These tools can coexist on the same computer, with different projects using diff
 
 ## Capture the working environment
 
-Have the agent use the appropriate tools to record the project's language and package versions. For an existing project, it should capture the versions already in use without upgrading them. To check that the setup can be recreated, the agent should save the output from a small part of the analysis, restore the recorded software versions, and rerun that part to compare the results.
+Have the agent use the appropriate tools to record the project's language and package versions. For an existing project, it should capture the versions already in use without upgrading them. Before restoring the software, have the agent run a small part of the analysis and save its output. That gives it a result from the working setup to compare with the result from the restored setup.
 
 ::: {#prompt-restore-environment .prompt}
 > Inspect this project's software and record the language version and all required package versions without upgrading them. Choose a small, representative part of the analysis, run it with the current setup, and save the output. Recreate the recorded software setup in a separate environment, leaving the current one unchanged. Rerun the same part of the analysis and compare the outputs. Report anything that could not be restored and any differences in the results. Keep the setup files with the project and update the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records) with any additional software requirements, restoration instructions, and the outcome of the check.
@@ -456,6 +456,8 @@ Have the agent identify the data, model settings, code, and saved results each s
 
 If a step downloads data, have the agent save a copy and record that file as an input. When the copy is refreshed, the runner can identify the calculations that depend on it. If the agent does not record a required file or setting as a dependency, the runner may reuse old results even after that input changes.
 
+Suppose you update the `R` package used to fit a model. By default, `targets` can still treat the saved fit as current because it does not [track changes to functions inside installed packages](https://books.ropensci.org/targets/packages.html). If you want the results to reflect the new version, ask the agent to rerun the fit and update the tables and figures that use it.
+
 ## Use saved commands to run the pipeline {#connect-the-analysis}
 
 [`just`](https://just.systems/) is a command runner: it saves instructions for starting a task under a short name (see [Chapter 7: Give research tasks reliable commands: just](#project-commands)). The agent can set up `just all`[^tk-just-all] to start `targets` or `Snakemake`. The dependency runner then checks which results are current and runs the steps needed to update the analysis. Either dependency runner can also be used on its own. Adding `just` gives the agent a consistent front door for running the project's tasks.
@@ -545,6 +547,8 @@ After submission, have the agent confirm early progress in the actual batch: a j
 
 The background service runs submitted jobs independently of the conversation with the agent. The statistical model fits can compute without repeated LLM calls; ask the agent to summarize their saved logs and results when you return. The computer must remain awake and available; a reboot or shutdown can interrupt unfinished fits.[^tk-queue-windows] An interrupted fit may need to start again from the beginning.[^tk-queue-checkpoint]
 
+For an overnight run on a Mac, ask the agent to use the built-in tool [`caffeinate`](https://github.com/apple-oss-distributions/PowerManagement/blob/main/caffeinate/caffeinate.8) to keep the Mac awake while the fits wait in the queue and while they run. On a MacBook, plug it in and leave the lid open. The screen can turn off while the fits continue.[^tk-queue-lid]
+
 ## Review results and recover failures
 
 Ask the agent to inspect the saved results as well as each job's reported status. A job that reports success may still have saved incomplete results or written them to an unexpected location. Have the agent retain failed attempts and their logs so it can investigate what happened.
@@ -578,6 +582,8 @@ pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
+On a Mac, the agent can use `caffeinate -i pueue wait 42` to prevent idle sleep until job 42 finishes. For a batch, it lists all the job identifiers after `wait` so the Mac stays awake until the last fit finishes.
+
 `pueue wait` reports that waiting has ended; its own exit status does not establish whether the fit succeeded. The agent must inspect the recorded result and the saved analysis output. This structure of the status report was checked with `pueue` 4.0.4; the agent should check it against the installed version.[^tk-queue-r]
 
 </details>
@@ -603,6 +609,8 @@ The queue counts the whole workflow as one job even if `targets` fits both model
 [^tk-queue-setup-checks]: [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains software-version records. [Chapter 2: Control what added tools can access](#tool-access) explains why a separate queue service needs its own access checks.
 
 [^tk-queue-windows]: On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), the Linux environment used by this guide, have the agent check that both the environment and the queue service remain available. Starting a service does not itself keep WSL running.
+
+[^tk-queue-lid]: Closing the lid normally puts a MacBook to sleep. If you use it with an external display, power, keyboard, and mouse or trackpad, you can use [Apple’s closed-lid setup](https://support.apple.com/en-us/102282).
 
 [^tk-queue-checkpoint]: A *checkpoint* saves the state of an unfinished fit so the fitting software can continue from it. `pueue` can rerun the command that starts a fit, but it does not create checkpoints. Pausing a job also does not save a checkpoint that survives a reboot. [Recover work after an interruption in Chapter 8](#run-the-pipeline-unattended-when-useful) explains how to ask the agent to save progress and check that interrupted work can resume.
 
@@ -778,7 +786,7 @@ Suppose an agent prepares a script that sends published abstracts to a paid larg
 
 For the abstract-classification example, first choose the service account and acceptable spending. Ask the agent to explain how the script's API use will be billed, including whether it is covered by an existing subscription. Have it check the available credential tools and configure the chosen arrangement. For `1Password`, the agent uses its command-line tool, [`op`](https://developer.1password.com/docs/cli/get-started/). Have it install `op` through [`Homebrew`](https://brew.sh/) if needed and configure access to your account.[^tk-credentials-install]
 
-`1Password` stores the key in a *vault*, a protected collection of saved items. The agent should guide any personal steps needed to create the key with the service, save it directly in the vault, and authorize access. Keep the key out of the conversation. Ask the agent to check which service operations the key permits and which vault items the configured programs can access, limiting both to the task where supported.
+`1Password` stores the key in a *vault*, a protected collection of saved items. The agent should guide any personal steps needed to create the key with the service, save it directly in the vault, and authorize access. When the agent requests the API key, `1Password` may prompt you to approve access. Check the account and application shown in the prompt. Your approval gives `op` [access to that account](https://developer.1password.com/docs/cli/app-integration-security/#authorization-model), even when the command requests just one key. Keep the key out of the conversation. Ask the agent to check which service operations the key permits and which vault items the configured programs can access, limiting both to the task where supported.
 
 The script receives the key through an *environment variable*: a named value made available to a running program. For example, it can read `MODEL_API_KEY` without containing the key itself. The agent records a *secret reference*, which identifies the vault item and field holding the key, in the project's settings.[^tk-credentials-reference-file] When the agent starts the script through `op run`, `op` retrieves the referenced key and supplies it under that variable name.
 
@@ -812,7 +820,7 @@ If a key has been exposed, ask the agent to guide its revocation and replacement
 
 [^tk-credentials-api]: API stands for *application programming interface*: a way for one program to request operations from another. An API key identifies authorized access under a service account; it may permit reading data, making changes, or incurring charges, depending on the service and key settings.
 
-[^tk-credentials-install]: To sign in through the `1Password` desktop app, have the agent configure `op` to use the app and guide any personal authorization. `Homebrew` can install the app on macOS. In WSL2, integration with the Windows app uses the Windows `op.exe`; the agent should follow [1Password's platform-specific setup instructions](https://developer.1password.com/docs/cli/get-started/).
+[^tk-credentials-install]: To use `op` with the `1Password` desktop app on a Mac, open **Settings → Developer** and select **Integrate with 1Password CLI**. `Homebrew` can install the app on macOS. In WSL2, integration with the Windows app uses the Windows `op.exe`; the agent should follow [1Password's platform-specific setup instructions](https://developer.1password.com/docs/cli/app-integration/).
 
 [^tk-credentials-reference-file]: The agent can use an environment file, often ending in `.env`, to associate variable names with secret references. In this arrangement the file holds references, not the key values. `op run` reads the file and supplies the values to the script; see [1Password's environment-variable guidance](https://developer.1password.com/docs/cli/secrets-environment-variables/). Other `.env` files may contain secrets, so the agent should check before sharing one.
 
@@ -848,12 +856,14 @@ You complete any personal sign-in or consent. Some connections provide their own
 
 For a task that only retrieves papers, use read-only access where the integration supports it. Asking the agent to use one collection does not necessarily restrict its technical access to that collection. Have it explain the actual limits before you authorize the connection.
 
+Also ask whether the connection sends library material to another service. For example, the `Zotero` integration can [find papers on the same topic](https://github.com/54yyyu/zotero-mcp/blob/main/docs/semantic-search.md) even when their authors use different terms. By default, it processes the text on your computer. If the agent proposes using an external service for that search, have it explain which parts of your library would be sent and where.
+
 Retrieved material may be sent to a hosted large language model (LLM), which runs on the provider's computers. The *provider* is the organization operating that service. Read-only access therefore still requires deciding which material may be sent. Apply [Chapter 3: Know where your data goes](https://iqss.github.io/dss-agentic-research/chapters/research-limits.html) in *Doing Research with AI Agents* and the tool controls in [Chapter 2: Control what added tools can access](#tool-access).
 
 Once connected, have the agent retrieve a known paper from the intended collection. It should compare the title and identifier with the expected record, then read an available attachment or note. This reveals whether it can obtain the material needed for the review, beyond merely finding a reference.
 
 ::: {#prompt-connect-library .prompt}
-> Set up access to the `Zotero` collection "Exercise and sleep" from this agent session, using a suitable permitted integration. Check existing connections first and install or configure what is missing. Explain the account, library, and records the connection can access, including any ability to make changes. Use read-only permissions where supported and guide any personal sign-in or consent. Retrieve the paper I identify, confirm its title and identifier, and read its available attachment or note. Report what you could access and any missing material. Leave the library unchanged. Save the setup and reconnection instructions in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), without secret values.
+> Set up access to the `Zotero` collection "Exercise and sleep" from this agent session, using a suitable permitted integration. Check existing connections first and install or configure what is missing. Explain the account, library, and records the connection can access, including any ability to make changes. Tell me whether this setup would send any library content to another service, and if so, what it would send and where. Use read-only permissions where supported and guide any personal sign-in or consent. Retrieve the paper I identify, confirm its title and identifier, and read its available attachment or note. Report what you could access and any missing material. Leave the library unchanged. Save the setup and reconnection instructions in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), without secret values.
 :::
 
 ## Use the connection for the literature task {#connect-the-literature-task}
@@ -896,7 +906,7 @@ Suppose a results page plots population counts by region and lets readers choose
 
 Ask the agent to check which browser tools it can use in the current session and configure another only if needed. [`Playwright MCP`](https://github.com/microsoft/playwright-mcp) is one option: it makes browser operations available through the Model Context Protocol (MCP), a standard way for an agent application to discover and use tools.[^tk-browser-cli] [Chapter 13: Connect to research data and services: MCP](#service-connections) explains how to choose and configure a connection.
 
-A *browser profile* is a separate set of browser settings and saved login information. Where the integration supports it, have the agent use a separate profile for the task so it does not inherit your everyday signed-in accounts. If the task needs an account, identify which one and complete any personal sign-in yourself. The agent should explain the access it needs before using it.
+A *browser profile* is a separate set of browser settings and saved login information. For example, if you use the [`Claude in Chrome`](https://code.claude.com/docs/en/chrome) extension with your everyday profile, the agent can access sites where you’re already signed in. Where the integration supports it, have the agent use a separate profile for the task so it does not inherit your everyday signed-in accounts. If the task needs an account, identify which one and complete any personal sign-in yourself. The agent should explain the access it needs before using it.
 
 A page's contents may be sent to a hosted large language model (LLM), which runs on the service provider's computers. Decide which material may be sent using [Chapter 3: Know where your data goes](https://iqss.github.io/dss-agentic-research/chapters/research-limits.html) in *Doing Research with AI Agents*. Have the agent configure the relevant controls from [Chapter 2: Control what added tools can access](#tool-access); a separate browser profile does not itself restrict every website or action. Submitting information or changing an online record should follow your authorization for the task. Before the agent opens a page, ask it to report any request that goes beyond the task you assigned, such as a request to upload a project file while checking a figure.
 
@@ -1604,7 +1614,7 @@ Explanation and checks: [Chapter 12: Keep credentials out of research files: 1Pa
 Explanation and checks: [Chapter 13: Connect to research data and services: MCP](#prompt-connect-library).
 
 ::: {.prompt}
-> Set up access to the `Zotero` collection "Exercise and sleep" from this agent session, using a suitable permitted integration. Check existing connections first and install or configure what is missing. Explain the account, library, and records the connection can access, including any ability to make changes. Use read-only permissions where supported and guide any personal sign-in or consent. Retrieve the paper I identify, confirm its title and identifier, and read its available attachment or note. Report what you could access and any missing material. Leave the library unchanged. Save the setup and reconnection instructions in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), without secret values.
+> Set up access to the `Zotero` collection "Exercise and sleep" from this agent session, using a suitable permitted integration. Check existing connections first and install or configure what is missing. Explain the account, library, and records the connection can access, including any ability to make changes. Tell me whether this setup would send any library content to another service, and if so, what it would send and where. Use read-only permissions where supported and guide any personal sign-in or consent. Retrieve the paper I identify, confirm its title and identifier, and read its available attachment or note. Report what you could access and any missing material. Leave the library unchanged. Save the setup and reconnection instructions in the [project context files](https://iqss.github.io/dss-agentic-research/chapters/project-context.html#project-records), without secret values.
 :::
 
 :::
@@ -1896,7 +1906,7 @@ A running program can receive information from the terminal, files, or another p
 | Pipe | A connection passing one program's output to another program's input; for example, passing a status report to a tool that selects the failed jobs |
 | Exit status | A number a program returns when it finishes |
 
-A zero exit status[^tk-vocabulary-exit-status] reports success according to the program's own rules. In [Chapter 9: Keep unattended jobs moving: pueue](#review-results-and-recover-failures), the `pueue wait` command returns zero when it finishes waiting, even if the queued job failed. The agent must check the job's recorded outcome and saved research outputs.
+A zero *exit status*[^tk-vocabulary-exit-status] reports success according to the program's own rules. In [Chapter 9: Keep unattended jobs moving: pueue](#review-results-and-recover-failures), the `pueue wait` command returns zero when it finishes waiting, even if the queued job failed. The agent must check the job's recorded outcome and saved research outputs.
 
 [^tk-vocabulary-tty]: TTY abbreviates teletype, an early keyboard-and-printer terminal. In modern software, the name refers to a terminal connection, including connections created by software.
 
@@ -1904,4 +1914,4 @@ A zero exit status[^tk-vocabulary-exit-status] reports success according to the 
 
 [^tk-vocabulary-unix]: An operating system manages a computer's hardware and runs programs. Unix is an operating system whose design influenced many later systems. macOS is based on Unix, and Linux follows many of the same conventions.
 
-[^tk-vocabulary-exit-status]: An exit status is a number a program returns when it finishes. By convention, zero reports success; other numbers usually indicate an error. The number describes the program's own outcome, which may cover only one step of a research task.
+[^tk-vocabulary-exit-status]: An *exit status* is a number a program returns when it finishes. By convention, zero reports success; other numbers usually indicate an error. The number describes the program's own outcome, which may cover only one step of a research task.

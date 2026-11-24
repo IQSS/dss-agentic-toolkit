@@ -60,7 +60,7 @@ A running program can receive information from the terminal, files, or another p
 | Pipe | A connection passing one program's output to another program's input; for example, passing a status report to a tool that selects the failed jobs |
 | Exit status | A number a program returns when it finishes |
 
-A zero exit status[^tk-vocabulary-exit-status] reports success according to the program's own rules. In [Chapter 9: Keep unattended jobs moving: pueue](#review-results-and-recover-failures), the `pueue wait` command returns zero when it finishes waiting, even if the queued job failed. The agent must check the job's recorded outcome and saved research outputs.
+A zero *exit status*[^tk-vocabulary-exit-status] reports success according to the program's own rules. In [Chapter 9: Keep unattended jobs moving: pueue](#review-results-and-recover-failures), the `pueue wait` command returns zero when it finishes waiting, even if the queued job failed. The agent must check the job's recorded outcome and saved research outputs.
 
 [^tk-vocabulary-tty]: TTY abbreviates teletype, an early keyboard-and-printer terminal. In modern software, the name refers to a terminal connection, including connections created by software.
 
@@ -68,4 +68,4 @@ A zero exit status[^tk-vocabulary-exit-status] reports success according to the 
 
 [^tk-vocabulary-unix]: An operating system manages a computer's hardware and runs programs. Unix is an operating system whose design influenced many later systems. macOS is based on Unix, and Linux follows many of the same conventions.
 
-[^tk-vocabulary-exit-status]: An exit status is a number a program returns when it finishes. By convention, zero reports success; other numbers usually indicate an error. The number describes the program's own outcome, which may cover only one step of a research task.
+[^tk-vocabulary-exit-status]: An *exit status* is a number a program returns when it finishes. By convention, zero reports success; other numbers usually indicate an error. The number describes the program's own outcome, which may cover only one step of a research task.
