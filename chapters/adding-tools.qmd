@@ -18,7 +18,7 @@ Describe the task to the agent and name the tool if you have one in mind. Otherw
 > Set up a job queue for this project's simulations, using `pueue` unless a suitable tool is already available. Check existing installations and how software is managed on the computer that will run the jobs. Use `Homebrew` unless an established institutional method is more appropriate, particularly on a computing cluster. Install `Homebrew` if needed, and explain any steps I must complete myself. Configure the queue and confirm that you can submit and monitor jobs from this session.
 :::
 
-The installation command for `pueue` is `brew install pueue`; the agent runs it. You handle system password prompts and institutional authorization. Enter passwords only when prompted by the installer or system, not in the conversation.
+The agent installs `pueue` with `brew install pueue`. `Homebrew` calls the instructions for building and installing a program like `pueue` a [*formula*](https://formulae.brew.sh/formula/pueue). A *cask* tells `Homebrew` how to install software that its developer has already packaged, such as the [`Zotero`](https://www.zotero.org/) app for Mac. You handle system password prompts and institutional authorization. Enter passwords only when prompted by the installer or system, not in the conversation.
 
 The agent can install `Homebrew` using its [official installation script](https://brew.sh/). If a step needs your input, such as an administrator password, it should explain exactly what to do in the [`Claude`](https://claude.com/download) app's built-in terminal[^tk-install-terminal] or the relevant system dialog.
 

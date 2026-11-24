@@ -33,21 +33,21 @@ resources:
 
       <!-- ===== the corkboard, holding the readout ===== -->
       <g id="board">
-        <rect x="836" y="83" width="356" height="313" fill="var(--g-shadow)"/>
-        <rect x="830" y="76" width="356" height="313" fill="var(--g-cork)" stroke="var(--g-cork-frame)" stroke-width="9"/>
+        <rect x="824" y="83" width="368" height="313" fill="var(--g-shadow)"/>
+        <rect x="818" y="76" width="368" height="313" fill="var(--g-cork)" stroke="var(--g-cork-frame)" stroke-width="9"/>
         <g fill="var(--g-cork-2)">
-          <circle cx="842" cy="96" r="1.6"/><circle cx="1176" cy="120" r="1.6"/><circle cx="840" cy="212" r="1.6"/><circle cx="1177" cy="260" r="1.6"/>
+          <circle cx="830" cy="96" r="1.6"/><circle cx="1176" cy="120" r="1.6"/><circle cx="828" cy="212" r="1.6"/><circle cx="1177" cy="260" r="1.6"/>
           <circle cx="895" cy="381" r="1.6"/><circle cx="1000" cy="380" r="1.6"/><circle cx="1120" cy="381" r="1.6"/><circle cx="950" cy="85" r="1.6"/>
-          <circle cx="1090" cy="86" r="1.6"/><circle cx="841" cy="318" r="1.6"/><circle cx="1178" cy="330" r="1.6"/><circle cx="1176" cy="190" r="1.6"/>
+          <circle cx="1090" cy="86" r="1.6"/><circle cx="829" cy="318" r="1.6"/><circle cx="1178" cy="330" r="1.6"/><circle cx="1176" cy="190" r="1.6"/>
         </g>
-        <rect x="849" y="96" width="324" height="281" fill="var(--g-shadow)"/>
-        <rect class="note" x="846" y="92" width="324" height="281"/>
-        <rect class="note-edge" x="846" y="92" width="324" height="281"/>
-        <circle cx="1008" cy="100" r="6" fill="var(--g-red)"/><circle cx="1006.5" cy="98.5" r="2" fill="var(--g-red-lt)"/>
+        <rect x="837" y="96" width="336" height="281" fill="var(--g-shadow)"/>
+        <rect class="note" x="834" y="92" width="336" height="281"/>
+        <rect class="note-edge" x="834" y="92" width="336" height="281"/>
+        <circle cx="1002" cy="100" r="6" fill="var(--g-red)"/><circle cx="1000.5" cy="98.5" r="2" fill="var(--g-red-lt)"/>
         <g id="note-title" style="display:none" font-family="Questrial, Montserrat, sans-serif" font-size="40" text-anchor="middle" fill="var(--g-note-ink)">
-          <text x="1008" y="218" font-size="30">Extend Your</text><text x="1008" y="262" font-size="30">Agent's Toolkit</text>
+          <text x="1002" y="218" font-size="30">Extend Your</text><text x="1002" y="262" font-size="30">Agent's Toolkit</text>
         </g>
-        <foreignObject id="board-fo" x="862" y="115" width="292" height="256">
+        <foreignObject id="board-fo" x="850" y="115" width="304" height="256">
           <div xmlns="http://www.w3.org/1999/xhtml" id="board-home">
             <section class="garage-readout" id="readout" aria-live="polite">
               <div class="intro" id="ro-intro">
@@ -58,11 +58,19 @@ resources:
               </div>
               <div class="chapter" id="ro-chapter" hidden>
                 <button type="button" class="overview-back" id="ro-back" aria-keyshortcuts="Escape" title="Return to the overview (Esc)"><span aria-hidden="true">← </span>Back to overview</button>
-                <div class="eyebrow"><i></i><span id="ro-part"></span></div>
-                <h2 id="ro-title"></h2>
-                <p id="ro-body"></p>
-                <a class="go no-external" id="ro-link" href="chapters/choose-tools.html" hidden>Open section</a>
-                <div class="hint" id="ro-hint" hidden></div>
+                <div class="chapter-summaries" id="ro-summaries">
+                  <template id="ro-summary-template">
+                    <div class="chapter-summary">
+                      <div class="eyebrow"><i></i><span></span></div>
+                      <h2><span class="n"></span></h2>
+                      <p></p>
+                    </div>
+                  </template>
+                </div>
+                <div class="sequence-actions">
+                  <a class="go no-external" id="ro-link">Open chapter</a>
+                  <button type="button" class="sequence-preview" id="ro-next" aria-controls="ro-summaries">Preview next chapter →</button>
+                </div>
               </div>
             </section>
           </div>

@@ -263,14 +263,14 @@ document.addEventListener("DOMContentLoaded", function () {
       C(q, -22, -18, 1.8, v("mustard-2"), D); C(q, -22, 0, 1.8, v("mustard-2"), D); C(q, -22, 16, 1.8, v("mustard-2"), D);
     },
     clock(g) {
-      const t = G(g, 806, 128);
+      const t = G(g, 797, 128);
       C(t, 0, 0, 31, v("blue-dk")); C(t, 0, 0, 26, v("cream"), D);
       for (let i = 0; i < 12; i++) R(t, -0.9, -24, 1.8, i % 3 ? 3.5 : 6.5, v("dark"), Object.assign({ transform: "rotate(" + i * 30 + ")" }, D));
       S(t, "M0 0 V-16", v("dark"), 3, D); S(t, "M0 0 L12 7", v("dark"), 3, D);
       S(t, "M0 4 L-7 -19", v("red"), 1.4, D); C(t, 0, 0, 2.6, v("red"), D);
     },
     clipboard(g) {
-      const t = G(g, 806, 268);
+      const t = G(g, 797, 268);
       R(t, -27, -34, 54, 72, v("wood-dk"), { rx: 4 });
       R(t, -22, -24, 44, 57, v("cream"), D);
       [-12, 2, 16].forEach((y, i) => {
@@ -492,8 +492,8 @@ document.addEventListener("DOMContentLoaded", function () {
   tool(wall, "7", DRAW.drill, { ghost: true, tag: [652, 232] });
   tool(wall, "C", DRAW.meter, { ghost: true, tag: [722, 112] });
   tool(wall, "D", DRAW.level, { ghost: true, tag: [600, 340] });
-  tool(wall, "9", DRAW.clock, { ghost: true, tag: [806, 174] });
-  tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [806, 322] });
+  tool(wall, "9", DRAW.clock, { ghost: true, tag: [797, 174] });
+  tool(wall, "3", DRAW.clipboard, { ghost: true, tag: [797, 322] });
   cone(wall);
 
   // the bench: back legs and recess, the bench itself, what stands under it, the front legs, what stands on it
@@ -574,8 +574,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================================================================================
   const ro = document.getElementById("readout");
   const roIntro = document.getElementById("ro-intro"), roChapter = document.getElementById("ro-chapter"), roHow = document.getElementById("ro-how");
-  const roPart = document.getElementById("ro-part"), roTitle = document.getElementById("ro-title"),
-        roBody = document.getElementById("ro-body"), roLink = document.getElementById("ro-link"), roHint = document.getElementById("ro-hint");
+  const roLink = document.getElementById("ro-link"), roNext = document.getElementById("ro-next");
+  const summaries = document.getElementById("ro-summaries");
+  const template = document.getElementById("ro-summary-template");
+  // The summaries share a grid cell so the controls sit below the tallest one at this width.
+  for (const ch of sequence) {
+    const summary = template.content.firstElementChild.cloneNode(true);
+    summary.dataset.n = ch.n;
+    summary.querySelector(".eyebrow span").textContent = GROUPS[ch.group].name + " · " + ch.tool;
+    summary.querySelector(".n").textContent = chapterLabel(ch.n);
+    summary.querySelector("h2").append(ch.title);
+    summary.querySelector("p").textContent = ch.body;
+    summaries.append(summary);
+  }
   const sceneSvg = document.getElementById("scene");
   const hotLinks = [...document.querySelectorAll(".hot")];
   const primaryTools = new Map(sequence.map(ch => [ch.n, hotLinks.find(a => a.dataset.n === ch.n)]));
@@ -591,12 +602,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const label = el("text", { x: 0, y: 4, "text-anchor": "middle" }, badge);
     cueBadges.set(n, label);
   }
-  const roNext = document.createElement("a");
-  roNext.className = "sequence-next-link no-external";
-  const roActions = document.createElement("div");
-  roActions.className = "sequence-actions";
-  roActions.append(roLink, roNext);
-  roChapter.insertBefore(roActions, roHint);
   function cueSequence(ch) {
     hotLinks.forEach(a => a.classList.remove("sequence-next", "sequence-start"));
     const next = ch ? nextChapter(ch) : byN("1");
@@ -608,10 +613,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     roNext.hidden = !ch || !next;
     if (ch && next) {
-      roNext.textContent = "Next: " + fullLabel(next.n) + " →";
-      roNext.href = SITE + next.slug + ".html";
-      roNext.title = fullLabel(next.n) + ": " + next.title;
-      roNext.setAttribute("aria-label", "Next: " + fullLabel(next.n) + ": " + next.title);
+      roNext.textContent = "Preview " + fullLabel(next.n) + "\u00a0→";
+      roNext.setAttribute("aria-label", "Preview " + fullLabel(next.n) + ": " + next.title);
     }
   }
   let pinned = null, explored = null, selectedTool = null;
@@ -622,16 +625,22 @@ document.addEventListener("DOMContentLoaded", function () {
     roIntro.hidden = true; roChapter.hidden = false;
     ro.style.setProperty("--dot", GROUPS[ch.group].dot);
     ro.dataset.preview = preview ? "1" : "0";
-    roPart.textContent = GROUPS[ch.group].name + " · " + ch.tool;
-    roTitle.innerHTML = '<span class="n">' + chapterLabel(ch.n) + "</span>" + ch.title;
-    roBody.textContent = ch.body;
-    roLink.href = SITE + ch.slug + ".html"; roLink.textContent = "Open " + chapterLabel(ch.n) + " →"; roLink.hidden = preview;
-    roHint.textContent = preview ? "" : "Tap the tool again to open the section, or use the link.";
-    roHint.hidden = preview;
+    for (const summary of summaries.querySelectorAll(".chapter-summary")) {
+      summary.classList.toggle("is-current", summary.dataset.n === ch.n);
+    }
+    roLink.href = SITE + ch.slug + ".html";
+    roLink.textContent = "Open " + fullLabel(ch.n);
     document.querySelectorAll(".hot.on").forEach(a => a.classList.remove("on"));
     selectedTool.classList.add("on");
     cueSequence(ch);
   }
+  roNext.addEventListener("click", () => {
+    const next = nextChapter(explored);
+    if (!next) return;
+    pinned = next;
+    show(next, false, primaryTools.get(next.n));
+    if (roNext.hidden) roLink.focus({ preventScroll: true });
+  });
   function restore() {
     // Keep the destination visible while crossing the space between tools.
     if (explored) { show(explored, !pinned || pinned.n !== explored.n); return; }

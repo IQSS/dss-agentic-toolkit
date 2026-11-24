@@ -30,6 +30,8 @@ After submission, have the agent confirm early progress in the actual batch: a j
 
 The background service runs submitted jobs independently of the conversation with the agent. The statistical model fits can compute without repeated LLM calls; ask the agent to summarize their saved logs and results when you return. The computer must remain awake and available; a reboot or shutdown can interrupt unfinished fits.[^tk-queue-windows] An interrupted fit may need to start again from the beginning.[^tk-queue-checkpoint]
 
+For an overnight run on a Mac, ask the agent to use the built-in tool [`caffeinate`](https://github.com/apple-oss-distributions/PowerManagement/blob/main/caffeinate/caffeinate.8) to keep the Mac awake while the fits wait in the queue and while they run. On a MacBook, plug it in and leave the lid open. The screen can turn off while the fits continue.[^tk-queue-lid]
+
 ## Review results and recover failures
 
 Ask the agent to inspect the saved results as well as each job's reported status. A job that reports success may still have saved incomplete results or written them to an unexpected location. Have the agent retain failed attempts and their logs so it can investigate what happened.
@@ -63,6 +65,8 @@ pueue wait 42
 pueue status --json | jq -e '.tasks["42"].status.Done.result == "Success"'
 ```
 
+On a Mac, the agent can use `caffeinate -i pueue wait 42` to prevent idle sleep until job 42 finishes. For a batch, it lists all the job identifiers after `wait` so the Mac stays awake until the last fit finishes.
+
 `pueue wait` reports that waiting has ended; its own exit status does not establish whether the fit succeeded. The agent must inspect the recorded result and the saved analysis output. This structure of the status report was checked with `pueue` 4.0.4; the agent should check it against the installed version.[^tk-queue-r]
 
 </details>
@@ -88,6 +92,8 @@ The queue counts the whole workflow as one job even if `targets` fits both model
 [^tk-queue-setup-checks]: [Chapter 6: Preserve a software environment: rig, renv, and uv](#environments) explains software-version records. [Chapter 2: Control what added tools can access](#tool-access) explains why a separate queue service needs its own access checks.
 
 [^tk-queue-windows]: On Windows through [`WSL2`](https://learn.microsoft.com/windows/wsl/systemd), the Linux environment used by this guide, have the agent check that both the environment and the queue service remain available. Starting a service does not itself keep WSL running.
+
+[^tk-queue-lid]: Closing the lid normally puts a MacBook to sleep. If you use it with an external display, power, keyboard, and mouse or trackpad, you can use [Apple’s closed-lid setup](https://support.apple.com/en-us/102282).
 
 [^tk-queue-checkpoint]: A *checkpoint* saves the state of an unfinished fit so the fitting software can continue from it. `pueue` can rerun the command that starts a fit, but it does not create checkpoints. Pausing a job also does not save a checkpoint that survives a reboot. [Recover work after an interruption in Chapter 8](#run-the-pipeline-unattended-when-useful) explains how to ask the agent to save progress and check that interrupted work can resume.
 

@@ -35,7 +35,7 @@ The agent can install any missing programs through [`Homebrew`](https://brew.sh/
 
 ## Investigate a missing match
 
-`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check [which files were searched](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) and whether any relevant files were excluded.
+`ripgrep` ordinarily skips hidden files, whose names begin with a dot, and files covered by ignore rules. If no match appears, have the agent check [which files were searched](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md) and whether any relevant files were excluded. Even if a search skips a file, the agent can still open it directly if it has permission to read it.
 
 A text search can miss information even when it includes the right files. The agent may need a suitable tool to read a PDF, image, or saved dataset. If code builds a variable name or filename from several pieces of text, the agent should follow the code to identify it.
 

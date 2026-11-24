@@ -16,6 +16,8 @@ Have the agent identify the data, model settings, code, and saved results each s
 
 If a step downloads data, have the agent save a copy and record that file as an input. When the copy is refreshed, the runner can identify the calculations that depend on it. If the agent does not record a required file or setting as a dependency, the runner may reuse old results even after that input changes.
 
+Suppose you update the `R` package used to fit a model. By default, `targets` can still treat the saved fit as current because it does not [track changes to functions inside installed packages](https://books.ropensci.org/targets/packages.html). If you want the results to reflect the new version, ask the agent to rerun the fit and update the tables and figures that use it.
+
 ## Use saved commands to run the pipeline {#connect-the-analysis}
 
 [`just`](https://just.systems/) is a command runner: it saves instructions for starting a task under a short name (see [Chapter 7: Give research tasks reliable commands: just](#project-commands)). The agent can set up `just all`[^tk-just-all] to start `targets` or `Snakemake`. The dependency runner then checks which results are current and runs the steps needed to update the analysis. Either dependency runner can also be used on its own. Adding `just` gives the agent a consistent front door for running the project's tasks.
