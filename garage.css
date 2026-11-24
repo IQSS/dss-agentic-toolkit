@@ -187,8 +187,14 @@ body.quarto-dark .garage-readout h2 .n { color: var(--g-mustard); }
 .garage-readout .overview-back:hover { color: var(--g-ink); }
 .garage-readout .overview-back:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .garage-readout .intro h1:focus { outline: none; }
-.garage-page .creator-credit { margin: .75rem 0 0; text-align: center; font-family: var(--g-mono); font-size: 12px; color: var(--g-muted); }
+.garage-page .creator-credit { margin: 1rem 0 0; text-align: center; font-family: var(--g-mono); font-size: 12px; color: var(--g-muted); }
 .garage-page .creator-credit a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.garage-page .companion-links { display: flex; justify-content: center; align-items: baseline; gap: .5em; margin: .75rem 0 0; text-align: center; font-family: var(--g-mono); font-size: 12px; color: var(--g-muted); }
+.garage-page .companion-links a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 600px) {
+  .garage-page .companion-links { flex-direction: column; align-items: center; gap: .25em; }
+  .garage-page .companion-links [aria-hidden] { display: none; }
+}
 #board .garage-readout .overview-back {
   display: block; width: fit-content; margin-bottom: 2px; color: var(--g-note-ink-2);
 }
