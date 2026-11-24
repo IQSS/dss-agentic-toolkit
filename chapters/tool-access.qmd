@@ -97,9 +97,11 @@ The sandbox must start successfully, and the example disables unsandboxed retrie
 
 </details>
 
-## When a tool needs different access
+## When a tool needs different access {#when-a-tool-needs-different-access}
 
 If an operation is blocked, ask the agent to identify what it needs: a particular folder, a network destination, or access to the queue service. It should explain a specific change and its consequences. A command that runs outside the sandbox needs another arrangement that meets the project's access requirements.
+
+For example, installing a package may require writing to a shared software folder outside the project. If the installation fails, ask the agent which folder the installer tried to change. If the agent proposes running the installer outside the sandbox, ask what else the installer could read or change with your account’s permissions.
 
 Where stronger separation is required, the agent can help configure an approved separate environment. [Chapter 10: Run work in a separate environment: containers](#containers) explains one option. Use the institution's support route when the necessary controls cannot be established in the current environment.
 

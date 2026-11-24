@@ -138,6 +138,11 @@ resources:
     </svg>
 </div>
 <div class="garage-legend" id="legend"></div>
+<nav class="companion-links" aria-label="Companion resources">
+  <span>Use these tools in a study with the <a href="https://iqss.github.io/dss-agentic-research/" class="no-external">research guide</a></span>
+  <span aria-hidden="true">·</span>
+  <span>Browse the <a href="https://iqss.github.io/dss-agent-skills/" class="no-external">DSS agent skills library</a></span>
+</nav>
 <p class="creator-credit">Created by <a href="https://stevenworthington.org/" class="no-external">Steven Worthington</a></p>
 <script src="garage.js"></script>
 ```

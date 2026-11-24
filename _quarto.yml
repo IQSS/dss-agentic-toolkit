@@ -121,6 +121,7 @@ chapter-map:
 anchor-map:
   "adding-tools": /chapters/adding-tools.qmd
   "agent-execution-terms": /chapters/parallel-work.qmd#agent-execution-terms
+  "ask-the-agent-to-configure-and-check-access": /chapters/tool-access.qmd#ask-the-agent-to-configure-and-check-access
   "ask-the-agent-to-install-the-tool": /chapters/adding-tools.qmd#ask-the-agent-to-install-the-tool
   "browser-work": /chapters/browser-work.qmd
   "check-what-reruns": /chapters/pipeline-dependencies.qmd#check-what-reruns
@@ -192,6 +193,7 @@ anchor-map:
   "tool-access": /chapters/tool-access.qmd
   "troubleshooting": /chapters/troubleshooting.qmd
   "version-control": /chapters/version-control.qmd
+  "when-a-tool-needs-different-access": /chapters/tool-access.qmd#when-a-tool-needs-different-access
   "working-environment": /chapters/working-environment.qmd
 
 daily-use:
