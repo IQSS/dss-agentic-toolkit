@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const byN = n => CH.find(c => c.n === n);
   // Reading order is independent of the SVG painting order.
   const sequence = [...CH].sort((a, b) => a.n.localeCompare(b.n, "en", { numeric: true }));
-  const nextChapter = ch => sequence[sequence.indexOf(ch) + 1];
+  const nextChapter = ch => ch ? sequence[sequence.indexOf(ch) + 1] : sequence[0];
   const fullLabel = n => /^[A-Z]$/.test(n) ? "Appendix " + n : "Chapter " + n;
 
   // ---- svg helpers ----
@@ -604,15 +604,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   function cueSequence(ch) {
     hotLinks.forEach(a => a.classList.remove("sequence-next", "sequence-start"));
-    const next = ch ? nextChapter(ch) : byN("1");
+    const next = nextChapter(ch);
     sceneSvg.dataset.sequenceStart = ch ? "0" : "1";
     sceneSvg.dataset.activeChapter = ch ? ch.n : "";
     if (next) {
       primaryTools.get(next.n).classList.add(ch ? "sequence-next" : "sequence-start");
       cueBadges.get(next.n).textContent = (ch ? "Next" : "Start") + " · " + next.n;
     }
-    roNext.hidden = !ch || !next;
-    if (ch && next) {
+    roLink.inert = !ch;
+    roNext.hidden = !next;
+    if (next) {
       roNext.textContent = "Preview " + fullLabel(next.n) + "\u00a0→";
       roNext.setAttribute("aria-label", "Preview " + fullLabel(next.n) + ": " + next.title);
     }
@@ -622,7 +623,7 @@ document.addEventListener("DOMContentLoaded", function () {
     explored = ch;
     selectedTool = toolLink || selectedTool || primaryTools.get(ch.n);
     pose("point");
-    roIntro.hidden = true; roChapter.hidden = false;
+    roIntro.inert = true; roChapter.inert = false;
     ro.style.setProperty("--dot", GROUPS[ch.group].dot);
     ro.dataset.preview = preview ? "1" : "0";
     for (const summary of summaries.querySelectorAll(".chapter-summary")) {
@@ -646,7 +647,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (explored) { show(explored, !pinned || pinned.n !== explored.n); return; }
     pose("rest");
     ro.dataset.preview = "0"; ro.style.setProperty("--dot", v("mustard"));
-    roChapter.hidden = true; roIntro.hidden = false;
+    roChapter.inert = true; roIntro.inert = false;
   }
   function resetOverview() {
     const moveFocus = ro.contains(document.activeElement) || hotLinks.includes(document.activeElement);
