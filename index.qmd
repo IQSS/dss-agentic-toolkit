@@ -53,7 +53,8 @@ resources:
               <div class="intro" id="ro-intro">
                 <h1 tabindex="-1">Extend Your Agent's Toolkit</h1>
                 <p>Add tools when your research needs them. Run, check, and reproduce the work.</p>
-                <p class="how"><b>Each tool opens a chapter.</b> <span id="ro-how">Hover to explore; click to open. The blue glow marks the next chapter.</span></p>
+                <p class="how how-diagram"><b>Each tool opens a chapter.</b> <span id="ro-how">Hover to explore; click to open. The blue glow marks the next chapter.</span></p>
+                <p class="how how-phone">Tap <b>Preview Chapter 1</b> below to see what it covers. Then tap <b>Open</b> to read the chapter or <b>Preview</b> to see the next summary.</p>
               </div>
               <div class="chapter" id="ro-chapter" inert>
                 <button type="button" class="overview-back" id="ro-back" aria-keyshortcuts="Escape" title="Return to the overview (Esc)"><span aria-hidden="true">← </span>Back to overview</button>

@@ -306,10 +306,24 @@ body.quarto-dark { --g-sequence: #8bd6ef; --g-sequence-halo: #438aab; --g-sequen
   margin-top: 2px; line-height: 1.35; white-space: nowrap;
 }
 #board .sequence-preview { font-size: 13px; color: #296f92; }
+.how-phone { display: none; }
 @media (max-width: 760px) {
-  .sequence-actions { align-items: center; }
-  .sequence-actions a, .sequence-preview { display: inline-flex; align-items: center; min-height: 44px; }
-  .sequence-preview { justify-content: flex-end; }
+  .how-diagram { display: none; }
+  .how-phone { display: block; }
+  .garage-readout { container-type: inline-size; }
+  .sequence-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
+  .sequence-actions a, .sequence-preview {
+    display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap;
+  }
+  .sequence-preview { width: auto; margin-inline-start: auto; }
+  /* Reserve two rows when the longest chapter and appendix labels cannot share one. */
+  @container (max-width: 345px) {
+    .sequence-actions { display: grid; grid-template-columns: 1fr; }
+  }
+}
+@media (max-width: 480px) {
+  .garage-page { padding-inline: 10px; }
+  .garage-readout { padding-inline: 10px; }
 }
 .sequence-preview[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
