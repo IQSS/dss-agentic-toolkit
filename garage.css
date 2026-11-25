@@ -310,6 +310,7 @@ body.quarto-dark { --g-sequence: #8bd6ef; --g-sequence-halo: #438aab; --g-sequen
 @media (max-width: 760px) {
   .how-diagram { display: none; }
   .how-phone { display: block; }
+  .garage-readout .intro .how-phone { margin-top: 8px; border-top: 1px solid var(--g-rule); padding-top: 8px; }
   .garage-readout { container-type: inline-size; }
   .sequence-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
   .sequence-actions a, .sequence-preview {
